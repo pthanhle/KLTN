@@ -4,10 +4,86 @@
       "products": "Products",
       "about": "About Us",
       "cart": "Cart",
-      "login": "Login"
+      "login": "Login",
+      "register": "Register",
+      "home": "Home",
+      "categories": "Categories",
+      "services": "Services & Booking",
+      "tracking": "Tracking Progress",
+      "contact": "Contact",
+      "profile": "My Profile",
+      "logout": "Logout"
     },
     "footer": {
-      "copyright": "© 2026 Store Name. All rights reserved."
+      "copyright": "© 2026 TT AUTO Premium Service. All rights reserved.",
+      "aboutText": "Premium authorized showroom and service center for luxury cars in Vietnam.",
+      "discovery": {
+        "title": "Discover",
+        "sedan": "Sedan Series",
+        "suv": "SUV Series",
+        "sport": "Sports Segment",
+        "testDrive": "Test Drive & Experience",
+        "used": "Pre-owned Vehicles"
+      },
+      "support": {
+        "title": "Support",
+        "booking": "Book Maintenance",
+        "serviceCenter": "Service Center",
+        "parts": "Genuine Parts",
+        "care": "Professional Car Care",
+        "warranty": "Warranty Policy"
+      },
+      "contact": {
+        "title": "Connect",
+        "address": "123 Ngoc Khanh Street, Ba Dinh District, Hanoi"
+      },
+      "legal": {
+        "terms": "Terms of Use",
+        "privacy": "Privacy Policy",
+        "sitemap": "Sitemap"
+      }
+    },
+    "home": {
+      "hero": {
+        "badge": "New Arrival 2026",
+        "titlePart1": "Masterpiece ",
+        "titlePart2": "Of Speed.",
+        "description": "Experience the ultimate standard of luxury automotive service in Vietnam. Where the passion for speed meets the art of dedicated service.",
+        "viewCarsBtn": "View Inventory",
+        "bookServiceBtn": "Book Service"
+      },
+      "brands": {
+        "title": "OUR PARTNER BRANDS"
+      },
+      "featuredCars": {
+        "title": "Featured Collections.",
+        "subtitle": "Masterpieces of the streets."
+      },
+      "recentHistory": {
+        "title": "Recently Viewed",
+        "subtitle": "Return to your supercar passion",
+        "viewAllBtn": "View History \u2192"
+      },
+      "exclusiveServices": {
+        "title": "Exclusive Services",
+        "subtitle": "We take care of your car with the strictest standards from top technicians.",
+        "services": {
+            "s1_title": "Intensive Maintenance",
+            "s1_desc": "Modern diagnostic systems, synchronized international standard processes exclusively for luxury cars.",
+            "s2_title": "Care & Detailing",
+            "s2_desc": "Professional detailing, Ceramic coating and PPF paint protection film from the world's leading brands.",
+            "s3_title": "Genuine Parts",
+            "s3_desc": "Directly imported parts warehouse, guaranteeing 100% originality and absolute safety for your journey."
+        }
+      },
+      "tradeIn": {
+        "badge": "Supercar Trade-in Program",
+        "title1": "Upgrade the Luxury.",
+        "title2": "Easier Than",
+        "title3": "Ever Before.",
+        "description": "We provide used car purchasing solutions with the best market prices and flexible financial support so you can own a new masterpiece immediately.",
+        "appraiseBtn": "Appraise your car now"
+      }
     }
   },
   "admin": {
@@ -27,7 +103,12 @@
       "greeting": "Hello, Administrator"
     },
     "actions": {
-      "logout": "Logout"
+      "logout": "Logout",
+      "profile": "Profile Info",
+      "settings": "Settings"
     }
+  },
+  "messages": {
+    "logoutSuccess": "Logout successful"
   }
 }

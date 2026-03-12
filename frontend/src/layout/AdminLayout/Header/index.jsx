@@ -1,6 +1,7 @@
 import { Dropdown } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { logout } from '../../../store/slices/authSlice';
 import HeaderUtilities from '../../../components/HeaderUtilities';
 import { 
@@ -14,6 +15,7 @@ import {
 const Header = ({ collapsed, onToggle }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { t } = useTranslation('layout');
     
     // User Data from Redux
     const { user } = useSelector((state) => state.auth);
@@ -109,7 +111,7 @@ const Header = ({ collapsed, onToggle }) => {
                                 label: (
                                     <div className="flex items-center space-x-3 px-2 py-1 text-sm text-slate-600 dark:text-slate-400 group/item">
                                         <User className="w-4 h-4 group-hover/item:text-yellow-600 dark:group-hover/item:text-premium-gold" />
-                                        <span>Thông tin cá nhân</span>
+                                        <span>{t('admin.actions.profile')}</span>
                                     </div>
                                 )
                             },
@@ -118,7 +120,7 @@ const Header = ({ collapsed, onToggle }) => {
                                 label: (
                                     <div className="flex items-center space-x-3 px-2 py-1 text-sm text-slate-600 dark:text-slate-400 group/item">
                                         <Settings className="w-4 h-4 group-hover/item:text-yellow-600 dark:group-hover/item:text-premium-gold" />
-                                        <span>Cài đặt</span>
+                                        <span>{t('admin.actions.settings')}</span>
                                     </div>
                                 )
                             },
@@ -128,7 +130,7 @@ const Header = ({ collapsed, onToggle }) => {
                                 label: (
                                     <div className="flex items-center space-x-3 px-2 py-1 text-sm text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors">
                                         <LogOut className="w-4 h-4" />
-                                        <span className="font-bold">Đăng xuất</span>
+                                        <span className="font-bold">{t('admin.actions.logout')}</span>
                                     </div>
                                 ),
                                 onClick: handleLogout

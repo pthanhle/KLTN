@@ -1,16 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-
-const NAV_LINKS = [
-    { name: 'Trang chủ', path: '/' },
-    { name: 'Danh mục Xe', path: '/categories', hasDropdown: true },
-    { name: 'Dịch vụ & Đặt lịch', path: '/services' },
-    { name: 'Theo dõi tiến độ', path: '/tracking' },
-    { name: 'Liên hệ', path: '/contact' },
-];
+import { useTranslation } from 'react-i18next';
 
 const Navigation = () => {
     const location = useLocation();
+    const { t } = useTranslation('layout');
+
+    const NAV_LINKS = [
+        { name: t('customer.header.home'), path: '/' },
+        { name: t('customer.header.categories'), path: '/categories', hasDropdown: true },
+        { name: t('customer.header.services'), path: '/services' },
+        { name: t('customer.header.tracking'), path: '/tracking' },
+        { name: t('customer.header.contact'), path: '/contact' },
+    ];
 
     return (
         <nav className="flex items-center gap-8 xl:gap-10">
@@ -22,8 +24,8 @@ const Navigation = () => {
                         to={link.path}
                         className={`text-[13px] font-bold flex items-center gap-1.5 transition-colors relative group py-2 ${
                             isActive 
-                            ? 'text-yellow-500 dark:text-yellow-500' 
-                            : 'text-slate-800 dark:text-slate-300 hover:text-yellow-500 dark:hover:text-yellow-400'
+                            ? '!text-yellow-500 dark:!text-yellow-500' 
+                            : '!text-slate-900 dark:!text-white hover:!text-yellow-500 dark:hover:!text-yellow-400'
                         }`}
                     >
                         {link.name}

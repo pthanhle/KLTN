@@ -4,10 +4,86 @@
       "products": "Sản phẩm",
       "about": "Giới thiệu",
       "cart": "Giỏ hàng",
-      "login": "Đăng nhập"
+      "login": "Đăng nhập",
+      "register": "Đăng ký",
+      "home": "Trang chủ",
+      "categories": "Danh mục Xe",
+      "services": "Dịch vụ & Đặt lịch",
+      "tracking": "Theo dõi tiến độ",
+      "contact": "Liên hệ",
+      "profile": "Hồ sơ của tôi",
+      "logout": "Đăng xuất"
     },
     "footer": {
-      "copyright": "© 2026 Store Name. Bảo lưu mọi quyền."
+      "copyright": "© 2026 TT AUTO Premium Service. Tất cả quyền được bảo lưu.",
+      "aboutText": "Showroom và Trung tâm dịch vụ ủy quyền cao cấp dành cho các dòng xe sang tại Việt Nam.",
+      "discovery": {
+        "title": "Khám Phá",
+        "sedan": "Dòng xe Sedan",
+        "suv": "Dòng xe SUV",
+        "sport": "Phân khúc Thể Thao",
+        "testDrive": "Thử lái & Trải nghiệm",
+        "used": "Xe đã qua sử dụng"
+      },
+      "support": {
+        "title": "Hỗ Trợ",
+        "booking": "Đặt lịch bảo dưỡng",
+        "serviceCenter": "Trung tâm dịch vụ",
+        "parts": "Phụ tùng chính hãng",
+        "care": "Chăm sóc xe chuyên nghiệp",
+        "warranty": "Chính sách bảo hành"
+      },
+      "contact": {
+        "title": "Kết Nối",
+        "address": "123 Đường Ngọc Khánh, Quận Ba Đình, Hà Nội"
+      },
+      "legal": {
+        "terms": "Điều khoản sử dụng",
+        "privacy": "Chính sách bảo mật",
+        "sitemap": "Sitemap"
+      }
+    },
+    "home": {
+      "hero": {
+        "badge": "New Arrival 2026",
+        "titlePart1": "Tuyệt Tác ",
+        "titlePart2": "Phân Khối.",
+        "description": "Trải nghiệm chuẩn mực dịch vụ ô tô thượng lưu hàng đầu Việt Nam. Nơi niềm đam mê tốc độ gặp gỡ nghệ thuật phục vụ tận tâm.",
+        "viewCarsBtn": "Xem dòng xe",
+        "bookServiceBtn": "Đặt lịch dịch vụ"
+      },
+      "brands": {
+        "title": "THƯƠNG HIỆU ĐỐI TÁC"
+      },
+      "featuredCars": {
+        "title": "Các dòng xe nổi bật.",
+        "subtitle": "Kiệt tác đường phố."
+      },
+      "recentHistory": {
+        "title": "Lịch sử đã xem gần đây",
+        "subtitle": "Trở lại đam mê siêu xe",
+        "viewAllBtn": "Xem lịch sử \u2192"
+      },
+      "exclusiveServices": {
+        "title": "Dịch Vụ Đặc Quyền",
+        "subtitle": "Chúng tôi chăm sóc chiếc xe của bạn bằng tiêu chuẩn khắt khe nhất từ những kỹ thuật viên hàng đầu.",
+        "services": {
+            "s1_title": "Bảo Dưỡng Chuyên Sâu",
+            "s1_desc": "Hệ thống chuẩn đoán hiện đại, đồng bộ quy trình chuẩn quốc tế dành riêng cho các dòng xe hạng sang.",
+            "s2_title": "Chăm Sóc & Làm Đẹp",
+            "s2_desc": "Detailing chuyên nghiệp, phủ Ceramic và dán phim bảo vệ sơn PPF từ những thương hiệu hàng đầu thế giới.",
+            "s3_title": "Phụ Tùng Chính Hãng",
+            "s3_desc": "Kho phụ tùng nhập khẩu trực tiếp, đảm bảo 100% nguyên bản và an toàn tuyệt đối cho hành trình của bạn."
+        }
+      },
+      "tradeIn": {
+        "badge": "Chương Trình Thu Đổi Siêu Xe",
+        "title1": "Lên Đời Xe Sang.",
+        "title2": "Dễ Dàng Hơn",
+        "title3": "Bao Giờ Hết.",
+        "description": "Chúng tôi cung cấp giải pháp thu mua xe cũ với giá tốt nhất thị trường và hỗ trợ tài chính linh hoạt để bạn sở hữu siêu phẩm mới ngay lập tức.",
+        "appraiseBtn": "Định giá xe của bạn ngay"
+      }
     }
   },
   "admin": {
@@ -27,7 +103,12 @@
       "greeting": "Xin chào, Quản trị viên"
     },
     "actions": {
-      "logout": "Đăng xuất"
+      "logout": "Đăng xuất",
+      "profile": "Thông tin cá nhân",
+      "settings": "Cài đặt"
     }
+  },
+  "messages": {
+    "logoutSuccess": "Đăng xuất thành công"
   }
 }

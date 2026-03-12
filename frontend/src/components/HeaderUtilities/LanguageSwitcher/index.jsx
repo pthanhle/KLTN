@@ -11,40 +11,40 @@ const LanguageSwitcher = () => {
     };
 
     const items = [
-        { 
-            key: 'en', 
+        {
+            key: 'en',
             label: (
-                <LanguageMenuItem 
-                    flagUrl="https://flagcdn.com/w20/us.png" 
-                    flagAlt="English (US)" 
-                    label="English (EN)" 
-                    labelClass={i18n.language === 'en' 
-                        ? "text-sm font-bold dark:text-premium-gold text-blue-600" 
-                        : "text-sm font-medium dark:text-slate-400 text-slate-500"} 
+                <LanguageMenuItem
+                    flagUrl="https://flagcdn.com/w20/us.png"
+                    flagAlt="English (US)"
+                    label="English (EN)"
+                    labelClass={i18n.language === 'en'
+                        ? "text-sm font-bold dark:text-premium-gold text-yellow-600"
+                        : "text-sm font-medium dark:text-slate-400 text-slate-500"}
                 />
-            ), 
-            onClick: () => changeLanguage('en') 
+            ),
+            onClick: () => changeLanguage('en')
         },
-        { 
-            key: 'vi', 
+        {
+            key: 'vi',
             label: (
-                <LanguageMenuItem 
-                    flagUrl="https://flagcdn.com/w20/vn.png" 
-                    flagAlt="Tiếng Việt (VN)" 
-                    label="Tiếng Việt (VI)" 
-                    labelClass={i18n.language === 'vi' 
-                        ? "text-sm font-bold dark:text-premium-gold text-blue-600" 
-                        : "text-sm font-medium dark:text-slate-400 text-slate-500"} 
+                <LanguageMenuItem
+                    flagUrl="https://flagcdn.com/w20/vn.png"
+                    flagAlt="Tiếng Việt (VN)"
+                    label="Tiếng Việt (VI)"
+                    labelClass={i18n.language === 'vi'
+                        ? "text-sm font-bold dark:text-premium-gold text-yellow-600"
+                        : "text-sm font-medium dark:text-slate-400 text-slate-500"}
                 />
-            ), 
-            onClick: () => changeLanguage('vi') 
+            ),
+            onClick: () => changeLanguage('vi')
         }
     ];
 
     return (
-        <Dropdown 
-            menu={{ items }} 
-            placement="bottomRight" 
+        <Dropdown
+            menu={{ items }}
+            placement="bottomRight"
             trigger={['click']}
             overlayClassName="dark:[&_.ant-dropdown-menu]:bg-[#141416]/95 dark:[&_.ant-dropdown-menu]:backdrop-blur-xl dark:[&_.ant-dropdown-menu]:border dark:[&_.ant-dropdown-menu]:border-white/10 dark:[&_.ant-dropdown-menu]:shadow-2xl [&_.ant-dropdown-menu]:rounded-xl font-sans"
         >

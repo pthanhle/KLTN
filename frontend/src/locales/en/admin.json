@@ -1,0 +1,18 @@
+{
+  "customers": {
+    "title": "Customer Management",
+    "breadcrumb": "Customer Management",
+    "addNew": "Add New Customer",
+    "searchPlaceholder": "Search customers by name, email...",
+    "filter": "Filter",
+    "export": "Export",
+    "showing": "Showing {{start}} to {{end}} of {{total}} customers",
+    "table": {
+      "customer": "CUSTOMER",
+      "phone": "PHONE NUMBER",
+      "status": "STATUS",
+      "joinDate": "JOIN DATE",
+      "actions": "ACTIONS"
+    }
+  }
+}

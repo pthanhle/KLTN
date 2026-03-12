@@ -1,0 +1,33 @@
+{
+  "customer": {
+    "header": {
+      "products": "Sản phẩm",
+      "about": "Giới thiệu",
+      "cart": "Giỏ hàng",
+      "login": "Đăng nhập"
+    },
+    "footer": {
+      "copyright": "© 2026 Store Name. Bảo lưu mọi quyền."
+    }
+  },
+  "admin": {
+    "sider": {
+      "dashboard": "Tổng quan",
+      "products": "Sản phẩm",
+      "categories": "Danh mục",
+      "customers": "Khách hàng",
+      "orders": "Đơn hàng",
+      "service-packages": "Gói dịch vụ",
+      "staff": "Nhân viên",
+      "promotions": "Khuyến mãi",
+      "tradein-vehicles": "Thu cũ đổi mới",
+      "revenue-reports": "Báo cáo doanh thu"
+    },
+    "header": {
+      "greeting": "Xin chào, Quản trị viên"
+    },
+    "actions": {
+      "logout": "Đăng xuất"
+    }
+  }
+}

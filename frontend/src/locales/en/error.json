@@ -1,0 +1,22 @@
+{
+  "401": {
+    "title": "401 Unauthorized",
+    "subTitle": "You are not logged in. Please log in to continue.",
+    "action": "Login Now"
+  },
+  "403": {
+    "title": "403 Forbidden",
+    "subTitle": "Sorry, you are not authorized to access this page.",
+    "action": "Back Home"
+  },
+  "404": {
+    "title": "404 Not Found",
+    "subTitle": "Sorry, the page you visited does not exist or has been removed.",
+    "action": "Back Home"
+  },
+  "500": {
+    "title": "500 Server Error",
+    "subTitle": "Sorry, the server is encountering an issue. Please try again later.",
+    "action": "Go Back"
+  }
+}

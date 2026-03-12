@@ -1,0 +1,18 @@
+{
+  "customers": {
+    "title": "Quản lý khách hàng",
+    "breadcrumb": "Quản lý khách hàng",
+    "addNew": "Thêm khách hàng mới",
+    "searchPlaceholder": "Tìm kiếm theo tên, email...",
+    "filter": "Lọc",
+    "export": "Xuất file",
+    "showing": "Hiển thị {{start}} tới {{end}} trong tổng số {{total}} khách hàng",
+    "table": {
+      "customer": "KHÁCH HÀNG",
+      "phone": "SỐ ĐIỆN THOẠI",
+      "status": "TRẠNG THÁI",
+      "joinDate": "NGÀY THAM GIA",
+      "actions": "THAO TÁC"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "401": {
+    "title": "401 Unauthorized",
+    "subTitle": "Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.",
+    "action": "Đăng nhập ngay"
+  },
+  "403": {
+    "title": "403 Forbidden",
+    "subTitle": "Xin lỗi, bạn không đủ thẩm quyền để truy cập trang này.",
+    "action": "Về trang chủ"
+  },
+  "404": {
+    "title": "404 Not Found",
+    "subTitle": "Xin lỗi, trang bạn tìm kiếm không tồn tại hoặc đã bị xóa.",
+    "action": "Về trang chủ"
+  },
+  "500": {
+    "title": "500 Server Error",
+    "subTitle": "Xin lỗi, máy chủ đang gặp sự cố. Vui lòng thử lại sau.",
+    "action": "Trở lại"
+  }
+}

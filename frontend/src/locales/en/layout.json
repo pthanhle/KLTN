@@ -1,0 +1,33 @@
+{
+  "customer": {
+    "header": {
+      "products": "Products",
+      "about": "About Us",
+      "cart": "Cart",
+      "login": "Login"
+    },
+    "footer": {
+      "copyright": "© 2026 Store Name. All rights reserved."
+    }
+  },
+  "admin": {
+    "sider": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "categories": "Categories",
+      "customers": "Customers",
+      "orders": "Orders",
+      "service-packages": "Service Packages",
+      "staff": "Staff",
+      "promotions": "Promotions",
+      "tradein-vehicles": "Trade-in Vehicles",
+      "revenue-reports": "Revenue Reports"
+    },
+    "header": {
+      "greeting": "Hello, Administrator"
+    },
+    "actions": {
+      "logout": "Logout"
+    }
+  }
+}

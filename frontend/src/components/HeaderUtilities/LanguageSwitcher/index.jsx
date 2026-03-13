@@ -46,7 +46,7 @@ const LanguageSwitcher = () => {
             menu={{ items }}
             placement="bottomRight"
             trigger={['click']}
-            overlayClassName="dark:[&_.ant-dropdown-menu]:bg-[#141416]/95 dark:[&_.ant-dropdown-menu]:backdrop-blur-xl dark:[&_.ant-dropdown-menu]:border dark:[&_.ant-dropdown-menu]:border-white/10 dark:[&_.ant-dropdown-menu]:shadow-2xl [&_.ant-dropdown-menu]:rounded-xl font-sans"
+            classNames={{ root: "dark:[&_.ant-dropdown-menu]:bg-[#141416]/95 dark:[&_.ant-dropdown-menu]:backdrop-blur-xl dark:[&_.ant-dropdown-menu]:border dark:[&_.ant-dropdown-menu]:border-white/10 dark:[&_.ant-dropdown-menu]:shadow-2xl [&_.ant-dropdown-menu]:rounded-xl font-sans" }}
         >
             <div>
                 <LanguageButton currentLang={i18n.language} />

@@ -1,0 +1,73 @@
+{
+    "titleNormal": "Khám Phá",
+    "titleHighlight": "Tuyệt Tác",
+    "subtitle": "Tìm kiếm và sở hữu những dòng xe hạng sang từ các thương hiệu hàng đầu thế giới. Trải nghiệm sự đẳng cấp tại TT AUTO.",
+    "searchBrandPlaceholder": "Tìm tên hãng xe (vd: Mercedes, BMW...)",
+    "availableCars": "{{count}} xe sẵn có",
+    "all": "ALL",
+    "noBrandsFound": "Không tìm thấy thương hiệu nào",
+    "noBrandsDesc": "Vui lòng thử lại với từ khóa hoặc chữ cái khác.",
+
+    "cars": {
+        "titleAll": "Tất Cả Dòng Xe",
+        "titleBrand": "Khám Phá",
+        "description": "Đỉnh cao của sự sang trọng và công nghệ. Tìm kiếm chiếc xe lý tưởng của bạn trong bộ sưu tập chọn lọc của TT AUTO.",
+        "filters": {
+            "searchPlaceholder": "Tìm kiếm mẫu xe...",
+            "brandsTitle": "Thương Hiệu",
+            "searchBrandPlaceholder": "Tìm thương hiệu...",
+            "allBrands": "Tất cả thương hiệu",
+            "priceTitle": "Khoảng Giá (VND)",
+            "from": "Từ",
+            "to": "Đến",
+            "unit": "Đơn vị: VNĐ",
+            "bodyStylesTitle": "Kiểu Dáng",
+            "applyFilter": "Lọc Kết Quả",
+            "resetFilter": "Bỏ lọc"
+        },
+        "sort": {
+            "label": "SẮP XẾP:",
+            "newest": "Mới nhất",
+            "priceAsc": "Giá: Thấp đến Cao",
+            "priceDesc": "Giá: Cao đến Thấp"
+        },
+        "displaying": "Hiển thị",
+        "outOf": "trên",
+        "carsCount": "xe",
+        "card": {
+            "engine": "ĐỘNG CƠ",
+            "fuel": "NHIÊN LIỆU",
+            "seats": "CHỖ NGỒI",
+            "priceLabel": "GIÁ NIÊM YẾT",
+            "detailBtn": "Xem chi tiết",
+            "year": "Sản xuất",
+            "odo": "Odo",
+            "newCar": "Xe mới"
+        },
+        "noCarsFound": "Không tìm thấy xe phù hợp",
+        "noCarsDesc": "Vui lòng điều chỉnh lại bộ lọc hoặc từ khóa tìm kiếm."
+    },
+    "detail": {
+        "priceColor": "Giá & màu sắc",
+        "features": "Tính năng nổi bật",
+        "design": "Thiết kế",
+        "performance": "Vận hành",
+        "technology": "Công nghệ",
+        "specs": "Thông số kỹ thuật chi tiết",
+        "gallery": "Thư viện ảnh",
+        "estimateBtn": "DỰ TOÁN CHI PHÍ",
+        "testDriveBtn": "ĐĂNG KÝ LÁI THỬ",
+        "retailPrice": "Giá bán lẻ đề xuất",
+        "photos": "Hình ảnh",
+        "videos": "Video",
+        "swipeToRotate": "Vuốt để xoay",
+        "zoomIn": "Phóng to",
+        "colors": {
+            "black": "Đen",
+            "gray": "Xám",
+            "white": "Trắng",
+            "red": "Đỏ",
+            "blue": "Xanh"
+        }
+    }
+}

@@ -6,21 +6,22 @@ import UserActions from './components/UserActions';
 const Header = () => {
     return (
         <header className="sticky top-0 z-50 w-full bg-white dark:bg-[#0b0f19] border-b border-gray-200 dark:border-slate-800/80 shadow-sm transition-colors duration-300">
-            <div className="container mx-auto max-w-[1400px]">
-                <div className="flex h-[72px] items-center justify-between px-4 lg:px-6 xl:px-8">
+            <div className="w-full px-4 md:px-6 lg:px-10 xl:px-16 2xl:px-24">
+                <div className="flex h-[72px] items-center justify-between">
                     
-                    {/* Left & Center: Logo + Navigation Links */}
-                    <div className="flex items-center xl:gap-16 lg:gap-8 gap-4 h-full">
+
+                    {/* Left: Logo */}
+                    <div className="flex-shrink-0 flex items-center h-full mr-4">
                         <Logo />
+                    </div>
                         
-                        {/* Center: Desktop Navigation */}
-                        <div className="hidden lg:flex h-full items-center">
-                            <Navigation />
-                        </div>
+                    {/* Center: Desktop Navigation */}
+                    <div className="hidden lg:flex flex-1 justify-center h-full items-center">
+                        <Navigation />
                     </div>
 
                     {/* Right: User Actions, Meta Links & Authentication */}
-                    <div className="hidden md:flex items-center">
+                    <div className="hidden md:flex flex-shrink-0 items-center ml-4">
                         <UserActions />
                     </div>
 

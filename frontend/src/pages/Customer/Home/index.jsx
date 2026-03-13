@@ -14,7 +14,8 @@ const Home = () => {
         brands,
         handleBookService,
         handleViewCars,
-        handleTradeIn
+        handleTradeIn,
+        isLoading
     } = useHomeLogic();
 
     return (
@@ -26,9 +27,9 @@ const Home = () => {
 
             <BrandsSection brands={brands} />
 
-            <FeaturedCars cars={featuredCars} />
+            <FeaturedCars cars={featuredCars} isLoading={isLoading} />
 
-            <RecentHistory history={recentHistory} />
+            <RecentHistory history={recentHistory} isLoading={isLoading} />
 
             <ExclusiveServices />
 

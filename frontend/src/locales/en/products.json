@@ -1,0 +1,71 @@
+{
+    "titleNormal": "Discover",
+    "titleHighlight": "Masterpieces",
+    "subtitle": "Search and own luxury vehicles from the world's top brands. Experience prestige at TT AUTO.",
+    "searchBrandPlaceholder": "Search brand name (e.g., Mercedes, BMW...)",
+    "availableCars": "{{count}} available cars",
+    "all": "ALL",
+    "noBrandsFound": "No brands found",
+    "noBrandsDesc": "Please try again with a different keyword or letter.",
+
+    "cars": {
+        "titleAll": "All Vehicles",
+        "titleBrand": "Discover",
+        "description": "The pinnacle of luxury and technology. Find your perfect vehicle in TT AUTO's curated collection.",
+        "filters": {
+            "searchPlaceholder": "Search car model...",
+            "brandsTitle": "Brands",
+            "searchBrandPlaceholder": "Search brand...",
+            "allBrands": "All brands",
+            "priceTitle": "Price Range (VND)",
+            "from": "From",
+            "to": "To",
+            "unit": "Unit: VND",
+            "bodyStylesTitle": "Body Styles",
+            "applyFilter": "Apply Filter",
+            "resetFilter": "Reset"
+        },
+        "sort": {
+            "label": "SORT BY:",
+            "newest": "Newest",
+            "priceAsc": "Price: Low to High",
+            "priceDesc": "Price: High to Low"
+        },
+        "displaying": "Showing",
+        "outOf": "of",
+        "carsCount": "cars",
+        "card": {
+            "engine": "ENGINE",
+            "fuel": "FUEL",
+            "seats": "SEATS",
+            "priceLabel": "LISTED PRICE",
+            "detailBtn": "View detail",
+            "year": "Year",
+            "odo": "Odo",
+            "newCar": "New Vehicle"
+        },
+        "noCarsFound": "No vehicles found",
+        "noCarsDesc": "Please adjust your filters or search keywords."
+    },
+    "detail": {
+        "priceColor": "Price & Colors",
+        "features": "Highlights",
+        "design": "Design",
+        "performance": "Performance",
+        "technology": "Technology",
+        "specs": "Specification",
+        "gallery": "Gallery",
+        "estimateBtn": "ESTIMATE COST",
+        "testDriveBtn": "TEST DRIVE",
+        "retailPrice": "Suggested Retail Price",
+        "photos": "Photos",
+        "videos": "Videos",
+        "colors": {
+            "black": "Black",
+            "gray": "Gray",
+            "white": "White",
+            "red": "Red",
+            "blue": "Blue"
+        }
+    }
+}

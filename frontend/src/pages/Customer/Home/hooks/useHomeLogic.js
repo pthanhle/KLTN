@@ -1,17 +1,15 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-/**
- * Separates the business logic (data fetching, state management)
- * from the UI components to maintain strict micro-component architecture.
- */
 export const useHomeLogic = () => {
-    // Simulated data states (Would typically use Redux/React-Query)
+    const navigate = useNavigate();
+
     const [featuredCars, setFeaturedCars] = useState([]);
     const [recentHistory, setRecentHistory] = useState([]);
     const [brands, setBrands] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Mock API Fetching matching Backend models (Product/Car, Brand, TradeIn, etc.)
         const mockFeaturedCars = [
             { id: 1, name: 'Mercedes-Benz G63', subtitle: 'Biểu tượng của quyền lực', image: 'https://images.unsplash.com/photo-1520031441872-265e4ff70366?q=80&w=800&auto=format&fit=crop' },
             { id: 2, name: 'Porsche 911 Turbo S', subtitle: 'Cảm xúc thuần khiết', image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800&auto=format&fit=crop' },
@@ -33,12 +31,13 @@ export const useHomeLogic = () => {
         setFeaturedCars(mockFeaturedCars);
         setRecentHistory(mockRecentHistory);
         setBrands(mockBrands);
+        setIsLoading(false);
     }, []);
 
     // Handlers
-    const handleBookService = () => console.log('Booking Service Clicked');
-    const handleViewCars = () => console.log('Viewing Cars Clicked');
-    const handleTradeIn = () => console.log('Trade-in Clicked');
+    const handleBookService = () => navigate('/services');
+    const handleViewCars = () => navigate('/products');
+    const handleTradeIn = () => navigate('/contact');
 
     return {
         featuredCars,
@@ -46,6 +45,7 @@ export const useHomeLogic = () => {
         brands,
         handleBookService,
         handleViewCars,
-        handleTradeIn
+        handleTradeIn,
+        isLoading
     };
 };

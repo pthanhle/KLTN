@@ -7,12 +7,13 @@
       "login": "Đăng nhập",
       "register": "Đăng ký",
       "home": "Trang chủ",
-      "categories": "Danh mục Xe",
+      "categories": "Thương hiệu",
       "services": "Dịch vụ & Đặt lịch",
       "tracking": "Theo dõi tiến độ",
       "contact": "Liên hệ",
       "profile": "Hồ sơ của tôi",
-      "logout": "Đăng xuất"
+      "logout": "Đăng xuất",
+      "parts": "Linh kiện"
     },
     "footer": {
       "copyright": "© 2026 TT AUTO Premium Service. Tất cả quyền được bảo lưu.",

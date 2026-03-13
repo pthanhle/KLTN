@@ -7,12 +7,13 @@
       "login": "Login",
       "register": "Register",
       "home": "Home",
-      "categories": "Categories",
+      "categories": "Brands",
       "services": "Services & Booking",
       "tracking": "Tracking Progress",
       "contact": "Contact",
       "profile": "My Profile",
-      "logout": "Logout"
+      "logout": "Logout",
+      "parts": "Accessories"
     },
     "footer": {
       "copyright": "© 2026 TT AUTO Premium Service. All rights reserved.",

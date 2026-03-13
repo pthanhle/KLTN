@@ -5,7 +5,7 @@ import { CustomerToolbar } from './components/CustomerToolbar';
 import { useCustomers } from './hooks/useCustomers';
 
 const CustomersPage = () => {
-    const { t, breadcrumbItems, data } = useCustomers();
+    const { t, breadcrumbItems, data, isLoading } = useCustomers();
 
     return (
         <div className="w-full flex justify-center">
@@ -18,6 +18,7 @@ const CustomersPage = () => {
                     <CustomerToolbar t={t} />
 
                     <Table
+                        loading={isLoading}
                         dataSource={data}
                         columns={CustomerColumns()}
                         pagination={false}

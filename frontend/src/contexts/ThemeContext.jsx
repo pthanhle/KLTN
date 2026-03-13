@@ -48,8 +48,11 @@ export const ThemeProvider = ({ children }) => {
                 theme={{
                     algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
                     token: {
-                        colorPrimary: '#1890ff',
+                        colorPrimary: '#eab308',
                         fontFamily: '"Inter", sans-serif',
+                        colorBgElevated: isDarkMode ? '#141416' : '#ffffff',
+                        colorText: isDarkMode ? '#f8fafc' : '#0f172a',
+                        borderRadius: 12,
                     },
                 }}
             >

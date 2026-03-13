@@ -1,7 +1,8 @@
 import CarCard from './CarCard';
 import { useTranslation } from 'react-i18next';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const FeaturedCars = ({ cars }) => {
+const FeaturedCars = ({ cars, isLoading }) => {
     const { t } = useTranslation('layout');
     return (
         <section className="py-20 lg:py-28 bg-white dark:bg-[#0a0a0b] transition-colors duration-300">
@@ -17,9 +18,24 @@ const FeaturedCars = ({ cars }) => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
-                    {cars.map((car) => (
-                        <CarCard key={car.id} car={car} />
-                    ))}
+                    {isLoading
+                        ? Array.from({ length: 4 }).map((_, index) => (
+                            <div key={index} className="flex flex-col gap-4">
+                                <Skeleton className="h-[250px] w-full rounded-xl" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[200px]" />
+                                    <Skeleton className="h-4 w-[150px]" />
+                                    <div className="flex gap-2">
+                                        <Skeleton className="h-6 w-16" />
+                                        <Skeleton className="h-6 w-16" />
+                                    </div>
+                                    <Skeleton className="h-10 w-full mt-4" />
+                                </div>
+                            </div>
+                        ))
+                        : cars.map((car) => (
+                            <CarCard key={car.id} car={car} />
+                        ))}
                 </div>
 
             </div>

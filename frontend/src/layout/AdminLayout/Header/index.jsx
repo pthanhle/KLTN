@@ -91,7 +91,7 @@ const Header = ({ collapsed, onToggle }) => {
                     }} 
                     placement="bottomRight" 
                     trigger={['click']}
-                    overlayClassName="dark:bg-[#141416]/95 dark:backdrop-blur-xl dark:border dark:border-white/10 dark:shadow-2xl rounded-2xl overflow-hidden"
+                    classNames={{ root: "dark:bg-[#141416]/95 dark:backdrop-blur-xl dark:border dark:border-white/10 dark:shadow-2xl rounded-2xl overflow-hidden" }}
                 >
                     <button className="relative p-2.5 bg-slate-100/70 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200/50 dark:border-white/10 rounded-xl transition-all">
                         <Bell className="w-5 h-5 text-slate-600 dark:text-slate-300" />
@@ -139,7 +139,7 @@ const Header = ({ collapsed, onToggle }) => {
                     }} 
                     placement="bottomRight" 
                     trigger={['click']}
-                    overlayClassName="dark:bg-[#141416]/95 dark:backdrop-blur-xl dark:border dark:border-white/10 dark:shadow-2xl rounded-2xl w-56"
+                    classNames={{ root: "dark:bg-[#141416]/95 dark:backdrop-blur-xl dark:border dark:border-white/10 dark:shadow-2xl rounded-2xl w-56" }}
                 >
                     <button className="flex items-center space-x-3 pl-2 pr-1 py-1 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200/50 dark:border-white/10 rounded-full transition-all duration-300">
                         <div className="text-right hidden sm:block">

@@ -50,7 +50,7 @@ const UserActions = () => {
                         </Link>
                         <Link
                             to="/register"
-                            className="text-[13px] font-bold bg-yellow-500 hover:bg-yellow-400 text-slate-900 px-5 py-2.5 rounded-full shadow-lg shadow-yellow-500/20 transition-all hover:scale-105 active:scale-95 tracking-wide whitespace-nowrap"
+                            className="flex items-center justify-center text-[13px] font-bold !bg-yellow-500 hover:!bg-yellow-400 !text-slate-900 px-5 py-2.5 rounded-full shadow-lg shadow-yellow-500/20 transition-all hover:scale-[1.03] active:scale-95 tracking-wide whitespace-nowrap"
                         >
                             {t('customer.header.register')}
                         </Link>

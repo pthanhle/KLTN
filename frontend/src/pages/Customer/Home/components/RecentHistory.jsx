@@ -1,9 +1,10 @@
 import HistoryCard from './HistoryCard';
 import { useTranslation } from 'react-i18next';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const RecentHistory = ({ history }) => {
+const RecentHistory = ({ history, isLoading }) => {
     const { t } = useTranslation('layout');
-    if (!history || history.length === 0) return null;
+    if (!isLoading && (!history || history.length === 0)) return null;
 
     return (
         <section className="py-12 bg-white dark:bg-[#0a0a0b] transition-colors duration-300 border-t border-slate-100 dark:border-white/5">
@@ -29,9 +30,20 @@ const RecentHistory = ({ history }) => {
                     [&::-webkit-scrollbar-track]:bg-slate-100 dark:[&::-webkit-scrollbar-track]:bg-[#141416] 
                     [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-yellow-500">
                     
-                    {history.map((item) => (
-                        <HistoryCard key={item.id} history={item} />
-                    ))}
+                    {isLoading
+                        ? Array.from({ length: 4 }).map((_, index) => (
+                            <div key={index} className="min-w-[280px] w-[280px] sm:min-w-[320px] sm:w-[320px] flex flex-col gap-3">
+                                <Skeleton className="h-[180px] w-full rounded-lg" />
+                                <Skeleton className="h-4 w-[200px]" />
+                                <div className="flex items-center justify-between">
+                                    <Skeleton className="h-4 w-[120px]" />
+                                    <Skeleton className="h-4 w-12" />
+                                </div>
+                            </div>
+                        ))
+                        : history.map((item) => (
+                            <HistoryCard key={item.id} history={item} />
+                        ))}
                     
                 </div>
             </div>

@@ -111,3 +111,26 @@ input:-webkit-autofill:focus {
   outline: none !important;
   border-color: #3b82f6 !important;
 }
+
+/* --- OVERRIDE ANT DESIGN MESSAGE --- */
+.ant-message .ant-message-notice-content {
+  background-color: var(--color-background) !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 16px !important;
+  padding: 16px 24px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+}
+
+.dark .ant-message .ant-message-notice-content {
+  background-color: #141416 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important;
+}
+
+.ant-message-custom-content.ant-message-success .anticon svg {
+  color: #eab308 !important; /* Tailwind yellow-500 */
+}

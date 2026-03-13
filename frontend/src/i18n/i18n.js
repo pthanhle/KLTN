@@ -10,6 +10,10 @@ import enAdmin from '../locales/en/admin.json';
 import viAdmin from '../locales/vi/admin.json';
 import enError from '../locales/en/error.json';
 import viError from '../locales/vi/error.json';
+import enProducts from '../locales/en/products.json';
+import viProducts from '../locales/vi/products.json';
+import enServices from '../locales/en/services.json';
+import viServices from '../locales/vi/services.json';
 
 i18n
     .use(initReactI18next)
@@ -20,14 +24,18 @@ i18n
                 layout: enLayout,
                 auth: enAuth,
                 admin: enAdmin,
-                error: enError
+                error: enError,
+                products: enProducts,
+                services: enServices
             },
             vi: {
                 translation: viTranslation,
                 layout: viLayout,
                 auth: viAuth,
                 admin: viAdmin,
-                error: viError
+                error: viError,
+                products: viProducts,
+                services: viServices
             },
         },
         lng: 'vi', // Default language

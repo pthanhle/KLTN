@@ -1,40 +1,38 @@
 import { Dropdown } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { logout } from '../../../store/slices/authSlice';
+import { useLogoutMutation } from '../../../services/queries/auth.queries';
 import HeaderUtilities from '../../../components/HeaderUtilities';
-import { 
-    Bell, 
-    LogOut, 
-    Settings, 
+import {
+    Bell,
+    LogOut,
+    Settings,
     User,
     Menu
 } from 'lucide-react';
 
 const Header = ({ collapsed, onToggle }) => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const { t } = useTranslation('layout');
-    
-    // User Data from Redux
     const { user } = useSelector((state) => state.auth);
+    const { mutate: logoutUser } = useLogoutMutation();
 
     const handleLogout = () => {
-        dispatch(logout());
-        localStorage.removeItem('token');
-        navigate('/login');
+        logoutUser(undefined, {
+            onSuccess: () => navigate('/login'),
+            onError: () => navigate('/login'),
+        });
     };
 
-    // User Avatar Initials fallback
     const userInitials = user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A';
 
     return (
         <header className="sticky top-0 z-50 w-full h-20 flex items-center justify-between px-6 lg:px-10 bg-white/80 dark:bg-[#0a0a0b]/80 backdrop-blur-md dark:backdrop-blur-xl border-b border-slate-200/80 dark:border-white/5 transition-all shadow-sm dark:shadow-none">
-            
+
             {/* TOGGLE BUTTON FOR SIDER */}
             <div className="flex-1 flex items-center">
-                <button 
+                <button
                     onClick={onToggle}
                     className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
                 >
@@ -44,52 +42,52 @@ const Header = ({ collapsed, onToggle }) => {
 
             {/* HEADER ACTIONS */}
             <div className="flex items-center space-x-2 md:space-x-4">
-                
+
                 {/* UTILITY GROUP */}
                 <HeaderUtilities />
 
                 {/* NOTIFICATIONS */}
-                <Dropdown 
-                    menu={{ 
+                <Dropdown
+                    menu={{
                         items: [
-                            { 
-                                key: 'header', 
+                            {
+                                key: 'header',
                                 label: (
                                     <div className="px-4 py-2 flex justify-between items-center w-[300px]">
                                         <span className="font-bold text-sm text-slate-800 dark:text-white">Notifications</span>
                                         <span className="text-[10px] bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full font-bold">2 NEW</span>
                                     </div>
-                                ) 
+                                )
                             },
                             { type: 'divider' },
-                            { 
-                                key: '1', 
+                            {
+                                key: '1',
                                 label: (
                                     <div className="flex flex-col py-2 px-2">
                                         <p className="text-sm text-slate-800 dark:text-slate-200 font-medium">New booking received</p>
                                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Mercedes G63 - Engine tuning</p>
                                         <p className="text-[10px] text-yellow-600 dark:text-premium-gold mt-2 uppercase font-bold tracking-wider">2 mins ago</p>
                                     </div>
-                                ) 
+                                )
                             },
-                            { 
-                                key: '2', 
+                            {
+                                key: '2',
                                 label: (
                                     <div className="flex flex-col py-2 px-2">
                                         <p className="text-sm text-slate-800 dark:text-slate-200 font-medium">Service complete</p>
                                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Rolls Royce Ghost - Exterior detailing</p>
                                         <p className="text-[10px] text-yellow-600 dark:text-premium-gold mt-2 uppercase font-bold tracking-wider">1 hour ago</p>
                                     </div>
-                                ) 
+                                )
                             },
                             { type: 'divider' },
-                            { 
-                                key: 'view_all', 
-                                label: <div className="text-center text-xs font-bold text-blue-600 dark:text-premium-gold hover:underline py-1">View all updates</div> 
+                            {
+                                key: 'view_all',
+                                label: <div className="text-center text-xs font-bold text-blue-600 dark:text-premium-gold hover:underline py-1">View all updates</div>
                             }
                         ]
-                    }} 
-                    placement="bottomRight" 
+                    }}
+                    placement="bottomRight"
                     trigger={['click']}
                     classNames={{ root: "dark:bg-[#141416]/95 dark:backdrop-blur-xl dark:border dark:border-white/10 dark:shadow-2xl rounded-2xl overflow-hidden" }}
                 >
@@ -103,8 +101,8 @@ const Header = ({ collapsed, onToggle }) => {
                 </Dropdown>
 
                 {/* USER PROFILE */}
-                <Dropdown 
-                    menu={{ 
+                <Dropdown
+                    menu={{
                         items: [
                             {
                                 key: 'profile',
@@ -136,8 +134,8 @@ const Header = ({ collapsed, onToggle }) => {
                                 onClick: handleLogout
                             }
                         ]
-                    }} 
-                    placement="bottomRight" 
+                    }}
+                    placement="bottomRight"
                     trigger={['click']}
                     classNames={{ root: "dark:bg-[#141416]/95 dark:backdrop-blur-xl dark:border dark:border-white/10 dark:shadow-2xl rounded-2xl w-56" }}
                 >

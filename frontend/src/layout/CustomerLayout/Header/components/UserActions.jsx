@@ -1,20 +1,23 @@
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingCart, Bell, LogOut, User } from 'lucide-react';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../../../store/slices/authSlice';
+import { useSelector } from 'react-redux';
+import { useLogoutMutation } from '../../../../services/queries/auth.queries';
 import { App as AntdApp } from 'antd';
 import HeaderUtilities from '../../../../components/HeaderUtilities';
 import { useTranslation } from 'react-i18next';
 
+
 const UserActions = () => {
     const { t } = useTranslation('layout');
     const { isAuthenticated, user } = useSelector((state) => state.auth);
-    const dispatch = useDispatch();
+    const { mutate: logoutUser } = useLogoutMutation();
     const { message } = AntdApp.useApp();
 
     const handleLogout = () => {
-        dispatch(logout());
-        message.success(t('messages.logoutSuccess'));
+        logoutUser(undefined, {
+            onSuccess: () => message.success(t('messages.logoutSuccess')),
+            onError: () => message.success(t('messages.logoutSuccess')), // vẫn logout client dù API lỗi
+        });
     };
 
     return (

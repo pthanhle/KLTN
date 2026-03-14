@@ -21,6 +21,7 @@ const ProductsPage = lazy(() => import('../pages/Customer/Products'));
 const CarsPage = lazy(() => import('../pages/Customer/Cars'));
 const CarDetailPage = lazy(() => import('../pages/Customer/CarDetail'));
 const ServicesPage = lazy(() => import('../pages/Customer/Services'));
+const PartsPage = lazy(() => import('../pages/Customer/Parts'));
 
 const ErrorPage = lazy(() => import('../pages/ErrorPage'));
 
@@ -45,6 +46,7 @@ const AppRoutes = () => {
                         <Route path="/cars/:id" element={<CarDetailPage />} />
                         <Route path="/brand/:brandName" element={<CarsPage />} />
                         <Route path="/services" element={<ServicesPage />} />
+                        <Route path="/parts" element={<PartsPage />} />
                     </Route>
 
                     <Route element={<ProtectedRoute allowedRoles={['customer']} requireLogin={true} />}>

@@ -1,14 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { useGoogleLogin } from '@react-oauth/google';
-import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { App as AntdApp } from 'antd';
 import { useGoogleLoginMutation } from '../../../../services/queries/auth.queries';
-import { loginSuccess } from '../../../../store/slices/authSlice';
 
 const SocialRegister = () => {
     const { t } = useTranslation('auth');
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const { message } = AntdApp.useApp();
     const { mutate: googleLoginUser } = useGoogleLoginMutation();
@@ -17,18 +14,16 @@ const SocialRegister = () => {
         onSuccess: async (tokenResponse) => {
             googleLoginUser(tokenResponse.access_token, {
                 onSuccess: (res) => {
-                    dispatch(loginSuccess({ user: res, token: res.token }));
-                    localStorage.setItem('token', res.token);
-                    message.success("Đăng nhập Google thành công!");
+                    message.success('Đăng nhập Google thành công!');
                     navigate(res.isAdmin ? '/admin/dashboard' : '/');
                 },
                 onError: (error) => {
-                    message.error(error.response?.data?.message || "Lỗi đăng nhập Google");
+                    message.error(error.response?.data?.message || 'Lỗi đăng nhập Google');
                 }
             });
         },
         onError: () => {
-            message.error("Đăng nhập Google thất bại");
+            message.error('Đăng nhập Google thất bại');
         }
     });
 
@@ -42,14 +37,14 @@ const SocialRegister = () => {
             </div>
 
             <div>
-                <button 
-                    type="button" 
+                <button
+                    type="button"
                     onClick={handleGoogleLogin}
                     className="w-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
                 >
-                    <img 
-                        src="https://www.svgrepo.com/show/475656/google-color.svg" 
-                        alt="Google Logo" 
+                    <img
+                        src="https://www.svgrepo.com/show/475656/google-color.svg"
+                        alt="Google Logo"
                         className="w-4 h-4"
                     />
                     {t('registerPage.googleBtn')}

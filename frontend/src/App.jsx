@@ -1,9 +1,10 @@
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import { AppProvider } from './contexts/AppContext';
-import { App as AntdApp } from 'antd'; // Tương đương Toast/Message context của Ant Design
+import { App as AntdApp } from 'antd';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { HelmetProvider } from 'react-helmet-async';
+import AuthInitializer from './components/AuthInitializer';
 
 function App() {
     return (
@@ -12,6 +13,7 @@ function App() {
                 <ThemeProvider>
                     <AppProvider>
                         <AntdApp>
+                            <AuthInitializer />
                             <AppRoutes />
                         </AntdApp>
                     </AppProvider>

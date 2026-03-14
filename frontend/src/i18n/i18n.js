@@ -14,6 +14,8 @@ import enProducts from '../locales/en/products.json';
 import viProducts from '../locales/vi/products.json';
 import enServices from '../locales/en/services.json';
 import viServices from '../locales/vi/services.json';
+import enParts from '../locales/en/parts.json';
+import viParts from '../locales/vi/parts.json';
 
 i18n
     .use(initReactI18next)
@@ -26,7 +28,8 @@ i18n
                 admin: enAdmin,
                 error: enError,
                 products: enProducts,
-                services: enServices
+                services: enServices,
+                parts: enParts,
             },
             vi: {
                 translation: viTranslation,
@@ -35,7 +38,8 @@ i18n
                 admin: viAdmin,
                 error: viError,
                 products: viProducts,
-                services: viServices
+                services: viServices,
+                parts: viParts,
             },
         },
         lng: 'vi', // Default language

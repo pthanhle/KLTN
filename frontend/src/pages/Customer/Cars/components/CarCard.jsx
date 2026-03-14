@@ -68,10 +68,9 @@ const CarCard = ({ car, t }) => {
                         <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t('cars.card.priceLabel')}</p>
                         <p className="text-xl font-black text-yellow-500">{formatVND(car.price)}</p>
                     </div>
-                    
                     <Link
                         to={`/cars/${car.id}`}
-                        className="px-5 py-2.5 bg-slate-100 hover:bg-yellow-500 text-slate-700 hover:text-white dark:bg-[#0b0f19] dark:hover:bg-yellow-500 dark:text-slate-300 text-[13px] font-bold rounded-full transition-all duration-300"
+                        className="!px-5 !py-2.5 !bg-slate-100 hover:!bg-yellow-500 !text-slate-700 hover:!text-white dark:!bg-[#0b0f19] dark:hover:!bg-yellow-500 dark:!text-slate-300 !text-[13px] !font-bold !rounded-full transition-all duration-300"
                     >
                         {t('cars.card.detailBtn')}
                     </Link>

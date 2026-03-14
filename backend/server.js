@@ -1,11 +1,12 @@
-import http from 'http' // Add core http module for socket.io
+import http from 'http'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import express from 'express'
 import dotenv from 'dotenv'
 import morgan from 'morgan'
 import colors from 'colors'
-import cors from "cors"
+import cors from 'cors'
+import cookieParser from 'cookie-parser'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -16,7 +17,7 @@ import './models/index.js'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import seedRoles from './seeders/roleSeed.js'
 import { ensureConfigured } from './config/cloudinary.js'
-import { initSocket } from './config/socket.js' // Nhúng Socket.io config
+import { initSocket } from './config/socket.js'
 
 ensureConfigured()
 
@@ -28,12 +29,18 @@ const initializeDatabase = async () => {
 initializeDatabase()
 
 const app = express()
-const server = http.createServer(app) // Tạo HTTP server trần
+const server = http.createServer(app)
 
-// Khởi tạo Socket.io truyền bằng Server HTTP trần
 initSocket(server)
 
-app.use(cors())
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}))
+
+app.use(cookieParser())
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))

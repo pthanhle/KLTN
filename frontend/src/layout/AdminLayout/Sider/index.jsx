@@ -1,11 +1,11 @@
 import { Layout, Menu } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { logout } from '../../../store/slices/authSlice';
+import { useLogoutMutation } from '../../../services/queries/auth.queries';
 import { CarFront, LogOut } from 'lucide-react';
 import { useSiderMenu } from './hooks/useSiderMenu';
+
 
 const { Sider: AntSider } = Layout;
 
@@ -13,13 +13,14 @@ const Sider = ({ collapsed }) => {
     const { t } = useTranslation('layout');
     const { isDarkMode } = useTheme();
     const { menuItems, handleMenuClick, selectedKey } = useSiderMenu(collapsed);
-    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { mutate: logoutUser } = useLogoutMutation();
 
     const handleLogout = () => {
-        dispatch(logout());
-        localStorage.removeItem('token');
-        navigate('/login');
+        logoutUser(undefined, {
+            onSuccess: () => navigate('/login'),
+            onError: () => navigate('/login'),
+        });
     };
 
     return (

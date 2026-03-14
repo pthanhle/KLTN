@@ -1,15 +1,40 @@
+import jwt from 'jsonwebtoken'
+import asyncHandler from 'express-async-handler'
 import User from '../../models/userModel.js'
 import Role from '../../models/roleModel.js'
-import asyncHandler from 'express-async-handler'
-import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import sendEmail from '../../utils/sendEmail.js'
 import { OAuth2Client } from 'google-auth-library'
+import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken.js'
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' })
+const setRefreshTokenCookie = (res, refreshToken) => {
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/api/client/auth',
+  })
+}
+
+const formatUserResponse = (user) => {
+  const isAdmin =
+    user.role_id?.role_name === 'admin' ||
+    user.role_id?.role_name === 'manager'
+
+  return {
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    full_name: user.full_name,
+    avatar: user.avatar,
+    phone: user.phone,
+    role: user.role_id?.role_name || 'Customer',
+    isAdmin,
+    authProvider: user.authProvider || 'local',
+  }
 }
 
 export const loginUser = asyncHandler(async (req, res) => {
@@ -32,19 +57,17 @@ export const loginUser = asyncHandler(async (req, res) => {
     throw new Error('Tài khoản đã bị khóa hoặc chưa kích hoạt')
   }
 
-  const isAdmin =
-    user.role_id?.role_name === 'admin' ||
-    user.role_id?.role_name === 'manager'
+  const accessToken = generateAccessToken(user._id)
+  const refreshToken = generateRefreshToken(user._id)
+
+  user.refreshTokens = [...(user.refreshTokens || []), refreshToken].slice(-5)
+  await user.save()
+
+  setRefreshTokenCookie(res, refreshToken)
 
   res.json({
-    _id: user._id,
-    username: user.username,
-    email: user.email,
-    full_name: user.full_name,
-    role: user.role_id.role_name,
-    isAdmin,
-    authProvider: user.authProvider || 'local',
-    token: generateToken(user._id),
+    ...formatUserResponse(user),
+    accessToken,
   })
 })
 
@@ -126,19 +149,15 @@ export const verifyEmailOTP = asyncHandler(async (req, res) => {
   user.status = 'active'
   user.emailOTP = undefined
   user.emailOTPExpire = undefined
-
   await user.save()
 
-  res.json({
-    message: 'Xác nhận email thành công. Bạn có thể đăng nhập.',
-  })
+  res.json({ message: 'Xác nhận email thành công. Bạn có thể đăng nhập.' })
 })
 
 export const resendEmailOTP = asyncHandler(async (req, res) => {
   const { email } = req.body
 
   const user = await User.findOne({ email })
-
   if (!user) throw new Error('Không tìm thấy tài khoản')
   if (user.isEmailVerified) throw new Error('Email đã được xác nhận')
 
@@ -164,7 +183,7 @@ export const resendEmailOTP = asyncHandler(async (req, res) => {
 
 export const getMe = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id)
-    .select('-password')
+    .select('-password -refreshTokens')
     .populate('role_id', 'role_name')
 
   res.json(user)
@@ -178,34 +197,27 @@ export const loginWithGoogle = asyncHandler(async (req, res) => {
     throw new Error('Thiếu Google ID Token')
   }
 
-  let payload;
+  let payload
   try {
     if (idToken.split('.').length === 3) {
-      // Verify as ID Token (JWT)
       const ticket = await googleClient.verifyIdToken({
         idToken,
         audience: process.env.GOOGLE_CLIENT_ID,
-      });
-      payload = ticket.getPayload();
+      })
+      payload = ticket.getPayload()
     } else {
-      // Verify as Access Token
       const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${idToken}` }
-      });
-      if (!response.ok) throw new Error('Invalid Access Token');
-      payload = await response.json();
+      })
+      if (!response.ok) throw new Error('Invalid Access Token')
+      payload = await response.json()
     }
   } catch (error) {
-    res.status(401);
-    throw new Error('Xác thực Google thất bại');
+    res.status(401)
+    throw new Error('Xác thực Google thất bại')
   }
 
-  const {
-    sub: googleId,
-    email,
-    name,
-    picture,
-  } = payload;
+  const { sub: googleId, email, name, picture } = payload
 
   let user = await User.findOne({ email }).populate('role_id', 'role_name')
 
@@ -215,39 +227,36 @@ export const loginWithGoogle = asyncHandler(async (req, res) => {
   }
 
   if (!user) {
-    const randomPassword = crypto.randomBytes(16).toString('hex') 
-
+    const randomPassword = crypto.randomBytes(16).toString('hex')
     user = await User.create({
       email,
       username: email.split('@')[0],
       full_name: name,
       avatar: picture,
       googleId,
-      password: randomPassword, 
+      password: randomPassword,
+      phone: '0000000000',
       role_id: customerRole._id,
       authProvider: 'google',
       isEmailVerified: true,
       status: 'active',
     })
-
     user.role_id = customerRole
   }
 
   if (!user.role_id) {
     user.role_id = customerRole._id
     await user.save()
-    user.role_id = customerRole 
+    user.role_id = customerRole
   }
 
   if (user && !user.googleId) {
     user.googleId = googleId
     user.authProvider = 'google'
     user.isEmailVerified = true
-
     if (!user.password) {
       user.password = crypto.randomBytes(16).toString('hex')
     }
-
     await user.save()
   }
 
@@ -256,25 +265,88 @@ export const loginWithGoogle = asyncHandler(async (req, res) => {
     throw new Error('Tài khoản đã bị khóa hoặc chưa kích hoạt')
   }
 
-  const isAdmin =
-    user.role_id?.role_name === 'admin' ||
-    user.role_id?.role_name === 'manager'
+  const accessToken = generateAccessToken(user._id)
+  const refreshToken = generateRefreshToken(user._id)
+
+  user.refreshTokens = [...(user.refreshTokens || []), refreshToken].slice(-5)
+  await user.save()
+
+  setRefreshTokenCookie(res, refreshToken)
 
   res.json({
-    _id: user._id,
-    username: user.username,
-    email: user.email,
-    full_name: user.full_name,
-    avatar: user.avatar,
-    role: user.role_id?.role_name || 'Customer', 
-    isAdmin,
-    authProvider: user.authProvider,
-    token: generateToken(user._id),
+    ...formatUserResponse(user),
+    accessToken,
   })
 })
 
+export const refreshToken = asyncHandler(async (req, res) => {
+  const token = req.cookies?.refreshToken
+
+  if (!token) {
+    res.status(401)
+    throw new Error('Không có refresh token')
+  }
+
+  let decoded
+  try {
+    decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
+  } catch (error) {
+    res.status(401)
+    throw new Error('Refresh token không hợp lệ hoặc đã hết hạn')
+  }
+
+  const user = await User.findById(decoded.id).populate('role_id', 'role_name')
+  if (!user || !user.refreshTokens.includes(token)) {
+    if (user) {
+      user.refreshTokens = []
+      await user.save()
+    }
+    res.status(401)
+    throw new Error('Refresh token đã bị thu hồi')
+  }
+
+  if (user.status !== 'active') {
+    res.status(403)
+    throw new Error('Tài khoản đã bị khóa')
+  }
+
+  const newRefreshToken = generateRefreshToken(user._id)
+  user.refreshTokens = user.refreshTokens
+    .filter(t => t !== token)
+    .concat(newRefreshToken)
+    .slice(-5)
+  await user.save()
+
+  setRefreshTokenCookie(res, newRefreshToken)
+
+  res.json({
+    accessToken: generateAccessToken(user._id),
+    user: formatUserResponse(user),
+  })
+})
+
+export const logoutUser = asyncHandler(async (req, res) => {
+  const token = req.cookies?.refreshToken
+
+  if (token) {
+    const user = await User.findOne({ refreshTokens: token })
+    if (user) {
+      user.refreshTokens = user.refreshTokens.filter(t => t !== token)
+      await user.save()
+    }
+  }
+
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/api/client/auth',
+  })
+
+  res.json({ message: 'Đăng xuất thành công' })
+})
+
 export const changePassword = asyncHandler(async (req, res) => {
-  console.log('changePassword function called')
   const { currentPassword, newPassword } = req.body
 
   if (!currentPassword || !newPassword) {
@@ -288,12 +360,10 @@ export const changePassword = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findById(req.user._id)
-
   if (!user) {
     res.status(404)
     throw new Error('Không tìm thấy người dùng')
   }
-
 
   const isPasswordMatch = await user.matchPassword(currentPassword)
   if (!isPasswordMatch) {
@@ -307,18 +377,20 @@ export const changePassword = asyncHandler(async (req, res) => {
     throw new Error('Mật khẩu mới không được trùng với mật khẩu hiện tại')
   }
 
-
   user.password = newPassword
+  user.refreshTokens = []
   await user.save()
 
-  res.json({
-    message: 'Đổi mật khẩu thành công',
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/api/client/auth',
   })
+
+  res.json({ message: 'Đổi mật khẩu thành công. Vui lòng đăng nhập lại.' })
 })
 
-// =====================================================
-// QUÊN MẬT KHẨU - GỬI EMAIL RESET
-// =====================================================
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body
 
@@ -328,29 +400,21 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findOne({ email })
-
   if (!user) {
     res.status(404)
     throw new Error('Không tìm thấy tài khoản với email này')
   }
 
-  // Tạo reset token (JWT với expire 5 phút)
   const resetToken = jwt.sign(
-    {
-      userId: user._id,
-      email: user.email,
-      purpose: 'reset_password' // Để bảo mật hơn
-    },
+    { userId: user._id, email: user.email, purpose: 'reset_password' },
     process.env.JWT_SECRET,
     { expiresIn: '5m' }
   )
 
-  // Lưu token vào DB (để có thể revoke nếu cần)
   user.passwordResetToken = resetToken
-  user.passwordResetExpire = Date.now() + 5 * 60 * 1000 // 5 phút
+  user.passwordResetExpire = Date.now() + 5 * 60 * 1000
   await user.save()
 
-  // Tạo link reset
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`
 
   try {
@@ -364,17 +428,13 @@ export const forgotPassword = asyncHandler(async (req, res) => {
           <p>Bạn đã yêu cầu đặt lại mật khẩu. Click vào nút bên dưới để tiếp tục:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" 
-               style="background-color: #4CAF50; color: white; padding: 12px 30px; 
+               style="background-color: #eab308; color: white; padding: 12px 30px; 
                       text-decoration: none; border-radius: 5px; display: inline-block;">
               Đặt lại mật khẩu
             </a>
           </div>
-          <p style="color: #666; font-size: 14px;">
-            ⚠️ Link này chỉ có hiệu lực trong <strong>5 phút</strong>.
-          </p>
-          <p style="color: #666; font-size: 14px;">
-            Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.
-          </p>
+          <p style="color: #666; font-size: 14px;">⚠️ Link này chỉ có hiệu lực trong <strong>5 phút</strong>.</p>
+          <p style="color: #666; font-size: 14px;">Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
           <p style="color: #999; font-size: 12px;">
             Hoặc copy link này vào trình duyệt:<br>
@@ -384,23 +444,16 @@ export const forgotPassword = asyncHandler(async (req, res) => {
       `,
     })
 
-    res.json({
-      message: 'Link đặt lại mật khẩu đã được gửi đến email của bạn',
-    })
+    res.json({ message: 'Link đặt lại mật khẩu đã được gửi đến email của bạn' })
   } catch (error) {
     user.passwordResetToken = undefined
     user.passwordResetExpire = undefined
     await user.save()
-
-    console.error('Error sending email:', error)
     res.status(500)
     throw new Error('Không thể gửi email. Vui lòng thử lại sau')
   }
 })
 
-// =====================================================
-// ĐẶT LẠI MẬT KHẨU - VERIFY TOKEN VÀ ĐỔI MẬT KHẨU
-// =====================================================
 export const resetPassword = asyncHandler(async (req, res) => {
   const { token, newPassword } = req.body
 
@@ -415,7 +468,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
     if (decoded.purpose !== 'reset_password') {
@@ -423,11 +475,10 @@ export const resetPassword = asyncHandler(async (req, res) => {
       throw new Error('Token không hợp lệ')
     }
 
-    // Tìm user và kiểm tra token trong DB
     const user = await User.findOne({
       _id: decoded.userId,
       passwordResetToken: token,
-      passwordResetExpire: { $gt: Date.now() }, // Kiểm tra còn hiệu lực
+      passwordResetExpire: { $gt: Date.now() },
     })
 
     if (!user) {
@@ -435,22 +486,19 @@ export const resetPassword = asyncHandler(async (req, res) => {
       throw new Error('Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn')
     }
 
-    // Kiểm tra mật khẩu mới không trùng cũ
     const isSamePassword = await user.matchPassword(newPassword)
     if (isSamePassword) {
       res.status(400)
       throw new Error('Mật khẩu mới không được trùng với mật khẩu cũ')
     }
 
-    // Cập nhật mật khẩu mới
     user.password = newPassword
     user.passwordResetToken = undefined
     user.passwordResetExpire = undefined
+    user.refreshTokens = []
     await user.save()
 
-    res.json({
-      message: 'Đặt lại mật khẩu thành công',
-    })
+    res.json({ message: 'Đặt lại mật khẩu thành công' })
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
       res.status(401)
@@ -464,9 +512,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
   }
 })
 
-// =====================================================
-// VERIFY RESET TOKEN - Để frontend check token hợp lệ
-// =====================================================
 export const verifyResetToken = asyncHandler(async (req, res) => {
   const { token } = req.body
 
@@ -489,10 +534,7 @@ export const verifyResetToken = asyncHandler(async (req, res) => {
       throw new Error('Link không hợp lệ hoặc đã hết hạn')
     }
 
-    res.json({
-      valid: true,
-      email: user.email,
-    })
+    res.json({ valid: true, email: user.email })
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
       res.status(401)

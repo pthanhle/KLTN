@@ -1,21 +1,49 @@
 import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../api/auth';
+import { useDispatch } from 'react-redux';
+import { loginSuccess, logout } from '@/store/slices/authSlice';
+import { queryClient } from '@/config/queryClient';
 
 export const useLoginMutation = () => {
+    const dispatch = useDispatch();
     return useMutation({
         mutationFn: authApi.loginUser,
+        onSuccess: (data) => {
+            const { accessToken, ...user } = data;
+            dispatch(loginSuccess({ user, accessToken }));
+        },
+    });
+};
+
+export const useGoogleLoginMutation = () => {
+    const dispatch = useDispatch();
+    return useMutation({
+        mutationFn: authApi.loginWithGoogle,
+        onSuccess: (data) => {
+            const { accessToken, ...user } = data;
+            dispatch(loginSuccess({ user, accessToken }));
+        },
+    });
+};
+
+export const useLogoutMutation = () => {
+    const dispatch = useDispatch();
+    return useMutation({
+        mutationFn: authApi.logoutUser,
+        onSuccess: () => {
+            dispatch(logout());
+            queryClient.clear();
+        },
+        onError: () => {
+            dispatch(logout());
+            queryClient.clear();
+        },
     });
 };
 
 export const useRegisterMutation = () => {
     return useMutation({
         mutationFn: authApi.registerUser,
-    });
-};
-
-export const useGoogleLoginMutation = () => {
-    return useMutation({
-        mutationFn: authApi.loginWithGoogle,
     });
 };
 

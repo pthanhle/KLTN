@@ -10,17 +10,17 @@ const userSchema = mongoose.Schema(
     full_name: { type: String, required: true },
     address: { type: String },
     googleId: {
-        type: String,
-      },
-      authProvider: {
-        type: String,
-        enum: ['local', 'google'],
-        default: 'local',
-      },
-      avatar: {
-        type: String,
-      },
-      
+      type: String,
+    },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
+    avatar: {
+      type: String,
+    },
+
     role_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Role',
@@ -30,7 +30,7 @@ const userSchema = mongoose.Schema(
     status: {
       type: String,
       enum: ['active', 'inactive', 'suspended'],
-      default: 'inactive', 
+      default: 'inactive',
     },
     isEmailVerified: {
       type: Boolean,
@@ -48,9 +48,13 @@ const userSchema = mongoose.Schema(
     passwordResetExpire: {
       type: Date,
     },
+    refreshTokens: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
-  
+
 )
 
 userSchema.methods.matchPassword = async function (enteredPassword) {

@@ -10,6 +10,8 @@ import {
   forgotPassword,
   resetPassword,
   verifyResetToken,
+  refreshToken,
+  logoutUser,
 } from '../../controllers/client/auth.controller.js'
 import { protect } from '../../middleware/authMiddleware.js'
 
@@ -20,11 +22,13 @@ router.post('/register', registerUser)
 router.post('/verify-email-otp', verifyEmailOTP)
 router.post('/resend-email-otp', resendEmailOTP)
 router.post('/google-login', loginWithGoogle)
-router.get('/me', protect, getMe)
-
-router.put('/change-password', protect, changePassword)
+router.post('/refresh', refreshToken)
+router.post('/logout', logoutUser)
 router.post('/forgot-password', forgotPassword)
 router.post('/reset-password', resetPassword)
 router.post('/verify-reset-token', verifyResetToken)
+
+router.get('/me', protect, getMe)
+router.put('/change-password', protect, changePassword)
 
 export default router

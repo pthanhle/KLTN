@@ -1,9 +1,16 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { ConfigProvider, theme } from 'antd';
+import viVN from 'antd/locale/vi_VN';
+import enUS from 'antd/locale/en_US';
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+import { useTranslation } from 'react-i18next';
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
+    const { i18n } = useTranslation();
+    
     const [isDarkMode, setIsDarkMode] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
         return savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -29,6 +36,16 @@ export const ThemeProvider = ({ children }) => {
         localStorage.setItem('fontSizeMultiplier', fontSizeMultiplier.toString());
     }, [fontSizeMultiplier]);
 
+    useEffect(() => {
+        if (i18n.language === 'vi') {
+            dayjs.locale('vi');
+        } else {
+            dayjs.locale('en');
+        }
+    }, [i18n.language]);
+
+    const antLocale = i18n.language === 'vi' ? viVN : enUS;
+
     const toggleTheme = () => {
         setIsDarkMode((prev) => !prev);
     };
@@ -45,10 +62,14 @@ export const ThemeProvider = ({ children }) => {
     return (
         <ThemeContext.Provider value={{ isDarkMode, toggleTheme, fontSizeMultiplier, setFontSizeMultiplier, toggleFontSize }}>
             <ConfigProvider
+                locale={antLocale}
                 theme={{
                     algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
                     token: {
                         colorPrimary: '#eab308',
+                        colorLink: '#eab308',
+                        colorLinkHover: '#ca8a04',
+                        colorLinkActive: '#a16207',
                         fontFamily: '"Inter", sans-serif',
                         colorBgElevated: isDarkMode ? '#141416' : '#ffffff',
                         colorText: isDarkMode ? '#f8fafc' : '#0f172a',

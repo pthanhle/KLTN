@@ -7,11 +7,13 @@ import Step2_Schedule from './components/Step2_Schedule';
 import Step3_Review from './components/Step3_Review';
 import { useServiceBookingLogic } from './hooks/useServiceBookingLogic';
 import { Helmet } from 'react-helmet-async';
+import { FormProvider } from 'react-hook-form';
 
 const ServicesPage = () => {
     const { t } = useTranslation(['services']);
     
     const {
+        methods,
         currentStep,
         services,
         categories,
@@ -37,9 +39,10 @@ const ServicesPage = () => {
                 <title>{t('services:title')} | TT AUTO</title>
             </Helmet>
 
-            <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1440px]">
-                {/* Stepper Logic */}
-                <BookingStepper currentStep={currentStep} t={t} />
+            <FormProvider {...methods}>
+                <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1440px]">
+                    {/* Stepper Logic */}
+                    <BookingStepper currentStep={currentStep} t={t} />
 
                 {/* Main Content Layout */}
                 <div className="flex flex-col-reverse lg:flex-row gap-12 lg:gap-16 items-start justify-between w-full mt-4 md:mt-12 xl:px-8">
@@ -92,6 +95,7 @@ const ServicesPage = () => {
 
                 </div>
             </div>
+            </FormProvider>
         </div>
     );
 };

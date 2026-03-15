@@ -1,9 +1,11 @@
 import { Wrench, Sparkles, Settings } from 'lucide-react';
 import ServiceCard from './ServiceCard';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const ExclusiveServices = () => {
     const { t } = useTranslation('layout');
+    const navigate = useNavigate();
 
     const SERVICES_DATA = [
         {
@@ -26,6 +28,16 @@ const ExclusiveServices = () => {
         }
     ];
 
+    const handleCardClick = (id) => {
+        if (id === 1) {
+            navigate('/services', { state: { category: 'Bảo dưỡng' } });
+        } else if (id === 2) {
+            navigate('/services', { state: { category: 'Chăm sóc xe' } });
+        } else if (id === 3) {
+            navigate('/parts');
+        }
+    };
+
     return (
         <section className="py-20 lg:py-28 bg-[#fafafa] dark:bg-[#060608] border-y border-slate-100 dark:border-white/5 transition-colors duration-300">
             <div className="container mx-auto px-6 lg:px-10">
@@ -47,6 +59,7 @@ const ExclusiveServices = () => {
                             icon={service.icon}
                             title={service.title}
                             desc={service.desc}
+                            onClick={() => handleCardClick(service.id)}
                         />
                     ))}
                 </div>

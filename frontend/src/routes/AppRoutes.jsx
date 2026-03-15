@@ -1,5 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import AuthRoute from './AuthRoute';
 import { PageLoader } from '../components/ui/page-loader';
@@ -22,12 +22,30 @@ const CarsPage = lazy(() => import('../pages/Customer/Cars'));
 const CarDetailPage = lazy(() => import('../pages/Customer/CarDetail'));
 const ServicesPage = lazy(() => import('../pages/Customer/Services'));
 const PartsPage = lazy(() => import('../pages/Customer/Parts'));
+const TestDriveBookingPage = lazy(() => import('../pages/Customer/TestDriveBooking'));
+
+const ProfilePage = lazy(() => import('../pages/Shared/Profile'));
 
 const ErrorPage = lazy(() => import('../pages/ErrorPage'));
+
+const ScrollToTop = () => {
+    const { pathname } = useLocation();
+
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth"
+        });
+    }, [pathname]);
+
+    return null;
+};
 
 const AppRoutes = () => {
     return (
         <Suspense fallback={<PageLoader />}>
+            <ScrollToTop />
             <Routes>
                 <Route element={<AuthRoute />}>
                     <Route path="/login" element={<Login />} />
@@ -45,12 +63,13 @@ const AppRoutes = () => {
                         <Route path="/cars" element={<CarsPage />} />
                         <Route path="/cars/:id" element={<CarDetailPage />} />
                         <Route path="/brand/:brandName" element={<CarsPage />} />
+                        <Route path="/test-drive/:id" element={<TestDriveBookingPage />} />
                         <Route path="/services" element={<ServicesPage />} />
                         <Route path="/parts" element={<PartsPage />} />
                     </Route>
 
                     <Route element={<ProtectedRoute allowedRoles={['customer']} requireLogin={true} />}>
-                        <Route path="/profile" element={<div>Trang Cá Nhân (Bắt buộc Login)</div>} />
+                        <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/cart" element={<div>Giỏ Hàng của tôi</div>} />
                     </Route>
                 </Route>
@@ -58,6 +77,7 @@ const AppRoutes = () => {
                 <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                     <Route element={<AdminLayout />}>
                         <Route path="/admin/dashboard" element={<div>Admin Dashboard</div>} />
+                        <Route path="/admin/profile" element={<ProfilePage />} />
                         <Route path="/admin/customers" element={<CustomersPage />} />
                         <Route path="/admin/orders" element={<div>Quản Lý Đơn Hàng</div>} />
                     </Route>

@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CalendarWidget from './CalendarWidget';
 import TimeSlotSelector from './TimeSlotSelector';
+import { useFormContext } from 'react-hook-form';
 
 const Step2_Schedule = ({ 
     bookingData, 
@@ -12,6 +13,8 @@ const Step2_Schedule = ({
     timeSlots,
     t 
 }) => {
+    const { formState: { errors } } = useFormContext();
+
     return (
         <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -30,17 +33,23 @@ const Step2_Schedule = ({
             </div>
 
             <div className="flex flex-col gap-8">
-                <CalendarWidget 
-                    bookingData={bookingData}
-                    updateBookingData={updateBookingData}
-                />
+                <div className="relative">
+                    <CalendarWidget 
+                        bookingData={bookingData}
+                        updateBookingData={updateBookingData}
+                    />
+                    {errors.booking_date && <span className="absolute -bottom-6 left-2 text-xs font-medium text-red-500">{errors.booking_date.message}</span>}
+                </div>
 
-                <TimeSlotSelector 
-                    timeSlots={timeSlots}
-                    bookingData={bookingData}
-                    updateBookingData={updateBookingData}
-                    t={t}
-                />
+                <div className="relative">
+                    <TimeSlotSelector 
+                        timeSlots={timeSlots}
+                        bookingData={bookingData}
+                        updateBookingData={updateBookingData}
+                        t={t}
+                    />
+                    {errors.time_slot && <span className="absolute -bottom-6 left-2 text-xs font-medium text-red-500">{errors.time_slot.message}</span>}
+                </div>
             </div>
 
             {/* Navigation Buttons */}

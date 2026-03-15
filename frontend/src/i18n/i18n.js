@@ -16,6 +16,10 @@ import enServices from '../locales/en/services.json';
 import viServices from '../locales/vi/services.json';
 import enParts from '../locales/en/parts.json';
 import viParts from '../locales/vi/parts.json';
+import enProfile from '../locales/en/profile.json';
+import viProfile from '../locales/vi/profile.json';
+import enBooking from '../locales/en/booking.json';
+import viBooking from '../locales/vi/booking.json';
 
 i18n
     .use(initReactI18next)
@@ -30,6 +34,8 @@ i18n
                 products: enProducts,
                 services: enServices,
                 parts: enParts,
+                profile: enProfile,
+                booking: enBooking,
             },
             vi: {
                 translation: viTranslation,
@@ -40,6 +46,8 @@ i18n
                 products: viProducts,
                 services: viServices,
                 parts: viParts,
+                profile: viProfile,
+                booking: viBooking,
             },
         },
         lng: 'vi', // Default language

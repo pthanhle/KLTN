@@ -1,8 +1,9 @@
 import Car360Viewer from './Car360Viewer';
 import { ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t }) => {
-    // Xen kẽ 2 tấm hình để demo tính năng xoay do ảnh thật bị lỗi mạng
+    const navigate = useNavigate();
     const img1 = "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200";
     const img2 = "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=1200";
     const frames = Array.from({ length: 36 }).map((_, i) => i % 2 === 0 ? img1 : img2);
@@ -62,7 +63,10 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
                             <button className="flex-1 px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[13px] font-bold uppercase tracking-widest hover:bg-yellow-600 dark:hover:bg-yellow-500 hover:text-white dark:hover:text-slate-900 transition-all rounded-[16px] shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.05)]">
                                 {t('products:detail.estimateBtn')}
                             </button>
-                            <button className="flex-1 px-8 py-4 bg-slate-50 dark:bg-[#141416] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-[13px] font-bold uppercase tracking-widest hover:border-slate-900 dark:hover:border-white transition-all rounded-[16px]">
+                            <button
+                                onClick={() => navigate(`/test-drive/${car.id || car._id || '1'}`)}
+                                className="flex-1 px-8 py-4 bg-slate-50 dark:bg-[#141416] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-[13px] font-bold uppercase tracking-widest hover:border-slate-900 dark:hover:border-white transition-all rounded-[16px]"
+                            >
                                 {t('products:detail.testDriveBtn')}
                             </button>
                         </div>

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
+import { useMemo } from 'react';
+import { getResetPasswordSchema } from '../../schemas/authSchemas';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { App as AntdApp } from 'antd';
 import { useResetPasswordMutation, useVerifyResetTokenMutation } from '../../../../services/queries/auth.queries';
@@ -41,11 +42,7 @@ export const useResetPasswordForm = () => {
         });
     }, [token, verifyToken, navigate, message]);
 
-    const formSchema = z.object({
-        password: z.string()
-            .min(6, { message: t('messages.invalidPassword') })
-            .regex(/^\S*$/, { message: "Mật khẩu không được chứa khoảng trắng" }),
-    });
+    const formSchema = useMemo(() => getResetPasswordSchema(t), [t]);
 
     const form = useForm({
         resolver: zodResolver(formSchema),

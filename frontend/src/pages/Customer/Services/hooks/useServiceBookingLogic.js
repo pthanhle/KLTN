@@ -1,30 +1,38 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { App } from 'antd';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { getServiceBookingSchema } from '../schemas/servicesSchema';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 export const useServiceBookingLogic = () => {
     const { message } = App.useApp();
-    // Luồng gồm 3 bước: 1 - Chọn Dịch vụ, 2 - Điền Thông tin xe & chọn ngày, 3 - Xác nhận (Review)
+    const { t } = useTranslation(['services']);
+    const location = useLocation();
+
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Form quản lý tổng
-    const [bookingData, setBookingData] = useState({
-        selected_services: [], // Array of { _id, service_name, price }
+    const schema = useMemo(() => getServiceBookingSchema(t), [t]);
 
-        // Thông tin xe
-        vehicle_brand: null,
-        vehicle_model: '',
-        license_plate: '',
-        vehicle_condition: '',
-
-        // Thời gian
-        booking_date: '',
-        time_slot: ''
+    const methods = useForm({
+        resolver: zodResolver(schema),
+        mode: 'onChange',
+        defaultValues: {
+            selected_services: [],
+            vehicle_brand: null,
+            vehicle_model: '',
+            license_plate: '',
+            vehicle_condition: '',
+            booking_date: '',
+            time_slot: ''
+        }
     });
 
-    const [selectedCategory, setSelectedCategory] = useState('Bảo dưỡng');
+    const bookingData = methods.watch();
+    const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'Bảo dưỡng');
 
-    // Fake API Data cho Brands
     const vehicleBrands = [
         { value: 'Mercedes', label: 'Mercedes-Benz' },
         { value: 'BMW', label: 'BMW' },
@@ -34,7 +42,6 @@ export const useServiceBookingLogic = () => {
         { value: 'Other', label: 'Khác (Other)' },
     ];
 
-    // Fake API Data cho Categories
     const categories = [
         { id: 'Bảo dưỡng', labelKey: 'maintenance', iconName: 'Settings' },
         { id: 'Sửa chữa', labelKey: 'repair', iconName: 'Wrench' },
@@ -94,30 +101,36 @@ export const useServiceBookingLogic = () => {
     };
 
     const updateBookingData = (data) => {
-        setBookingData(prev => ({ ...prev, ...data }));
+        Object.entries(data).forEach(([key, value]) => {
+            methods.setValue(key, value, { shouldValidate: true, shouldDirty: true });
+        });
     };
 
     const handleServiceToggle = (srv) => {
-        const isExists = bookingData.selected_services.some(s => s._id === srv._id);
+        const currentServices = methods.getValues('selected_services');
+        const isExists = currentServices.some(s => s._id === srv._id);
         let newServices;
         if (isExists) {
-            newServices = bookingData.selected_services.filter(s => s._id !== srv._id);
+            newServices = currentServices.filter(s => s._id !== srv._id);
         } else {
-            newServices = [...bookingData.selected_services, { _id: srv._id, service_name: srv.service_name, price: srv.price }];
+            newServices = [...currentServices, { _id: srv._id, service_name: srv.service_name, price: srv.price }];
         }
-        updateBookingData({ selected_services: newServices });
+        methods.setValue('selected_services', newServices, { shouldValidate: true });
     };
 
-    const isStep1Valid = bookingData.vehicle_brand && bookingData.vehicle_model && bookingData.license_plate && bookingData.selected_services.length > 0;
-    const isStep2Valid = bookingData.booking_date && bookingData.time_slot;
+    const isStep1Valid = Boolean(
+        bookingData.vehicle_brand &&
+        bookingData.vehicle_model &&
+        bookingData.license_plate &&
+        bookingData.selected_services.length > 0
+    );
+    const isStep2Valid = Boolean(bookingData.booking_date && bookingData.time_slot);
 
     const handleSubmitBooking = async (t) => {
         setIsSubmitting(true);
-        // Simulate API call to BE: POST /api/client/bookings
         await new Promise(resolve => setTimeout(resolve, 1500));
         console.log("Dữ liệu gửi lên BE: ", bookingData);
         setIsSubmitting(false);
-        // Success redirect or Modal using Ant Design message
         message.success({
             content: t ? t('services:booking_success', 'Booking successful! We will contact you soon.') : 'Booking successful!',
             style: {
@@ -127,6 +140,7 @@ export const useServiceBookingLogic = () => {
     };
 
     return {
+        methods,
         currentStep,
         services,
         categories,

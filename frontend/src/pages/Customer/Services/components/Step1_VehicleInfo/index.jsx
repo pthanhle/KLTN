@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from 'antd';
+import { useFormContext, Controller } from 'react-hook-form';
 import VehicleForm from './VehicleForm';
 import ServiceCategorySelector from './ServiceCategorySelector';
 import ServiceList from './ServiceList';
@@ -21,6 +22,7 @@ const Step1_VehicleInfo = ({
     isStep1Valid,
     t 
 }) => {
+    const { control, formState: { errors } } = useFormContext();
 
     return (
         <motion.div 
@@ -39,10 +41,8 @@ const Step1_VehicleInfo = ({
                 </p>
             </div>
 
-            {/* Vehicle Details Form (Micro Component) */}
             <VehicleForm 
                 bookingData={bookingData}
-                updateBookingData={updateBookingData}
                 vehicleBrands={vehicleBrands}
                 t={t}
             />
@@ -66,13 +66,18 @@ const Step1_VehicleInfo = ({
             {/* Symptoms / Note */}
             <div>
                 <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4 block">{t('services:vehicle_symptoms')}</label>
-                <TextArea 
-                    rows={4}
-                    placeholder={t('services:symptoms_placeholder')}
-                    value={bookingData.vehicle_condition}
-                    onChange={(e) => updateBookingData({ vehicle_condition: e.target.value })}
-                    className="w-full text-[15px] font-medium"
-                    size="large"
+                <Controller
+                    name="vehicle_condition"
+                    control={control}
+                    render={({ field }) => (
+                        <TextArea 
+                            {...field}
+                            rows={4}
+                            placeholder={t('services:symptoms_placeholder')}
+                            className="w-full text-[15px] font-medium"
+                            size="large"
+                        />
+                    )}
                 />
             </div>
 

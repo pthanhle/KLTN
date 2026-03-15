@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
+import { useMemo } from 'react';
+import { getLoginSchema } from '../../schemas/authSchemas';
 import { useNavigate } from 'react-router-dom';
 import { App as AntdApp } from 'antd';
 import { useLoginMutation } from '../../../../services/queries/auth.queries';
@@ -15,14 +16,7 @@ export const useLoginForm = () => {
 
     const { mutate: loginUser, isPending: isLoading } = useLoginMutation();
 
-    const formSchema = z.object({
-        email: z.string()
-            .email({ message: t('messages.invalidEmail') })
-            .max(100, { message: 'Email quá dài' }),
-        password: z.string()
-            .min(6, { message: t('messages.invalidPassword') })
-            .regex(/^\S*$/, { message: 'Mật khẩu không được chứa khoảng trắng' }),
-    });
+    const formSchema = useMemo(() => getLoginSchema(t), [t]);
 
     const form = useForm({
         resolver: zodResolver(formSchema),

@@ -22,7 +22,10 @@ const CarsPage = lazy(() => import('../pages/Customer/Cars'));
 const CarDetailPage = lazy(() => import('../pages/Customer/CarDetail'));
 const ServicesPage = lazy(() => import('../pages/Customer/Services'));
 const PartsPage = lazy(() => import('../pages/Customer/Parts'));
+const PartDetail = lazy(() => import('../pages/Customer/PartDetail'));
 const TestDriveBookingPage = lazy(() => import('../pages/Customer/TestDriveBooking'));
+const WishlistPage = lazy(() => import('../pages/Customer/Wishlist'));
+const CheckoutFlow = lazy(() => import('../pages/Customer/Checkout'));
 
 const ProfilePage = lazy(() => import('../pages/Shared/Profile'));
 
@@ -66,11 +69,17 @@ const AppRoutes = () => {
                         <Route path="/test-drive/:id" element={<TestDriveBookingPage />} />
                         <Route path="/services" element={<ServicesPage />} />
                         <Route path="/parts" element={<PartsPage />} />
+                        <Route path="/parts/:id" element={<PartDetail />} />
+                        <Route path="/wishlist" element={<WishlistPage />} />
                     </Route>
 
                     <Route element={<ProtectedRoute allowedRoles={['customer']} requireLogin={true} />}>
                         <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/cart" element={<div>Giỏ Hàng của tôi</div>} />
+                        <Route path="/profile/orders" element={<ProfilePage />} />
+                        <Route path="/profile/orders/:id" element={<ProfilePage />} />
+                        <Route path="/profile/services" element={<ProfilePage />} />
+                        <Route path="/profile/services/:id" element={<ProfilePage />} />
+                        <Route path="/cart" element={<CheckoutFlow />} />
                     </Route>
                 </Route>
 

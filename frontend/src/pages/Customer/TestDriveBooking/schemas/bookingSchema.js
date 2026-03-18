@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const getBookingSchema = (t) => {
     return z.object({
+        fullName: z.string().min(2, t('booking_errorName', 'Vui lòng nhập họ và tên')),
         phoneNumber: z.string()
             .regex(/^(0|\+84)[0-9]{8,9}$/, t('booking_errorPhone', 'Vui lòng nhập số điện thoại hợp lệ')),
         bookingType: z.enum(['showroom', 'home']),
@@ -31,4 +32,16 @@ export const getBookingSchema = (t) => {
             });
         }
     });
+};
+
+export const defaultBookingValues = {
+    fullName: '',
+    phoneNumber: '',
+    bookingType: 'showroom',
+    showroomBranch: '1',
+    deliveryAddress: '',
+    selectedDate: null,
+    selectedTimeSlot: '',
+    hasDriverLicense: false,
+    note: ''
 };

@@ -20,6 +20,10 @@ import enProfile from '../locales/en/profile.json';
 import viProfile from '../locales/vi/profile.json';
 import enBooking from '../locales/en/booking.json';
 import viBooking from '../locales/vi/booking.json';
+import enWishlist from '../locales/en/wishlist.json';
+import viWishlist from '../locales/vi/wishlist.json';
+import enCheckout from '../locales/en/checkout.json';
+import viCheckout from '../locales/vi/checkout.json';
 
 i18n
     .use(initReactI18next)
@@ -36,6 +40,8 @@ i18n
                 parts: enParts,
                 profile: enProfile,
                 booking: enBooking,
+                wishlist: enWishlist,
+                checkout: enCheckout,
             },
             vi: {
                 translation: viTranslation,
@@ -48,6 +54,8 @@ i18n
                 parts: viParts,
                 profile: viProfile,
                 booking: viBooking,
+                wishlist: viWishlist,
+                checkout: viCheckout,
             },
         },
         lng: 'vi', // Default language

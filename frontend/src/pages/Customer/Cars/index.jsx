@@ -36,14 +36,18 @@ const CarsPage = () => {
         <div className="bg-[#fcfcfc] dark:bg-[#0a0a0b] min-h-screen transition-colors duration-300">
             {/* Minimalist Top Breadcrumb & Header */}
             <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1440px] pt-24 pb-12">
-                <div className="flex items-center gap-2 text-[13px] font-bold text-slate-400 dark:text-slate-500 mb-6">
-                    <Link to="/" className="!text-slate-400 dark:!text-slate-500 hover:!text-yellow-500 transition-colors">{t('layout:customer.header.home')}</Link>
-                    <ChevronRight size={14} />
-                    <Link to="/products" className="!text-slate-400 dark:!text-slate-500 hover:!text-yellow-500 transition-colors">{t('layout:customer.header.categories')}</Link>
+                <div className="flex items-center gap-2 text-[13px] font-bold text-slate-900 dark:text-white mb-6">
+                    <Link to="/" className="!text-slate-900 dark:!text-white hover:!text-yellow-500 transition-colors">{t('layout:customer.header.home')}</Link>
+                    <ChevronRight size={14} className="text-slate-400" />
+                    {!brandNameParam ? (
+                        <span className="text-yellow-500 font-bold">{t('layout:customer.header.categories')}</span>
+                    ) : (
+                        <Link to="/products" className="!text-slate-900 dark:!text-white hover:!text-yellow-500 transition-colors">{t('layout:customer.header.categories')}</Link>
+                    )}
                     {brandNameParam && (
                         <>
-                            <ChevronRight size={14} />
-                            <span className="text-slate-800 dark:text-white capitalize">{brandNameParam.replace('-', ' ')}</span>
+                            <ChevronRight size={14} className="text-slate-400" />
+                            <span className="text-yellow-500 font-bold capitalize">{brandNameParam.replace('-', ' ')}</span>
                         </>
                     )}
                 </div>

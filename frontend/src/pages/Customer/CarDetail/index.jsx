@@ -26,20 +26,16 @@ const CarDetailPage = () => {
         let activeIndex = 0;
         let scrollTimeout = null;
 
-        // Collect all snapable sections dynamically
         const sectionIds = ['hero', 'price-color', 'design', 'technology', 'specs', 'gallery'];
 
-        // Helper to forcefully jump to a section
         const jumpToSection = (index) => {
             if (index < 0 || index >= sectionIds.length) return;
             activeIndex = index;
             isScrolling = true;
 
             if (index === 0) {
-                // Hero is special, snap strictly to absolute top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-                // Other sections respect the sticky nav offset (-136)
                 scroller.scrollTo(sectionIds[index], {
                     duration: 900,
                     smooth: 'easeInOutQuart',
@@ -47,36 +43,31 @@ const CarDetailPage = () => {
                 });
             }
 
-            // Lock scrolling until animation completes
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => { isScrolling = false; }, 950);
         };
 
         const handleWheel = (e) => {
-            // Check if user is scrolling inside a table/container that has scrollbar
             const scrollableContainer = e.target.closest('.custom-scrollbar');
             if (scrollableContainer) {
                 const { scrollTop, scrollHeight, clientHeight } = scrollableContainer;
                 const isAtTop = scrollTop <= 0;
                 const isAtBottom = Math.max(0, scrollHeight - (scrollTop + clientHeight)) <= 1;
 
-                // Only intercept to allow native scroll if not at the boundaries
                 if (e.deltaY > 0 && !isAtBottom) {
-                    return; // allow native scroll down
+                    return;
                 }
                 if (e.deltaY < 0 && !isAtTop) {
-                    return; // allow native scroll up
+                    return;
                 }
             }
 
-            e.preventDefault(); // Take 100% control of the wheel
+            e.preventDefault();
             if (isScrolling) return;
 
             if (e.deltaY > 0) {
-                // Scroll Down -> Next Section
                 jumpToSection(activeIndex + 1);
             } else if (e.deltaY < 0) {
-                // Scroll Up -> Prev Section
                 jumpToSection(activeIndex - 1);
             }
         };
@@ -93,15 +84,15 @@ const CarDetailPage = () => {
 
         // Force activeIndex back to 0 when the component mounts specifically
         const handleInitialScroll = () => {
-             // Forcing top scroll to prevent browser from returning to middle-of-page state from previous navigation
-             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-             activeIndex = 0;
+            // Forcing top scroll to prevent browser from returning to middle-of-page state from previous navigation
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            activeIndex = 0;
         };
         handleInitialScroll();
 
         // Must run in setTimeout to beat browser's native scroll restoration on soft navigations
         setTimeout(() => {
-             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         }, 10);
 
         window.addEventListener('wheel', handleWheel, { passive: false });
@@ -133,7 +124,7 @@ const CarDetailPage = () => {
             <StickyNav t={t} />
 
             {/* 3. Price & Color (360 Viewer) */}
-            <PriceAndColorSection 
+            <PriceAndColorSection
                 car={car}
                 colors={colors}
                 selectedColor={selectedColor}
@@ -144,17 +135,17 @@ const CarDetailPage = () => {
             {/* 4. Features Zig-Zag Layout */}
             {car.features && car.features.length > 0 && (
                 <>
-                    <FeatureSection 
-                        id="design" 
+                    <FeatureSection
+                        id="design"
                         title={car.features[0].title}
                         features={[{ title: '', desc: car.features[0].desc, image: car.features[0].image }]}
                         align="right"
                         subtitle={t('products:detail.design')}
                     />
-                    
+
                     {car.features[1] && (
-                        <FeatureSection 
-                            id="technology" 
+                        <FeatureSection
+                            id="technology"
                             title={car.features[1].title}
                             features={[{ title: '', desc: car.features[1].desc, image: car.features[1].image }]}
                             align="left"

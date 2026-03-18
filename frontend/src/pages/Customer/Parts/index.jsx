@@ -40,16 +40,12 @@ const PartsPage = () => {
         <div className="bg-[#fcfcfc] dark:bg-[#0a0a0b] min-h-screen transition-colors duration-300">
             <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1440px] pt-24 pb-12">
                 
-                <div className="flex items-center gap-2 text-[13px] font-bold text-slate-400 dark:text-slate-500 mb-6">
-                    <Link to="/" className="hover:text-yellow-500 transition-colors">
+                <div className="flex items-center gap-2 text-[13px] font-bold mb-6">
+                    <Link to="/" className="!text-slate-900 dark:!text-white hover:!text-yellow-500 transition-colors">
                         {t('breadcrumb_home', 'Trang chủ')}
                     </Link>
-                    <span>/</span>
-                    <Link to="/cua-hang" className="hover:text-yellow-500 transition-colors">
-                        {t('breadcrumb_store', 'Cửa hàng')}
-                    </Link>
-                    <span>/</span>
-                    <span className="text-yellow-500 font-semibold">{t('breadcrumb_parts', 'Linh kiện & Phụ tùng')}</span>
+                    <span className="text-slate-400 font-normal">/</span>
+                    <span className="text-yellow-500 font-bold">{t('breadcrumb_parts', 'Linh kiện')}</span>
                 </div>
 
                 <div className="max-w-3xl">

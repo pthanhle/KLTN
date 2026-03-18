@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { getMockCarDetail, TIME_SLOTS, SHOWROOM_BRANCHES } from '../data/testDrive.mock';
-import { getBookingSchema } from '../schemas/bookingSchema';
+import { getBookingSchema, defaultBookingValues } from '../schemas/bookingSchema';
 
 export const useTestDriveLogic = () => {
     const navigate = useNavigate();
@@ -23,16 +23,7 @@ export const useTestDriveLogic = () => {
     const methods = useForm({
         resolver: zodResolver(schema),
         mode: 'onChange',
-        defaultValues: {
-            bookingType: 'showroom',
-            phoneNumber: '',
-            showroomBranch: '1',
-            deliveryAddress: '',
-            selectedDate: null,
-            selectedTimeSlot: '',
-            hasDriverLicense: false,
-            note: ''
-        }
+        defaultValues: defaultBookingValues
     });
 
     useEffect(() => {
@@ -53,6 +44,7 @@ export const useTestDriveLogic = () => {
                 test_drive_type: data.bookingType,
                 showroom_branch: data.bookingType === 'showroom' ? data.showroomBranch : null,
                 delivery_address: data.bookingType === 'home' ? data.deliveryAddress : null,
+                full_name: data.fullName,
                 contact_phone: data.phoneNumber,
                 booking_date: data.selectedDate.format('YYYY-MM-DD'),
                 time_slot: data.selectedTimeSlot,

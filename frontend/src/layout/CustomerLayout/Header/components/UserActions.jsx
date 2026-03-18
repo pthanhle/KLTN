@@ -27,9 +27,12 @@ const UserActions = () => {
             </div>
 
             <div className="flex items-center gap-5 text-slate-700 dark:text-slate-300">
-                <button className="hover:text-yellow-500 transition-colors">
+                <Link to="/wishlist" className="relative hover:!text-yellow-500 !text-slate-700 dark:!text-slate-300 transition-colors group">
                     <Heart size={20} />
-                </button>
+                    <span className="absolute -top-2 -right-2 bg-yellow-500 text-slate-900 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0b0f19] group-hover:scale-110 transition-transform shadow-sm">
+                        4
+                    </span>
+                </Link>
                 <Link to="/cart" className="relative hover:!text-yellow-500 !text-slate-700 dark:!text-white transition-colors group">
                     <ShoppingCart size={20} />
                     <span className="absolute -top-2 -right-2 bg-yellow-500 text-slate-900 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0b0f19] group-hover:scale-110 transition-transform shadow-sm">

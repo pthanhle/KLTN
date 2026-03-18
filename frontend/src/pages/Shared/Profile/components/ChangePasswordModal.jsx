@@ -40,7 +40,7 @@ const ChangePasswordModal = ({ isOpen, onClose, t }) => {
             open={isOpen}
             onCancel={onClose}
             footer={null}
-            destroyOnClose
+            destroyOnHidden
             className="[&_.ant-modal-content]:!bg-white dark:[&_.ant-modal-content]:!bg-[#141416] [&_.ant-modal-content]:!rounded-[32px] [&_.ant-modal-close]:!text-slate-400 [&_.ant-modal-header]:!bg-transparent [&_.ant-modal-header]:!border-b-0"
             width={480}
             centered

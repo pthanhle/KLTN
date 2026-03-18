@@ -39,6 +39,8 @@ const LocationSelector = ({ branches, t }) => {
                 render={({ field }) => (
                     <Input 
                         {...field}
+                        value={field.value || ''}
+                        autoComplete="new-password"
                         placeholder="Nhập địa chỉ của bạn để chúng tôi giao xe tới..."
                         className={`!h-[52px] !px-4 !rounded-2xl !bg-slate-50 dark:!bg-[#0a0a0b] !border-slate-200 dark:!border-white/10 hover:!border-yellow-500/50 focus:!border-yellow-500 !text-[15px] !font-medium !text-slate-900 dark:!text-white transition-all placeholder:!text-slate-400 ${errors.deliveryAddress ? '!border-red-500 focus:!border-red-500' : ''}`}
                     />

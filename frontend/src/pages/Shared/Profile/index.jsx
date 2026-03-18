@@ -3,6 +3,10 @@ import ProfileSidebar from './components/ProfileSidebar';
 import ProfileForm from './components/ProfileForm';
 import EmployeeInfo from './components/EmployeeInfo';
 import ChangePasswordModal from './components/ChangePasswordModal';
+import OrderHistory from './pages/OrderHistory/index.jsx';
+import OrderDetail from './pages/OrderDetail/index.jsx';
+import ServiceHistory from './pages/ServiceHistory/index.jsx';
+import ServiceQuotation from './pages/ServiceQuotation/index.jsx';
 import { useLocation } from 'react-router-dom';
 
 const ProfilePage = () => {
@@ -48,18 +52,30 @@ const ProfilePage = () => {
                         </aside>
 
                         <main className="flex-1 min-w-0 w-full">
-                            <ProfileForm 
-                                profile={profile} 
-                                isEditing={isEditing} 
-                                methods={methods}
-                                handleSave={handleSave} 
-                                handleEditToggle={handleEditToggle} 
-                                t={t} 
-                            />
+                            {location.pathname === '/profile/orders' ? (
+                                <OrderHistory />
+                            ) : location.pathname.startsWith('/profile/orders/') ? (
+                                <OrderDetail />
+                            ) : location.pathname.startsWith('/profile/services/') ? (
+                                <ServiceQuotation />
+                            ) : location.pathname === '/profile/services' ? (
+                                <ServiceHistory />
+                            ) : (
+                                <>
+                                    <ProfileForm 
+                                        profile={profile} 
+                                        isEditing={isEditing} 
+                                        methods={methods}
+                                        handleSave={handleSave} 
+                                        handleEditToggle={handleEditToggle} 
+                                        t={t} 
+                                    />
 
-                            {/* Show Employee Info only for Admin/Staff */}
-                            {profile.employeeInfo && (
-                                <EmployeeInfo employeeInfo={profile.employeeInfo} t={t} />
+                                    {/* Show Employee Info only for Admin/Staff */}
+                                    {profile.employeeInfo && (
+                                        <EmployeeInfo employeeInfo={profile.employeeInfo} t={t} />
+                                    )}
+                                </>
                             )}
                         </main>
                     </div>

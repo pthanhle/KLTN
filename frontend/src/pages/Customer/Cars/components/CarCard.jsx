@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Image } from 'antd';
+import { Image, message } from 'antd';
+import { Heart } from 'lucide-react';
 import { formatVND } from '../hooks/useCarsLogic';
 
 export const CarCardSkeleton = () => {
@@ -25,10 +26,22 @@ export const CarCardSkeleton = () => {
 };
 
 const CarCard = ({ car, t }) => {
+    const handleAddToWishlist = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        message.success(t('Cập nhật thành công! Đã thêm vào yêu thích.', { name: car.name }));
+    };
+
     return (
-        <div className="flex flex-col bg-white dark:bg-[#141416] border border-slate-100 dark:border-white/5 rounded-[32px] overflow-hidden hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_20px_40px_rgba(255,255,255,0.02)] transition-all duration-300 group hover:-translate-y-1">
+        <div className="flex flex-col bg-white dark:bg-[#141416] border border-slate-100 dark:border-white/5 rounded-[32px] overflow-hidden hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_20px_40px_rgba(255,255,255,0.02)] transition-all duration-300 group hover:-translate-y-1 relative">
             {/* Image Container with scale effect */}
             <div className="relative w-full h-[220px] bg-slate-50 dark:bg-[#0b0f19] overflow-hidden flex items-center justify-center p-4">
+                <button 
+                    onClick={handleAddToWishlist}
+                    className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-[#141416]/90 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-500 hover:bg-white transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-100/50 dark:border-white/10"
+                >
+                    <Heart size={16} />
+                </button>
                 <Image 
                     src={car.image} 
                     alt={car.name} 

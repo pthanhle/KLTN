@@ -6,7 +6,7 @@ const PageBreadcrumbs = ({ items }) => {
         <nav className="flex items-center space-x-1.5 text-sm mb-6" aria-label="Breadcrumb">
             <Link 
                 to="/admin/dashboard" 
-                className="flex items-center !text-slate-500 hover:!text-yellow-600 dark:!text-slate-400 dark:hover:!text-premium-gold transition-colors"
+                className="flex items-center !text-slate-900 hover:!text-yellow-600 dark:!text-white dark:hover:!text-premium-gold transition-colors"
                 title="Home"
             >
                 <Home size={16} />
@@ -19,13 +19,13 @@ const PageBreadcrumbs = ({ items }) => {
                     <div key={index} className="flex items-center space-x-1.5">
                         <ChevronRight size={14} className="text-slate-400 dark:text-slate-600 mt-0.5" />
                         {isLast || !item.href ? (
-                            <span className={`font-semibold ${isLast ? '!text-slate-800 dark:!text-white' : '!text-slate-500 dark:!text-slate-400'}`}>
+                            <span className={`font-semibold ${isLast ? '!text-yellow-500 dark:!text-yellow-500' : '!text-slate-900 dark:!text-white'}`}>
                                 {item.label}
                             </span>
                         ) : (
                             <Link 
                                 to={item.href} 
-                                className="font-medium !text-slate-500 hover:!text-yellow-600 dark:!text-slate-400 dark:hover:!text-premium-gold transition-colors"
+                                className="font-medium !text-slate-900 hover:!text-yellow-600 dark:!text-white dark:hover:!text-premium-gold transition-colors"
                             >
                                 {item.label}
                             </Link>

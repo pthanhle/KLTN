@@ -1,5 +1,5 @@
 export const MOCK_PROFILE_CUSTOMER = {
-    _id: "65c2e10b923d",
+    id: "65c2e10b923d",
     username: "nguyenvana_tt",
     email: "customer@ttauto.com",
     full_name: "Nguyễn Văn A",
@@ -12,7 +12,7 @@ export const MOCK_PROFILE_CUSTOMER = {
 };
 
 export const MOCK_PROFILE_ADMIN = {
-    _id: "78a9c20b411d",
+    id: "78a9c20b411d",
     username: "admin_vip",
     email: "admin@ttauto.vn",
     full_name: "Nguyễn Quản Trị",

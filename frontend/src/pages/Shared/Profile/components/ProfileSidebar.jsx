@@ -1,4 +1,4 @@
-import { Camera, Shield, User, Clock, ShoppingBag, Wrench } from 'lucide-react';
+import { Camera, Shield, User, Clock, ShoppingBag, Wrench, Car } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
@@ -81,6 +81,22 @@ const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
                         <Wrench size={18} className={currentPath === '/profile/services' ? 'text-yellow-500' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors'} strokeWidth={2.5} />
                         <span className={`text-[14px] font-bold transition-colors ${currentPath === '/profile/services' ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'}`}>
                             {t('service_history_title', 'Lịch sử bảo dưỡng')}
+                        </span>
+                    </div>
+                </button>
+
+                <button 
+                    onClick={() => navigate('/profile/test-drives')}
+                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${
+                        currentPath === '/profile/test-drives' 
+                            ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]' 
+                            : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
+                    }`}
+                >
+                    <div className="flex items-center gap-3">
+                        <Car size={18} className={currentPath === '/profile/test-drives' ? 'text-yellow-500' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors'} strokeWidth={2.5} />
+                        <span className={`text-[14px] font-bold transition-colors ${currentPath === '/profile/test-drives' ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'}`}>
+                            {t('testdrive_history_title', 'Lái thử & Trải nghiệm')}
                         </span>
                     </div>
                 </button>

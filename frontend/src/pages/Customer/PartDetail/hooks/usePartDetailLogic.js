@@ -1,12 +1,22 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { App } from 'antd';
 import { getMockPartDetail } from '../data/mockPartDetail';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '@/store/slices/cartSlice';
+import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
 export const usePartDetailLogic = (id) => {
     const { t } = useTranslation('parts');
+    const navigate = useNavigate();
+    const { message } = App.useApp();
+    const dispatch = useDispatch();
+
     const [part, setPart] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    
+    const [isSubmittingAction, setIsSubmittingAction] = useState(false);
+
     // State Options variants
     const [selectedOptions, setSelectedOptions] = useState({});
     const [quantity, setQuantity] = useState(1);
@@ -31,17 +41,54 @@ export const usePartDetailLogic = (id) => {
         if (type === 'decrement' && quantity > 1) setQuantity(q => q - 1);
     };
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
+    const handleAddToCart = async () => {
+        if (!part) return;
+        setIsSubmittingAction(true);
+        try {
+            // Giả lập Payload đẩy lên Redux / Backend Database
+            await new Promise(resolve => setTimeout(resolve, 800)); // Delay xử lý mạng
+            
+            dispatch(addToCart({ 
+                ...part, 
+                id: Date.now().toString(),
+                product_id: part.id,
+                quantity: quantity,
+                condition: 'New',
+                selected_options: selectedOptions
+            }));
+
+            message.success(t('add_to_cart_success', 'Đã thêm sản phẩm vào Giỏ Hàng!'));
+        } catch (error) {
+            message.error(t('action_error', 'Có lỗi xảy ra, vui lòng thử lại!'));
+        } finally {
+            setIsSubmittingAction(false);
+        }
     };
 
-    const handleAddToCart = () => {
-        console.log('Thêm vào giỏ:', { id: part.id, quantity, options: selectedOptions });
-        // Typically triggers mini-cart Context
-    };
+    const handleBuyNow = async () => {
+        if (!part) return;
+        setIsSubmittingAction(true);
+        try {
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            dispatch(addToCart({ 
+                ...part, 
+                id: Date.now().toString(),
+                product_id: part.id,
+                quantity: quantity,
+                condition: 'New',
+                selected_options: selectedOptions,
+                isBuyNow: true
+            }));
 
-    const handleBuyNow = () => {
-        console.log('Mua ngay, redirect tới checkout');
+            message.success(t('buy_now_processing', 'Đã thêm vào giỏ. Đang chuyển hướng...'));
+
+            navigate('/cart');
+        } catch (error) {
+            message.error(t('action_error', 'Có lỗi xảy ra, vui lòng thử lại!'));
+        } finally {
+            setIsSubmittingAction(false);
+        }
     };
 
     const submitReview = (rating, comment) => {
@@ -58,9 +105,10 @@ export const usePartDetailLogic = (id) => {
         setActiveTab,
         handleOptionSelect,
         handleQuantityChange,
-        formatCurrency,
+        formatCurrency: formatVND,
         handleAddToCart,
         handleBuyNow,
-        submitReview
+        submitReview,
+        isSubmittingAction
     };
 };

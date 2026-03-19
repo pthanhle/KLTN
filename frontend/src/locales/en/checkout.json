@@ -51,11 +51,38 @@
   "support_desc": "The TT AUTO expert team is available 24/7 via Hotline.",
   "support_call": "Call 1900 1234",
 
-  "success_title": "ORDER SUCCESSFUL!",
-  "success_subtitle": "Thank you for trusting TT AUTO. Your order is being processed.",
-  "success_order_id": "Order ID",
-  "success_order_date": "Order Date",
-  "success_delivery_est": "Estimated Delivery",
-  "success_notice": "A confirmation email has been sent. Our advisor will contact you shortly.",
-  "success_track": "Track Order"
+  "success_title": "ORDER PLACED SUCCESSFULLY!",
+  "success_subtitle": "Thank you for trusting TT AUTO. We are packing and preparing your order for delivery.",
+  "success_order_id": "Order ID: #{{id}}",
+  "success_email_sent": "A DETAILED RECEIPT HAS BEEN SENT TO EMAIL {{email}}",
+  "success_track_btn": "Track your order",
+  "success_continue_btn": "Continue shopping",
+
+  "success_timeline_1": "ORDERED",
+  "success_timeline_2": "PACKING",
+  "success_timeline_3": "SHIPPING",
+  "success_timeline_4": "DELIVERED",
+
+  "success_product_summary": "PRODUCT SUMMARY",
+  "success_qty": "Quantity: {{count}}",
+  "success_final_total": "FINAL TOTAL",
+  "success_tax_included": "VAT & Shipping included",
+
+  "success_shipping_info": "SHIPPING INFORMATION",
+  "success_receiver": "Receiver:",
+  "success_phone": "Phone number:",
+  "success_address": "Address:",
+  "success_shipping_method": "Shipping:",
+  "success_delivery_est": "EXPECTED: {{date}}",
+
+  "success_payment_info": "PAYMENT",
+  "success_payment_status": "SUCCESS",
+  "success_payment_card_tail": "Card ending: **** {{tail}}",
+
+  "success_support_title": "Need to change delivery details or cancel?",
+  "success_support_desc": "You can perform this online or contact support within the next 30 minutes.",
+  "success_support_hotline": "HOTLINE: 1900 88XX",
+  "success_copied": "Order ID copied",
+  "summary_free_shipping_notice": "Free nationwide shipping on orders over 100,000,000 VND. Applies to standard parts. Heavy/Bulky items require additional surcharge.",
+  "summary_back": "Return to cart"
 }

@@ -1,3 +1,5 @@
+import { MOCK_PARTS } from '../../Parts/data/parts.mock';
+
 export const mockPartsList = {
     '1': {
         id: '1',
@@ -9,7 +11,7 @@ export const mockPartsList = {
         reviews_count: 128,
         sold_count: 842,
         original_price: 150000000,
-        current_price: 1425000000,
+        price: 142500000,
         discount_percent: 5,
         is_best_seller: true,
         in_stock: true,
@@ -319,4 +321,26 @@ export const mockPartsList = {
     }
 };
 
-export const getMockPartDetail = (id) => mockPartsList[id] || mockPartsList['1'];
+export const getMockPartDetail = (id) => {
+    const listDetail = mockPartsList['1']; 
+    const summaryData = MOCK_PARTS.find(p => String(p.id) === String(id));
+    
+    if (summaryData) {
+        return {
+            ...listDetail,
+            id: summaryData.id,
+            name: summaryData.name,
+            sku: summaryData.sku,
+            category: summaryData.category,
+            price: summaryData.price,
+            original_price: Math.floor(summaryData.price * 1.05),
+            brand: summaryData.compatible_brands?.[0] || 'Phụ kiện',
+            stock: summaryData.stock,
+            in_stock: summaryData.stock > 0,
+            images: [summaryData.image, ...listDetail.images.slice(1)],
+            description_html: listDetail.description,
+            description: summaryData.description
+        };
+    }
+    return listDetail;
+};

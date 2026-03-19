@@ -5,18 +5,25 @@ import LocationSelector from './BookingForm/LocationSelector';
 import DateTimeSelector from './BookingForm/DateTimeSelector';
 import AdditionalInfo from './BookingForm/AdditionalInfo';
 import ActionButtons from './BookingForm/ActionButtons';
+import RescheduleReasonInput from './BookingForm/RescheduleReasonInput';
 
 const BookingForm = ({ hookState }) => {
     const {
-        handleCancel, isLoading, methods, onSubmit, timeSlots, branches, t
+        handleCancel, isLoading, isReschedule, methods, onSubmit, timeSlots, branches, t
     } = hookState;
 
     return (
         <FormProvider {...methods}>
             <form onSubmit={onSubmit} className="flex-1 p-8 md:p-14 flex flex-col h-full bg-white dark:bg-[#141416] w-full max-w-full overflow-hidden">
                 <div className="mb-10 mt-2">
-                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-3">{t('booking_title', 'Đăng Ký Lái Thử')}</h1>
-                    <p className="text-[15px] font-medium text-slate-500 dark:text-slate-400">{t('booking_subtitle', 'Để lại thông tin, đội ngũ TT AUTO sẽ liên hệ xác nhận trong 15 phút.')}</p>
+                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-3">
+                        {isReschedule ? t('booking_title_reschedule', 'Dời Lịch Lái Thử') : t('booking_title', 'Đăng Ký Lái Thử')}
+                    </h1>
+                    <p className="text-[15px] font-medium text-slate-500 dark:text-slate-400">
+                        {isReschedule 
+                            ? t('booking_subtitle_reschedule', 'Vui lòng chọn khung giờ mới và điền lý do dời lịch.') 
+                            : t('booking_subtitle', 'Để lại thông tin, đội ngũ TT AUTO sẽ liên hệ xác nhận trong 15 phút.')}
+                    </p>
                 </div>
 
                 <div className="space-y-8 flex-1">
@@ -30,6 +37,7 @@ const BookingForm = ({ hookState }) => {
                     </div>
 
                     <DateTimeSelector timeSlots={timeSlots} t={t} />
+                    <RescheduleReasonInput t={t} isReschedule={isReschedule} />
                     <AdditionalInfo t={t} />
                 </div>
 

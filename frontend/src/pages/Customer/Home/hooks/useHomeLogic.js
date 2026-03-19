@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MOCK_FEATURED_CARS, MOCK_RECENT_HISTORY, MOCK_BRANDS_LIST } from '../data/home.mock';
 
 export const useHomeLogic = () => {
     const navigate = useNavigate();
@@ -10,33 +11,16 @@ export const useHomeLogic = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const mockFeaturedCars = [
-            { id: 1, name: 'Mercedes-Benz G63', subtitle: 'Biểu tượng của quyền lực', image: 'https://images.unsplash.com/photo-1520031441872-265e4ff70366?q=80&w=800&auto=format&fit=crop' },
-            { id: 2, name: 'Porsche 911 Turbo S', subtitle: 'Cảm xúc thuần khiết', image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800&auto=format&fit=crop' },
-            { id: 3, name: 'Range Rover Autobiography', subtitle: 'Đỉnh cao của sự sang trọng', image: 'https://images.unsplash.com/photo-1606016159991-efaee400ccdb?q=80&w=800&auto=format&fit=crop' },
-            { id: 4, name: 'Lamborghini Urus S', subtitle: 'Siêu SUV không đối thủ', image: 'https://images.unsplash.com/photo-1620882357774-fbfa943ed2d6?q=80&w=800&auto=format&fit=crop' },
-        ];
-
-        const mockRecentHistory = [
-            { id: 10, name: 'Audi RS7 Sportback', engine: '4.0 V8', time: 'Đã xem 2 giờ trước', image: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=600&auto=format&fit=crop' },
-            { id: 11, name: 'BMW M4 Competition', engine: '3.0 L6', time: 'Đã xem 5 giờ trước', image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=600&auto=format&fit=crop' },
-            { id: 12, name: 'Bentley Bentayga V8', engine: '4.0 V8', time: 'Đã xem hôm qua', image: 'https://images.unsplash.com/photo-1627916323114-f421f1e2fbc0?q=80&w=600&auto=format&fit=crop' },
-            { id: 13, name: 'Lexus LX600 VIP', engine: '3.5 V6', time: 'Đã xem 2 ngày trước', image: 'https://images.unsplash.com/photo-1619682817481-e994891cb1b4?q=80&w=600&auto=format&fit=crop' },
-        ];
-
-        const mockBrands = [
-            'Mercedes-Benz', 'BMW', 'Audi', 'Porsche', 'Range Rover', 'Lexus'
-        ];
-
-        setFeaturedCars(mockFeaturedCars);
-        setRecentHistory(mockRecentHistory);
-        setBrands(mockBrands);
+        setFeaturedCars(MOCK_FEATURED_CARS);
+        setRecentHistory(MOCK_RECENT_HISTORY);
+        setBrands(MOCK_BRANDS_LIST);
         setIsLoading(false);
     }, []);
 
     // Handlers
     const handleBookService = () => navigate('/services');
     const handleViewCars = () => navigate('/products');
+    const handleViewCarDetail = (id) => navigate(`/cars/${id}`);
     const handleTradeIn = () => navigate('/contact');
 
     return {
@@ -45,6 +29,7 @@ export const useHomeLogic = () => {
         brands,
         handleBookService,
         handleViewCars,
+        handleViewCarDetail,
         handleTradeIn,
         isLoading
     };

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Loader2, Trash2 } from 'lucide-react';
 import { Button, Image } from 'antd';
-import ConfirmModal from '../../../../../components/ui/ConfirmModal';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 
-const WishlistCard = ({ item, isRemoving, isAddingToCart, onRemove, onAddToCart, t, formatCurrency }) => {
+const WishlistCard = ({ item, isRemoving, isAddingToCart, isBuyingNow, onRemove, onAddToCart, onBuyNow, t, formatCurrency }) => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
     const getBadgeStyle = (type) => {
@@ -53,9 +53,9 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, onRemove, onAddToCart,
 
             {/* Left: Image */}
             <div className="relative w-full flex-shrink-0 rounded-2xl bg-[#fcfcfc] dark:bg-[#141416] overflow-hidden md:w-[260px] h-[260px] flex items-center justify-center border border-slate-50 dark:border-white/5">
-                {item.badgeType && (
-                    <span className={`absolute top-3 left-3 z-10 text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest ${getBadgeStyle(item.badgeType)}`}>
-                        {t(`wishlist:${item.badgeType}`, item.badgeType.replace('_', ' '))}
+                {item.badge_type && (
+                    <span className={`absolute top-3 left-3 z-10 text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest ${getBadgeStyle(item.badge_type)}`}>
+                        {t(`wishlist:${item.badge_type}`, item.badge_type.replace('_', ' '))}
                     </span>
                 )}
                 <div className="w-[80%] h-[80%] flex items-center justify-center">
@@ -72,7 +72,7 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, onRemove, onAddToCart,
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                     <div>
                         <p className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">{item.brand}</p>
-                        <Link to={`/parts/${item.partId}`} className="hover:text-yellow-500 transition-colors block">
+                        <Link to={`/parts/${item.product_id}`} className="hover:text-yellow-500 transition-colors block">
                             <h3 className="font-extrabold text-xl md:text-2xl leading-tight text-slate-900 dark:text-white line-clamp-2 md:line-clamp-none">{item.name}</h3>
                         </Link>
                     </div>
@@ -88,13 +88,13 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, onRemove, onAddToCart,
                             />
                         ))}
                     </div>
-                    <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">({item.reviewsCount} {t('wishlist:reviews')})</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">({item.reviews_count} {t('wishlist:reviews')})</span>
                 </div>
 
                 <div className="flex items-center justify-center md:justify-start gap-2 pt-1">
-                    <span className={`w-2 h-2 rounded-full ${getStatusStyle(item.stockStatus).split(' ')[0]}`}></span>
-                    <span className={`text-xs font-bold uppercase tracking-wide ${getStatusStyle(item.stockStatus).split(' ')[1]}`}>
-                        {t(`wishlist:${item.stockStatus}`)}
+                    <span className={`w-2 h-2 rounded-full ${getStatusStyle(item.stock_status).split(' ')[0]}`}></span>
+                    <span className={`text-xs font-bold uppercase tracking-wide ${getStatusStyle(item.stock_status).split(' ')[1]}`}>
+                        {t(`wishlist:${item.stock_status}`)}
                     </span>
                 </div>
             </div>
@@ -102,31 +102,34 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, onRemove, onAddToCart,
             {/* Right: Price & CTA */}
             <div className="w-full md:w-64 flex flex-col items-center md:items-end justify-center gap-5 md:border-l border-slate-100 dark:border-white/5 md:pl-8 flex-shrink-0">
                 <div className="text-center md:text-right">
-                    <p className={`text-2xl lg:text-[28px] font-black ${item.originalPrice ? 'text-red-600 dark:text-red-500' : 'text-slate-900 dark:text-white'}`}>
+                    <p className={`text-2xl lg:text-[28px] font-black ${item.original_price ? 'text-red-600 dark:text-red-500' : 'text-slate-900 dark:text-white'}`}>
                         {formatCurrency(item.price)}
                     </p>
-                    {item.originalPrice && (
+                    {item.original_price && (
                         <p className="text-sm font-semibold text-slate-400 dark:text-slate-500 line-through mt-1">
-                            {formatCurrency(item.originalPrice)}
+                            {formatCurrency(item.original_price)}
                         </p>
                     )}
                 </div>
 
                 <div className="w-full space-y-3 mt-2">
                     <Button
+                        loading={isBuyingNow}
                         type="primary"
                         onClick={() => {
-                            // Todo: Thực hiện logic Buy Now chuyển hướng tới thanh toán
+                            if (item.stock_status !== 'out_of_stock' && item.stock_status !== 'pre_order') {
+                                onBuyNow(item);
+                            }
                         }}
-                        disabled={item.stockStatus === 'out_of_stock'}
-                        className={`w-full !h-auto !py-3.5 !rounded-2xl !font-bold !text-[14px] transition-all duration-300 flex items-center justify-center active:scale-95 ${item.stockStatus === 'out_of_stock'
+                        disabled={item.stock_status === 'out_of_stock'}
+                        className={`w-full !h-auto !py-3.5 !rounded-2xl !font-bold !text-[14px] transition-all duration-300 flex items-center justify-center active:scale-95 ${item.stock_status === 'out_of_stock'
                                 ? '!bg-slate-200 dark:!bg-slate-800 !text-slate-400 !shadow-none !border-0'
                                 : '!bg-yellow-500 hover:!bg-yellow-400 !text-slate-900 !border-0 shadow-lg shadow-yellow-500/20'
                             }`}
                     >
-                        {item.stockStatus === 'out_of_stock'
+                        {item.stock_status === 'out_of_stock'
                             ? t('wishlist:out_of_stock', 'Hết hàng')
-                            : item.stockStatus === 'pre_order'
+                            : item.stock_status === 'pre_order'
                                 ? t('wishlist:contact_order', 'Liên hệ đặt hàng')
                                 : t('wishlist:buy_now', 'Mua ngay')
                         }
@@ -134,8 +137,8 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, onRemove, onAddToCart,
                     <Button
                         loading={isAddingToCart}
                         onClick={() => onAddToCart(item)}
-                        disabled={item.stockStatus === 'out_of_stock'}
-                        className={`w-full !h-auto !py-3.5 !rounded-2xl !font-bold !text-[14px] transition-all duration-300 flex items-center justify-center active:scale-95 ${item.stockStatus === 'out_of_stock'
+                        disabled={item.stock_status === 'out_of_stock'}
+                        className={`w-full !h-auto !py-3.5 !rounded-2xl !font-bold !text-[14px] transition-all duration-300 flex items-center justify-center active:scale-95 ${item.stock_status === 'out_of_stock'
                                 ? '!bg-slate-100 dark:!bg-white/5 !text-slate-500 dark:!text-slate-500 !border-slate-200 dark:!border-white/5 opacity-50'
                                 : '!bg-white dark:!bg-transparent hover:!bg-slate-50 dark:hover:!bg-white/5 !text-slate-700 dark:!text-slate-300 !border-slate-200 dark:!border-white/10'
                             }`}

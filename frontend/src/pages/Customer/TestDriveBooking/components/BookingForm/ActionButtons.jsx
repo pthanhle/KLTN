@@ -13,6 +13,7 @@ const ActionButtons = ({ handleCancel, isLoading, isValid, t }) => {
             <Button 
                 htmlType="submit"
                 loading={isLoading}
+                disabled={!isValid}
                 type="primary"
                 className={`w-full sm:w-auto !h-12 !px-10 !rounded-xl !font-black text-[15px] transition-all
                            ${isValid && !isLoading

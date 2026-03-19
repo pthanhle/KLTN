@@ -1,3 +1,5 @@
+import { DUMMY_CARS } from '@/pages/Customer/Cars/data/cars.mock';
+
 export const mockServices = [
     {
         booking_code: 'SRV-2026-B77P',
@@ -6,8 +8,8 @@ export const mockServices = [
         advisor_info: { id: 'ADV-001', name: 'Đỗ Tiến Đạt' },
         mechanic_info: { id: 'MEC-005', name: 'Lê Văn Nam' },
         vehicle_info: {
-            brand: 'MERCEDES-BENZ',
-            model: 'S450 LUXURY',
+            brand: DUMMY_CARS[0].brandName,
+            model: DUMMY_CARS[0].name,
             license_plate: '30A-888.88',
             vin_number: 'WDD2221831A12345',
             current_odometer: 12450
@@ -44,8 +46,8 @@ export const mockServices = [
         advisor_info: { id: 'ADV-002', name: 'Nguyễn Thị Bích' },
         mechanic_info: { id: 'MEC-012', name: 'Trần Mạnh Hùng' },
         vehicle_info: {
-            brand: 'PORSCHE',
-            model: '911 CARRERA S',
+            brand: DUMMY_CARS[8].brandName,
+            model: DUMMY_CARS[8].name,
             license_plate: '30G-999.99',
             vin_number: 'WP0ZZZ99ZLS12345',
             current_odometer: 2100

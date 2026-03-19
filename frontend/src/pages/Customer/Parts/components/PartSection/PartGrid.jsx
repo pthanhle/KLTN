@@ -22,7 +22,7 @@ const PartGrid = ({ isLoading, isFiltering, parts, currentPage, totalPages, onPa
                 {showLoading ? (
                     Array.from({ length: 9 }).map((_, i) => <PartCardSkeleton key={i} />)
                 ) : parts.length > 0 ? (
-                    parts.map(part => <PartCard key={part._id} part={part} />)
+                    parts.map(part => <PartCard key={part.id} part={part} />)
                 ) : (
                     <div className="col-span-full py-24 flex flex-col items-center justify-center text-center bg-slate-50/50 dark:bg-white/5 rounded-3xl border border-dashed border-slate-200 dark:border-white/10">
                         <p className="text-[16px] font-bold text-slate-800 dark:text-white mb-2">{t('no_parts_found', 'Không tìm thấy phụ tùng nào')}</p>

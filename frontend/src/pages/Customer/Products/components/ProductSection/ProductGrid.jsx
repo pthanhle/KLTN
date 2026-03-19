@@ -13,7 +13,7 @@ const ProductGrid = ({ isLoading, products }) => {
                     ))
                 ) : products.length > 0 ? (
                     products.map(product => (
-                        <ProductCard key={product._id} product={product} />
+                        <ProductCard key={product.id} product={product} />
                     ))
                 ) : (
                     <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-slate-50 dark:bg-white/5 rounded-3xl border border-dashed border-slate-200 dark:border-white/10">

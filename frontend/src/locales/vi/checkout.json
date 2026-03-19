@@ -52,10 +52,37 @@
   "support_call": "Gọi ngay 1900 1234",
 
   "success_title": "ĐẶT HÀNG THÀNH CÔNG!",
-  "success_subtitle": "Cảm ơn bạn đã tin tưởng TT AUTO. Đơn hàng của bạn đang được xử lý.",
-  "success_order_id": "Mã đơn hàng",
-  "success_order_date": "Ngày đặt hàng",
-  "success_delivery_est": "Dự kiến giao hàng",
-  "success_notice": "Thông báo xác nhận đã được gửi đến email của bạn. Nhân viên tư vấn sẽ liên hệ sớm nhất.",
-  "success_track": "Theo dõi đơn hàng"
+  "success_subtitle": "Cảm ơn bạn đã tin tưởng TT AUTO. Hệ thống đang tiến hành đóng gói và giao hàng cho bạn.",
+  "success_order_id": "Mã đơn hàng: #{{id}}",
+  "success_email_sent": "BIÊN LAI CHI TIẾT ĐÃ ĐƯỢC GỬI ĐẾN EMAIL {{email}}",
+  "success_track_btn": "Theo dõi tiến độ đơn hàng",
+  "success_continue_btn": "Tiếp tục mua sắm",
+
+  "success_timeline_1": "ĐẶT HÀNG",
+  "success_timeline_2": "ĐÓNG GÓI",
+  "success_timeline_3": "ĐANG GIAO",
+  "success_timeline_4": "HOÀN TẤT",
+
+  "success_product_summary": "TÓM TẮT SẢN PHẨM",
+  "success_qty": "Số lượng: {{count}}",
+  "success_final_total": "TỔNG CỘNG THANH TOÁN",
+  "success_tax_included": "Đã bao gồm VAT & Phí vận chuyển",
+
+  "success_shipping_info": "THÔNG TIN GIAO NHẬN",
+  "success_receiver": "Người nhận:",
+  "success_phone": "Số điện thoại:",
+  "success_address": "Địa chỉ:",
+  "success_shipping_method": "Vận chuyển:",
+  "success_delivery_est": "DỰ KIẾN: {{date}}",
+
+  "success_payment_info": "THANH TOÁN",
+  "success_payment_status": "THÀNH CÔNG",
+  "success_payment_card_tail": "Đuôi thẻ: **** {{tail}}",
+
+  "success_support_title": "Cần thay đổi thông tin giao hàng hoặc hủy đơn?",
+  "success_support_desc": "Bạn có thể thực hiện thao tác trực tuyến hoặc liên hệ hỗ trợ trong 30 phút tới.",
+  "success_support_hotline": "HOTLINE: 1900 88XX",
+  "success_copied": "Đã copy mã đơn hàng",
+  "summary_free_shipping_notice": "Miễn phí giao hàng toàn quốc trên 100.000.000 đ. Áp dụng cho mặt hàng phụ tùng tiêu chuẩn. Phụ thu hàng Cồng Kềnh tính riêng.",
+  "summary_back": "Quay lại giỏ hàng"
 }

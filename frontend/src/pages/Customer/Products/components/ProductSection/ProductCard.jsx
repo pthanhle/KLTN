@@ -33,8 +33,8 @@ const ProductCard = ({ product }) => {
                 {product.images && product.images.length > 0 ? (
                     <Image 
                         src={product.images[0]} 
-                        alt={product.product_name} 
-                        wrapperClassName="w-full h-full"
+                        alt={product.name} 
+                        rootClassName="w-full h-full"
                         className="!w-full !h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                 ) : (
@@ -51,7 +51,7 @@ const ProductCard = ({ product }) => {
             <div className="flex flex-col flex-1">
                 <div className="flex justify-between items-start gap-4 mb-2">
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight group-hover:text-yellow-600 dark:group-hover:text-premium-gold transition-colors">
-                        {product.product_name}
+                        {product.name}
                     </h3>
                     <button className="text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors shrink-0">
                         <Heart size={20} strokeWidth={2} />

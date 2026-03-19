@@ -1,11 +1,15 @@
+import { DUMMY_CARS } from '@/pages/Customer/Cars/data/cars.mock';
+import { MOCK_PARTS } from '@/pages/Customer/Parts/data/parts.mock';
+import { MOCK_PROFILE_CUSTOMER } from '@/pages/Shared/Profile/data/profile.mock';
+
 export const mockOrders = [
     {
         order_code: 'ORD-2026-X89A',
         user_id: 'USR-08912',
-        custom_info: {
-            name: 'Nguyễn Văn A',
-            phone: '0987654321',
-            address: '123 Đường B, Quận C, Hà Nội'
+        customer_info: {
+            full_name: MOCK_PROFILE_CUSTOMER.full_name,
+            phone: MOCK_PROFILE_CUSTOMER.phone,
+            address: MOCK_PROFILE_CUSTOMER.address
         },
         order_type: 'CAR_PURCHASE',
         order_date: '12/10/2026',
@@ -22,32 +26,32 @@ export const mockOrders = [
         },
         items: [
             {
-                product_id: 'PROD-911CS',
-                sku: 'P911-S-2026',
-                name: 'Porsche 911 Carrera S',
+                product_id: DUMMY_CARS[8].id,
+                sku: DUMMY_CARS[8].sku,
+                name: DUMMY_CARS[8].name,
                 quantity: 1,
-                unit_price: 8230000000,
-                total_price: 8230000000,
-                image: 'https://images.unsplash.com/photo-1503376713546-7729f225adcc?auto=format&fit=crop&q=80&w=800'
+                unit_price: DUMMY_CARS[8].price,
+                total_price: DUMMY_CARS[8].price,
+                image: DUMMY_CARS[8].image
             },
             {
-                product_id: 'ACC-RSMAM',
-                sku: 'RS-MAM-21IN',
-                name: 'Bộ mâm hợp kim RS Spyder',
+                product_id: MOCK_PARTS[1].id,
+                sku: MOCK_PARTS[1].sku,
+                name: MOCK_PARTS[1].name,
                 quantity: 1,
-                unit_price: 150000000,
-                total_price: 150000000,
-                image: 'https://images.unsplash.com/photo-1623512399650-6debf7aeef2b?auto=format&fit=crop&q=80&w=800'
+                unit_price: MOCK_PARTS[1].price,
+                total_price: MOCK_PARTS[1].price,
+                image: MOCK_PARTS[1].image
             }
         ]
     },
     {
         order_code: 'ORD-2026-V12K',
         user_id: 'USR-08912',
-        custom_info: {
-            name: 'Nguyễn Văn A',
-            phone: '0987654321',
-            address: '456 KĐT Mới, Quận 7, TP.HCM'
+        customer_info: {
+            full_name: MOCK_PROFILE_CUSTOMER.full_name,
+            phone: MOCK_PROFILE_CUSTOMER.phone,
+            address: MOCK_PROFILE_CUSTOMER.address
         },
         order_type: 'ACCESSORIES',
         order_date: '05/11/2026',
@@ -64,13 +68,13 @@ export const mockOrders = [
         },
         items: [
             {
-                product_id: 'ACC-THAMCB',
-                sku: 'THAM-CB-S450',
-                name: 'Thảm lót sàn cao cấp Carbon',
+                product_id: MOCK_PARTS[5].id,
+                sku: MOCK_PARTS[5].sku,
+                name: MOCK_PARTS[5].name,
                 quantity: 1,
-                unit_price: 12500000,
-                total_price: 12500000,
-                image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=800'
+                unit_price: MOCK_PARTS[5].price,
+                total_price: MOCK_PARTS[5].price,
+                image: MOCK_PARTS[5].image
             }
         ]
     }

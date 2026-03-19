@@ -1,30 +1,59 @@
 import { useState, useEffect, useMemo } from 'react';
-import { message } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { App } from 'antd';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-import { getMockCarDetail, TIME_SLOTS, SHOWROOM_BRANCHES } from '../data/testDrive.mock';
-import { getBookingSchema, defaultBookingValues } from '../schemas/bookingSchema';
+import { getMockCarDetail } from '../../CarDetail/data/carDetail.mock';
+import { TIME_SLOTS, SHOWROOM_BRANCHES } from '../data/testDrive.mock';
+import { getBookingSchema } from '../schemas/bookingSchema';
+import { mapRescheduleDataToForm, mapFormToBookingPayload } from '../utils/bookingFormMapper';
+import { useGetTestDriveById, useSubmitTestDrive } from '../../../../services/queries/bookingQueries';
 
 export const useTestDriveLogic = () => {
+    const { message } = App.useApp();
     const navigate = useNavigate();
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
     const { t } = useTranslation(['booking']);
+
+    // Tách Param từ URL Thanh điều hướng
+    const rescheduleId = searchParams.get('reschedule_id');
+    const isReschedule = !!rescheduleId;
+
+    // [REACT QUERY] Gọi API GET vé cũ
+    const { data: rescheduleData, error: fetchError } = useGetTestDriveById(rescheduleId);
     
+    // Xử lý Lỗi ném ra từ API GET
+    useEffect(() => {
+        if (fetchError) {
+            message.error(t('booking_notFound', 'Không tìm thấy lịch hẹn cần dời hoặc vé đã bị khóa.'));
+            navigate('/profile/test-drives', { replace: true });
+        }
+    }, [fetchError, t, navigate]);
+
+    // [REACT QUERY] Gọi API POST gửi vé
+    const submitMutation = useSubmitTestDrive();
+
     const [car, setCar] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
 
     const timeSlots = TIME_SLOTS;
     const branches = SHOWROOM_BRANCHES;
 
-    const schema = useMemo(() => getBookingSchema(t), [t]);
+    const schema = useMemo(() => getBookingSchema(t, rescheduleData), [t, rescheduleData]);
+
+    // Sử dụng Utils để ánh xạ (Map) Data Lịch sử thành Default Form Values
+    const defaultVals = useMemo(() => mapRescheduleDataToForm(rescheduleData), [rescheduleData]);
 
     const methods = useForm({
         resolver: zodResolver(schema),
         mode: 'onChange',
-        defaultValues: defaultBookingValues
+        defaultValues: defaultVals
     });
+
+    useEffect(() => {
+        methods.reset(defaultVals);
+    }, [defaultVals, methods]);
 
     useEffect(() => {
         // Mock fetch car details using ID
@@ -35,39 +64,28 @@ export const useTestDriveLogic = () => {
         navigate(-1); // Back to previous page
     };
 
-    const onSubmit = async (data) => {
-        setIsLoading(true);
-        try {
-            const payload = {
-                product_id: car?.id,
-                booking_type: 'vehicle',
-                test_drive_type: data.bookingType,
-                showroom_branch: data.bookingType === 'showroom' ? data.showroomBranch : null,
-                delivery_address: data.bookingType === 'home' ? data.deliveryAddress : null,
-                full_name: data.fullName,
-                contact_phone: data.phoneNumber,
-                booking_date: data.selectedDate.format('YYYY-MM-DD'),
-                time_slot: data.selectedTimeSlot,
-                has_driver_license: data.hasDriverLicense,
-                note: data.note
-            };
+    const onSubmit = (data) => {
+        // Sử dụng Utils để phân giải Data thô từ Form thành Payload chuẩn API
+        const payload = mapFormToBookingPayload(data, car?.id, isReschedule, rescheduleData);
 
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-            console.log('Submitted Payload:', payload);
-
-            message.success(t('booking_success', 'Đăng ký lái thử thành công! Quý khách sẽ nhận được liên hệ sớm nhất.'));
-            navigate(-1);
-            
-        } catch (error) {
-            message.error(error.message || t('booking_fail', 'Đã xảy ra lỗi hệ thống.'));
-        } finally {
-            setIsLoading(false);
-        }
+        // Bắn Lệnh Đột Biến (Mutation) của React Query
+        submitMutation.mutate(payload, {
+            onSuccess: () => {
+                message.success(isReschedule 
+                    ? t('reschedule_success', 'Dời lịch thành công! Quý khách sẽ nhận được liên hệ xác nhận.') 
+                    : t('booking_success', 'Đăng ký lái thử thành công! Quý khách sẽ nhận được liên hệ sớm nhất.'));
+                navigate(-1);
+            },
+            onError: (error) => {
+                message.error(error.message || t('booking_fail', 'Đã xảy ra lỗi hệ thống.'));
+            }
+        });
     };
 
     return {
         car,
-        isLoading,
+        isLoading: submitMutation.isPending, // Chuyển state loading thủ công qua tự động
+        isReschedule,
         handleCancel,
         methods,
         onSubmit: methods.handleSubmit(onSubmit),

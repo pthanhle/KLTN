@@ -1,5 +1,6 @@
 import React from 'react';
 import { useWishlistLogic } from './hooks/useWishlistLogic';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import WishlistHeader from './components/Header/WishlistHeader';
 import WishlistCard from './components/Cards/WishlistCard';
@@ -8,13 +9,16 @@ import EmptyWishlist from './components/EmptyState/EmptyWishlist';
 const WishlistPage = () => {
     const {
         t,
+        isLoading,
         items,
         isRemoving,
         isAddingToCart,
+        isBuyingNow,
         formatCurrency,
         handleRemoveItem,
         handleClearAll,
-        handleAddToCart
+        handleAddToCart,
+        handleBuyNow
     } = useWishlistLogic();
 
     return (
@@ -30,15 +34,21 @@ const WishlistPage = () => {
 
                 {/* Main List Section */}
                 <section className="flex flex-col gap-6" id="wishlist-list">
-                    {items.length > 0 ? (
+                    {isLoading ? (
+                        [1, 2, 3].map(idx => (
+                            <Skeleton key={idx} className="w-full h-[300px] md:h-[260px] rounded-3xl" />
+                        ))
+                    ) : items.length > 0 ? (
                         items.map((item) => (
                             <WishlistCard 
                                 key={item.id}
                                 item={item}
                                 isRemoving={isRemoving === item.id}
                                 isAddingToCart={isAddingToCart === item.id}
+                                isBuyingNow={isBuyingNow === item.id}
                                 onRemove={handleRemoveItem}
                                 onAddToCart={handleAddToCart}
+                                onBuyNow={handleBuyNow}
                                 formatCurrency={formatCurrency}
                                 t={t}
                             />

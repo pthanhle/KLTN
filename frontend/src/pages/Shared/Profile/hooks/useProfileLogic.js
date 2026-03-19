@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { MOCK_PROFILE_ADMIN, MOCK_PROFILE_CUSTOMER } from '../data/profile.mock';
-import { message } from 'antd';
+import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getProfileSchema } from '../schemas/profileSchema';
 
 export const useProfileLogic = (roleType = 'admin') => {
+    const { message } = App.useApp();
     const { t } = useTranslation('profile');
     const [isLoading, setIsLoading] = useState(true);
     const [profile, setProfile] = useState(null);

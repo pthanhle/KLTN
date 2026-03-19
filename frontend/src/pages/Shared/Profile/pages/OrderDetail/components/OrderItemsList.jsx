@@ -41,7 +41,7 @@ export const OrderItemsList = ({ items, isCompleted, handleReview, formatCurrenc
                                 </p>
                             )}
                             <p className="text-xl font-extrabold text-slate-900 dark:text-white">
-                                {formatCurrency(item.final_price)}
+                                {formatCurrency(item.price)}
                             </p>
                             
                             {isCompleted && (

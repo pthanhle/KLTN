@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Image, message } from 'antd';
+import { Image, App } from 'antd';
 import { Heart } from 'lucide-react';
-import { formatVND } from '../hooks/useCarsLogic';
+import { useDispatch } from 'react-redux';
+import { addToWishlist } from '@/store/slices/wishlistSlice';
+import { formatVND } from '../utils/formatters';
 
 export const CarCardSkeleton = () => {
     return (
@@ -26,9 +28,26 @@ export const CarCardSkeleton = () => {
 };
 
 const CarCard = ({ car, t }) => {
+    const { message } = App.useApp();
+    const dispatch = useDispatch();
+
     const handleAddToWishlist = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
+        dispatch(addToWishlist({
+            id: `c_${car.id}`,
+            product_id: car.id,
+            brand: car.brandName,
+            name: car.name,
+            image: car.image,
+            price: car.price,
+            original_price: null,
+            stock_status: 'in_stock',
+            rating: 5.0,
+            reviews_count: 0
+        }));
+
         message.success(t('Cập nhật thành công! Đã thêm vào yêu thích.', { name: car.name }));
     };
 
@@ -45,7 +64,7 @@ const CarCard = ({ car, t }) => {
                 <Image 
                     src={car.image} 
                     alt={car.name} 
-                    wrapperClassName="w-full h-full"
+                    rootClassName="w-full h-full"
                     className="!w-full !h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition-transform duration-700 ease-in-out"
                 />
             </div>

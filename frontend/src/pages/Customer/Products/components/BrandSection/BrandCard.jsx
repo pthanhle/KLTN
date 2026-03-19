@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
+import { Image } from 'antd';
 
 const BrandCard = ({ brand, t }) => {
     return (
@@ -8,9 +9,10 @@ const BrandCard = ({ brand, t }) => {
             className="flex flex-col items-center justify-center p-8 bg-white dark:bg-[#141416] border border-slate-100/80 dark:border-white/5 rounded-[32px] hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-none hover:-translate-y-1 transition-all duration-300 group"
         >
             <div className="w-full h-24 mb-6 relative flex items-center justify-center overflow-hidden mix-blend-multiply dark:mix-blend-normal">
-                <img 
+                <Image 
                     src={brand.image} 
                     alt={brand.name} 
+                    preview={false}
                     className="w-full h-full object-contain grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-95 group-hover:scale-105"
                 />
             </div>

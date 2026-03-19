@@ -1,7 +1,7 @@
 import { Star, ShieldCheck, PenTool } from 'lucide-react';
 import { Button, InputNumber } from 'antd';
 
-export const PartInfoActions = ({ part, selectedOptions, quantity, handleOptionSelect, handleQuantityChange, formatCurrency, handleAddToCart, handleBuyNow, t }) => {
+export const PartInfoActions = ({ part, selectedOptions, quantity, handleOptionSelect, handleQuantityChange, formatCurrency, handleAddToCart, handleBuyNow, t, isSubmittingAction }) => {
     return (
         <div className="lg:col-span-5 space-y-8">
             <div data-purpose="product-meta">
@@ -34,7 +34,7 @@ export const PartInfoActions = ({ part, selectedOptions, quantity, handleOptionS
                 </div>
 
                 <div className="flex items-baseline gap-4">
-                    <span className="text-3xl font-black text-yellow-500">{formatCurrency(part.current_price)}</span>
+                    <span className="text-3xl font-black text-yellow-500">{formatCurrency(part.price)}</span>
                     {part.original_price && (
                         <>
                             <span className="text-lg text-slate-400 line-through">{formatCurrency(part.original_price)}</span>
@@ -88,6 +88,7 @@ export const PartInfoActions = ({ part, selectedOptions, quantity, handleOptionS
                     
                     <Button 
                         type="primary"
+                        loading={isSubmittingAction}
                         onClick={handleBuyNow}
                         className="flex-1 !h-auto !bg-yellow-500 hover:!bg-yellow-600 !text-black !font-black !py-4 sm:!py-5 !rounded-2xl shadow-xl shadow-yellow-500/20 transition-all border-0 text-sm sm:text-base uppercase"
                     >

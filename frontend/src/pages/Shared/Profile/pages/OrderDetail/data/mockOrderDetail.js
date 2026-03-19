@@ -1,12 +1,14 @@
+import { MOCK_PROFILE_CUSTOMER } from '@/pages/Shared/Profile/data/profile.mock';
+
 export const getMockOrderDetail = (id) => {
     return {
         order_code: id || 'ORD-2026-X89A',
         created_at: 'Oct 24, 2024 • 14:32 PM',
         status: 'SHIPPING', // PENDING, CONFIRMED, SHIPPING, DELIVERED, COMPLETED, CANCELLED
         delivery: {
-            receiver_name: 'Nguyễn Minh Đức',
-            phone: '0901 234 567',
-            address: 'Tòa nhà FPT, Số 10 Phạm Văn Bạch, Cầu Giấy, Hà Nội\nVietnam',
+            receiver_name: MOCK_PROFILE_CUSTOMER.full_name,
+            phone: MOCK_PROFILE_CUSTOMER.phone,
+            address: MOCK_PROFILE_CUSTOMER.address,
             note: 'Giao giờ hành chính. Nhớ bọc chống xốc kỹ cho mâm xe Forged nhé shop.'
         },
         shipping: {
@@ -35,7 +37,7 @@ export const getMockOrderDetail = (id) => {
                 image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCmK6T48q5swrv1iMKE3-C-6oXmhq7sh-IbB9B0zfPwjZxkhsh96PwYSOrdqDquJ-9ByDg7Coqmor7-cNaemhGQpUIyOL90l4oDXk2713cLK05H1TXdQJdaIur488fe8nc_hHj4HcV4DsHedtJ5LneTIC5Uwc_FleIJ4xb50Yz7oubhdBFloOT-erI000pv_qN5-UgjRDbLzVbYuuVvLAh9aUJL7TF0udf7ck09iUIXMvPBH8reCWRhNM8Dyx51RLrnzcVqQ4npaOs',
                 quantity: 1,
                 original_price: null,
-                final_price: 1425000000,
+                price: 1425000000,
                 is_reviewed: false
             },
             {
@@ -46,7 +48,7 @@ export const getMockOrderDetail = (id) => {
                 image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-nY0YrxmMzWnV6CR6Q6ME7Vwe3G_sIV7Yhctnqh1v8aEWMym3Bigh6n6z_iCbkZTqo24E43D2rNk66zJrFjnLK66BPLTC7Yeure1cznon_EXhIONsCbZZheTLu41iOqyDQ6S6_QK2ePx6XI-qcbGiwGzdKUpMhGC78EAmludfX5wp-hilS2QGRwhEMN5USwhaTXfv4nbl8bOR-YNm7hvScpD36C7G6l3Y3hb3wubvDojlYaFmvFxy0ZCA4fDH8HbRPMlmCf1YIuA',
                 quantity: 1,
                 original_price: 95000000,
-                final_price: 85000000,
+                price: 85000000,
                 is_reviewed: true
             }
         ],

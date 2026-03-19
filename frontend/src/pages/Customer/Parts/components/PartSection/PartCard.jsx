@@ -1,7 +1,11 @@
 import { ShoppingCart, Heart } from 'lucide-react';
-import { Button, Image, Tooltip, message } from 'antd';
+import { Button, Image, Tooltip, App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '@/store/slices/cartSlice';
+import { addToWishlist } from '@/store/slices/wishlistSlice';
+import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
 export const PartCardSkeleton = () => (
     <div className="bg-white dark:bg-[#141416] rounded-[24px] p-4 flex flex-col h-full shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-slate-50 dark:border-white/5">
@@ -20,10 +24,12 @@ export const PartCardSkeleton = () => (
 const PartCard = ({ part }) => {
     const { t } = useTranslation('parts');
     const navigate = useNavigate();
-    const isOutOfStock = part.stock_quantity === 0;
-    const formattedPrice = new Intl.NumberFormat('vi-VN').format(part.price);
+    const dispatch = useDispatch();
+    const { message } = App.useApp();
+    const isOutOfStock = part.stock === 0;
+    const formattedPrice = formatVND(part.price);
 
-    const subInfo = `${t('sku', 'Mã SP:')} ${part._id.padStart(5, '0')} • ${part.compatible_brands?.length > 0 ? part.compatible_brands.join(', ') : t('universal_badge', 'Phổ thông')}`;
+    const subInfo = `${t('sku', 'Mã SP:')} ${part.id.padStart(5, '0')} • ${part.compatible_brands?.length > 0 ? part.compatible_brands.join(', ') : t('universal_badge', 'Phổ thông')}`;
 
     const handleCardClick = () => {
         navigate(`/parts/1`);
@@ -32,18 +38,48 @@ const PartCard = ({ part }) => {
     const handleAddToWishlist = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        message.success(`Đã thêm ${part.product_name} vào danh sách yêu thích!`);
+        
+        dispatch(addToWishlist({
+            id: `p_${part.id}`,
+            product_id: part.id,
+            brand: part.compatible_brands?.[0] || 'Phụ kiện',
+            name: part.name,
+            image: part.image,
+            price: part.price,
+            original_price: null,
+            stock_status: part.stock > 0 ? 'in_stock' : 'out_of_stock',
+            rating: part.rating || 5.0,
+            reviews_count: part.reviews_count || 0
+        }));
+
+        message.success(t('wishlist_added', `Đã thêm ${part.name} vào danh sách yêu thích!`));
+    };
+
+    const handleAddToCart = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isOutOfStock) return;
+
+        dispatch(addToCart({ 
+            ...part, 
+            id: Date.now().toString(),
+            product_id: part.id,
+            quantity: 1,
+            condition: 'New'
+        }));
+
+        message.success(t('cart_added', `Đã thêm ${part.name} vào Giỏ hàng!`));
     };
 
     return (
         <div className="group flex flex-col bg-white dark:bg-[#141416] rounded-[24px] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-slate-50 dark:border-white/5 hover:shadow-[0_10px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 h-full relative">
 
             <div className="relative w-full h-[180px] bg-[#f8fafc] dark:bg-[#0b0f19] rounded-xl flex items-center justify-center p-3 mb-5 overflow-hidden [&_.ant-image]:!w-full [&_.ant-image]:!h-full">
-                {part.images?.length > 0 ? (
+                {part.image ? (
                     <Image
-                        src={part.images[0]}
-                        alt={part.product_name}
-                        preview={{ maskClassName: '!hidden' }}
+                        src={part.image}
+                        alt={part.name}
+                        preview={{ classNames: { mask: '!hidden' } }}
                         className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal group-hover:scale-105 transition-transform duration-700"
                     />
                 ) : (
@@ -69,7 +105,7 @@ const PartCard = ({ part }) => {
                 onClick={handleCardClick}
             >
                 <h3 className="text-lg font-black text-slate-900 dark:text-white leading-[1.3] mb-2 line-clamp-2 transition-colors hover:text-yellow-600 dark:hover:text-yellow-500">
-                    {part.product_name}
+                    {part.name}
                 </h3>
                 
                 <p className="text-[12px] sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium mb-4">
@@ -87,19 +123,14 @@ const PartCard = ({ part }) => {
                         </span>
                         <div className="flex items-center gap-1">
                             <span className="text-[20px] sm:text-[22px] font-black text-slate-900 dark:text-white leading-none">{formattedPrice}</span>
-                            <span className="text-[14px] font-bold text-yellow-500 underline decoration-yellow-500/30 underline-offset-2 leading-none">đ</span>
                         </div>
                     </div>
 
                     <Tooltip title={isOutOfStock ? t('add_to_cart_disabled', 'Hết hàng') : ''} color="#1e293b" placement="top">
                         <Button
                             type="primary"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (!isOutOfStock) {
-                                    /* Handle Add to cart logic */
-                                }
-                            }}
+                            onClick={handleAddToCart}
+                            disabled={isOutOfStock}
                             className={`!w-[42px] !h-[42px] !rounded-[12px] !border-none !flex !items-center !justify-center flex-shrink-0 transition-all duration-300 ${isOutOfStock
                                     ? '!bg-slate-100 dark:!bg-white/5 !shadow-none !cursor-default border !border-slate-200 dark:!border-white/10'
                                     : '!bg-yellow-500 hover:!bg-yellow-400 !shadow-[0_4px_12px_rgba(234,179,8,0.25)]'

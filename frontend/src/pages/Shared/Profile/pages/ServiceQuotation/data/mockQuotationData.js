@@ -1,19 +1,22 @@
+import { DUMMY_CARS } from '../../../../../Customer/Cars/data/cars.mock';
+import { MOCK_PROFILE_CUSTOMER } from '../../../data/profile.mock';
+
 export const getMockQuotation = (id) => {
     return {
         booking_code: id || 'SRV-2026-B77P',
         created_date: '24/05/2026',
         status: 'WAITING_FOR_APPROVAL',
-        customer: {
-            name: 'Nguyễn Minh Đức',
-            phone: '0901 234 567',
-            address: 'Cầu Giấy, Hà Nội',
+        customer_info: {
+            full_name: MOCK_PROFILE_CUSTOMER.full_name,
+            phone: MOCK_PROFILE_CUSTOMER.phone,
+            address: MOCK_PROFILE_CUSTOMER.address,
         },
-        vehicle: {
-            brand: 'Mercedes-Benz',
-            model: 'S450 Luxury',
+        vehicle_info: {
+            brand: DUMMY_CARS[0].brandName,
+            model: DUMMY_CARS[0].name,
             license_plate: '30A-888.88',
-            vin: 'WDD222158...',
-            odo: '12,450',
+            vin_number: 'WDD222158...',
+            current_odometer: '12,450',
         },
         parts: [
             { id: 'MB-FIL-992', name: 'Lọc dầu động cơ chính hãng MB', quantity: 1, unit_price: 850000 },

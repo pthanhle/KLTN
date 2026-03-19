@@ -13,7 +13,7 @@ const DeliveryForm = ({ hookState }) => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Controller 
-                    name="fullName"
+                    name="full_name"
                     control={methods.control}
                     render={({ field, fieldState }) => (
                         <div className="space-y-2">

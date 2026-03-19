@@ -15,7 +15,7 @@ const CarSummary = ({ car }) => {
 
             <div className="relative z-10 w-full mb-10 transform hover:scale-105 transition-transform duration-700 ease-out flex justify-center">
                 <Image 
-                    src={car.heroImage} 
+                    src={car.image} 
                     alt={car.name}
                     preview={false} 
                     className="w-full h-auto object-cover opacity-90 filter drop-shadow-[0_20px_20px_rgba(0,0,0,0.8)]"

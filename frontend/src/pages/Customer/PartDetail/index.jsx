@@ -48,6 +48,13 @@ const PartDetail = () => {
                         <Skeleton className="w-full h-16 rounded-2xl" />
                     </div>
                 </div>
+            ) : !logic.part ? (
+                <div className="min-h-[50vh] flex flex-col items-center justify-center text-slate-900 dark:text-white gap-4">
+                     <p className="text-xl font-bold">{logic.t('part_not_found', 'Không tìm thấy linh kiện.')}</p>
+                     <Link to="/parts" className="text-yellow-500 hover:text-yellow-600 font-bold hover:underline underline-offset-4 decoration-2">
+                         {logic.t('back_to_parts', 'Quay lại danh sách')}
+                     </Link>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
                     <PartGallery images={logic.part.images} />
@@ -55,7 +62,7 @@ const PartDetail = () => {
                 </div>
             )}
 
-            {!logic.isLoading && <PartTabsSection {...logic} />}
+            {!logic.isLoading && logic.part && <PartTabsSection {...logic} />}
         </main>
     );
 };

@@ -23,5 +23,12 @@
     "booking_errorBranch": "Vui lòng chọn chi nhánh",
     "summary_engine": "ĐỘNG CƠ",
     "summary_power": "SỨC MẠNH",
-    "summary_price": "Giá bán lẻ đề xuất"
+    "summary_price": "Giá bán lẻ đề xuất",
+    "booking_title_reschedule": "Dời Lịch Lái Thử",
+    "booking_subtitle_reschedule": "Vui lòng chọn khung giờ mới và điền lý do dời lịch.",
+    "booking_rescheduleReason": "Lý do dời lịch",
+    "booking_errorReason": "Vui lòng cung cấp lý do dời lịch.",
+    "reschedule_success": "Dời lịch thành công! Cố vấn sẽ liên hệ lại với quý khách.",
+    "booking_notFound": "Không tìm thấy lịch hẹn hoặc mã vé đã hết hạn.",
+    "booking_errorDuplicateTime": "Giờ dời lịch bị trùng khớp với lịch hiện tại!"
 }

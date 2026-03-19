@@ -1,14 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useDebounce } from '../../../../hooks/useDebounce';
 import { MOCK_PARTS, MOCK_BRANDS } from '../data/parts.mock';
-
-function useDebounce(value, delay) {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-    useEffect(() => {
-        const handler = setTimeout(() => setDebouncedValue(value), delay);
-        return () => clearTimeout(handler);
-    }, [value, delay]);
-    return debouncedValue;
-}
 
 const SORT_OPTIONS = ['newest', 'price_asc', 'price_desc', 'popular'];
 const ITEMS_PER_PAGE = 9;
@@ -39,7 +31,7 @@ export const usePartsLogic = () => {
         if (debouncedSearch) {
             const q = debouncedSearch.toLowerCase();
             result = result.filter(p =>
-                p.product_name.toLowerCase().includes(q) ||
+                p.name.toLowerCase().includes(q) ||
                 p.description.toLowerCase().includes(q)
             );
         }
@@ -56,7 +48,7 @@ export const usePartsLogic = () => {
 
         if (sortBy === 'price_asc') result = [...result].sort((a, b) => a.price - b.price);
         else if (sortBy === 'price_desc') result = [...result].sort((a, b) => b.price - a.price);
-        else if (sortBy === 'popular') result = [...result].sort((a, b) => b.stock_quantity - a.stock_quantity);
+        else if (sortBy === 'popular') result = [...result].sort((a, b) => b.stock - a.stock);
 
         return result;
     }, [debouncedSearch, activeCategory, selectedBrands, includeUniversal, priceRange, sortBy]);

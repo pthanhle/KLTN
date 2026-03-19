@@ -2,7 +2,7 @@ import * as z from 'zod';
 
 export const getCheckoutSchema = (t) => {
     return z.object({
-        fullName: z.string()
+        full_name: z.string()
             .min(1, { message: t('val_required', 'Vui lòng nhập họ tên') })
             .min(2, { message: t('val_name_min', 'Họ tên phải có ít nhất 2 ký tự') }),
             

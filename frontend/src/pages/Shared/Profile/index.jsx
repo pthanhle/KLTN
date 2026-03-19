@@ -7,6 +7,7 @@ import OrderHistory from './pages/OrderHistory/index.jsx';
 import OrderDetail from './pages/OrderDetail/index.jsx';
 import ServiceHistory from './pages/ServiceHistory/index.jsx';
 import ServiceQuotation from './pages/ServiceQuotation/index.jsx';
+import TestDriveHistory from './pages/TestDriveHistory/index.jsx';
 import { useLocation } from 'react-router-dom';
 
 const ProfilePage = () => {
@@ -60,6 +61,8 @@ const ProfilePage = () => {
                                 <ServiceQuotation />
                             ) : location.pathname === '/profile/services' ? (
                                 <ServiceHistory />
+                            ) : location.pathname === '/profile/test-drives' ? (
+                                <TestDriveHistory />
                             ) : (
                                 <>
                                     <ProfileForm 

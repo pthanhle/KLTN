@@ -2,115 +2,36 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageLoader } from '@/components/ui/page-loader';
 import { useCarDetailLogic } from './hooks/useCarDetailLogic';
-import { scroller } from 'react-scroll';
+import { useScrollSpy } from './hooks/useScrollSpy';
 
-import HeroSection from './components/HeroSection';
-import StickyNav from './components/StickyNav';
-import PriceAndColorSection from './components/PriceAndColorSection';
-import FeatureSection from './components/FeatureSection';
-import SpecsSection from './components/SpecsSection';
-import MediaGallerySection from './components/MediaGallerySection';
+import HeroSection from './components/ProductInfo/HeroSection';
+import StickyNav from './components/Shared/StickyNav';
+import PriceAndColorSection from './components/ProductInfo/PriceAndColorSection';
+import FeatureSection from './components/Features/FeatureSection';
+import SpecsSection from './components/Features/SpecsSection';
+import MediaGallerySection from './components/Gallery/MediaGallerySection';
 
 const CarDetailPage = () => {
     const { t } = useTranslation(['products', 'layout']);
     const {
         isLoading,
         car,
-        colors,
         selectedColor,
         setSelectedColor
     } = useCarDetailLogic();
 
-    useEffect(() => {
-        let isScrolling = false;
-        let activeIndex = 0;
-        let scrollTimeout = null;
-
-        const sectionIds = ['hero', 'price-color', 'design', 'technology', 'specs', 'gallery'];
-
-        const jumpToSection = (index) => {
-            if (index < 0 || index >= sectionIds.length) return;
-            activeIndex = index;
-            isScrolling = true;
-
-            if (index === 0) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                scroller.scrollTo(sectionIds[index], {
-                    duration: 900,
-                    smooth: 'easeInOutQuart',
-                    offset: -136
-                });
-            }
-
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => { isScrolling = false; }, 950);
-        };
-
-        const handleWheel = (e) => {
-            const scrollableContainer = e.target.closest('.custom-scrollbar');
-            if (scrollableContainer) {
-                const { scrollTop, scrollHeight, clientHeight } = scrollableContainer;
-                const isAtTop = scrollTop <= 0;
-                const isAtBottom = Math.max(0, scrollHeight - (scrollTop + clientHeight)) <= 1;
-
-                if (e.deltaY > 0 && !isAtBottom) {
-                    return;
-                }
-                if (e.deltaY < 0 && !isAtTop) {
-                    return;
-                }
-            }
-
-            e.preventDefault();
-            if (isScrolling) return;
-
-            if (e.deltaY > 0) {
-                jumpToSection(activeIndex + 1);
-            } else if (e.deltaY < 0) {
-                jumpToSection(activeIndex - 1);
-            }
-        };
-
-        const handleKeyDown = (e) => {
-            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-                e.preventDefault();
-                if (!isScrolling) jumpToSection(activeIndex + 1);
-            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-                e.preventDefault();
-                if (!isScrolling) jumpToSection(activeIndex - 1);
-            }
-        };
-
-        // Force activeIndex back to 0 when the component mounts specifically
-        const handleInitialScroll = () => {
-            // Forcing top scroll to prevent browser from returning to middle-of-page state from previous navigation
-            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-            activeIndex = 0;
-        };
-        handleInitialScroll();
-
-        // Must run in setTimeout to beat browser's native scroll restoration on soft navigations
-        setTimeout(() => {
-            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-        }, 10);
-
-        window.addEventListener('wheel', handleWheel, { passive: false });
-        window.addEventListener('keydown', handleKeyDown, { passive: false });
-
-        return () => {
-            window.removeEventListener('wheel', handleWheel);
-            window.removeEventListener('keydown', handleKeyDown);
-            clearTimeout(scrollTimeout);
-        };
-    }, []);
+    useScrollSpy();
 
     if (isLoading) {
         return <PageLoader />;
     }
 
     if (!car) {
-        return <div className="min-h-screen flex items-center justify-center dark:text-white">Không tìm thấy dữ liệu xe.</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0a0a0b] text-slate-900 dark:text-white text-lg font-bold">
+                {t('products:detail.carNotFound', 'Không tìm thấy dữ liệu xe.')}
+            </div>
+        );
     }
 
     return (
@@ -126,7 +47,7 @@ const CarDetailPage = () => {
             {/* 3. Price & Color (360 Viewer) */}
             <PriceAndColorSection
                 car={car}
-                colors={colors}
+                colors={car.colors || []}
                 selectedColor={selectedColor}
                 setSelectedColor={setSelectedColor}
                 t={t}
@@ -159,7 +80,7 @@ const CarDetailPage = () => {
             <SpecsSection specs={car.specs} t={t} />
 
             {/* 6. Media Gallery */}
-            <MediaGallerySection images={car.gallery} t={t} />
+            {car.gallery && <MediaGallerySection gallery={car.gallery} t={t} />}
 
         </div>
     );

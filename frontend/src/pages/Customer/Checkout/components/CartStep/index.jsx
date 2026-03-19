@@ -2,35 +2,19 @@ import { Checkbox, Image, Button } from 'antd';
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
 import { Link } from 'react-router-dom';
+import EmptyCart from './EmptyCart';
 
 const CartStep = ({ hookState }) => {
     const { 
         t, cartItems, subtotal, hasCheckedItems, 
-        toggleItemCheck, toggleAllChecks, updateQuantity, removeItem, applyPromoCode, proceedToPayment 
+        toggleItemCheck, toggleAllChecks, updateQuantity, removeItem, moveToWishlist, proceedToPayment 
     } = hookState;
 
     const allChecked = cartItems.length > 0 && cartItems.every(item => item.checked);
     const checkedCount = cartItems.filter(item => item.checked).length;
 
     if (cartItems.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500 max-w-md mx-auto">
-                <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
-                    <Image src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-7359557-6024626.png" alt="Empty Cart" className="w-20 opacity-50 grayscale dark:invert" preview={false} />
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-3">
-                    {t('cart_empty')}
-                </h3>
-                <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
-                    {t('cart_empty_desc')}
-                </p>
-                <Link to="/products">
-                    <Button type="primary" className="bg-slate-900 border-none h-12 hover:!bg-slate-800 dark:bg-white dark:hover:!bg-slate-200 dark:!text-slate-900 text-white font-bold px-8 py-4 rounded-full transition-all active:scale-95 text-sm uppercase tracking-widest shadow-xl">
-                        {t('cart_continue_shopping')}
-                    </Button>
-                </Link>
-            </div>
-        );
+        return <EmptyCart t={t} />;
     }
 
     return (
@@ -62,6 +46,7 @@ const CartStep = ({ hookState }) => {
                             item={item} 
                             updateQuantity={updateQuantity}
                             removeItem={removeItem}
+                            moveToWishlist={moveToWishlist}
                             toggleItemCheck={toggleItemCheck}
                             t={t}
                         />
@@ -73,8 +58,8 @@ const CartStep = ({ hookState }) => {
                 <CartSummary 
                     subtotal={subtotal} 
                     hasCheckedItems={hasCheckedItems}
+                    checkedCount={checkedCount}
                     proceedToPayment={proceedToPayment}
-                    applyPromoCode={applyPromoCode}
                     t={t}
                 />
             </div>

@@ -1,10 +1,10 @@
 import { useHomeLogic } from './hooks/useHomeLogic';
-import HeroSection from './components/HeroSection';
-import BrandsSection from './components/BrandsSection';
-import FeaturedCars from './components/FeaturedCars';
-import RecentHistory from './components/RecentHistory';
-import ExclusiveServices from './components/ExclusiveServices';
-import TradeInPromote from './components/TradeInPromote';
+import HeroSection from './components/Sections/HeroSection';
+import BrandsSection from './components/Sections/BrandsSection';
+import FeaturedCars from './components/Sections/FeaturedCars';
+import RecentHistory from './components/Sections/RecentHistory';
+import ExclusiveServices from './components/Sections/ExclusiveServices';
+import TradeInPromote from './components/Sections/TradeInPromote';
 import { useTranslation } from 'react-i18next';
 
 const Home = () => {
@@ -14,6 +14,7 @@ const Home = () => {
         brands,
         handleBookService,
         handleViewCars,
+        handleViewCarDetail,
         handleTradeIn,
         isLoading
     } = useHomeLogic();
@@ -27,9 +28,17 @@ const Home = () => {
 
             <BrandsSection brands={brands} />
 
-            <FeaturedCars cars={featuredCars} isLoading={isLoading} />
+            <FeaturedCars 
+                cars={featuredCars} 
+                isLoading={isLoading} 
+                onCarClick={handleViewCarDetail} 
+            />
 
-            <RecentHistory history={recentHistory} isLoading={isLoading} />
+            <RecentHistory 
+                history={recentHistory} 
+                isLoading={isLoading} 
+                onCarClick={handleViewCarDetail} 
+            />
 
             <ExclusiveServices />
 

@@ -23,5 +23,12 @@
     "booking_errorBranch": "Please select a branch",
     "summary_engine": "ENGINE",
     "summary_power": "POWER",
-    "summary_price": "Suggested Retail Price"
+    "summary_price": "Suggested Retail Price",
+    "booking_title_reschedule": "Reschedule Test Drive",
+    "booking_subtitle_reschedule": "Please select a new time slot and provide a reason for rescheduling.",
+    "booking_rescheduleReason": "Reschedule Reason",
+    "booking_errorReason": "Please provide a reason for rescheduling.",
+    "reschedule_success": "Reschedule successful! Our advisor will contact you shortly.",
+    "booking_notFound": "Ticket not found or has been locked.",
+    "booking_errorDuplicateTime": "New time block matches your original booking!"
 }

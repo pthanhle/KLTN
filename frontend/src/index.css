@@ -95,23 +95,26 @@
   }
 }
 
-/* Fix browser default white background & border when autofilling or pasting text into inputs */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  -webkit-text-fill-color: #ffffff !important;
-  -webkit-box-shadow: 0 0 0px 1000px #1e293b inset !important;
-  box-shadow: 0 0 0px 1000px #1e293b inset !important;
-  background-color: transparent !important;
-  transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s !important;
-  color-scheme: dark !important;
+/* Ngăn chặn Chrome/Edge tự động fill nền và đổi màu chữ bằng Inset Box Shadow (hỗ trợ chuyển đổi dark/light mode mượt mà) */
+html:not(.dark) input:-webkit-autofill,
+html:not(.dark) input:-webkit-autofill:hover,
+html:not(.dark) input:-webkit-autofill:focus,
+html:not(.dark) input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
+  -webkit-text-fill-color: #0f172a !important;
 }
 
-/* Ensure focus outline is none since Chrome autofill forcibly adds white focus rings */
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover,
+html.dark input:-webkit-autofill:focus,
+html.dark input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0a0a0b inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Ẩn outline mặc định khi focus vào ô autofill */
 input:-webkit-autofill:focus {
   outline: none !important;
-  border-color: #3b82f6 !important;
 }
 
 /* --- OVERRIDE ANT DESIGN MESSAGE --- */
@@ -136,6 +139,11 @@ input:-webkit-autofill:focus {
 .ant-message-custom-content.ant-message-success .anticon svg {
   color: #eab308 !important;
   /* Tailwind yellow-500 */
+}
+
+.ant-message-custom-content.ant-message-loading .anticon svg,
+.ant-message-custom-content.ant-message-info .anticon svg {
+  color: #eab308 !important;
 }
 
 /* --- CUSTOM SCROLLBAR --- */

@@ -6,16 +6,21 @@ import { getServiceBookingSchema } from '../schemas/servicesSchema';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
+// Import Constants & Mocks đã được xé lẻ ra
+import { VEHICLE_BRANDS, SERVICE_CATEGORIES, TIME_SLOTS } from '../constants/bookingConstants';
+import { MOCK_SERVICES_DATA } from '../data/services.mock';
+
 export const useServiceBookingLogic = () => {
     const { message } = App.useApp();
     const { t } = useTranslation(['services']);
     const location = useLocation();
 
+    // 1. Quản lý Step và State vòng chờ API
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // 2. Tái cấu trúc Zod Schema & React Hook Form
     const schema = useMemo(() => getServiceBookingSchema(t), [t]);
-
     const methods = useForm({
         resolver: zodResolver(schema),
         mode: 'onChange',
@@ -31,67 +36,13 @@ export const useServiceBookingLogic = () => {
     });
 
     const bookingData = methods.watch();
+    
+    // 3. Logic chọn Dịch vụ
     const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'Bảo dưỡng');
+    // Phép lọc dữ liệu với Data Tĩnh được nhét vào Hook
+    const filteredServices = MOCK_SERVICES_DATA.filter(s => s.category === selectedCategory || s.category === 'Kiểm tra đo đạc');
 
-    const vehicleBrands = [
-        { value: 'Mercedes', label: 'Mercedes-Benz' },
-        { value: 'BMW', label: 'BMW' },
-        { value: 'Audi', label: 'Audi' },
-        { value: 'Porsche', label: 'Porsche' },
-        { value: 'Lexus', label: 'Lexus' },
-        { value: 'Other', label: 'Khác (Other)' },
-    ];
-
-    const categories = [
-        { id: 'Bảo dưỡng', labelKey: 'maintenance', iconName: 'Settings' },
-        { id: 'Sửa chữa', labelKey: 'repair', iconName: 'Wrench' },
-        { id: 'Chăm sóc xe', labelKey: 'spa', iconName: 'Sparkles' },
-        { id: 'Gầm bệ - Lốp', labelKey: 'tires', iconName: 'CircleDashed' },
-    ];
-
-    const services = [
-        {
-            _id: 'srv_1',
-            service_name: 'Bảo dưỡng định kỳ (B-Service) Mercedes',
-            description: 'Bao gồm thay dầu động cơ, thay lọc dầu, kiểm tra hệ thống phanh, kiểm tra nước làm mát, vệ sinh lọc gió, quét lỗi phần mềm chẩn đoán chuyên sâu (Xentry). Khuyến cáo sau mỗi 10,000 km.',
-            price: 4500000,
-            duration: '120 phút',
-            category: 'Bảo dưỡng',
-            image: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&q=80&w=800'
-        },
-        {
-            _id: 'srv_2',
-            service_name: 'Kiểm tra tổng quát 160 điểm (Pre-Purchase)',
-            description: 'Dành cho xe mới hoặc trước khi mua bán. Đội ngũ chuyên gia sẽ lên cầu kẹp thiết bị đo nội soi gầm, động cơ, khung gầm và hệ thống điện mạch.',
-            price: 2800000,
-            duration: '90 phút',
-            category: 'Kiểm tra đo đạc',
-            image: 'https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&q=80&w=800'
-        },
-        {
-            _id: 'srv_3',
-            service_name: 'Phủ Ceramic Siêu Bóng (Gói Diamond)',
-            description: 'Đánh bóng hiệu chỉnh bề mặt sơn 3 bước. Phủ 3 lớp Ceramic chuẩn 9H+ từ Đức (Kisho/CarPro). Bảo hành độ bóng 5 năm.',
-            price: 18500000,
-            duration: '2 ngày',
-            category: 'Chăm sóc xe',
-            image: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&q=80&w=800'
-        },
-        {
-            _id: 'srv_4',
-            service_name: 'Thay mâm vỏ và Cân bằng động Road Force',
-            description: 'Hệ thống Hunter cân bằng động và kẹp chì. Miễn phí hệ thống bơm khí Nitơ tinh khiết cho 4 lốp.',
-            price: 1200000,
-            duration: '60 phút',
-            category: 'Gầm bệ - Lốp',
-            image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=800'
-        }
-    ];
-
-    const timeSlots = ['08:00-10:00', '10:00-12:00', '13:00-15:00', '15:00-17:00'];
-
-    const filteredServices = services.filter(s => s.category === selectedCategory || s.category === 'Kiểm tra đo đạc');
-
+    // 4. Các Hàm Handler Điều hướng & Chọn lựa
     const handleNextStep = () => {
         if (currentStep < 3) setCurrentStep(prev => prev + 1);
     };
@@ -126,29 +77,38 @@ export const useServiceBookingLogic = () => {
     );
     const isStep2Valid = Boolean(bookingData.booking_date && bookingData.time_slot);
 
+    // 5. Logic Core - Fake API
     const handleSubmitBooking = async (t) => {
         setIsSubmitting(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        console.log("Dữ liệu gửi lên BE: ", bookingData);
-        setIsSubmitting(false);
-        message.success({
-            content: t ? t('services:booking_success', 'Booking successful! We will contact you soon.') : 'Booking successful!',
-            style: {
-                marginTop: '10vh',
-            },
-        });
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            console.log("Dữ liệu gửi lên BE: ", bookingData);
+            
+            message.success({
+                content: t ? t('services:booking_success', 'Booking successful! We will contact you soon.') : 'Booking successful!',
+                style: { marginTop: '10vh' },
+            });
+            // Tương lai: redirect sang trang OrderSuccess báo thành công
+        } catch (error) {
+            message.error("Lỗi hệ thống");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return {
         methods,
         currentStep,
-        services,
-        categories,
-        vehicleBrands,
+        
+        // Trả ra các Constants & Mock Data cho View sử dụng
+        services: MOCK_SERVICES_DATA,
+        categories: SERVICE_CATEGORIES,
+        vehicleBrands: VEHICLE_BRANDS,
+        timeSlots: TIME_SLOTS,
+        
         filteredServices,
         selectedCategory,
         setSelectedCategory,
-        timeSlots,
         bookingData,
         isSubmitting,
         isStep1Valid,
@@ -158,5 +118,5 @@ export const useServiceBookingLogic = () => {
         handleNextStep,
         handlePrevStep,
         handleSubmitBooking
-    }
-}
+    };
+};

@@ -10,13 +10,15 @@ import { useTranslation } from 'react-i18next';
 const UserActions = () => {
     const { t } = useTranslation('layout');
     const { isAuthenticated, user } = useSelector((state) => state.auth);
+    const wishlistItems = useSelector((state) => state.wishlist.items);
+    const cartItems = useSelector((state) => state.cart.items);
     const { mutate: logoutUser } = useLogoutMutation();
     const { message } = AntdApp.useApp();
 
     const handleLogout = () => {
         logoutUser(undefined, {
             onSuccess: () => message.success(t('messages.logoutSuccess')),
-            onError: () => message.success(t('messages.logoutSuccess')), // vẫn logout client dù API lỗi
+            onError: () => message.success(t('messages.logoutSuccess')),
         });
     };
 
@@ -29,15 +31,19 @@ const UserActions = () => {
             <div className="flex items-center gap-5 text-slate-700 dark:text-slate-300">
                 <Link to="/wishlist" className="relative hover:!text-yellow-500 !text-slate-700 dark:!text-slate-300 transition-colors group">
                     <Heart size={20} />
-                    <span className="absolute -top-2 -right-2 bg-yellow-500 text-slate-900 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0b0f19] group-hover:scale-110 transition-transform shadow-sm">
-                        4
-                    </span>
+                    {wishlistItems.length > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-yellow-500 text-slate-900 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0b0f19] group-hover:scale-110 transition-transform shadow-sm">
+                            {wishlistItems.length}
+                        </span>
+                    )}
                 </Link>
                 <Link to="/cart" className="relative hover:!text-yellow-500 !text-slate-700 dark:!text-white transition-colors group">
                     <ShoppingCart size={20} />
-                    <span className="absolute -top-2 -right-2 bg-yellow-500 text-slate-900 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0b0f19] group-hover:scale-110 transition-transform shadow-sm">
-                        2
-                    </span>
+                    {cartItems.length > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-yellow-500 text-slate-900 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-[#0b0f19] group-hover:scale-110 transition-transform shadow-sm">
+                            {cartItems.length}
+                        </span>
+                    )}
                 </Link>
                 <button className="relative hover:text-yellow-500 transition-colors">
                     <Bell size={20} />

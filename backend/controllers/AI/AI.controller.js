@@ -18,17 +18,13 @@ export const AiChatController = {
       if (!message) return res.status(400).json({ success: false, error: "Empty message" });
 
 
-      // =================================================================================
-      // BƯỚC 1: SCHEMA PROMPT (Đã thêm intent category_check)
-      // =================================================================================
-
       const schemaPrompt = `
         Bạn là chuyên gia Query Database của CarsShop.
         Nhiệm vụ: Chuyển câu hỏi tự nhiên thành JSON Object.
 
         CẤU TRÚC JSON BẮT BUỘC:
         {
-           "intent": "product_search" | "service_search" | "category_check" | "order_tracking" | "booking_tracking" | "tradein_check",
+           "intent": "product_search" | "service_search" | "category_check" | "order_tracking" | "booking_tracking" | "tradein_check" | "general",
            "mode": "list_all" | "search", 
            "keyword": string | null,
            "max_price": number | null
@@ -41,8 +37,11 @@ export const AiChatController = {
            -> mode: "search".
            -> keyword: TRÍCH XUẤT DANH TỪ CỐT LÕI (Bỏ động từ "thay", "mua", "tìm").
            (Ví dụ: "Tôi muốn thay lọc gió" -> keyword: "lọc gió").
+        4. Nếu khách chỉ giao tiếp cơ bản ("Xin chào", "Hi", "Alo", "Tư vấn"):
+           -> intent: "general", mode: "search", keyword: null.
 
         VÍ DỤ HUẤN LUYỆN:
+        - "Xin chào, shop có online không?" -> { "intent": "general", "mode": "search" }
         - "Shop có những dịch vụ nào?" -> { "intent": "service_search", "mode": "list_all" }
         - "Có các mục sản phẩm gì?" -> { "intent": "category_check", "mode": "list_all" }
         - "Tôi muốn thay lọc gió" -> { "intent": "service_search", "mode": "search", "keyword": "lọc gió" }
@@ -60,13 +59,10 @@ export const AiChatController = {
         console.error("JSON Parse Fail:", e);
       }
 
-      // =================================================================================
-      // BƯỚC 2: EXECUTE QUERY
-      // =================================================================================
+
 
       let dbContext = "Không tìm thấy dữ liệu.";
 
-      // --- 1. CATEGORY CHECK (Mới thêm) ---
       if (q.intent === "category_check") {
         const categories = await Category.find().limit(10);
         if (categories.length > 0) {
@@ -77,12 +73,10 @@ export const AiChatController = {
         }
       }
 
-      // --- 2. PRODUCT SEARCH ---
       else if (q.intent === "product_search") {
         let filter = {};
 
         if (q.mode === "list_all") {
-          // Lấy tất cả sản phẩm (bỏ filter type để lấy cả phụ kiện nếu có)
           filter = {};
         } else {
           const { keyword, max_price } = q;
@@ -119,7 +113,6 @@ export const AiChatController = {
         }
       }
 
-      // --- 3. SERVICE SEARCH ---
       else if (q.intent === "service_search") {
         let services = [];
 
@@ -146,7 +139,6 @@ export const AiChatController = {
         }
       }
 
-      // --- 4. ORDER TRACKING ---
       else if (q.intent === "order_tracking") {
         if (!currentUser) dbContext = "Vui lòng đăng nhập để tra cứu đơn hàng.";
         else {
@@ -171,7 +163,6 @@ export const AiChatController = {
         }
       }
 
-      // --- 5. BOOKING TRACKING ---
       else if (q.intent === "booking_tracking") {
         if (!currentUser) dbContext = "Vui lòng đăng nhập để xem lịch hẹn.";
         else {
@@ -199,7 +190,6 @@ export const AiChatController = {
         }
       }
 
-      // --- 6. TRADE-IN CHECK ---
       else if (q.intent === "tradein_check") {
         if (!currentUser) dbContext = "Vui lòng đăng nhập để kiểm tra xe cũ.";
         else {
@@ -229,9 +219,7 @@ export const AiChatController = {
       }
 
 
-      // =================================================================================
-      // BƯỚC 3: RESPONSE GENERATION
-      // =================================================================================
+
 
       const finalPrompt = `
         Vai trò: Nhân viên tư vấn CarsShop chuyên nghiệp, thân thiện.
@@ -247,12 +235,18 @@ export const AiChatController = {
         1. Trả lời dựa trên SỰ THẬT.
         2. Liệt kê đầy đủ danh sách nếu có (Tên + Giá).
         3. Văn phong: tự nhiên, chuyên nghiệp.
-        4. KHÔNG sử dụng định dạng Markdown (như **bold**, ## header, * list).
-        5. Thay vì dùng dấu *, hãy dùng Emoji để liệt kê (Ví dụ: 🚗, 🔧, ✅, 📌).
-        6. BẮT BUỘC phải xuống dòng (\n) giữa các mục để dễ đọc.
-        7. Với giá tiền: Viết rõ "VND" (Ví dụ: 500.000 VND).
+        4. ĐIỀU CHỈNH ĐỘ DÀI (QUAN TRỌNG MỨC CAO NHẤT): 
+           - NGUYÊN TẮC VÀNG: Nếu lời của khách RẤT NGẮN ("Xin chào", "Alo", "Hi"), BẠN CHỈ ĐƯỢC PHÉP TRẢ LỜI 1-2 CÂU MÀ THÔI! Tuyệt đối không tự bịa ra ví dụ, không được copy mẫu có sẵn mà hiển thị toàn bộ xe ra!
+           - Chỉ trả lời đầy đủ, liệt kê nếu khách hỏi rõ ràng (Ví dụ: "Xe gì", "Có dịch vụ chi", "Giá bao nhiêu").
+        5. KHÔNG sử dụng định dạng Markdown (như **bold**, ## header, * list).
+        6. Thay vì dùng dấu *, hãy dùng Emoji để liệt kê (Ví dụ: 🚗, 🔧, ✅, 📌).
+        7. BẮT BUỘC phải xuống dòng (\n) giữa các mục để dễ đọc.
+        8. Với giá tiền: Viết rõ "VND" (Ví dụ: 500.000 VND).
 
-        MẪU TRẢ LỜI MONG MUỐN:
+        MẪU TRẢ LỜI MONG MUỐN KHI CHÀO HỎI NGẮN:
+        "Chào bạn ạ! CarsShop chuyên kinh doanh xe và dịch vụ bảo dưỡng, bạn cần hỗ trợ thông tin gì ạ?"
+
+        MẪU TRẢ LỜI MONG MUỐN KHI HỎI CHI TIẾT:
         "Chào bạn ạ! CarsShop hiện có các dịch vụ sau:
         
         🔧 Bảo dưỡng định kỳ: 200.000 VND - Giúp xe vận hành êm ái.

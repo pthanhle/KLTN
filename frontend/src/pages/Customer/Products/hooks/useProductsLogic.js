@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
-import { BRANDS_MOCK_DATA } from '../data/products.mock';
+import { CategoryAPI } from '../../../../services/api/category';
 
 export const useProductsLogic = () => {
     const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -13,18 +13,41 @@ export const useProductsLogic = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8; 
 
-    // Inject external mock data
-    const brandsData = BRANDS_MOCK_DATA;
-
+    const [allBrands, setAllBrands] = useState([]);
     const [filteredBrands, setFilteredBrands] = useState([]);
     const [paginatedBrands, setPaginatedBrands] = useState([]);
 
-    // Data filtering and fetching effect
+    // Fetch original data from backend
+    useEffect(() => {
+        const fetchBrands = async () => {
+            try {
+                // Lấy số lượng lớn để support filter theo chữ cái ở frontend
+                const res = await CategoryAPI.getCategoryList({ page: 1, limit: 100 });
+                if (res && res.categories) {
+                    const mappedBrands = res.categories.map(c => ({
+                        id: c._id,
+                        name: c.category_name,
+                        image: c.image || 'https://images.unsplash.com/photo-1556189250-72ba954cfc2b?auto=format&fit=crop&q=80&w=400', // fallback ảnh
+                        count: c.count || 0 // Số lượng xe từ backend
+                    }));
+                    setAllBrands(mappedBrands);
+                }
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+            } finally {
+                setIsInitialLoading(false);
+            }
+        };
+
+        fetchBrands();
+    }, []);
+
+    // Data filtering effect
     useEffect(() => {
         setIsFiltering(true);
         
         const timer = setTimeout(() => {
-            let result = brandsData;
+            let result = allBrands;
 
             // Apply debounced search filter
             if (debouncedSearch) {
@@ -40,12 +63,11 @@ export const useProductsLogic = () => {
             setCurrentPage(1); 
             
             setIsFiltering(false);
-            if (isInitialLoading) setIsInitialLoading(false);
 
-        }, 400); // Simulate network request delay
+        }, 300); // Wait a bit for smooth UI transition
 
         return () => clearTimeout(timer);
-    }, [debouncedSearch, activeLetter, brandsData]);
+    }, [debouncedSearch, activeLetter, allBrands]);
 
     // Pagination slice effect
     useEffect(() => {

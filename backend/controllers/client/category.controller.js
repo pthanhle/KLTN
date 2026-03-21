@@ -1,10 +1,8 @@
 // controllers/client/category.controller.js
 import asyncHandler from 'express-async-handler'
 import Category from '../../models/categoryModel.js'
+import Product from '../../models/productModel.js'
 
-// @desc    Lấy danh sách categories (Public)
-// @route   GET /api/client/categories
-// @access  Public
 export const getCategories = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.current || req.query.page) || 1;
   const limit = parseInt(req.query.pageSize || req.query.limit) || 12;
@@ -27,10 +25,18 @@ export const getCategories = asyncHandler(async (req, res) => {
   const categories = await Category.find(filter)
     .sort(sortObj)
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit)
+    .lean();
+
+  const categoriesWithCount = await Promise.all(
+    categories.map(async (category) => {
+      const count = await Product.countDocuments({ category_id: category._id });
+      return { ...category, count };
+    })
+  );
 
   res.json({
-    categories,
+    categories: categoriesWithCount,
     pagination: {
       current: page,
       pageSize: limit,

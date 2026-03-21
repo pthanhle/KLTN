@@ -36,7 +36,7 @@
       },
       "contact": {
         "title": "Connect",
-        "address": "123 Ngoc Khanh Street, Ba Dinh District, Hanoi"
+        "address": "1 Vo Van Ngan, Thu Duc, Ho Chi Minh City"
       },
       "legal": {
         "terms": "Terms of Use",
@@ -69,12 +69,12 @@
         "title": "Exclusive Services",
         "subtitle": "We take care of your car with the strictest standards from top technicians.",
         "services": {
-            "s1_title": "Intensive Maintenance",
-            "s1_desc": "Modern diagnostic systems, synchronized international standard processes exclusively for luxury cars.",
-            "s2_title": "Care & Detailing",
-            "s2_desc": "Professional detailing, Ceramic coating and PPF paint protection film from the world's leading brands.",
-            "s3_title": "Genuine Parts",
-            "s3_desc": "Directly imported parts warehouse, guaranteeing 100% originality and absolute safety for your journey."
+          "s1_title": "Intensive Maintenance",
+          "s1_desc": "Modern diagnostic systems, synchronized international standard processes exclusively for luxury cars.",
+          "s2_title": "Care & Detailing",
+          "s2_desc": "Professional detailing, Ceramic coating and PPF paint protection film from the world's leading brands.",
+          "s3_title": "Genuine Parts",
+          "s3_desc": "Directly imported parts warehouse, guaranteeing 100% originality and absolute safety for your journey."
         }
       },
       "tradeIn": {

@@ -36,7 +36,7 @@
       },
       "contact": {
         "title": "Kết Nối",
-        "address": "123 Đường Ngọc Khánh, Quận Ba Đình, Hà Nội"
+        "address": "1 Võ Văn Ngân, Thủ Đức, TP.HCM"
       },
       "legal": {
         "terms": "Điều khoản sử dụng",
@@ -69,12 +69,12 @@
         "title": "Dịch Vụ Đặc Quyền",
         "subtitle": "Chúng tôi chăm sóc chiếc xe của bạn bằng tiêu chuẩn khắt khe nhất từ những kỹ thuật viên hàng đầu.",
         "services": {
-            "s1_title": "Bảo Dưỡng Chuyên Sâu",
-            "s1_desc": "Hệ thống chuẩn đoán hiện đại, đồng bộ quy trình chuẩn quốc tế dành riêng cho các dòng xe hạng sang.",
-            "s2_title": "Chăm Sóc & Làm Đẹp",
-            "s2_desc": "Detailing chuyên nghiệp, phủ Ceramic và dán phim bảo vệ sơn PPF từ những thương hiệu hàng đầu thế giới.",
-            "s3_title": "Phụ Tùng Chính Hãng",
-            "s3_desc": "Kho phụ tùng nhập khẩu trực tiếp, đảm bảo 100% nguyên bản và an toàn tuyệt đối cho hành trình của bạn."
+          "s1_title": "Bảo Dưỡng Chuyên Sâu",
+          "s1_desc": "Hệ thống chuẩn đoán hiện đại, đồng bộ quy trình chuẩn quốc tế dành riêng cho các dòng xe hạng sang.",
+          "s2_title": "Chăm Sóc & Làm Đẹp",
+          "s2_desc": "Detailing chuyên nghiệp, phủ Ceramic và dán phim bảo vệ sơn PPF từ những thương hiệu hàng đầu thế giới.",
+          "s3_title": "Phụ Tùng Chính Hãng",
+          "s3_desc": "Kho phụ tùng nhập khẩu trực tiếp, đảm bảo 100% nguyên bản và an toàn tuyệt đối cho hành trình của bạn."
         }
       },
       "tradeIn": {

@@ -53,10 +53,9 @@ export const createCategory = asyncHandler(async (req, res) => {
     throw new Error('Danh mục đã tồn tại')
   }
 
-  // Lấy ảnh từ Cloudinary qua multer
   let imageUrl = ''
   if (req.file) {
-    imageUrl = req.file.path  // Cloudinary URL
+    imageUrl = req.file.path
   }
 
   const category = new Category({

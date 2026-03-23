@@ -112,10 +112,24 @@
   "messages": {
     "logoutSuccess": "Logout successful"
   },
-  "chatbot_new_chat": "New Chat",
+  "chatbot_new_chat": "NEW CHAT",
   "chatbot_history": "History",
-  "chatbot_title": "CarsShop AI",
-  "chatbot_subtitle": "24/7 Virtual Assistant",
-  "chatbot_input_placeholder": "Ask AI...",
-  "header_fontsize": "Display Size"
+  "chatbot_title": "TT AUTO AI",
+  "chatbot_subtitle": "24/7 SUPPORT",
+  "chatbot_input_placeholder": "Type your message here...",
+  "chatbot_disclaimer": "AI may make mistakes. Please verify vehicle configurations.",
+  "chatbot_recent": "Recent",
+  "chatbot_today": "Today",
+  "chatbot_error_msg": "Connection interrupted. Cannot retrieve warehouse data.",
+  "chatbot_retry": "Retry now",
+  "chatbot_welcome": "Hello! I am **TT AUTO AI**. I can help you with pricing, booking maintenance, or consulting on luxury pre-owned cars. What service are you interested in?",
+  "quick_action_pricing": "Parts Pricing",
+  "quick_action_booking": "Book Maintenance",
+  "quick_action_consult": "Pre-owned Cars",
+  "quick_action_sales": "Contact Sales",
+  "header_fontsize": "Display Size",
+  "plan_standard": "Standard Customer",
+  "plan_premium": "Premium Member",
+  "chatbot_you": "YOU",
+  "chatbot_ai": "AI"
 }

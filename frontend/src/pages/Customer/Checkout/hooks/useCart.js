@@ -32,7 +32,8 @@ export const useCart = (t) => {
         const item = cartItems.find(i => i.id === id);
         if (!item) return;
         const newQuantity = item.quantity + delta;
-        if (newQuantity >= 1 && newQuantity <= item.stock) {
+        const maxStock = item.inventory ? (item.inventory.showroom + item.inventory.warehouse) : (item.stock || 99); 
+        if (newQuantity >= 1 && newQuantity <= maxStock) {
             dispatch(updateReduxQuantity({ id, quantity: newQuantity }));
         }
     };

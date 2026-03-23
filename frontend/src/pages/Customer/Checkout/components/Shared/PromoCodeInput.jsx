@@ -1,4 +1,4 @@
-import { Input, Button, Form } from 'antd';
+import { Input, Button } from 'antd';
 import { useState } from 'react';
 
 const PromoCodeInput = ({ applyPromoCode, t, className = '' }) => {
@@ -13,7 +13,7 @@ const PromoCodeInput = ({ applyPromoCode, t, className = '' }) => {
     };
 
     return (
-        <Form onFinish={handleApply} className={`flex gap-2 ${className}`}>
+        <form onSubmit={(e) => { e.preventDefault(); handleApply(); }} className={`flex gap-2 ${className}`}>
             <Input
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
@@ -28,7 +28,7 @@ const PromoCodeInput = ({ applyPromoCode, t, className = '' }) => {
             >
                 {t('summary_apply', 'Áp dụng')}
             </Button>
-        </Form>
+        </form>
     );
 };
 

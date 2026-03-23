@@ -84,5 +84,6 @@
   "success_support_hotline": "HOTLINE: 1900 88XX",
   "success_copied": "Order ID copied",
   "summary_free_shipping_notice": "Free nationwide shipping on orders over 100,000,000 VND. Applies to standard parts. Heavy/Bulky items require additional surcharge.",
-  "summary_back": "Return to cart"
+  "summary_back": "Return to cart",
+  "success_per_item": "/ item"
 }

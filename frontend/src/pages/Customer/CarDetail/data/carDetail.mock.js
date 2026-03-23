@@ -12,6 +12,7 @@ export const getMockCarDetail = (id) => {
         name: baseCar.name,
         sku: baseCar.sku,
         stock: baseCar.stock || 1,
+        isDemoAvailable: String(id) !== '2', // Fake out of demo stock for Car ID 2
         tagline: `Tuyệt tác từ ${brand}`,
         image: baseCar.image,
         colors: baseCar.colors,

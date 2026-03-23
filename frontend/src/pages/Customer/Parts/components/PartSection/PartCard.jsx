@@ -2,9 +2,9 @@ import { ShoppingCart, Heart } from 'lucide-react';
 import { Button, Image, Tooltip, App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '@/store/slices/cartSlice';
-import { addToWishlist } from '@/store/slices/wishlistSlice';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
 export const PartCardSkeleton = () => (
@@ -32,16 +32,20 @@ const PartCard = ({ part }) => {
     const subInfo = `${t('sku', 'Mã SP:')} ${part.id.padStart(5, '0')} • ${part.compatible_brands?.length > 0 ? part.compatible_brands.join(', ') : t('universal_badge', 'Phổ thông')}`;
 
     const handleCardClick = () => {
-        navigate(`/parts/1`);
+        navigate(`/parts/${part.id}`);
     };
 
-    const handleAddToWishlist = (e) => {
+    const wishlistItems = useSelector(state => state.wishlist.items);
+    const isWishlisted = wishlistItems.some(item => String(item.product_id) === String(part.id));
+
+    const handleToggleWishlist = (e) => {
         e.preventDefault();
         e.stopPropagation();
         
-        dispatch(addToWishlist({
+        dispatch(toggleWishlist({
             id: `p_${part.id}`,
             product_id: part.id,
+            type: 'part',
             brand: part.compatible_brands?.[0] || 'Phụ kiện',
             name: part.name,
             image: part.image,
@@ -52,7 +56,11 @@ const PartCard = ({ part }) => {
             reviews_count: part.reviews_count || 0
         }));
 
-        message.success(t('wishlist_added', `Đã thêm ${part.name} vào danh sách yêu thích!`));
+        if (isWishlisted) {
+            message.info(t('wishlist_removed', `Đã xóa ${part.name} khỏi danh sách yêu thích.`));
+        } else {
+            message.success(t('wishlist_added', `Đã thêm ${part.name} vào danh sách yêu thích!`));
+        }
     };
 
     const handleAddToCart = (e) => {
@@ -87,10 +95,14 @@ const PartCard = ({ part }) => {
                 )}
 
                 <button 
-                    onClick={handleAddToWishlist}
-                    className="absolute top-3 right-3 w-8 h-8 z-10 flex items-center justify-center rounded-full bg-white/95 dark:bg-[#141416]/90 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-500 hover:bg-white transition-colors cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-slate-100/50 dark:border-white/10"
+                    onClick={handleToggleWishlist}
+                    className="absolute top-3 right-3 w-8 h-8 z-10 flex items-center justify-center rounded-full bg-white/95 dark:bg-[#141416]/90 hover:bg-white transition-colors cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-slate-100/50 dark:border-white/10 group/btn"
                 >
-                    <Heart size={14} className="" />
+                    <Heart 
+                        size={14} 
+                        fill={isWishlisted ? "currentColor" : "none"}
+                        className={isWishlisted ? 'text-pink-500' : 'text-slate-400 dark:text-slate-500 group-hover/btn:text-pink-500'} 
+                    />
                 </button>
 
                 {part.category && part.category !== 'all' && (
@@ -126,18 +138,24 @@ const PartCard = ({ part }) => {
                         </div>
                     </div>
 
-                    <Tooltip title={isOutOfStock ? t('add_to_cart_disabled', 'Hết hàng') : ''} color="#1e293b" placement="top">
-                        <Button
-                            type="primary"
-                            onClick={handleAddToCart}
-                            disabled={isOutOfStock}
-                            className={`!w-[42px] !h-[42px] !rounded-[12px] !border-none !flex !items-center !justify-center flex-shrink-0 transition-all duration-300 ${isOutOfStock
-                                    ? '!bg-slate-100 dark:!bg-white/5 !shadow-none !cursor-default border !border-slate-200 dark:!border-white/10'
-                                    : '!bg-yellow-500 hover:!bg-yellow-400 !shadow-[0_4px_12px_rgba(234,179,8,0.25)]'
-                                }`}
-                            icon={<ShoppingCart size={18} strokeWidth={2.5} className={isOutOfStock ? "!text-slate-900 dark:!text-white" : "text-slate-900"} />}
-                        />
-                    </Tooltip>
+                    {isOutOfStock ? (
+                        <Button 
+                            type="default"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/parts/pre-order/${part.id}`); }}
+                            className="!h-[42px] px-3 sm:px-4 !rounded-[12px] !bg-slate-50 hover:!bg-slate-100 dark:!bg-[#1a1c23] dark:hover:!bg-[#22252d] !border-slate-200 dark:!border-white/10 !text-slate-600 dark:!text-slate-400 hover:!text-slate-900 dark:hover:!text-white !font-bold !text-[11px] transition-all tracking-wider uppercase shadow-none border flex-shrink-0 active:scale-95"
+                        >
+                            {t('btn_preorder', 'Đặt hàng')}
+                        </Button>
+                    ) : (
+                        <Tooltip title={''} color="#1e293b" placement="top">
+                            <Button
+                                type="primary"
+                                onClick={handleAddToCart}
+                                className={`!w-[42px] !h-[42px] !rounded-[12px] !border-none !flex !items-center !justify-center flex-shrink-0 transition-all duration-300 !bg-yellow-500 hover:!bg-yellow-400 !shadow-[0_4px_12px_rgba(234,179,8,0.25)] hover:scale-105 active:scale-95`}
+                                icon={<ShoppingCart size={18} strokeWidth={2.5} className="text-slate-900" />}
+                            />
+                        </Tooltip>
+                    )}
                 </div>
             </div>
 

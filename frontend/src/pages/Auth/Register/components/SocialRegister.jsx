@@ -3,6 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate, Link } from 'react-router-dom';
 import { App as AntdApp } from 'antd';
 import { useGoogleLoginMutation } from '../../../../services/queries/auth.queries';
+import { Google } from '@thesvg/react';
 
 const SocialRegister = () => {
     const { t } = useTranslation('auth');
@@ -42,11 +43,7 @@ const SocialRegister = () => {
                     onClick={handleGoogleLogin}
                     className="w-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
                 >
-                    <img
-                        src="https://www.svgrepo.com/show/475656/google-color.svg"
-                        alt="Google Logo"
-                        className="w-4 h-4"
-                    />
+                    <Google width={16} height={16} />
                     {t('registerPage.googleBtn')}
                 </button>
             </div>

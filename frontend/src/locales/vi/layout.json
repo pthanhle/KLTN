@@ -32,7 +32,9 @@
         "serviceCenter": "Trung tâm dịch vụ",
         "parts": "Phụ tùng chính hãng",
         "care": "Chăm sóc xe chuyên nghiệp",
-        "warranty": "Chính sách bảo hành"
+        "warranty": "Chính sách bảo hành",
+        "search_no_results": "Không tìm thấy kết quả nào",
+        "header_fontsize": "Kích cỡ hiển thị"
       },
       "contact": {
         "title": "Kết Nối",
@@ -111,5 +113,10 @@
   },
   "messages": {
     "logoutSuccess": "Đăng xuất thành công"
-  }
+  },
+  "chatbot_new_chat": "Nhắn tin mới",
+  "chatbot_history": "Lịch sử",
+  "chatbot_title": "CarsShop AI",
+  "chatbot_subtitle": "Trợ lý tư vấn 24/7",
+  "chatbot_input_placeholder": "Hỏi AI tiếp..."
 }

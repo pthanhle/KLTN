@@ -22,6 +22,11 @@ const PaymentSummary = ({ checkedItems, subtotal, isLoading, handleCheckoutSubmi
                             </div>
                             <div className="flex-1 min-w-0 flex flex-col justify-center">
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate" title={item.name}>{item.name}</h4>
+                                {item.selected_options && Object.keys(item.selected_options).length > 0 && (
+                                    <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                                        {Object.entries(item.selected_options).map(([k, v]) => `${k}: ${v}`).join(' | ')}
+                                    </p>
+                                )}
                                 <div className="flex justify-between items-center mt-1">
                                     <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{t('summary_quantity', { count: String(item.quantity).padStart(2, '0') })}</span>
                                     <span className="text-sm font-bold text-slate-900 dark:text-white">
@@ -33,9 +38,11 @@ const PaymentSummary = ({ checkedItems, subtotal, isLoading, handleCheckoutSubmi
                     ))}
                 </div>
 
-                <div className="h-px bg-slate-100 dark:bg-white/10 mb-6"></div>
+                <div className="h-px bg-slate-100 dark:bg-white/10 mb-5"></div>
 
-                <PromoCodeInput applyPromoCode={applyPromoCode} t={t} className="mb-8" />
+                <PromoCodeInput applyPromoCode={applyPromoCode} t={t} className="mb-5" />
+
+                <div className="h-px bg-slate-100 dark:bg-white/10 mb-5"></div>
 
                 <div className="space-y-3 mb-8">
                     <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">

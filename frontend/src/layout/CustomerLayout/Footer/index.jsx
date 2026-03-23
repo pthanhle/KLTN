@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Facebook, Instagram, Twitter, MapPin, Phone, Mail, CarFront } from 'lucide-react';
+import { MapPin, Phone, Mail, CarFront } from 'lucide-react';
+import { Facebook, Instagram, Twitter } from '@thesvg/react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -26,14 +27,14 @@ const Footer = () => {
                             {t('customer.footer.aboutText')}
                         </p>
                         <div className="flex items-center gap-4">
-                            <a href="#" className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center !text-slate-600 dark:!text-slate-400 hover:!bg-yellow-500 hover:!text-white dark:hover:!bg-yellow-500 dark:hover:!text-slate-900 transition-all cursor-pointer">
-                                <Facebook size={16} />
+                            <a href="#" className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center hover:bg-[#1877F2]/10 transition-all cursor-pointer group">
+                                <Facebook width={16} height={16} fill="#1877F2" className="fill-[#1877F2] opacity-90 group-hover:opacity-100 transition-opacity" />
                             </a>
-                            <a href="#" className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center !text-slate-600 dark:!text-slate-400 hover:!bg-yellow-500 hover:!text-white dark:hover:!bg-yellow-500 dark:hover:!text-slate-900 transition-all cursor-pointer">
-                                <Instagram size={16} />
+                            <a href="#" className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center hover:bg-pink-500/10 transition-all cursor-pointer group">
+                                <Instagram width={16} height={16} className="opacity-90 group-hover:opacity-100 transition-opacity" />
                             </a>
-                            <a href="#" className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center !text-slate-600 dark:!text-slate-400 hover:!bg-yellow-500 hover:!text-white dark:hover:!bg-yellow-500 dark:hover:!text-slate-900 transition-all cursor-pointer">
-                                <Twitter size={16} />
+                            <a href="#" className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center hover:bg-[#1DA1F2]/10 transition-all cursor-pointer group">
+                                <Twitter width={16} height={16} fill="#1DA1F2" className="fill-[#1DA1F2] opacity-90 group-hover:opacity-100 transition-opacity" />
                             </a>
                         </div>
                     </div>

@@ -321,6 +321,52 @@ export const mockPartsList = {
     }
 };
 
+const getOptionsByCategory = (category) => {
+    switch(category) {
+        case 'engine':
+        case 'suspension':
+            return [
+                { type: 'size', name: 'Cấu hình/Loại', choices: ['Standard', 'Performance (Tối ưu hóa)', 'Racing (Trường đua)'] }
+            ];
+        case 'brake':
+            return [
+                { type: 'size', name: 'Loại má phanh/Đĩa', choices: ['Ceramic', 'OEM Standard', 'Carbon Fiber'] }
+            ];
+        case 'electrical':
+            return [
+                { type: 'size', name: 'Công suất cung cấp', choices: ['Tiêu chuẩn (12V)', 'High Output (Dòng xả cao)'] }
+            ];
+        case 'tires':
+        case 'wheels':
+            return [
+                { type: 'size', name: 'Kích thước (Inch)', choices: ['18"', '19"', '20"', '21"'] },
+                { type: 'color', name: 'Màu sắc', choices: [{label: 'Đen mờ', colorCode: '#27272a'}, {label: 'Bạc', colorCode: '#cbd5e1'}] }
+            ];
+        case 'filter':
+            return [
+                { type: 'size', name: 'Điều kiện sử dụng', choices: ['Phố bụi thông thường', 'Hiệu suất cao (High-Flow)', 'Off-road'] }
+            ];
+        case 'body':
+        case 'accessory':
+        default:
+            return [
+                { type: 'color', name: 'Màu sắc/Phiên bản', choices: [{label: 'Đen nhám (Matte Black)', colorCode: '#27272a'}, {label: 'Sợi Carbon thật', colorCode: '#333333'}, {label: 'Nguyên bản (OEM)', colorCode: '#cbd5e1'}] }
+            ];
+    }
+};
+
+const getSpecsByCategory = (category, data) => {
+    return [
+        { label: 'Tên sản phẩm (Name)', value: data.name },
+        { label: 'Thương hiệu/Dòng tương thích', value: data.compatible_brands?.join(', ') || 'Đa dụng (Universal)' },
+        { label: 'Chuẩn chất lượng (Standard)', value: 'Tương đương thiết bị chính hãng (OEM) / Khí động học Đức' },
+        { label: 'Sản xuất/Xuất xứ (Origin)', value: 'USA/Germany (Phụ thuộc lô hàng)' },
+        { label: 'Tuổi thọ dự kiến', value: '4-8 năm tùy điều kiện vận hành' },
+        { label: 'Bảo hành (Warranty)', value: '12 - 36 tháng lỗi sản xuất' },
+        { label: 'Ghi chú lắp đặt', value: 'Cần kỹ thuật viên chuyên dụng có máy chẩn đoán' }
+    ];
+};
+
 export const getMockPartDetail = (id) => {
     const listDetail = mockPartsList['1']; 
     const summaryData = MOCK_PARTS.find(p => String(p.id) === String(id));
@@ -336,10 +382,17 @@ export const getMockPartDetail = (id) => {
             original_price: Math.floor(summaryData.price * 1.05),
             brand: summaryData.compatible_brands?.[0] || 'Phụ kiện',
             stock: summaryData.stock,
-            in_stock: summaryData.stock > 0,
+            inventory: summaryData.inventory || {
+                showroom: Math.floor(Math.random() * 5),
+                warehouse: Math.floor(Math.random() * 50) + 10
+            },
+            in_stock: summaryData.stock > 0 || true, // Fix logic to reflect the new inventory
             images: [summaryData.image, ...listDetail.images.slice(1)],
-            description_html: listDetail.description,
-            description: summaryData.description
+            description: listDetail.description, 
+            short_description: summaryData.description,
+            compatible_brands: summaryData.compatible_brands,
+            options: getOptionsByCategory(summaryData.category),
+            specs: getSpecsByCategory(summaryData.category, summaryData)
         };
     }
     return listDetail;

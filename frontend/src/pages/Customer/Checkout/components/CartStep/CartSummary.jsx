@@ -1,6 +1,7 @@
 import { Button } from 'antd';
 import { ShieldCheck } from 'lucide-react';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
+import { Visa, Mastercard } from '@thesvg/react';
 
 const CartSummary = ({ subtotal, hasCheckedItems, checkedCount, proceedToPayment, t }) => {
     return (
@@ -50,10 +51,12 @@ const CartSummary = ({ subtotal, hasCheckedItems, checkedCount, proceedToPayment
                             <ShieldCheck size={18} strokeWidth={2.5}/>
                             <span className="text-[10px] font-bold uppercase tracking-widest">{t('trust_secure', '100% Secure Checkout')}</span>
                         </div>
-                        <div className="flex gap-2 flex-wrap items-center justify-center opacity-70 grayscale">
+                        <div className="flex gap-2 flex-wrap items-center justify-center">
                             {['VISA', 'MC', 'VNPAY', 'MOMO', 'COD'].map(method => (
                                 <div key={method} className="h-6 px-3 bg-white dark:bg-[#0a0a0b] rounded text-[9px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 flex items-center justify-center uppercase">
-                                    {method}
+                                    {method === 'VISA' ? <Visa width={24} height={14} /> :
+                                     method === 'MC' ? <Mastercard width={24} height={14} /> :
+                                     method}
                                 </div>
                             ))}
                         </div>

@@ -23,6 +23,7 @@ const CarDetailPage = lazy(() => import('../pages/Customer/CarDetail'));
 const ServicesPage = lazy(() => import('../pages/Customer/Services'));
 const PartsPage = lazy(() => import('../pages/Customer/Parts'));
 const PartDetail = lazy(() => import('../pages/Customer/PartDetail'));
+const PreorderPartPage = lazy(() => import('../pages/Customer/Parts/pages/PreorderPart'));
 const TestDriveBookingPage = lazy(() => import('../pages/Customer/TestDriveBooking'));
 const WishlistPage = lazy(() => import('../pages/Customer/Wishlist'));
 const CheckoutFlow = lazy(() => import('../pages/Customer/Checkout'));
@@ -70,6 +71,7 @@ const AppRoutes = () => {
                         <Route path="/services" element={<ServicesPage />} />
                         <Route path="/parts" element={<PartsPage />} />
                         <Route path="/parts/:id" element={<PartDetail />} />
+                        <Route path="/parts/pre-order/:id" element={<PreorderPartPage />} />
                         <Route path="/wishlist" element={<WishlistPage />} />
                     </Route>
 

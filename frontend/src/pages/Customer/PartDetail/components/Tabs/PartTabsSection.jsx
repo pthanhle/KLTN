@@ -1,5 +1,6 @@
 import { Star, Upload, MessageSquare } from 'lucide-react';
 import { Button } from 'antd';
+import DOMPurify from 'dompurify';
 import SpecsTable from './SpecsTable';
 import ReviewSection from './ReviewSection';
 
@@ -18,9 +19,11 @@ export const PartTabsSection = ({ part, activeTab, setActiveTab, submitReview, t
                 </Button>
             </div>
 
-            {/* Description Tab */}
             {activeTab === 'description' && (
-                <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{ __html: part.description }}></div>
+                <div
+                    className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(part.description) }}
+                />
             )}
 
             {/* Specs Tab */}

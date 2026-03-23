@@ -1,11 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import CategoryTopNav from './components/Shared/CategoryTopNav';
 import BrandSearch from './components/BrandSection/BrandSearch';
 import AlphabetFilter from './components/BrandSection/AlphabetFilter';
-import BrandCard, { BrandCardSkeleton } from './components/BrandSection/BrandCard'; // Retaining BrandCardSkeleton as it's used and not explicitly removed by instruction
+import BrandCard, { BrandCardSkeleton } from './components/BrandSection/BrandCard';
 import BrandPagination from './components/BrandSection/BrandPagination';
-import SidebarFilter from './components/ProductSection/SidebarFilter';
-import ProductGrid from './components/ProductSection/ProductGrid';
 import { useProductsLogic } from './hooks/useProductsLogic';
 import { Skeleton } from '@/components/ui/skeleton';
 

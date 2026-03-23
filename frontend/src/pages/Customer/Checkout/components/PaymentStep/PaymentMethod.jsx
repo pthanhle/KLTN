@@ -1,4 +1,5 @@
 import { CreditCard, Wallet, QrCode, Handshake } from 'lucide-react';
+import { Visa, Mastercard } from '@thesvg/react';
 
 const getPaymentIcon = (id) => {
     switch (id) {
@@ -49,8 +50,10 @@ const PaymentMethod = ({ paymentMethod, setPaymentMethod, mockPaymentMethods, t 
                             {method.tags && method.tags.length > 0 && (
                                 <div className="flex space-x-2">
                                     {method.tags.map(tag => (
-                                        <div key={tag} className="w-8 h-5 bg-slate-200 dark:bg-white/10 rounded text-[9px] text-slate-600 dark:text-slate-400 flex items-center justify-center font-bold">
-                                            {tag}
+                                        <div key={tag} className="min-w-[32px] px-1 h-5 bg-slate-200 dark:bg-white/10 rounded text-[9px] text-slate-600 dark:text-slate-400 flex items-center justify-center font-bold">
+                                            {tag === 'VISA' ? <Visa width={22} height={12} /> :
+                                             tag === 'MC' ? <Mastercard width={22} height={12} /> :
+                                             tag}
                                         </div>
                                     ))}
                                 </div>

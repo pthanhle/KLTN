@@ -25,14 +25,24 @@ const ProductSummary = ({ items, total, t }) => {
                             <h4 className="text-sm md:text-base font-bold text-slate-900 dark:text-white truncate mb-1" title={item.name}>
                                 {item.name}
                             </h4>
+                            {item.selected_options && Object.keys(item.selected_options).length > 0 && (
+                                <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1 mb-2">
+                                    {Object.entries(item.selected_options).map(([k, v]) => `${k}: ${v}`).join(' | ')}
+                                </p>
+                            )}
                             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/10 px-2 py-1 rounded w-fit mb-3">
                                 {t('success_qty', { count: String(item.quantity).padStart(2, '0') })}
                             </span>
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex flex-col items-end justify-center">
                             <span className="text-sm md:text-base font-bold text-slate-900 dark:text-white shrink-0">
-                                {formatVND(item.unit_price)}
+                                {formatVND(item.total_price || (item.unit_price * item.quantity))}
                             </span>
+                            {item.quantity > 1 && (
+                                <span className="text-[11px] text-slate-400 mt-1">
+                                    {formatVND(item.unit_price)} {t('success_per_item', '/ sp')}
+                                </span>
+                            )}
                         </div>
                     </div>
                 ))}
@@ -41,9 +51,9 @@ const ProductSummary = ({ items, total, t }) => {
             <div className="h-px bg-slate-100 dark:bg-white/10 my-8"></div>
 
             <div className="mt-auto">
-                <div className="flex justify-between items-end mb-2">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">{t('success_final_total')}</span>
-                    <span className="text-3xl md:text-4xl font-black text-yellow-500 tracking-tighter">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-end mb-2 gap-2">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">{t('success_final_total', 'Tổng cộng thanh toán')}</span>
+                    <span className="text-3xl sm:text-4xl font-black text-yellow-500 tracking-tighter whitespace-nowrap text-right">
                         {formatVND(total || 0)}
                     </span>
                 </div>

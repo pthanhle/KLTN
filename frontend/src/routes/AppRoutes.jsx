@@ -21,6 +21,8 @@ const ProductsPage = lazy(() => import('../pages/Customer/Products'));
 const CarsPage = lazy(() => import('../pages/Customer/Cars'));
 const CarDetailPage = lazy(() => import('../pages/Customer/CarDetail'));
 const ServicesPage = lazy(() => import('../pages/Customer/Services'));
+const ServiceTrackingPage = lazy(() => import('../pages/Customer/ServiceTracking'));
+const ServiceTrackingDetail = lazy(() => import('../pages/Customer/ServiceTrackingDetail'));
 const PartsPage = lazy(() => import('../pages/Customer/Parts'));
 const PartDetail = lazy(() => import('../pages/Customer/PartDetail'));
 const PreorderPartPage = lazy(() => import('../pages/Customer/Parts/pages/PreorderPart'));
@@ -71,6 +73,8 @@ const AppRoutes = () => {
                         <Route path="/brand/:brandName" element={<CarsPage />} />
                         <Route path="/test-drive/:id" element={<TestDriveBookingPage />} />
                         <Route path="/services" element={<ServicesPage />} />
+                        <Route path="/tracking" element={<ServiceTrackingPage />} />
+                        <Route path="/tracking/:id" element={<ServiceTrackingDetail />} />
                         <Route path="/parts" element={<PartsPage />} />
                         <Route path="/parts/:id" element={<PartDetail />} />
                         <Route path="/parts/pre-order/:id" element={<PreorderPartPage />} />

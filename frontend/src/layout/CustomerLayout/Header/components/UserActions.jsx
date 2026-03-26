@@ -49,7 +49,7 @@ const UserActions = () => {
                 </Link>
                 
                 {/* Micro Component: Dropdown thông báo chuẩn API-Ready */}
-                <NotificationDropdown />
+                {isAuthenticated && <NotificationDropdown />}
             </div>
 
             <div className="flex items-center gap-3 pl-2">

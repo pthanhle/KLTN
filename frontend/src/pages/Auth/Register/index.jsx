@@ -21,12 +21,12 @@ const Register = () => {
         <AuthLayout
             title={t('registerPage.title')}
             subtitle={t('registerPage.subtitle')}
+            iconClass="bg-transparent shadow-none"
             icon={
                 <div className="w-10 h-10 flex items-center justify-center">
                     <img src={BrandLogo} alt="Logo" className="w-full h-full object-contain [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.08))] dark:[filter:drop-shadow(0_0_2px_rgba(255,255,255,0.6))_drop-shadow(0_0_12px_rgba(255,255,255,0.15))]" />
                 </div>
             }
-            iconClass="bg-yellow-500 shadow-yellow-500/30"
             bgImage="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=2000&auto=format&fit=crop"
             cardClass="bg-[#161a23]/90 backdrop-blur-xl border border-slate-800 shadow-2xl rounded-2xl max-w-[450px]"
             containerClass="bg-gradient-to-br from-[#0b0f19] to-[#151b2b]"

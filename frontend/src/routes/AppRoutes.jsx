@@ -78,7 +78,6 @@ const AppRoutes = () => {
                         <Route path="/parts" element={<PartsPage />} />
                         <Route path="/parts/:id" element={<PartDetail />} />
                         <Route path="/parts/pre-order/:id" element={<PreorderPartPage />} />
-                        <Route path="/wishlist" element={<WishlistPage />} />
                     </Route>
 
                     <Route element={<ProtectedRoute allowedRoles={['customer']} requireLogin={true} />}>
@@ -90,6 +89,7 @@ const AppRoutes = () => {
                         <Route path="/profile/test-drives" element={<ProfilePage />} />
                         <Route path="/profile/notifications" element={<ProfilePage />} />
                         <Route path="/cart" element={<CheckoutFlow />} />
+                        <Route path="/wishlist" element={<WishlistPage />} />
                     </Route>
                 </Route>
 

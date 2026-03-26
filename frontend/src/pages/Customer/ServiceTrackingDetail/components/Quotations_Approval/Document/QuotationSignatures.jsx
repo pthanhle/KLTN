@@ -11,8 +11,8 @@ const QuotationSignatures = ({ quotation, t }) => (
                         src={quotation.customer_signature} 
                         alt="E-Signature" 
                         preview={false}
-                        wrapperClassName="h-full w-auto z-10 opacity-80 mix-blend-multiply dark:mix-blend-lighten dark:invert flex justify-center items-center"
-                        className="h-full w-auto object-contain cursor-crosshair drop-shadow-md" 
+                        wrapperClassName="h-full w-auto z-10 flex justify-center items-center"
+                        className="h-full w-auto object-contain cursor-crosshair opacity-80 dark:invert drop-shadow-md" 
                     />
                 ) : (
                     <div className="absolute inset-x-0 bottom-4 text-[10px] text-slate-300 dark:text-white/20 italic">

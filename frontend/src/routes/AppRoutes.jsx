@@ -88,6 +88,7 @@ const AppRoutes = () => {
                         <Route path="/profile/services" element={<ProfilePage />} />
                         <Route path="/profile/services/:id" element={<ProfilePage />} />
                         <Route path="/profile/test-drives" element={<ProfilePage />} />
+                        <Route path="/profile/notifications" element={<ProfilePage />} />
                         <Route path="/cart" element={<CheckoutFlow />} />
                     </Route>
                 </Route>

@@ -1,26 +1,28 @@
 import { useTranslation } from 'react-i18next';
-import { MapPin, Phone, Mail, CarFront } from 'lucide-react';
+import { Image } from 'antd';
+import { MapPin, Phone, Mail } from 'lucide-react';
 import { Facebook, Instagram, Twitter } from '@thesvg/react';
 import { Link } from 'react-router-dom';
+import BrandLogo from '@/assets/images/brand/logo.png';
 
 const Footer = () => {
     const { t } = useTranslation('layout');
 
     return (
-        <footer className="bg-slate-50 dark:bg-[#060608] pt-20 pb-10 border-t border-slate-200 dark:border-white/5 transition-colors duration-300 w-full font-sans">
-            <div className="container mx-auto px-6 lg:px-10">
+        <footer className="bg-white dark:bg-[#0b0f19] border-t border-slate-200 dark:border-white/5 pt-16 pb-8 transition-colors duration-300">
+            <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1280px]">
                 {/* Top Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-12">
                     
-                    {/* Brand Info */}
-                    <div className="flex flex-col pr-4">
-                        <Link to="/" className="flex items-center gap-2 mb-6 w-max group">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-lg bg-yellow-500 shadow-yellow-500/20 transition-all duration-300 group-hover:scale-105">
-                                <CarFront className="text-slate-900 w-6 h-6 stroke-[2.5]" />
+                    {/* Brand Section */}
+                    <div className="flex flex-col space-y-6">
+                        <Link to="/" className="flex items-center gap-3 group w-max hover:-translate-y-1 transition-all duration-300">
+                            <div className="w-12 h-12 flex items-center justify-center">
+                                <Image preview={false} src={BrandLogo} alt="TT AUTO Logo" className="!w-full !h-full object-contain [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.08))] dark:[filter:drop-shadow(0_0_2px_rgba(255,255,255,0.6))_drop-shadow(0_0_12px_rgba(255,255,255,0.15))] transition-all duration-300" rootClassName="flex items-center justify-center w-full h-full" />
                             </div>
-                            <div className="flex flex-col ml-1">
-                                <span className="text-xl font-black tracking-tighter uppercase italic leading-none text-slate-900 dark:text-white group-hover:text-yellow-600 dark:group-hover:text-yellow-500 transition-colors">TT AUTO</span>
-                                <span className="text-[9px] tracking-[0.2em] text-yellow-600 dark:text-yellow-500 lg:text-yellow-500/80 font-bold uppercase mt-1 leading-none">Premium Services</span>
+                            <div className="flex flex-col">
+                                <span className="font-extrabold text-xl leading-none tracking-wide text-slate-900 dark:text-white uppercase">TT AUTO</span>
+                                <span className="text-[10px] font-bold text-yellow-500 tracking-[0.2em] uppercase mt-1">Premium Garage</span>
                             </div>
                         </Link>
                         <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed font-medium mb-6">

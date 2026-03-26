@@ -1,13 +1,15 @@
-import { CarFront, Minus, X, Menu } from 'lucide-react';
+import { Minus, X, Menu } from 'lucide-react';
+import React from 'react';
+import BrandLogo from '@/assets/images/brand/logo.png';
 import IconButton from '../common/IconButton';
 
 const Header = ({ onClose, t }) => {
     return (
-        <header className="bg-slate-50/90 dark:bg-slate-900/60 backdrop-blur-xl flex justify-between items-center w-full px-4 md:px-5 py-3 z-20 border-b border-slate-200 dark:border-white/5">
-            <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#1a1c23] border-b border-gray-100 dark:border-white/5 rounded-t-2xl shadow-sm z-20 relative">
+            <div className="flex items-center gap-2">
                 <IconButton icon={Menu} className="md:hidden" />
-                <div className="bg-yellow-500 p-2 rounded-xl text-slate-900 shadow-lg shadow-yellow-500/20 shrink-0">
-                    <CarFront size={20} className="stroke-slate-900" />
+                <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                    <img src={BrandLogo} alt="AI Assistant" className="w-full h-full object-contain transition-all duration-300 [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.08))] dark:[filter:drop-shadow(0_0_2px_rgba(255,255,255,0.6))_drop-shadow(0_0_12px_rgba(255,255,255,0.15))]" />
                 </div>
                 <div className="flex flex-col">
                     <h1 className="text-sm font-black tracking-widest text-slate-900 dark:text-yellow-500 uppercase font-headline">
@@ -22,7 +24,7 @@ const Header = ({ onClose, t }) => {
                 <IconButton icon={Minus} onClick={onClose} ariaLabel="Minimize" />
                 <IconButton icon={X} onClick={onClose} size={22} ariaLabel="Close" />
             </div>
-        </header>
+        </div>
     );
 };
 export default Header;

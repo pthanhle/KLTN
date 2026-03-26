@@ -131,5 +131,18 @@
   "plan_standard": "Standard Customer",
   "plan_premium": "Premium Member",
   "chatbot_you": "YOU",
-  "chatbot_ai": "AI"
+  "chatbot_ai": "AI",
+  "notifications": {
+    "title": "Notifications",
+    "new": "New",
+    "mark_all_read": "Mark all as read",
+    "empty": "No notifications yet",
+    "view_all": "View all ({{count}})",
+    "time": {
+      "just_now": "Just now",
+      "minutes_ago": "{{count}} mins ago",
+      "hours_ago": "{{count}} hours ago",
+      "days_ago": "{{count}} days ago"
+    }
+  }
 }

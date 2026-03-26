@@ -132,5 +132,18 @@
   "plan_standard": "Khách hàng tiêu chuẩn",
   "plan_premium": "Hội viên cao cấp",
   "chatbot_you": "BẠN",
-  "chatbot_ai": "AI"
+  "chatbot_ai": "AI",
+  "notifications": {
+    "title": "Thông báo",
+    "new": "Mới",
+    "mark_all_read": "Đọc tất cả",
+    "empty": "Không có thông báo nào",
+    "view_all": "Xem tất cả ({{count}})",
+    "time": {
+      "just_now": "Vừa xong",
+      "minutes_ago": "{{count}} phút trước",
+      "hours_ago": "{{count}} giờ trước",
+      "days_ago": "{{count}} ngày trước"
+    }
+  }
 }

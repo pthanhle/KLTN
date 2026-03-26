@@ -117,9 +117,10 @@ const ContactForm = ({ control, errors, isSubmitting, handleSubmit, t }) => {
                     type="primary"
                     htmlType="submit"
                     loading={isSubmitting}
-                    className="w-full mt-4 !h-[60px] !bg-yellow-500 hover:!bg-yellow-600 !text-slate-900 font-black uppercase tracking-widest !rounded-full transition-all border-none shadow-xl shadow-yellow-500/20 hover:-translate-y-1 active:scale-95 text-base"
+                    className="w-full mt-8 !h-[60px] !bg-yellow-500 hover:!bg-yellow-400 dark:!bg-[linear-gradient(135deg,#eab308,#d4af37)] !text-slate-900 font-bold text-[13px] md:text-[14px] uppercase tracking-[0.2em] !rounded-2xl transition-all border-none shadow-[0_8px_20px_rgba(234,179,8,0.25)] hover:shadow-[0_12px_25px_rgba(234,179,8,0.35)] dark:shadow-[0_8px_25px_rgba(212,175,55,0.4)] dark:hover:shadow-[0_12px_30px_rgba(212,175,55,0.5)] transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 group"
                 >
-                    {t('form_submit')}
+                    <span>{t('form_submit')}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-send group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300"><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg>
                 </Button>
             </Form>
         </div>

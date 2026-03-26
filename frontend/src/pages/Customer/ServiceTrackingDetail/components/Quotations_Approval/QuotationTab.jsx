@@ -47,21 +47,19 @@ const QuotationTab = ({ quotationData, setQuotationData, isFullWidthBar = false 
     }
 
     return (
-        <div className="pb-32">
-            {/* The Document View (Đưa Animation vào cục bộ) */}
+        <div className="pb-32 w-full flex flex-col items-center">
             <div className="w-full flex justify-center sticky-a4-wrapper animate-in fade-in slide-in-from-bottom-8 duration-700">
                 <QuotationA4Document quotation={quotationData} calculations={calculations} />
             </div>
 
-            {/* The Floating Action Bar - Thoát khỏi Stacking Context của Animation để neo Fixed đúng chuẩn */}
-            <QuotationActionBar
-                status={quotationData.status}
-                onOpenSignature={handleOpenSignature}
-                onReject={handleReject}
-                isFullWidthBar={isFullWidthBar}
-            />
+            <div className="w-full animate-in fade-in duration-500 delay-300">
+                <QuotationActionBar
+                    status={quotationData.status}
+                    onOpenSignature={handleOpenSignature}
+                    onReject={handleReject}
+                />
+            </div>
 
-            {/* Hidden Modal Portal for Signature Canvas */}
             <SignatureModal
                 isOpen={isSignatureModalOpen}
                 onClose={handleCloseSignature}
@@ -69,8 +67,7 @@ const QuotationTab = ({ quotationData, setQuotationData, isFullWidthBar = false 
                 calculations={calculations}
             />
 
-            {/* Deposit Payment Lock-in Modal (Edge Case 2) */}
-            <QuotationDepositModal 
+            <QuotationDepositModal
                 isOpen={isDepositModalOpen}
                 paymentTerms={quotationData.payment_terms}
                 onClose={closeDepositModal}

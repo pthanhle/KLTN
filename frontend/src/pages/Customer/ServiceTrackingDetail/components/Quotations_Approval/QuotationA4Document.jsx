@@ -4,6 +4,7 @@ import QuotationHeader from './Document/QuotationHeader';
 import QuotationEntityInfo from './Document/QuotationEntityInfo';
 import QuotationItemsTable from './Document/QuotationItemsTable';
 import QuotationFinancialSummary from './Document/QuotationFinancialSummary';
+import QuotationValidityTerms from './Document/QuotationValidityTerms';
 import QuotationSignatures from './Document/QuotationSignatures';
 
 const QuotationA4Document = ({ quotation, calculations }) => {
@@ -17,6 +18,7 @@ const QuotationA4Document = ({ quotation, calculations }) => {
             <QuotationEntityInfo quotation={quotation} t={t} />
             <QuotationItemsTable parts={quotation.parts} labors={quotation.labors} t={t} />
             <QuotationFinancialSummary quotation={quotation} calculations={calculations} t={t} />
+            <QuotationValidityTerms quotation={quotation} t={t} />
             <QuotationSignatures quotation={quotation} t={t} />
         </article>
     );

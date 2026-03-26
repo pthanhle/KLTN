@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bell, UserCircle, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import NotificationDropdown from '../../../../../layout/CustomerLayout/Header/components/Notification/NotificationDropdown';
 
 const TopAppBar = () => {
     const { t } = useTranslation('tracking');
@@ -15,9 +16,7 @@ const TopAppBar = () => {
                     <a className="text-slate-500 dark:text-[#d3c5ac]  tracking-tight font-semibold uppercase hover:text-yellow-600 dark:hover:text-[#ffd165] transition-colors" href="#">{t('nav_support', 'Support')}</a>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="text-slate-500 dark:text-[#d3c5ac] hover:text-yellow-600 dark:hover:text-[#ffd165] transition-colors">
-                        <Bell className="w-6 h-6" />
-                    </button>
+                    <NotificationDropdown />
                     <button className="text-slate-500 dark:text-[#d3c5ac] hover:text-yellow-600 dark:hover:text-[#ffd165] transition-colors">
                         <UserCircle className="w-6 h-6" />
                     </button>

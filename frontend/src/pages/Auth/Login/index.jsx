@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { CarFront } from 'lucide-react';
+import AuthLayout from '../components/AuthLayout';
 import LoginForm from './components/LoginForm';
 import SocialLogin from './components/SocialLogin';
-import AuthLayout from '../../../layout/AuthLayout';
+import BrandLogo from '@/assets/images/brand/logo.png';
 
 const Login = () => {
     const { t } = useTranslation('auth');
@@ -11,8 +11,11 @@ const Login = () => {
         <AuthLayout
             title={t('login.title')}
             subtitle={t('login.subtitle')}
-            icon={<CarFront size={28} className="text-slate-900" />}
-            iconClass="bg-yellow-500 shadow-yellow-500/30"
+            icon={
+                <div className="w-10 h-10 flex items-center justify-center">
+                    <img src={BrandLogo} alt="Logo" className="w-full h-full object-contain [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.08))] dark:[filter:drop-shadow(0_0_2px_rgba(255,255,255,0.6))_drop-shadow(0_0_12px_rgba(255,255,255,0.15))]" />
+                </div>
+            }
         >
             <LoginForm />
             <SocialLogin />

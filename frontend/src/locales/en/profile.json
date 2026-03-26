@@ -180,5 +180,22 @@
     "view_terms": "View General Terms",
     "empty_hero_title": "New journey awaits",
     "empty_hero_desc": "You have no upcoming test drives. Select your favorite model and experience the premium drive with TT AUTO today.",
-    "empty_hero_btn": "Book a test drive now"
+    "empty_hero_btn": "Book a test drive now",
+    "notif_page_title": "Notifications",
+    "notif_page_desc": "Latest updates from TT AUTO system",
+    "notif_btn_mark_all": "Mark all as read",
+    "notif_tab_all": "All",
+    "notif_tab_unread": "Unread",
+    "notif_tab_read": "Read",
+    "notif_group_today": "Today",
+    "notif_group_yesterday": "Yesterday",
+    "notif_group_older": "Older",
+    "notif_btn_load_more": "Load more notifications",
+    "notif_action_detail": "Details",
+    "notif_action_mark_read": "Mark as read",
+    "notif_action_mark_unread": "Mark as unread",
+    "notif_action_delete": "Delete notification",
+    "notif_empty_title": "No notifications yet",
+    "notif_empty_desc": "You have caught up with everything.",
+    "notif_badge_new": "New"
 }

@@ -6,6 +6,7 @@ import { App as AntdApp } from 'antd';
 import HeaderUtilities from '../../../../components/HeaderUtilities';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import NotificationDropdown from './Notification/NotificationDropdown';
 
 
 const UserActions = () => {
@@ -46,10 +47,9 @@ const UserActions = () => {
                         </span>
                     )}
                 </Link>
-                <button className="relative hover:text-yellow-500 transition-colors">
-                    <Bell size={20} />
-                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 border-2 border-white dark:border-[#0b0f19] rounded-full animate-pulse"></span>
-                </button>
+                
+                {/* Micro Component: Dropdown thông báo chuẩn API-Ready */}
+                <NotificationDropdown />
             </div>
 
             <div className="flex items-center gap-3 pl-2">

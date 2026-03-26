@@ -8,13 +8,13 @@ import OrderDetail from './pages/OrderDetail/index.jsx';
 import ServiceHistory from './pages/ServiceHistory/index.jsx';
 import ServiceQuotation from './pages/ServiceQuotation/index.jsx';
 import TestDriveHistory from './pages/TestDriveHistory/index.jsx';
+import ProfileNotifications from './pages/Notifications/index.jsx';
 import { useLocation } from 'react-router-dom';
 
 const ProfilePage = () => {
-    // Detect if current route is admin or customer
     const location = useLocation();
     const isCustomerRoute = !location.pathname.startsWith('/admin');
-    
+
     const {
         t,
         isLoading,
@@ -33,7 +33,7 @@ const ProfilePage = () => {
         <div className="bg-[#fcfcfc] dark:bg-[#0a0a0b] min-h-screen transition-colors duration-300">
             {/* Added container padding depending on role since customer layout has fixed top header */}
             <div className={`container mx-auto px-4 md:px-6 lg:px-10 max-w-[1280px] ${isCustomerRoute ? 'pt-24' : 'pt-8'} pb-12`}>
-                
+
                 {isLoading ? (
                     <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 animate-pulse">
                         <div className="w-full lg:w-[320px] xl:w-[340px] flex-shrink-0 bg-white dark:bg-[#141416] rounded-[32px] p-8 h-[500px] border border-slate-100 dark:border-white/5 shadow-sm"></div>
@@ -44,10 +44,10 @@ const ProfilePage = () => {
                         {/* Sidebar (Left Column) */}
                         <aside className="w-full lg:w-[320px] xl:w-[340px] flex-shrink-0">
                             <div className="sticky top-28 bg-white dark:bg-[#0b0f19] p-8 md:p-10 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
-                                <ProfileSidebar 
-                                    profile={profile} 
-                                    t={t} 
-                                    setIsPasswordModalOpen={setIsPasswordModalOpen} 
+                                <ProfileSidebar
+                                    profile={profile}
+                                    t={t}
+                                    setIsPasswordModalOpen={setIsPasswordModalOpen}
                                 />
                             </div>
                         </aside>
@@ -63,15 +63,17 @@ const ProfilePage = () => {
                                 <ServiceHistory />
                             ) : location.pathname === '/profile/test-drives' ? (
                                 <TestDriveHistory />
+                            ) : location.pathname === '/profile/notifications' ? (
+                                <ProfileNotifications />
                             ) : (
                                 <>
-                                    <ProfileForm 
-                                        profile={profile} 
-                                        isEditing={isEditing} 
+                                    <ProfileForm
+                                        profile={profile}
+                                        isEditing={isEditing}
                                         methods={methods}
-                                        handleSave={handleSave} 
-                                        handleEditToggle={handleEditToggle} 
-                                        t={t} 
+                                        handleSave={handleSave}
+                                        handleEditToggle={handleEditToggle}
+                                        t={t}
                                     />
 
                                     {/* Show Employee Info only for Admin/Staff */}
@@ -84,7 +86,7 @@ const ProfilePage = () => {
                     </div>
                 )}
 
-                <ChangePasswordModal 
+                <ChangePasswordModal
                     isOpen={isPasswordModalOpen}
                     onClose={() => setIsPasswordModalOpen(false)}
                     t={t}

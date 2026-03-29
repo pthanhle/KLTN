@@ -42,8 +42,14 @@ axiosClient.interceptors.response.use(
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
-            if (originalRequest.url?.includes('/auth/refresh') || originalRequest.url?.includes('/auth/logout')) {
-                store.dispatch(logout());
+            if (
+                originalRequest.url?.includes('/auth/refresh') || 
+                originalRequest.url?.includes('/auth/logout') ||
+                originalRequest.url?.includes('/auth/login')
+            ) {
+                if (!originalRequest.url?.includes('/auth/login')) {
+                    store.dispatch(logout());
+                }
                 return Promise.reject(error);
             }
 

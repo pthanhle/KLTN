@@ -14,6 +14,7 @@ const ResetPassword = lazy(() => import('../pages/Auth/ResetPassword'));
 const VerifyOTP = lazy(() => import('../pages/Auth/VerifyOTP'));
 
 const CustomersPage = lazy(() => import('../pages/Admin/Customers'));
+const CustomerDetailPage = lazy(() => import('../pages/Admin/CustomerDetail'));
 
 const Home = lazy(() => import('../pages/Customer/Home'));
 
@@ -98,6 +99,7 @@ const AppRoutes = () => {
                         <Route path="/admin/dashboard" element={<div>Admin Dashboard</div>} />
                         <Route path="/admin/profile" element={<ProfilePage />} />
                         <Route path="/admin/customers" element={<CustomersPage />} />
+                        <Route path="/admin/customers/:id" element={<CustomerDetailPage />} />
                         <Route path="/admin/orders" element={<div>Quản Lý Đơn Hàng</div>} />
                     </Route>
                 </Route>

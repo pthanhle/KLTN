@@ -1,56 +1,63 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
+import { MOCK_CUSTOMERS, MOCK_PAGINATION, MOCK_STATS } from '../data/customers.mock';
+
 export const useCustomers = () => {
-    const { t } = useTranslation(['admin', 'layout']);
+    const { t } = useTranslation(['adminCustomers', 'layout']);
 
     const breadcrumbItems = [
-        { label: t('layout:admin.sider.customers'), href: '/admin/customers' },
-        { label: t('admin:customers.breadcrumb') }
+        { label: t('adminCustomers:title', 'Quản lý khách hàng') }
     ];
 
     const [isLoading, setIsLoading] = useState(true);
-
-    // Placeholder data
     const [data, setData] = useState([]);
+    const [stats, setStats] = useState(MOCK_STATS);
+    const [pagination, setPagination] = useState(MOCK_PAGINATION);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     useEffect(() => {
-        setData([
-            {
-                key: '1',
-                customer: { name: 'Alex Johnson', email: 'alex.j@example.com', avatar: 'https://i.pravatar.cc/150?u=1' },
-                phone: '+84 901 234 567',
-                status: 'ACTIVE',
-                joinDate: 'Oct 24, 2023'
-            },
-            {
-                key: '2',
-                customer: { name: 'Sarah Williams', email: 's.williams@web.com', avatar: 'https://i.pravatar.cc/150?u=2' },
-                phone: '+84 905 888 999',
-                status: 'INACTIVE',
-                joinDate: 'Nov 02, 2023'
-            },
-            {
-                key: '3',
-                customer: { name: 'Michael Chen', email: 'm.chen@service.io', avatar: 'https://i.pravatar.cc/150?u=3' },
-                phone: '+84 988 555 111',
-                status: 'ACTIVE',
-                joinDate: 'Jan 15, 2024'
-            },
-            {
-                key: '4',
-                customer: { name: 'Linh Nguyễn', email: 'linh.n@gmail.com', avatar: 'https://i.pravatar.cc/150?u=4' },
-                phone: '+84 912 345 678',
-                status: 'BLOCKED',
-                joinDate: 'Feb 10, 2024'
-            }
-        ]);
-        setIsLoading(false);
+        const fetchCustomers = () => {
+            setIsLoading(true);
+            setTimeout(() => {
+                setData(MOCK_CUSTOMERS);
+                setPagination(MOCK_PAGINATION);
+                setStats(MOCK_STATS);
+                setIsLoading(false);
+            }, 800);
+        };
+
+        fetchCustomers();
     }, []);
+
+    const handlePaginationChange = (page, pageSize) => {
+        setPagination({ ...pagination, currentPage: page, pageSize });
+    };
+
+    const handleSelectChange = (newSelectedRowKeys) => {
+        setSelectedRowKeys(newSelectedRowKeys);
+    };
+
+    const handleClearSelection = () => {
+        setSelectedRowKeys([]);
+    };
+
+    const handleBulkAction = (actionType) => {
+        console.log(`Bulk action ${actionType} on IDs:`, selectedRowKeys);
+        alert(`Đã nhận lệnh [${actionType}] với ${selectedRowKeys.length} khách`);
+        setSelectedRowKeys([]);
+    };
 
     return {
         t,
         breadcrumbItems,
         data,
-        isLoading
+        stats,
+        pagination,
+        isLoading,
+        selectedRowKeys,
+        handleSelectChange,
+        handleClearSelection,
+        handleBulkAction,
+        handlePaginationChange
     };
 };

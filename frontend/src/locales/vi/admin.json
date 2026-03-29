@@ -1,18 +1,50 @@
 {
-  "customers": {
-    "title": "Quản lý khách hàng",
-    "breadcrumb": "Quản lý khách hàng",
-    "addNew": "Thêm khách hàng mới",
-    "searchPlaceholder": "Tìm kiếm theo tên, email...",
-    "filter": "Lọc",
-    "export": "Xuất file",
-    "showing": "Hiển thị {{start}} tới {{end}} trong tổng số {{total}} khách hàng",
-    "table": {
-      "customer": "KHÁCH HÀNG",
-      "phone": "SỐ ĐIỆN THOẠI",
-      "status": "TRẠNG THÁI",
-      "joinDate": "NGÀY THAM GIA",
-      "actions": "THAO TÁC"
-    }
-  }
+  "customers.title": "Quản lý khách hàng",
+  "customers.breadcrumb": "Quản lý khách hàng",
+  "customers.addNew": "Thêm khách hàng",
+  "customers.searchPlaceholder": "Tìm kiếm theo tên, Tên xe, SĐT, Email...",
+  "customers.filter": "Lọc",
+  "customers.export": "Xuất file",
+  "customers.showing": "Hiển thị {{start}} đến {{end}} trong tổng số {{total}} khách hàng",
+  
+  "customers.stats.total": "TỔNG KHÁCH HÀNG",
+  "customers.stats.vsLastMonth": "so với tháng trước",
+  "customers.stats.vip": "KHÁCH HÀNG VIP",
+  "customers.stats.newUpgrades": "thăng hạng mới",
+  "customers.stats.retention": "TỶ LỆ GIỮ CHÂN",
+  "customers.stats.vsLastQuarter": "so với quý trước",
+  "customers.stats.newWeek": "MỚI TUẦN NÀY",
+  "customers.stats.vsLastWeek": "so với tuần trước",
+
+  "customers.table.customer": "KHÁCH HÀNG",
+  "customers.table.phone": "SỐ ĐIỆN THOẠI",
+  "customers.table.tier": "HẠNG",
+  "customers.table.spend": "TỔNG CHI TIÊU",
+  "customers.table.garage": "GARAGE",
+  "customers.table.lastVisit": "LẦN CUỐI",
+  "customers.table.status": "TRẠNG THÁI",
+  "customers.table.joinDate": "NGÀY THAM GIA",
+  "customers.table.actions": "THAO TÁC",
+
+  "customers.detail.tabOverview": "Tổng quan",
+  "customers.detail.tabGarage": "Garage",
+  "customers.detail.tabHistory": "Lịch sử",
+  "customers.detail.contact": "Thông tin liên hệ",
+  "customers.detail.updating": "Đang cập nhật",
+  "customers.detail.valueAnalysis": "Phân tích giá trị",
+  "customers.detail.receiveCar": "Nhận xe",
+  "customers.detail.noCars": "Khách chưa lưu thông tin xe!",
+  "customers.detail.noHistory": "Chưa có dữ liệu lịch sử",
+  "customers.detail.created": "Tạo hồ sơ:",
+  "customers.detail.editProfile": "Chỉnh sửa Hồ sơ",
+
+  "customers.filterDrawer.title": "BỘ LỌC CHI TIẾT",
+  "customers.filterDrawer.subtitle": "Thu gọn danh sách tìm kiếm",
+  "customers.filterDrawer.brand": "Hãng Xe",
+  "customers.filterDrawer.brands.all": "Tất cả các dòng sang",
+  "customers.filterDrawer.tier": "Hạng Thành viên",
+  "customers.filterDrawer.tierPlaceholder": "Chọn hạng",
+  "customers.filterDrawer.spend": "Mức chi tiêu (LTV)",
+  "customers.filterDrawer.reset": "Thiết lập lại",
+  "customers.filterDrawer.apply": "Áp dụng lọc"
 }

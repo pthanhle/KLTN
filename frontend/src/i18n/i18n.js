@@ -8,6 +8,8 @@ import enAuth from '../locales/en/auth.json';
 import viAuth from '../locales/vi/auth.json';
 import enAdmin from '../locales/en/admin.json';
 import viAdmin from '../locales/vi/admin.json';
+import enAdminCustomers from '../locales/en/adminCustomers.json';
+import viAdminCustomers from '../locales/vi/adminCustomers.json';
 import enError from '../locales/en/error.json';
 import viError from '../locales/vi/error.json';
 import enProducts from '../locales/en/products.json';
@@ -38,6 +40,7 @@ i18n
                 layout: enLayout,
                 auth: enAuth,
                 admin: enAdmin,
+                adminCustomers: enAdminCustomers,
                 error: enError,
                 products: enProducts,
                 services: enServices,
@@ -54,6 +57,7 @@ i18n
                 layout: viLayout,
                 auth: viAuth,
                 admin: viAdmin,
+                adminCustomers: viAdminCustomers,
                 error: viError,
                 products: viProducts,
                 services: viServices,

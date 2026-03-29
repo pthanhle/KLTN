@@ -1,18 +1,50 @@
 {
-  "customers": {
-    "title": "Customer Management",
-    "breadcrumb": "Customer Management",
-    "addNew": "Add New Customer",
-    "searchPlaceholder": "Search customers by name, email...",
-    "filter": "Filter",
-    "export": "Export",
-    "showing": "Showing {{start}} to {{end}} of {{total}} customers",
-    "table": {
-      "customer": "CUSTOMER",
-      "phone": "PHONE NUMBER",
-      "status": "STATUS",
-      "joinDate": "JOIN DATE",
-      "actions": "ACTIONS"
-    }
-  }
+  "customers.title": "Customer Management",
+  "customers.breadcrumb": "Customer Management",
+  "customers.addNew": "Add Customer",
+  "customers.searchPlaceholder": "Search by name, Car, Phone, Email...",
+  "customers.filter": "Filter",
+  "customers.export": "Export",
+  "customers.showing": "Showing {{start}} to {{end}} out of {{total}} customers",
+  
+  "customers.stats.total": "TOTAL CUSTOMERS",
+  "customers.stats.vsLastMonth": "vs last month",
+  "customers.stats.vip": "VIP CUSTOMERS",
+  "customers.stats.newUpgrades": "new upgrades",
+  "customers.stats.retention": "RETENTION RATE",
+  "customers.stats.vsLastQuarter": "vs last quarter",
+  "customers.stats.newWeek": "NEW THIS WEEK",
+  "customers.stats.vsLastWeek": "vs last week",
+
+  "customers.table.customer": "CUSTOMER",
+  "customers.table.phone": "PHONE NUMBER",
+  "customers.table.tier": "TIER",
+  "customers.table.spend": "TOTAL SPEND",
+  "customers.table.garage": "GARAGE",
+  "customers.table.lastVisit": "LAST VISIT",
+  "customers.table.status": "STATUS",
+  "customers.table.joinDate": "JOIN DATE",
+  "customers.table.actions": "ACTIONS",
+
+  "customers.detail.tabOverview": "Overview",
+  "customers.detail.tabGarage": "Garage",
+  "customers.detail.tabHistory": "History",
+  "customers.detail.contact": "Contact Information",
+  "customers.detail.updating": "Updating",
+  "customers.detail.valueAnalysis": "Value Analysis",
+  "customers.detail.receiveCar": "Receive Car",
+  "customers.detail.noCars": "No cars registered for this customer!",
+  "customers.detail.noHistory": "No history data available",
+  "customers.detail.created": "Created:",
+  "customers.detail.editProfile": "Edit Profile",
+
+  "customers.filterDrawer.title": "ADVANCED FILTER",
+  "customers.filterDrawer.subtitle": "Refine your search list",
+  "customers.filterDrawer.brand": "Car Brand",
+  "customers.filterDrawer.brands.all": "All luxury brands",
+  "customers.filterDrawer.tier": "Membership Tier",
+  "customers.filterDrawer.tierPlaceholder": "Select tier",
+  "customers.filterDrawer.spend": "Spending Range (LTV)",
+  "customers.filterDrawer.reset": "Reset All",
+  "customers.filterDrawer.apply": "Apply Filter"
 }

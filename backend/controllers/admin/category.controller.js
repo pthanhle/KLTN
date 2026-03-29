@@ -84,7 +84,6 @@ export const updateCategory = asyncHandler(async (req, res) => {
     throw new Error('Danh mục không tồn tại')
   }
 
-  // Kiểm tra tên danh mục trùng
   if (category_name && category_name !== category.category_name) {
     const existingCategory = await Category.findOne({ category_name })
     if (existingCategory) {
@@ -96,7 +95,6 @@ export const updateCategory = asyncHandler(async (req, res) => {
   category.category_name = category_name || category.category_name
   category.description = description !== undefined ? description : category.description
 
-  // Cập nhật ảnh từ Cloudinary nếu có file upload mới
   if (req.file) {
     category.image = req.file.path
   }

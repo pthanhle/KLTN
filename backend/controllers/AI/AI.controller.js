@@ -219,8 +219,6 @@ export const AiChatController = {
       }
 
 
-
-
       const finalPrompt = `
         Vai trò: Nhân viên tư vấn CarsShop chuyên nghiệp, thân thiện.
         

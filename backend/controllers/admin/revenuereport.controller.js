@@ -4,9 +4,7 @@ import PDFDocument from 'pdfkit'
 import path from 'path'
 import fs from 'fs'
 
-// [GET] /api/manager/revenue-report
-// Lấy toàn bộ báo cáo hoặc lọc theo tháng, năm
-// Access: Private (Manager)
+
 export const getRevenueReports = asyncHandler(async (req, res) => {
   const { month, year } = req.query
 
@@ -26,9 +24,7 @@ export const getRevenueReports = asyncHandler(async (req, res) => {
   })
 })
 
-// [GET] /api/manager/revenue-report/pdf?month=...&year=...
-// Xuất file PDF báo cáo doanh thu
-// Access: Private (Manager)
+
 export const exportRevenueReportPDF = asyncHandler(async (req, res) => {
   const { month, year } = req.query
 
@@ -66,12 +62,11 @@ export const exportRevenueReportPDF = asyncHandler(async (req, res) => {
   writeStream.on('finish', () => {
     res.download(filePath, (err) => {
       if (err) console.error(err)
-      fs.unlinkSync(filePath) 
+      fs.unlinkSync(filePath)
     })
   })
 })
 
-// [POST] /api/manager/revenue-report/create
 export const createRevenueReport = asyncHandler(async (req, res) => {
   const { month, year, total_revenue } = req.body
 

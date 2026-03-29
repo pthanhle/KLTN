@@ -1,12 +1,9 @@
-// backend/controllers/admin/tradeinVehicle.controller.js
 import OldVehicle from '../../models/oldvehicleModel.js'
 import User from '../../models/userModel.js'
 import Employee from '../../models/employeeModel.js'
 import asyncHandler from 'express-async-handler'
 
-// @desc    Lấy danh sách xe cũ trade-in
-// @route   GET /api/admin/tradein-vehicles
-// @access  Private/Admin
+
 export const getTradeinVehicles = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
@@ -44,9 +41,7 @@ export const getTradeinVehicles = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Lấy chi tiết xe trade-in
-// @route   GET /api/admin/tradein-vehicles/:id
-// @access  Private/Admin
+
 export const getTradeinVehicleById = asyncHandler(async (req, res) => {
     const vehicle = await OldVehicle.findById(req.params.id)
         .populate('user_id', 'full_name email phone')
@@ -63,26 +58,22 @@ export const getTradeinVehicleById = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Tạo yêu cầu trade-in mới
-// @route   POST /api/admin/tradein-vehicles
-// @access  Private/Admin
+
 export const createTradeinVehicle = asyncHandler(async (req, res) => {
     const { user_id, vehicle_info, price_offered, employee_id, status } = req.body
 
-    // Validate
+
     if (!user_id || !vehicle_info) {
         res.status(400)
         throw new Error('Vui lòng nhập user_id và thông tin xe')
     }
 
-    // Kiểm tra user tồn tại
     const user = await User.findById(user_id)
     if (!user) {
         res.status(404)
         throw new Error('Khách hàng không tồn tại')
     }
 
-    // Kiểm tra employee (nếu có)
     let employee = null
     if (employee_id) {
         employee = await Employee.findById(employee_id)
@@ -109,9 +100,7 @@ export const createTradeinVehicle = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Cập nhật yêu cầu trade-in
-// @route   PUT /api/admin/tradein-vehicles/:id
-// @access  Private/Admin
+
 export const updateTradeinVehicle = asyncHandler(async (req, res) => {
     const { vehicle_info, price_offered, employee_id, status } = req.body
 
@@ -121,7 +110,7 @@ export const updateTradeinVehicle = asyncHandler(async (req, res) => {
         throw new Error('Xe trade-in không tồn tại')
     }
 
-    // Kiểm tra employee (nếu có)
+
     if (employee_id) {
         const employee = await Employee.findById(employee_id)
         if (!employee) {
@@ -146,9 +135,7 @@ export const updateTradeinVehicle = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Xóa yêu cầu trade-in
-// @route   DELETE /api/admin/tradein-vehicles/:id
-// @access  Private/Admin
+
 export const deleteTradeinVehicle = asyncHandler(async (req, res) => {
     const vehicle = await OldVehicle.findById(req.params.id)
     if (!vehicle) {

@@ -1,61 +1,139 @@
 import mongoose from 'mongoose'
 
+const customerInfoSchema = new mongoose.Schema(
+  {
+    full_name: { type: String },
+    contact_phone: { type: String },
+    email: { type: String },
+  },
+  { _id: false }
+)
+
+const vehicleInfoSchema = new mongoose.Schema(
+  {
+    brand: { type: String },
+    model: { type: String },
+    license_plate: { type: String },
+    vin_number: { type: String },
+    current_odometer: { type: Number },
+  },
+  { _id: false }
+)
+
+const attachmentsSchema = new mongoose.Schema(
+  {
+    before: { type: [String], default: [] },
+    after: { type: [String], default: [] },
+  },
+  { _id: false }
+)
+
+const bookingServiceSchema = new mongoose.Schema(
+  {
+    service_id: { type: String },
+    service_name: { type: String },
+    price: { type: Number, default: 0 },
+  },
+  { _id: false }
+)
+
+const timelineStepSchema = new mongoose.Schema(
+  {
+    step: {
+      type: String,
+      enum: ['RECEIVED', 'IN_PROGRESS', 'COMPLETED'],
+    },
+    key: { type: String },
+    status: {
+      type: String,
+      enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED'],
+      default: 'PENDING',
+    },
+    time: { type: Date },
+    note: { type: String, default: '' },
+    images: { type: [String], default: [] },
+  },
+  { _id: false }
+)
+
 const bookingSchema = mongoose.Schema(
   {
+    booking_code: { type: String, unique: true, sparse: true },
+
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    service_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'ServicePackage',
-      required: false,
+    customer_info: { type: customerInfoSchema },
+
+    booking_type: {
+      type: String,
+      enum: ['test_drive', 'service', 'maintenance'],
+      required: true,
+      default: 'test_drive',
     },
+
     product_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Product',
       required: false,
     },
-    booking_type: {
+    vehicle_info: { type: vehicleInfoSchema },
+
+
+    booking_date: { type: Date, required: true },
+    time_slot: { type: String, required: true },
+
+    test_drive_type: {
       type: String,
-      enum: ['service', 'vehicle'],
-      required: true,
-      default: 'service',
+      enum: ['showroom', 'home'],
+      default: 'showroom',
     },
-    booking_date: {
-      type: Date,
-      required: true,
-    },
-    time_slot: {
+    delivery_address: { type: String },
+
+    service_type: {
       type: String,
-      required: true,
+      enum: ['MAINTENANCE', 'CAR_SPA', 'REPAIR', 'INSPECTION', 'OTHER'],
     },
-    status: {
+    services: { type: [bookingServiceSchema], default: [] },
+    total_cost: { type: Number, default: 0 },
+    attachments: { type: attachmentsSchema },
+
+    advisor_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    mechanic_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+
+    booking_status: {
       type: String,
-      enum: ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'],
-      default: 'pending',
+      enum: [
+        'PENDING',
+        'CONFIRMED',
+        'RECEIVED',
+        'IN_PROGRESS',
+        'COMPLETED',
+        'CANCELLED',
+      ],
+      default: 'PENDING',
     },
-    note: {
-      type: String,
-      required: false,
-    },
-    price: {
-      type: Number,
-      required: true,
-      default: 0
-    },
+    status_text: { type: String },
+
+    timeline: { type: [timelineStepSchema], default: [] },
+
+    customer_note: { type: String },
+    reschedule_reason: { type: String },
+    rating: { type: Number, min: 1, max: 5, default: null },
+    price: { type: Number, default: 0 },
   },
   {
     timestamps: true,
   }
 )
-
-bookingSchema.pre('save', async function () {
-  if (!this.service_id && !this.product_id) {
-    throw new Error('Booking phải có service_id hoặc product_id')
-  }
-})
 
 const Booking = mongoose.model('Booking', bookingSchema)
 

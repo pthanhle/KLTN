@@ -4,23 +4,24 @@ import {
     getBookingById,
     createBooking,
     cancelBooking,
+    rescheduleBooking,
+    rateBooking,
 } from '../../controllers/client/booking.controller.js'
 import { protect, customer } from '../../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-// Bảo vệ tất cả route bằng customer
 router.use(protect, customer)
 
 router.route('/')
-    .get(getBookings)      // GET /api/client/bookings
-    .post(createBooking)   // POST /api/client/bookings
+    .get(getBookings)
+    .post(createBooking)
 
 router.route('/:id')
-    .get(getBookingById)   // GET /api/client/bookings/:id
-    .delete(cancelBooking) // DELETE /api/client/bookings/:id
+    .get(getBookingById)
 
-// PUT /api/client/bookings/:id/cancel
-router.put('/:id/cancel', protect, cancelBooking)
+router.put('/:id/cancel', cancelBooking)
+router.put('/:id/reschedule', rescheduleBooking)
+router.put('/:id/rate', rateBooking)
 
 export default router

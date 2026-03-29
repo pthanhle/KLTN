@@ -27,12 +27,10 @@ export const createStockTransaction = asyncHandler(async (req, res) => {
   if (!inventory)
     return res.status(404).json({ message: "Sản phẩm chưa có trong kho" });
 
-  //  -----  Outbound Validation  -----  //
   if (type === "outbound" && quantity > inventory.quantity_available) {
     return res.status(400).json({ message: "Số lượng xuất vượt quá tồn kho" });
   }
 
-  //  -----  Update Stock  -----  //
   if (type === "inbound") {
     inventory.quantity_available += quantity;
   } else if (type === "outbound") {
@@ -49,13 +47,12 @@ export const createStockTransaction = asyncHandler(async (req, res) => {
 
 
 
-  //  -----  Save Transaction Log  -----  //
   const transaction = await StockTransaction.create({
     product_id,
     quantity,
     type,
     note,
-    created_by: req.user?._id, // nếu có auth middleware
+    created_by: req.user?._id,
   });
 
   res.status(201).json({

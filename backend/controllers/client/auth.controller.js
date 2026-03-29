@@ -433,7 +433,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
               Đặt lại mật khẩu
             </a>
           </div>
-          <p style="color: #666; font-size: 14px;">⚠️ Link này chỉ có hiệu lực trong <strong>5 phút</strong>.</p>
+          <p style="color: #666; font-size: 14px;">Link này chỉ có hiệu lực trong <strong>5 phút</strong>.</p>
           <p style="color: #666; font-size: 14px;">Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
           <p style="color: #999; font-size: 12px;">

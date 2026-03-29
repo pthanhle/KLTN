@@ -3,9 +3,6 @@ import Inventory from "../../../models/inventoryModel.js";
 import Product from "../../../models/productModel.js";
 import Category from "../../../models/categoryModel.js";
 
-/**
- * GET: Lấy danh sách tồn kho
- */
 export const getInventoryList = asyncHandler(async (req, res) => {
   const inventory = await Inventory.find()
     .populate({
@@ -44,10 +41,7 @@ export const addInventory = asyncHandler(async (req, res) => {
 });
 
 
-/**
- * POST: Thêm sản phẩm bằng product_name + category_name
- * Category phải tồn tại trước
- */
+
 export const addInventoryByName = asyncHandler(async (req, res) => {
   const { product_name, category_name, price, images, quantity_available } = req.body;
 
@@ -102,9 +96,7 @@ export const addInventoryByName = asyncHandler(async (req, res) => {
 });
 
 
-/**
- * PUT: Cập nhật số lượng tồn kho
- */
+
 export const updateInventory = asyncHandler(async (req, res) => {
   const { quantity_available } = req.body;
   if (quantity_available < 0)
@@ -126,15 +118,12 @@ export const updateInventory = asyncHandler(async (req, res) => {
 });
 
 
-/**
- * DELETE: Xóa tồn kho và reset tồn kho trong Product
- */
+
 export const deleteInventory = asyncHandler(async (req, res) => {
   const inventory = await Inventory.findById(req.params.id);
   if (!inventory)
     return res.status(404).json({ message: "Không tìm thấy mục kho" });
 
-  // Reset stock về 0
   await Product.findByIdAndUpdate(inventory.product_id, { stock_quantity: 0 });
 
   await inventory.deleteOne();

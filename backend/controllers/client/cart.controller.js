@@ -1,21 +1,16 @@
-// backend/controllers/client/cart.controller.js
 import Cart from '../../models/cartModel.js'
 import Product from '../../models/productModel.js'
 import asyncHandler from 'express-async-handler'
 
-// ✅ Helper: Convert object {0:'h', 1:'t', 2:'t', 3:'p'...} thành string
 const convertBrokenObjectToString = (obj) => {
   if (!obj || typeof obj !== 'object') return null
 
-  // Convert Mongoose document to plain object
   const plainObj = obj.toObject ? obj.toObject() : obj
 
-  // Lấy tất cả keys là số
   const numericKeys = Object.keys(plainObj).filter(key => /^\d+$/.test(key))
 
   if (numericKeys.length === 0) return null
 
-  // Sort theo số và ghép lại
   numericKeys.sort((a, b) => parseInt(a) - parseInt(b))
   const reconstructedUrl = numericKeys.map(key => plainObj[key]).join('')
 
@@ -26,32 +21,25 @@ const convertBrokenObjectToString = (obj) => {
   return null
 }
 
-// ✅ Helper: Get first image from product (handle all formats)
 const getFirstImage = (product) => {
   if (!product) return ''
 
-  // Check images array
   if (product.images && Array.isArray(product.images) && product.images.length > 0) {
     const firstImage = product.images[0]
 
-    // Case 1: String bình thường
     if (typeof firstImage === 'string' && firstImage.trim()) {
       return firstImage
     }
 
-    // Case 2: Object
     if (typeof firstImage === 'object' && firstImage !== null) {
-      // Có image_url hoặc url
       if (firstImage.image_url) return firstImage.image_url
       if (firstImage.url) return firstImage.url
 
-      // Data bị lưu sai dạng {0: 'h', 1: 't', ...}
       const reconstructed = convertBrokenObjectToString(firstImage)
       if (reconstructed) return reconstructed
     }
   }
 
-  // Fallback: single image field
   if (product.image) {
     if (typeof product.image === 'string') return product.image
     if (typeof product.image === 'object') {
@@ -63,7 +51,6 @@ const getFirstImage = (product) => {
   return ''
 }
 
-// ✅ Helper: Map cart item to response format
 const mapCartItem = (item) => {
   return {
     product_id: item.product_id._id,
@@ -76,9 +63,7 @@ const mapCartItem = (item) => {
   }
 }
 
-// @desc    Lấy giỏ hàng của khách hàng
-// @route   GET /api/client/cart
-// @access  Private/Customer
+
 export const getCart = asyncHandler(async (req, res) => {
   try {
     console.log('Getting cart for user:', req.user._id)
@@ -117,9 +102,7 @@ export const getCart = asyncHandler(async (req, res) => {
   }
 })
 
-// @desc    Thêm sản phẩm vào giỏ hàng
-// @route   POST /api/client/cart
-// @access  Private/Customer
+
 export const addToCart = asyncHandler(async (req, res) => {
   const { product_id, quantity } = req.body
 
@@ -183,9 +166,7 @@ export const addToCart = asyncHandler(async (req, res) => {
   })
 })
 
-// @desc    Cập nhật số lượng sản phẩm trong giỏ
-// @route   PUT /api/client/cart
-// @access  Private/Customer
+
 export const updateCartItem = asyncHandler(async (req, res) => {
   const { product_id, quantity } = req.body
 
@@ -241,9 +222,7 @@ export const updateCartItem = asyncHandler(async (req, res) => {
   })
 })
 
-// @desc    Xóa sản phẩm khỏi giỏ hàng
-// @route   DELETE /api/client/cart/:product_id
-// @access  Private/Customer
+
 export const removeFromCart = asyncHandler(async (req, res) => {
   const product_id = req.params.product_id
 
@@ -283,9 +262,7 @@ export const removeFromCart = asyncHandler(async (req, res) => {
   })
 })
 
-// @desc    Xóa toàn bộ giỏ hàng
-// @route   DELETE /api/client/cart
-// @access  Private/Customer
+
 export const clearCart = asyncHandler(async (req, res) => {
   const cart = await Cart.findOne({ user_id: req.user._id })
   if (!cart) {

@@ -1,9 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import SupportRequest from '../../models/supportRequestModel.js';
 
-// @desc    Tạo yêu cầu hỗ trợ mới (bắt đầu chat)
-// @route   POST /api/client/support
-// @access  Private
+
 export const createSupportRequest = asyncHandler(async (req, res) => {
   const { message } = req.body;
 
@@ -37,9 +35,7 @@ export const createSupportRequest = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Lấy yêu cầu hỗ trợ đang mở của user
-// @route   GET /api/client/support/active
-// @access  Private
+
 export const getActiveSupportRequest = asyncHandler(async (req, res) => {
 
   const activeRequest = await SupportRequest.findOne({
@@ -54,9 +50,7 @@ export const getActiveSupportRequest = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Gửi tin nhắn trong support chat
-// @route   POST /api/client/support/:id/message
-// @access  Private
+
 export const sendSupportMessage = asyncHandler(async (req, res) => {
   const { text } = req.body;
 
@@ -72,7 +66,6 @@ export const sendSupportMessage = asyncHandler(async (req, res) => {
     throw new Error('Yêu cầu hỗ trợ không tồn tại');
   }
 
-  // Kiểm tra owner
   if (supportRequest.user.toString() !== req.user._id.toString()) {
     res.status(403);
     throw new Error('Không có quyền gửi tin nhắn cho yêu cầu này');
@@ -103,9 +96,7 @@ export const sendSupportMessage = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Đóng yêu cầu hỗ trợ
-// @route   PUT /api/client/support/:id/close
-// @access  Private
+
 export const closeSupportRequest = asyncHandler(async (req, res) => {
 
   const supportRequest = await SupportRequest.findById(req.params.id);
@@ -115,7 +106,6 @@ export const closeSupportRequest = asyncHandler(async (req, res) => {
     throw new Error('Yêu cầu hỗ trợ không tồn tại');
   }
 
-  // Kiểm tra owner
   if (supportRequest.user.toString() !== req.user._id.toString()) {
     res.status(403);
     throw new Error('Không có quyền đóng yêu cầu này');

@@ -44,10 +44,7 @@ export const getContracts = async (req, res) => {
   }
 };
 
-/**
- * POST /staff/sale/contracts
- * Tạo hợp đồng mới
- */
+
 export const createContract = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -60,7 +57,6 @@ export const createContract = async (req, res) => {
       return res.status(404).json({ message: "Order không tồn tại" });
     }
 
-    // Nếu order đã có contract → chặn
     const existed = await Contract.findOne({ order_id: order._id });
     if (existed) {
       return res.status(400).json({ message: "Order đã có hợp đồng" });
@@ -103,10 +99,7 @@ export const createContract = async (req, res) => {
 };
 
 
-/**
- * GET /staff/sale/contracts/:id/print
- * In & tải PDF hợp đồng
- */
+
 export const printContract = async (req, res) => {
   try {
     const contract = await Contract.findById(req.params.id);
@@ -122,7 +115,6 @@ export const printContract = async (req, res) => {
 
     const filePath = path.join(outputDir, `${contract.contract_number}.pdf`);
 
-    // Nếu file đã tồn tại → trả luôn
     if (fs.existsSync(filePath)) {
       return res.download(filePath);
     }
@@ -132,13 +124,11 @@ export const printContract = async (req, res) => {
 
     doc.pipe(stream);
 
-    // ===== HEADER =====
     doc.fontSize(20).text("HỢP ĐỒNG MUA HÀNG", { align: "center" });
     doc.moveDown();
     doc.fontSize(12).text(`Số hợp đồng: ${contract.contract_number}`);
     doc.moveDown(2);
 
-    // ===== CUSTOMER =====
     doc.fontSize(14).text("1. Thông tin khách hàng");
     doc.fontSize(12)
       .text(`Họ tên: ${contract.customer_snapshot?.full_name || ""}`)
@@ -147,7 +137,6 @@ export const printContract = async (req, res) => {
       .text(`Địa chỉ: ${contract.customer_snapshot?.address || ""}`);
     doc.moveDown();
 
-    // ===== ORDER =====
     doc.fontSize(14).text("2. Thông tin đơn hàng");
     doc.fontSize(12)
       .text(`Ngày tạo: ${new Date(contract.order_snapshot?.createdAt).toLocaleString()}`)
@@ -159,7 +148,6 @@ export const printContract = async (req, res) => {
       );
     doc.moveDown();
 
-    // ===== ITEMS =====
     doc.fontSize(14).text("3. Danh sách sản phẩm");
     doc.moveDown();
 

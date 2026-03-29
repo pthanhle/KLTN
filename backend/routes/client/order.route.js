@@ -4,18 +4,16 @@ import {
   getMyOrders,
   getOrderById,
   cancelOrder,
+  updatePaymentStatus,
 } from '../../controllers/client/order.controller.js'
 import { protect } from '../../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-
 router.post('/', protect, createOrder)
-
 router.get('/', protect, getMyOrders)
-
 router.get('/:id', protect, getOrderById)
-
 router.put('/:id/cancel', protect, cancelOrder)
+router.put('/:id/payment-status', protect, updatePaymentStatus)
 
 export default router

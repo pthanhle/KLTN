@@ -2,9 +2,7 @@ import asyncHandler from 'express-async-handler'
 import Product from '../../models/productModel.js'
 import mongoose from 'mongoose'
 
-// @desc    Lấy TẤT CẢ sản phẩm (kèm tồn kho Admin + tồn kho Showroom)
-// @route   GET /api/admin/products
-// @access  Private (Manager)
+
 export const getAllProducts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.current || req.query.page) || 1;
   const limit = parseInt(req.query.pageSize || req.query.limit) || 10;
@@ -28,7 +26,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
   pipeline.push(
     {
       $lookup: {
-        from: 'inventories',       // Collection 'inventories'
+        from: 'inventories',
         localField: '_id',
         foreignField: 'product_id',
         as: 'inventory_data'
@@ -36,7 +34,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: 'categories',        // Collection 'categories'
+        from: 'categories',
         localField: 'category_id',
         foreignField: '_id',
         as: 'category_doc'
@@ -44,11 +42,9 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        // Lấy quantity_available từ mảng inventory_data (nếu ko có thì = 0)
         inventory_quantity: {
           $ifNull: [{ $arrayElemAt: ["$inventory_data.quantity_available", 0] }, 0]
         },
-        // Mô phỏng populate: thay thế category_id bằng object category
         category_id: { $arrayElemAt: ["$category_doc", 0] },
         cleanPrice: {
           $cond: {
@@ -61,7 +57,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     },
     {
       $project: {
-        inventory_data: 0, // Ẩn mảng tạm
+        inventory_data: 0,
         category_doc: 0,
         cleanPrice: 0
       }
@@ -93,9 +89,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
   });
 })
 
-// @desc    Lấy danh sách sản phẩm theo category
-// @route   GET /api/admin/products/:categoryId
-// @access  Private (Manager)
+
 export const getProductsByCategory = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
   const page = parseInt(req.query.current || req.query.page) || 1;
@@ -182,9 +176,7 @@ export const getProductsByCategory = asyncHandler(async (req, res) => {
   });
 })
 
-// @desc    Thêm sản phẩm mới
-// @route   POST /api/admin/products
-// @access  Private (Manager)
+
 export const createProduct = asyncHandler(async (req, res) => {
   const {
     category_id,
@@ -200,10 +192,9 @@ export const createProduct = asyncHandler(async (req, res) => {
     throw new Error('Thiếu thông tin bắt buộc của sản phẩm')
   }
 
-  // Xử lý hình ảnh từ Cloudinary (chỉ 1 file)
+
   let images = []
   if (req.file) {
-    // lưu url string vì model định nghĩa mảng string
     images = [req.file.path]
   }
 
@@ -221,9 +212,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   res.status(201).json(createdProduct)
 })
 
-// @desc    Cập nhật sản phẩm
-// @route   PUT /api/admin/products/:id
-// @access  Private (Manager)
+
 export const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params
   const { product_name, description, price, stock_quantity, type } = req.body
@@ -239,20 +228,17 @@ export const updateProduct = asyncHandler(async (req, res) => {
     throw new Error('Sản phẩm không tồn tại')
   }
 
-  // Xử lý hình ảnh mới từ Cloudinary (một file)
   let newImages = []
   if (req.file) {
     newImages = [req.file.path]
   }
 
-  // Cập nhật thông tin sản phẩm
   product.product_name = product_name || product.product_name
   product.description = description || product.description
   product.price = price || product.price
   product.stock_quantity = stock_quantity !== undefined ? stock_quantity : product.stock_quantity
   product.type = type || product.type
 
-  // Nếu có hình mới, chỉ giữ file mới (1 ảnh)
   if (newImages.length > 0) {
     product.images = newImages
   }
@@ -261,9 +247,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   res.json(updatedProduct)
 })
 
-// @desc    Xóa sản phẩm
-// @route   DELETE /api/admin/products/:id
-// @access  Private (Manager)
+
 export const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params
 

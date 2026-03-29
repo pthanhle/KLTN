@@ -2,21 +2,17 @@ import mongoose from 'mongoose'
 
 const servicePackageSchema = mongoose.Schema(
   {
-    service_name: {
+    service_name: { type: String, required: true },
+    description: { type: String },
+    price: { type: Number, required: true },
+    duration: { type: String, required: true },
+    service_type: {
       type: String,
-      required: true,
+      enum: ['MAINTENANCE', 'CAR_SPA', 'REPAIR', 'INSPECTION', 'OTHER'],
+      default: 'OTHER',
     },
-    description: {
-      type: String,
-    },
-    price: {
-      type: mongoose.Types.Decimal128,
-      required: true,
-    },
-    duration: {
-      type: String,
-      required: true,
-    },
+    image: { type: String },
+    isActive: { type: Boolean, default: true },
   },
   {
     timestamps: true,

@@ -11,14 +11,13 @@ export const getAppointments = asyncHandler(async (req, res) => {
     const status = req.query.status || ''
     const search = req.query.search || ''
 
-    // Initialize query object FIRST
     const query = { booking_type: 'service' }
     if (status) query.status = status
 
     const startDate = req.query.startDate ? new Date(req.query.startDate) : null
     const endDate = req.query.endDate ? new Date(req.query.endDate) : null
 
-    const dateStr = req.query.date; // YYYY-MM-DD
+    const dateStr = req.query.date;
     if (dateStr) {
         const start = new Date(dateStr);
         start.setHours(0, 0, 0, 0);
@@ -47,7 +46,6 @@ export const getAppointments = asyncHandler(async (req, res) => {
         .limit(limit)
         .sort({ booking_date: 1 })
 
-    // Inject Snapshot Price
     const appointments = appointmentsData.map(app => {
         const appObj = app.toObject();
         if (appObj.price !== undefined && appObj.price !== null) {
@@ -67,9 +65,7 @@ export const getAppointments = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Lấy chi tiết lịch hẹn
-// @route   GET /api/staff/service/appointments/:id
-// @access  Private/Service Staff
+
 export const getAppointmentById = asyncHandler(async (req, res) => {
     const appointment = await Booking.findById(req.params.id)
         .populate('user_id', 'full_name email phone')
@@ -83,9 +79,7 @@ export const getAppointmentById = asyncHandler(async (req, res) => {
     res.json(appointment)
 })
 
-// @desc    Cập nhật trạng thái lịch hẹn (xác nhận, hủy, hoàn thành)
-// @route   PUT /api/staff/service/appointments/:id
-// @access  Private/Service Staff
+
 export const updateAppointment = asyncHandler(async (req, res) => {
     const { status } = req.body
 

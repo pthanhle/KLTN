@@ -60,7 +60,7 @@ export const initSocket = (server) => {
     });
 
     socket.on('disconnect', () => {
-      console.log(`🔴 Realtime | Thu hồi kết nối: [${socket.user?.email}]`.gray);
+      console.log(` Realtime | Thu hồi kết nối: [${socket.user?.email}]`.gray);
     });
   });
 

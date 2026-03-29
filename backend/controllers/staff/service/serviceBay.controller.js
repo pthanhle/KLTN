@@ -4,9 +4,7 @@ import Booking from '../../../models/bookingModel.js'
 import RepairProgress from '../../../models/repairProgressModel.js'
 import asyncHandler from 'express-async-handler'
 
-// @desc    Lấy danh sách khu vực dịch vụ (cho Service Staff)
-// @route   GET /api/staff/service/service-bays
-// @access  Private/Service Staff
+
 export const getServiceBays = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
@@ -26,7 +24,7 @@ export const getServiceBays = asyncHandler(async (req, res) => {
         })
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ bay_number: 1 }) // Sắp xếp theo số hiệu khu vực
+        .sort({ bay_number: 1 })
 
     res.json({
         serviceBays,
@@ -39,9 +37,7 @@ export const getServiceBays = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Lấy chi tiết khu vực dịch vụ
-// @route   GET /api/staff/service/service-bays/:id
-// @access  Private/Service Staff
+
 export const getServiceBayById = asyncHandler(async (req, res) => {
     const serviceBay = await ServiceBay.findById(req.params.id).populate({
         path: 'current_booking',
@@ -59,26 +55,21 @@ export const getServiceBayById = asyncHandler(async (req, res) => {
     res.json(serviceBay)
 })
 
-// @desc    Tạo khu vực dịch vụ mới
-// @route   POST /api/staff/service/service-bays
-// @access  Private/Service Staff
+
 export const createServiceBay = asyncHandler(async (req, res) => {
     const { bay_number, status, notes } = req.body
 
-    // Validate
     if (!bay_number) {
         res.status(400)
         throw new Error('Vui lòng cung cấp số hiệu khu vực')
     }
 
-    // Kiểm tra khu vực đã tồn tại
     const existing = await ServiceBay.findOne({ bay_number })
     if (existing) {
         res.status(400)
         throw new Error('Khu vực dịch vụ với số hiệu này đã tồn tại')
     }
 
-    // Kiểm tra trạng thái hợp lệ
     if (status && !['available', 'occupied', 'maintenance'].includes(status)) {
         res.status(400)
         throw new Error('Trạng thái không hợp lệ')
@@ -96,10 +87,7 @@ export const createServiceBay = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Cập nhật khu vực dịch vụ
-// @route   PUT /api/staff/service/service-bays/:id
-// @access  Private/Service Staff
-// @route   PUT /api/staff/service/service-bays/:id
+
 export const updateServiceBay = asyncHandler(async (req, res) => {
     const { status, current_booking, last_maintenance, notes } = req.body
 
@@ -109,7 +97,6 @@ export const updateServiceBay = asyncHandler(async (req, res) => {
         throw new Error('Khu vực dịch vụ không tồn tại')
     }
 
-    // Validate Status
     if (status && !['available', 'occupied', 'maintenance'].includes(status)) {
         res.status(400)
         throw new Error('Trạng thái không hợp lệ')
@@ -136,7 +123,6 @@ export const updateServiceBay = asyncHandler(async (req, res) => {
             throw new Error(`Lịch hẹn này đã được gán cho khu vực ${existingBay.bay_number}`)
         }
 
-        // Validate logic trạng thái
         if (status !== 'occupied') {
             res.status(400)
             throw new Error('Khi gán lịch hẹn, trạng thái khoang phải là occupied')
@@ -181,9 +167,7 @@ export const updateServiceBay = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Xóa khu vực dịch vụ
-// @route   DELETE /api/staff/service/service-bays/:id
-// @access  Private/Service Staff
+
 export const deleteServiceBay = asyncHandler(async (req, res) => {
     const serviceBay = await ServiceBay.findById(req.params.id)
     if (!serviceBay) {

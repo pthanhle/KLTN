@@ -21,7 +21,7 @@ const UserProfile = ({ isLoading = false, t }) => {
                         <>
                             <p className="text-[11px] font-bold text-slate-900 dark:text-white truncate">{mockUserProfile.name}</p>
                             <p className="text-[9px] text-slate-500 dark:text-white/50 uppercase tracking-tighter">
-                                {t ? t(mockUserProfile.planKey) : mockUserProfile.planKey} 
+                                {t ? t(mockUserProfile.planKey) : mockUserProfile.planKey}
                             </p>
                         </>
                     )}

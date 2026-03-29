@@ -1,18 +1,14 @@
-// backend/controllers/admin/staff.controller.js
 import User from '../../models/userModel.js'
 import Employee from '../../models/employeeModel.js'
 import asyncHandler from 'express-async-handler'
 import Role from '../../models/roleModel.js'
 
-// @desc    Lấy danh sách nhân viên (staff)
-// @route   GET /api/admin/staff
-// @access  Private/Admin
+
 export const getStaff = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
     const search = req.query.search || ''
 
-    // Tìm các role nhân viên: inventory, service, sale
     const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale'] } })
     const staffRoleIds = staffRoles.map(role => role._id)
 
@@ -38,7 +34,6 @@ export const getStaff = asyncHandler(async (req, res) => {
         .limit(limit)
         .sort({ createdAt: -1 })
 
-    // Join với Employee để lấy thông tin chi tiết
     const staff = await Promise.all(
         users.map(async (user) => {
             const emp = await Employee.findOne({ user_id: user._id })
@@ -62,9 +57,7 @@ export const getStaff = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Lấy chi tiết nhân viên
-// @route   GET /api/admin/staff/:id
-// @access  Private/Admin
+
 export const getStaffById = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id)
         .select('-password')
@@ -94,27 +87,21 @@ export const getStaffById = asyncHandler(async (req, res) => {
     res.json(staff)
 })
 
-// @desc    Tạo nhân viên mới
-// @route   POST /api/admin/staff
-// @access  Private/Admin
+
 export const createStaff = asyncHandler(async (req, res) => {
     const { username, password, email, phone, full_name, position, salary, hired_date } = req.body
 
-    // Validate
     if (!username || !password || !email || !phone || !full_name || !position || !salary || !hired_date) {
         res.status(400)
         throw new Error('Vui lòng nhập đầy đủ thông tin')
     }
 
-    // Kiểm tra tồn tại
     const exists = await User.findOne({ $or: [{ email }, { username }, { phone }] })
     if (exists) {
         res.status(400)
         throw new Error('Email, tên đăng nhập hoặc số điện thoại đã được sử dụng')
     }
 
-    // Tìm role tương ứng với position (inventory / service / sale)
-    // Lưu ý: Position ở frontend gửi lên: 'inventory' | 'service' | 'sale'
     const targetRoleName = position;
     const targetRole = await Role.findOne({ role_name: targetRoleName })
 
@@ -123,7 +110,6 @@ export const createStaff = asyncHandler(async (req, res) => {
         throw new Error(`Vai trò ${targetRoleName} không tồn tại trong hệ thống`)
     }
 
-    // Tạo user
     const user = await User.create({
         username,
         password,
@@ -135,7 +121,6 @@ export const createStaff = asyncHandler(async (req, res) => {
         status: 'active',
     })
 
-    // Tạo employee record
     const employee = await Employee.create({
         user_id: user._id,
         position,
@@ -158,9 +143,7 @@ export const createStaff = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Cập nhật nhân viên
-// @route   PUT /api/admin/staff/:id
-// @access  Private/Admin
+
 export const updateStaff = asyncHandler(async (req, res) => {
     const { full_name, email, phone, position, salary, hired_date, status } = req.body
 
@@ -178,7 +161,6 @@ export const updateStaff = asyncHandler(async (req, res) => {
         throw new Error('Không thể cập nhật: không phải nhân viên')
     }
 
-    // Nếu thay đổi position -> Cần update role_id tương ứng
     if (position && position !== (await Employee.findOne({ user_id: user._id }))?.position) {
         const newRole = await Role.findOne({ role_name: position })
         if (newRole) {
@@ -186,7 +168,6 @@ export const updateStaff = asyncHandler(async (req, res) => {
         }
     }
 
-    // Cập nhật user
     user.full_name = full_name || user.full_name
     user.email = email || user.email
     user.phone = phone || user.phone
@@ -194,7 +175,6 @@ export const updateStaff = asyncHandler(async (req, res) => {
 
     const updatedUser = await user.save()
 
-    // Cập nhật employee
     let updatedEmp = await Employee.findOne({ user_id: user._id })
     if (updatedEmp) {
         updatedEmp.position = position || updatedEmp.position
@@ -219,9 +199,7 @@ export const updateStaff = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Xóa (vô hiệu hóa) nhân viên
-// @route   DELETE /api/admin/staff/:id
-// @access  Private/Admin
+
 export const deleteStaff = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id)
     if (!user) {
@@ -237,7 +215,6 @@ export const deleteStaff = asyncHandler(async (req, res) => {
         throw new Error('Không thể xóa: không phải nhân viên')
     }
 
-    // Đổi status thành suspended
     user.status = 'suspended'
     await user.save()
 

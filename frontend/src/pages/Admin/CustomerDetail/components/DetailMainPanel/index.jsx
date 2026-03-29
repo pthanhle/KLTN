@@ -8,7 +8,7 @@ import { CustomerLoyalty } from './CustomerLoyalty';
 import { getDetailTabs } from '../../constants/detailTabs';
 
 export const DetailMainPanel = ({ customer, activeTab, setActiveTab, isLoading, t }) => {
-    
+
     if (isLoading || !customer) {
         return (
             <section className="lg:col-span-7 space-y-10 animate-pulse">
@@ -27,7 +27,6 @@ export const DetailMainPanel = ({ customer, activeTab, setActiveTab, isLoading, 
         );
     }
 
-    // Kết hợp config (tên Tab) từ file tách rời + Logic render Component
     const items = getDetailTabs(t).map(tab => {
         let content;
         switch (tab.key) {
@@ -43,11 +42,11 @@ export const DetailMainPanel = ({ customer, activeTab, setActiveTab, isLoading, 
     return (
         <section className="lg:col-span-7">
             {/* Custom Tabs Navigation */}
-            <Tabs 
-                activeKey={activeTab} 
-                onChange={setActiveTab} 
-                items={items} 
-                className="custom-admin-detail-tabs dark:text-slate-300 mb-6" 
+            <Tabs
+                activeKey={activeTab}
+                onChange={setActiveTab}
+                items={items}
+                className="custom-admin-detail-tabs dark:text-slate-300 mb-6"
                 tabBarStyle={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
             />
 

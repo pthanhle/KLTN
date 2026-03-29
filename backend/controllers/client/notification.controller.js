@@ -1,9 +1,6 @@
-// controllers/notificationController.js
 import asyncHandler from 'express-async-handler';
 import Notification from '../../models/notificationModel.js';
 
-// [GET] /api/notifications
-// Lấy danh sách thông báo của người dùng hiện tại
 
 export const getNotifications = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -18,8 +15,7 @@ export const getNotifications = asyncHandler(async (req, res) => {
   res.status(200).json(notifications);
 });
 
-// [GET] /api/notifications/:id
-// Xem chi tiết 1 thông báo
+
 export const getNotificationById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const userId = req.user._id;
@@ -37,8 +33,7 @@ export const getNotificationById = asyncHandler(async (req, res) => {
   res.status(200).json(notification);
 });
 
-// [PUT] /api/notifications/:id/read
-// Đánh dấu thông báo là đã đọc
+
 export const markAsRead = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const userId = req.user._id;
@@ -62,8 +57,7 @@ export const markAsRead = asyncHandler(async (req, res) => {
   });
 });
 
-// [PUT] /api/notifications/read-all
-// Đánh dấu TẤT CẢ thông báo là đã đọc
+
 export const markAllAsRead = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 

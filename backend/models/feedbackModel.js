@@ -7,24 +7,32 @@ const feedbackSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    // Đánh giá có thể liên quan đến sản phẩm HOẶC booking dịch vụ
     product_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Product',
     },
-    service_id: {
+    booking_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'ServicePackage',
+      ref: 'Booking',
     },
+    order_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Order',
+    },
+
     rating: {
       type: Number,
       required: true,
       min: 1,
       max: 5,
     },
-    comment: {
-      type: String,
-    },
-    status: {                  
+    comment: { type: String },
+
+    // Ảnh kèm theo đánh giá
+    images: { type: [String], default: [] },
+
+    status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',

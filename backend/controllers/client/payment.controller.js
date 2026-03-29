@@ -48,7 +48,7 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
   vnp_Params['vnp_Locale'] = 'vn'
   vnp_Params['vnp_CurrCode'] = 'VND'
   vnp_Params['vnp_TxnRef'] = payment._id.toString()
-  vnp_Params['vnp_OrderInfo'] = 'Thanh toan don hang ' + order_id  
+  vnp_Params['vnp_OrderInfo'] = 'Thanh toan don hang ' + order_id
   vnp_Params['vnp_OrderType'] = 'other'
   vnp_Params['vnp_Amount'] = validAmount * 100
   vnp_Params['vnp_ReturnUrl'] = vnpayConfig.vnp_ReturnUrl

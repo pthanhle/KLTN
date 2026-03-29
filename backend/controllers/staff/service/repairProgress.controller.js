@@ -1,4 +1,3 @@
-// backend/controllers/staff/service/repairProgress.controller.js
 import RepairProgress from '../../../models/repairProgressModel.js'
 import Booking from '../../../models/bookingModel.js'
 import ServiceBay from '../../../models/serviceBayModel.js'
@@ -8,9 +7,7 @@ import Notification from '../../../models/notificationModel.js'
 import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
 
-// @desc    Lấy danh sách tiến độ sửa chữa (cho Service Staff)
-// @route   GET /api/staff/service/repair-progress
-// @access  Private/Service Staff
+
 export const getRepairProgresses = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
@@ -48,7 +45,6 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
             match: { _id: { $exists: true } },
         })
 
-    // Log chi tiết để debug
     progresses.forEach(p => {
         const rawProgress = p.toObject();
         if (!p.staff_id) {
@@ -76,9 +72,7 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Lấy chi tiết tiến độ sửa chữa
-// @route   GET /api/staff/service/repair-progress/:id
-// @access  Private/Service Staff
+
 export const getRepairProgressById = asyncHandler(async (req, res) => {
     const progress = await RepairProgress.findById(req.params.id)
         .populate({
@@ -98,26 +92,23 @@ export const getRepairProgressById = asyncHandler(async (req, res) => {
     res.json(progress)
 })
 
-// @desc    Tạo tiến độ sửa chữa mới
+
 // @route   POST /api/staff/service/repair-progress
 // @access  Private/Service Staff
 export const createRepairProgress = asyncHandler(async (req, res) => {
     const { booking_id, status, notes, estimated_completion } = req.body
 
-    // Validate
     if (!booking_id || !status) {
         res.status(400)
         throw new Error('Vui lòng cung cấp booking_id và trạng thái')
     }
 
-    // Kiểm tra booking tồn tại
     const booking = await Booking.findById(booking_id)
     if (!booking) {
         res.status(404)
         throw new Error('Lịch hẹn không tồn tại')
     }
 
-    // Kiểm tra trạng thái hợp lệ
     if (!['in_progress', 'waiting_parts', 'testing', 'completed'].includes(status)) {
         res.status(400)
         throw new Error('Trạng thái không hợp lệ')
@@ -145,9 +136,7 @@ export const createRepairProgress = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Cập nhật tiến độ sửa chữa
-// @route   PUT /api/staff/service/repair-progress/:id
-// @access  Private/Service Staff
+
 export const updateRepairProgress = asyncHandler(async (req, res) => {
     const { status, notes, estimated_completion, free_bay } = req.body
 
@@ -242,9 +231,7 @@ export const updateRepairProgress = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Xóa tiến độ sửa chữa
-// @route   DELETE /api/staff/service/repair-progress/:id
-// @access  Private/Service Staff
+
 export const deleteRepairProgress = asyncHandler(async (req, res) => {
     const progress = await RepairProgress.findById(req.params.id)
     if (!progress) {

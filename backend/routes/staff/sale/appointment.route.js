@@ -1,4 +1,3 @@
-// backend/routes/staff/sale/appointment.routes.js
 import express from 'express'
 import {
     getAppointments,
@@ -12,10 +11,10 @@ const router = express.Router()
 router.use(protect, saleStaff)
 
 router.route('/')
-    .get(getAppointments)      // GET /api/staff/sale/appointments
+    .get(getAppointments)
 
 router.route('/:id')
-    .get(getAppointmentById)   // GET /api/staff/sale/appointments/:id
-    .put(updateAppointment)    // PUT /api/staff/sale/appointments/:id
+    .get(getAppointmentById)
+    .put(updateAppointment)
 
 export default router

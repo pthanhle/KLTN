@@ -1,4 +1,3 @@
-// backend/routes/admin/customer.routes.js
 import express from 'express'
 import {
     getCustomers,

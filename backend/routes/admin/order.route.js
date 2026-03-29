@@ -1,4 +1,3 @@
-// backend/routes/admin/order.route.js
 import express from 'express'
 import {
     getOrders,
@@ -11,16 +10,15 @@ import { protect, admin } from '../../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-// Bảo vệ tất cả route bằng admin
 router.use(protect, admin)
 
 router.route('/')
-    .get(getOrders)       // GET /api/admin/orders
-    .post(createOrder)    // POST /api/admin/orders
+    .get(getOrders)
+    .post(createOrder)
 
 router.route('/:id')
-    .get(getOrderById)    // GET /api/admin/orders/:id
-    .put(updateOrder)     // PUT /api/admin/orders/:id
-    .delete(deleteOrder)  // DELETE /api/admin/orders/:id
+    .get(getOrderById)
+    .put(updateOrder)
+    .delete(deleteOrder)
 
 export default router

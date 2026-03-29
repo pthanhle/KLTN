@@ -1,10 +1,7 @@
-// backend/controllers/admin/servicePackage.controller.js
 import ServicePackage from '../../models/servicepackageModel.js'
 import asyncHandler from 'express-async-handler'
 
-// @desc    Lấy danh sách gói dịch vụ
-// @route   GET /api/admin/service-packages
-// @access  Private/Admin
+
 export const getServicePackages = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.current || req.query.page) || 1;
     const limit = parseInt(req.query.pageSize || req.query.limit) || 10;
@@ -42,9 +39,7 @@ export const getServicePackages = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Lấy chi tiết gói dịch vụ
-// @route   GET /api/admin/service-packages/:id
-// @access  Private/Admin
+
 export const getServicePackageById = asyncHandler(async (req, res) => {
     const servicePackage = await ServicePackage.findById(req.params.id)
     if (!servicePackage) {
@@ -58,13 +53,10 @@ export const getServicePackageById = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Tạo gói dịch vụ mới
-// @route   POST /api/admin/service-packages
-// @access  Private/Admin
+
 export const createServicePackage = asyncHandler(async (req, res) => {
     const { service_name, description, price, duration } = req.body
 
-    // Validate
     if (!service_name || !price || !duration) {
         res.status(400)
         throw new Error('Vui lòng nhập đầy đủ thông tin: tên, giá, thời gian')
@@ -92,9 +84,7 @@ export const createServicePackage = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Cập nhật gói dịch vụ
-// @route   PUT /api/admin/service-packages/:id
-// @access  Private/Admin
+
 export const updateServicePackage = asyncHandler(async (req, res) => {
     const { service_name, description, price, duration } = req.body
 
@@ -104,7 +94,6 @@ export const updateServicePackage = asyncHandler(async (req, res) => {
         throw new Error('Gói dịch vụ không tồn tại')
     }
 
-    // Kiểm tra tên trùng (nếu đổi tên)
     if (service_name && service_name !== servicePackage.service_name) {
         const exists = await ServicePackage.findOne({ service_name })
         if (exists) {
@@ -129,9 +118,7 @@ export const updateServicePackage = asyncHandler(async (req, res) => {
     })
 })
 
-// @desc    Xóa gói dịch vụ
-// @route   DELETE /api/admin/service-packages/:id
-// @access  Private/Admin
+
 export const deleteServicePackage = asyncHandler(async (req, res) => {
     const servicePackage = await ServicePackage.findById(req.params.id)
     if (!servicePackage) {

@@ -10,7 +10,6 @@ import { protect } from '../../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-// ✅ Chỉ dùng protect, BỎ customer
 router.route('/')
     .get(protect, getCart)
     .post(protect, addToCart)

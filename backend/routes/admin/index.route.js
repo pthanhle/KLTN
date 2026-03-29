@@ -1,4 +1,3 @@
-// backend/routes/admin/index.route.js
 import express from 'express'
 import categoryRoutes from './category.route.js'
 import productRoutes from './product.route.js'
@@ -10,10 +9,10 @@ import servicePackageRoutes from './servicePackage.route.js'
 import promotionRoutes from './promotion.route.js'
 import tradeinVehicleRoutes from './tradeinVehicle.route.js'
 import revenueReportRoutes from './revenuereport.route.js'
+import supportRoutes from './support.route.js'
 
 const router = express.Router()
 
-// Mount all admin routes
 router.use('/categories', categoryRoutes)
 router.use('/products', productRoutes)
 router.use('/customers', customerRoutes)
@@ -24,5 +23,6 @@ router.use('/service-packages', servicePackageRoutes)
 router.use('/promotions', promotionRoutes)
 router.use('/tradein-vehicles', tradeinVehicleRoutes)
 router.use('/revenue-reports', revenueReportRoutes)
+router.use('/support', supportRoutes)
 
 export default router

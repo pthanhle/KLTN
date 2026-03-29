@@ -1,87 +1,69 @@
 import Feedback from '../../models/feedbackModel.js'
 import Product from '../../models/productModel.js'
-import ServicePackage from '../../models/servicepackageModel.js'
+import Booking from '../../models/bookingModel.js'
+import Order from '../../models/orderModel.js'
 import asyncHandler from 'express-async-handler'
+import mongoose from 'mongoose'
 
-// @desc    Lấy danh sách feedback cá nhân của khách hàng (Private)
-// @route   GET /api/client/feedbacks
-// @access  Private/Customer
-export const getFeedbacks = asyncHandler(async (req, res) => {
+
+export const getMyFeedbacks = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
-    const productId = req.query.product_id
-    const serviceId = req.query.service_id
+    const { product_id, booking_id, order_id } = req.query
 
     const query = { user_id: req.user._id }
-    if (productId) query.product_id = productId
-    if (serviceId) query.service_id = serviceId
+    if (product_id && mongoose.Types.ObjectId.isValid(product_id)) query.product_id = product_id
+    if (booking_id && mongoose.Types.ObjectId.isValid(booking_id)) query.booking_id = booking_id
+    if (order_id && mongoose.Types.ObjectId.isValid(order_id)) query.order_id = order_id
 
     const total = await Feedback.countDocuments(query)
     const feedbacks = await Feedback.find(query)
-        .populate('product_id', 'product_name')
-        .populate('service_id', 'service_name')
+        .populate('product_id', 'product_name images')
+        .populate('booking_id', 'booking_code booking_type booking_date')
+        .populate('order_id', 'order_code order_date')
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ createdAt: -1 })
 
     res.json({
         feedbacks,
-        pagination: {
-            page,
-            limit,
-            total,
-            pages: Math.ceil(total / limit),
-        },
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) }
     })
 })
 
-// @desc    Lấy feedback public (đã duyệt) cho sản phẩm/dịch vụ cụ thể
-// @route   GET /api/client/feedbacks/public
-// @access  Public
+
+
 export const getPublicFeedbacks = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
-    const productId = req.query.product_id
-    const serviceId = req.query.service_id
+    const { product_id, booking_id } = req.query
 
     const query = { status: 'approved' }
-
-    // Filter theo sản phẩm hoặc dịch vụ cụ thể
-    if (productId) {
-        query.product_id = productId
-    }
-    if (serviceId) {
-        query.service_id = serviceId
-        console.log('Filtering by service_id:', serviceId)
-    }
+    if (product_id && mongoose.Types.ObjectId.isValid(product_id)) query.product_id = product_id
+    if (booking_id && mongoose.Types.ObjectId.isValid(booking_id)) query.booking_id = booking_id
 
     const total = await Feedback.countDocuments(query)
     const feedbacks = await Feedback.find(query)
-        .populate('user_id', 'username full_name avatar')
-        .populate('product_id', 'product_name')
-        .populate('service_id', 'service_name')
+        .populate('user_id', 'full_name avatar')
+        .populate('product_id', 'product_name images')
+        .populate('booking_id', 'booking_code booking_type')
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ createdAt: -1 })
 
     res.json({
         feedbacks,
-        pagination: {
-            page,
-            limit,
-            total,
-            pages: Math.ceil(total / limit),
-        },
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) }
     })
 })
 
-// @desc    Lấy chi tiết feedback
-// @route   GET /api/client/feedbacks/:id
-// @access  Private/Customer
+
+
 export const getFeedbackById = asyncHandler(async (req, res) => {
     const feedback = await Feedback.findById(req.params.id)
-        .populate('product_id', 'product_name')
-        .populate('service_id', 'service_name')
+        .populate('product_id', 'product_name images')
+        .populate('booking_id', 'booking_code booking_type booking_date')
+        .populate('order_id', 'order_code order_date')
 
     if (!feedback) {
         res.status(404)
@@ -96,58 +78,71 @@ export const getFeedbackById = asyncHandler(async (req, res) => {
     res.json(feedback)
 })
 
-// @desc    Tạo feedback mới
-// @route   POST /api/client/feedbacks
-// @access  Private/Customer
+
+
 export const createFeedback = asyncHandler(async (req, res) => {
-    const { product_id, service_id, rating, comment } = req.body
+    const { rating, product_id, booking_id, order_id, comment, images } = req.body
 
-    if (!rating || (!product_id && !service_id)) {
-        res.status(400)
-        throw new Error('Vui lòng cung cấp rating và product_id hoặc service_id')
-    }
-
-    if (rating < 1 || rating > 5) {
+    if (!rating || rating < 1 || rating > 5) {
         res.status(400)
         throw new Error('Rating phải từ 1 đến 5')
     }
 
+    if (!product_id && !booking_id && !order_id) {
+        res.status(400)
+        throw new Error('Cần cung cấp product_id, booking_id hoặc order_id')
+    }
+
+
     if (product_id) {
-        const product = await Product.findById(product_id)
-        if (!product) {
-            res.status(404)
-            throw new Error('Sản phẩm không tồn tại')
+        const exists = await Product.exists({ _id: product_id })
+        if (!exists) { res.status(404); throw new Error('Sản phẩm không tồn tại') }
+    }
+
+    if (booking_id) {
+        const booking = await Booking.findById(booking_id)
+        if (!booking) { res.status(404); throw new Error('Booking không tồn tại') }
+        if (booking.user_id.toString() !== req.user._id.toString()) {
+            res.status(403)
+            throw new Error('Bạn không có quyền đánh giá booking này')
         }
-    } else if (service_id) {
-        const service = await ServicePackage.findById(service_id)
-        if (!service) {
-            res.status(404)
-            throw new Error('Dịch vụ không tồn tại')
+        if (booking.booking_status !== 'COMPLETED') {
+            res.status(400)
+            throw new Error('Chỉ đánh giá được sau khi dịch vụ hoàn thành')
+        }
+    }
+
+    if (order_id) {
+        const order = await Order.findById(order_id)
+        if (!order) { res.status(404); throw new Error('Đơn hàng không tồn tại') }
+        if (order.user_id.toString() !== req.user._id.toString()) {
+            res.status(403)
+            throw new Error('Bạn không có quyền đánh giá đơn hàng này')
         }
     }
 
     const feedback = await Feedback.create({
         user_id: req.user._id,
         product_id: product_id || null,
-        service_id: service_id || null,
+        booking_id: booking_id || null,
+        order_id: order_id || null,
         rating,
         comment: comment || '',
-        status: 'pending'
+        images: images || [],
+        status: 'pending',
     })
 
     res.status(201).json({
-        message: 'Gửi phản hồi thành công. Đánh giá của bạn sẽ được hiển thị sau khi được duyệt.',
+        message: 'Gửi đánh giá thành công. Đánh giá sẽ hiển thị sau khi được duyệt.',
         feedback: await Feedback.findById(feedback._id)
-            .populate('product_id', 'product_name')
-            .populate('service_id', 'service_name'),
+            .populate('product_id', 'product_name images')
+            .populate('booking_id', 'booking_code'),
     })
 })
 
-// @desc Cập nhật feedback
-// @route   PUT /api/client/feedbacks/:id
-// @access  Private/Customer
+
 export const updateFeedback = asyncHandler(async (req, res) => {
-    const { rating, comment } = req.body
+    const { rating, comment, images } = req.body
 
     const feedback = await Feedback.findById(req.params.id)
     if (!feedback) {
@@ -165,22 +160,21 @@ export const updateFeedback = asyncHandler(async (req, res) => {
         throw new Error('Rating phải từ 1 đến 5')
     }
 
-    feedback.rating = rating || feedback.rating
-    feedback.comment = comment !== undefined ? comment : feedback.comment
+    if (rating !== undefined) feedback.rating = rating
+    if (comment !== undefined) feedback.comment = comment
+    if (images !== undefined) feedback.images = images
+
+    feedback.status = 'pending'
 
     const updated = await feedback.save()
 
     res.json({
-        message: 'Cập nhật phản hồi thành công',
-        feedback: await Feedback.findById(updated._id)
-            .populate('product_id', 'product_name')
-            .populate('service_id', 'service_name'),
+        message: 'Cập nhật đánh giá thành công',
+        feedback: updated,
     })
 })
 
-// @desc    Xóa feedback
-// @route   DELETE /api/client/feedbacks/:id
-// @access  Private/Customer
+
 export const deleteFeedback = asyncHandler(async (req, res) => {
     const feedback = await Feedback.findById(req.params.id)
     if (!feedback) {
@@ -194,5 +188,5 @@ export const deleteFeedback = asyncHandler(async (req, res) => {
     }
 
     await feedback.deleteOne()
-    res.json({ message: 'Xóa phản hồi thành công' })
+    res.json({ message: 'Xóa đánh giá thành công' })
 })

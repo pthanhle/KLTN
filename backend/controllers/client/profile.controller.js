@@ -1,11 +1,8 @@
-// controllers/profileController.js
 import asyncHandler from 'express-async-handler';
 import User from '../../models/userModel.js';
 import bcrypt from 'bcryptjs';
 
-// @desc    Lấy thông tin cá nhân của người dùng
-// @route   GET /api/profile
-// @access  Private
+
 export const getProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select('-password');
   if (user) {
@@ -16,9 +13,7 @@ export const getProfile = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Cập nhật thông tin cá nhân
-// @route   PUT /api/profile
-// @access  Private
+
 export const updateProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
@@ -29,13 +24,11 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
   const { full_name, email, phone, address, currentPassword, newPassword } = req.body;
 
-  // Cập nhật thông tin cơ bản
   if (full_name) user.full_name = full_name;
   if (email) user.email = email;
   if (phone) user.phone = phone;
   if (address) user.address = address;
 
-  // Đổi password 
   if (newPassword) {
     if (!currentPassword) {
       res.status(400);
@@ -48,7 +41,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
       throw new Error('Mật khẩu hiện tại không đúng');
     }
 
-    user.password = newPassword; 
+    user.password = newPassword;
   }
 
   const updatedUser = await user.save();

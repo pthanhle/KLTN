@@ -1,130 +1,231 @@
-// controllers/orderController.js
-import asyncHandler from 'express-async-handler';
-import Order from '../../models/orderModel.js';
-import OrderItem from '../../models/orderItemModel.js';
-import Payment from '../../models/paymentModel.js';
-import Product from '../../models/productModel.js'; // nếu cần populate tên sản phẩm
+import asyncHandler from 'express-async-handler'
+import Order from '../../models/orderModel.js'
+import Product from '../../models/productModel.js'
 import Cart from '../../models/cartModel.js'
+import mongoose from 'mongoose'
 
+// helper sinh order_code
+const generateOrderCode = () => {
+  const datePart = new Date().getFullYear()
+  const rand = Math.random().toString(36).substring(2, 6).toUpperCase()
+  return `ORD-${datePart}-${rand}`
+}
 
-export const createOrder = asyncHandler(async (req, res) => {
-  const { items, total_amount, payment_method } = req.body
+// ─────────────────────────────────────────────
+// GET /api/orders  – lịch sử đơn hàng của user
+// Query: order_type, order_status, payment_status, page, limit
+// ─────────────────────────────────────────────
+export const getMyOrders = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1
+  const limit = parseInt(req.query.limit) || 10
+  const { order_type, order_status, payment_status } = req.query
 
-  if (!items || items.length === 0 || !total_amount || !payment_method) {
-    return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin đơn hàng và sản phẩm' })
-  }
+  const query = { user_id: req.user._id }
+  if (order_type) query.order_type = order_type
+  if (order_status) query.order_status = order_status
+  if (payment_status) query.payment_status = payment_status
 
-  const order = new Order({
-    user_id: req.user._id,
-    total_amount,
-    payment_method,
-  })
+  const total = await Order.countDocuments(query)
+  const orders = await Order.find(query)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean()
 
-  const createdOrder = await order.save()
-
-
-  const orderItems = await Promise.all(
-    items.map(async (item) => {
-      return await OrderItem.create({
-        order_id: createdOrder._id,
-        product_id: item.product_id,
-        quantity: item.quantity,
-        price: item.price,
-      })
-    })
-  )
-
-  try {
-    await Cart.deleteOne({ user_id: req.user._id })
-    console.log('Đã xóa giỏ hàng của user:', req.user._id)
-  } catch (err) {
-    console.error('Lỗi khi xóa giỏ hàng:', err)
-  }
-
-  res.status(201).json({
-    message: 'Tạo đơn hàng thành công',
-    order: createdOrder,
-    items: orderItems,
+  res.json({
+    orders,
+    pagination: { page, limit, total, pages: Math.ceil(total / limit) }
   })
 })
 
 
+// ─────────────────────────────────────────────
+// GET /api/orders/:id  – chi tiết đơn hàng
+// ─────────────────────────────────────────────
 export const getOrderById = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).lean();
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400)
+    throw new Error('Order ID không hợp lệ')
+  }
+
+  const order = await Order.findById(req.params.id).lean()
   if (!order) {
-    return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+    res.status(404)
+    throw new Error('Không tìm thấy đơn hàng')
   }
 
   if (order.user_id.toString() !== req.user._id.toString()) {
-    return res.status(403).json({ message: 'Bạn không có quyền xem đơn hàng này' });
+    res.status(403)
+    throw new Error('Không có quyền xem đơn hàng này')
   }
 
-  const items = await OrderItem.find({ order_id: order._id })
-    .populate({
-      path: 'product_id',
-      select: 'product_name price images category_id stock_quantity',  // ← Sửa 'name' thành 'product_name'
-      populate: {
-        path: 'category_id',
-        select: 'category_name'
-      }
-    });
-
-  order.items = items;
-
-  res.status(200).json(order);
-});
+  res.json(order)
+})
 
 
-export const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ user_id: req.user._id })
-    .sort({ createdAt: -1 })
-    .lean();
+// ─────────────────────────────────────────────
+// POST /api/orders  – tạo đơn hàng (checkout)
+// Body:
+//   items: [{ product_id, quantity }]
+//   payment_method: 'CASH' | 'BANK_TRANSFER' | 'CARD' | 'E_WALLET'
+//   order_type: 'CAR_PURCHASE' | 'ACCESSORIES'
+//   shipping_fee: number (default 0)
+//   discount_amount: number (default 0)
+//   customer_info: { full_name, phone, address, email }
+// ─────────────────────────────────────────────
+export const createOrder = asyncHandler(async (req, res) => {
+  const {
+    items, payment_method, order_type,
+    shipping_fee, discount_amount, customer_info,
+  } = req.body
 
-  if (!orders.length) {
-    return res.status(404).json({ message: 'Không có lịch sử đơn hàng' });
+  if (!items || items.length === 0) {
+    res.status(400)
+    throw new Error('Đơn hàng phải có ít nhất một sản phẩm')
   }
 
-  for (let order of orders) {
-    const items = await OrderItem.find({ order_id: order._id })
-      .populate({
-        path: 'product_id',
-        select: 'product_name price images category_id',
-        populate: {
-          path: 'category_id',
-          select: 'category_name'
-        }
-      });
-    order.items = items;
+  if (!payment_method) {
+    res.status(400)
+    throw new Error('Vui lòng chọn phương thức thanh toán')
   }
 
-  res.status(200).json(orders);
-});
+  // Lấy thông tin sản phẩm thực tế từ DB để tính giá
+  const productIds = items.map(i => i.product_id).filter(id => mongoose.Types.ObjectId.isValid(id))
+  const dbProducts = await Product.find({ _id: { $in: productIds } }).lean()
+  const productMap = Object.fromEntries(dbProducts.map(p => [p._id.toString(), p]))
+
+  // Build items với snapshot và tính tổng tiền hàng
+  let subtotal = 0
+  const orderItems = items.map(item => {
+    const p = productMap[item.product_id]
+    if (!p) throw Object.assign(new Error(`Sản phẩm ${item.product_id} không tồn tại`), { status: 404 })
+    if (p.stock < item.quantity) throw Object.assign(new Error(`Sản phẩm "${p.product_name}" không đủ hàng`), { status: 400 })
+
+    const unit_price = p.price
+    const total_price = unit_price * item.quantity
+    subtotal += total_price
+
+    return {
+      product_id: p._id,
+      sku: p.sku,
+      name: p.product_name,
+      image: p.images?.[0] || '',
+      quantity: item.quantity,
+      unit_price,
+      total_price,
+    }
+  })
+
+  const fee = Number(shipping_fee || 0)
+  const discount = Number(discount_amount || 0)
+  const total_amount = subtotal + fee - discount
+
+  const resolvedCustomerInfo = customer_info || {
+    full_name: req.user.full_name,
+    phone: req.user.phone,
+    address: req.user.address,
+    email: req.user.email,
+  }
+
+  const order = await Order.create({
+    order_code: generateOrderCode(),
+    user_id: req.user._id,
+    customer_info: resolvedCustomerInfo,
+    order_type: order_type || 'ACCESSORIES',
+    items: orderItems,
+    shipping_fee: fee,
+    discount_amount: discount,
+    total_amount,
+    payment_method,
+    payment_status: 'UNPAID',
+    order_status: 'PENDING',
+    order_date: new Date(),
+  })
+
+  await Promise.all(
+    orderItems.map(item =>
+      Product.findByIdAndUpdate(item.product_id, {
+        $inc: { stock: -item.quantity }
+      })
+    )
+  )
+
+  try {
+    await Cart.findOneAndDelete({ user_id: req.user._id })
+  } catch (e) {
+    console.error('Lỗi xóa giỏ hàng:', e)
+  }
+
+  res.status(201).json({
+    message: 'Tạo đơn hàng thành công',
+    order,
+  })
+})
 
 
 export const cancelOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id);
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400)
+    throw new Error('Order ID không hợp lệ')
+  }
+
+  const order = await Order.findById(req.params.id)
   if (!order) {
-    return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+    res.status(404)
+    throw new Error('Không tìm thấy đơn hàng')
   }
 
   if (order.user_id.toString() !== req.user._id.toString()) {
-    return res.status(403).json({ message: 'Không thể hủy đơn hàng của người khác' });
+    res.status(403)
+    throw new Error('Không có quyền hủy đơn hàng này')
   }
 
-  if (order.status !== 'pending') {
-    return res.status(400).json({ message: 'Đơn hàng đã xử lý, không thể hủy' });
+  if (!['PENDING', 'CONFIRMED'].includes(order.order_status)) {
+    res.status(400)
+    throw new Error('Không thể hủy đơn hàng ở trạng thái này')
   }
 
-  const payment = await Payment.findOne({ order_id: order._id });
-  if (payment && payment.status === 'completed') {
-    return res.status(400).json({ message: 'Đơn hàng đã thanh toán, không thể hủy' });
+  if (order.payment_status === 'PAID') {
+    res.status(400)
+    throw new Error('Đơn hàng đã thanh toán, không thể hủy trực tiếp')
   }
 
-  order.status = 'cancelled';
-  await order.save();
+  order.order_status = 'CANCELLED'
+  await order.save()
 
-  res.json({
-    message: 'Đơn hàng đã được hủy thành công',
-    order,
-  });
-});
+  await Promise.all(
+    order.items.map(item =>
+      Product.findByIdAndUpdate(item.product_id, {
+        $inc: { stock: item.quantity }
+      })
+    )
+  )
+
+  res.json({ message: 'Hủy đơn hàng thành công', order })
+})
+
+
+export const updatePaymentStatus = asyncHandler(async (req, res) => {
+  const { payment_status, invoice_url } = req.body
+
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400)
+    throw new Error('Order ID không hợp lệ')
+  }
+
+  const order = await Order.findById(req.params.id)
+  if (!order) {
+    res.status(404)
+    throw new Error('Không tìm thấy đơn hàng')
+  }
+
+  if (payment_status) order.payment_status = payment_status
+  if (invoice_url) order.invoice_url = invoice_url
+
+  if (payment_status === 'PAID' && order.order_status === 'PENDING') {
+    order.order_status = 'CONFIRMED'
+  }
+
+  await order.save()
+  res.json({ message: 'Cập nhật thanh toán thành công', order })
+})

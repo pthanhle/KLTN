@@ -1,4 +1,3 @@
-// backend/routes/admin/staff.routes.js
 import express from 'express'
 import {
     getStaff,
@@ -11,16 +10,15 @@ import { protect, admin } from '../../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-// Bảo vệ tất cả route bằng admin
 router.use(protect, admin)
 
 router.route('/')
-    .get(getStaff)       // GET /api/admin/staff
-    .post(createStaff)   // POST /api/admin/staff
+    .get(getStaff)
+    .post(createStaff)
 
 router.route('/:id')
-    .get(getStaffById)   // GET /api/admin/staff/:id
-    .put(updateStaff)    // PUT /api/admin/staff/:id
-    .delete(deleteStaff) // DELETE /api/admin/staff/:id
+    .get(getStaffById)
+    .put(updateStaff)
+    .delete(deleteStaff)
 
 export default router

@@ -1,4 +1,3 @@
-// backend/controllers/admin/customer.controller.js
 import User from '../../models/userModel.js'
 import Order from '../../models/orderModel.js'
 import OrderItem from '../../models/orderItemModel.js'
@@ -12,7 +11,7 @@ export const getCustomers = asyncHandler(async (req, res) => {
     const search = req.query.search || ''
 
     const query = {
-        role_id: { $in: await getCustomerRoleIds() }, // Lọc theo role "customer"
+        role_id: { $in: await getCustomerRoleIds() },
         $or: [
             { full_name: { $regex: search, $options: 'i' } },
             { email: { $regex: search, $options: 'i' } },
@@ -56,7 +55,6 @@ export const getCustomerById = asyncHandler(async (req, res) => {
         throw new Error('Người dùng này không phải là khách hàng')
     }
 
-    // thêm thông tin thống kê nhanh để UI admin có thể hiển thị
     const orderCount = await Order.countDocuments({ user_id: customer._id })
     const bookingCount = await Booking.countDocuments({ user_id: customer._id })
 

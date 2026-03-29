@@ -8,7 +8,7 @@ export const getTradeinVehicles = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
     const search = req.query.search || ''
-    const status = req.query.status || '' // Lọc theo status
+    const status = req.query.status || ''
 
     const query = {
         $or: [

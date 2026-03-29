@@ -18,7 +18,6 @@ const productPromotionSchema = mongoose.Schema(
   }
 )
 
-// Compound index to ensure a product can only have one active promotion
 productPromotionSchema.index({ product_id: 1, promotion_id: 1 }, { unique: true })
 
 const ProductPromotion = mongoose.model('ProductPromotion', productPromotionSchema)

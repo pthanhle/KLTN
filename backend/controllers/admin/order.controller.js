@@ -1,4 +1,3 @@
-// backend/controllers/admin/order.controller.js
 import Order from '../../models/orderModel.js'
 import OrderItem from '../../models/orderItemModel.js';
 import Payment from '../../models/paymentModel.js'
@@ -99,20 +98,20 @@ export const getOrderById = asyncHandler(async (req, res) => {
 export const createOrder = asyncHandler(async (req, res) => {
     const { user_id, items, total_amount, payment_method } = req.body
 
- 
+
     if (!user_id || !items || !items.length || !total_amount || !payment_method) {
         res.status(400)
         throw new Error('Vui lòng nhập đầy đủ thông tin: khách hàng, sản phẩm, tổng tiền, phương thức thanh toán')
     }
 
-    
+
     const user = await User.findById(user_id)
     if (!user) {
         res.status(404)
         throw new Error('Khách hàng không tồn tại')
     }
 
-    
+
     const order = await Order.create({
         user_id,
         total_amount: parseFloat(total_amount),
@@ -120,7 +119,7 @@ export const createOrder = asyncHandler(async (req, res) => {
         payment_method,
     })
 
- 
+
     for (const item of items) {
         const product = await Product.findById(item.product_id)
         if (!product) {
@@ -145,7 +144,7 @@ export const createOrder = asyncHandler(async (req, res) => {
         await product.save()
     }
 
-  
+
     const payment = await Payment.create({
         order_id: order._id,
         amount: parseFloat(total_amount),

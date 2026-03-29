@@ -1,18 +1,22 @@
 import { z } from 'zod';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-export const getBookingSchema = (t, rescheduleData) => {
+dayjs.extend(customParseFormat);
+
+export const getBookingSchema = (t, rescheduleData, isDemoAvailable = true) => {
     return z.object({
         fullName: z.string().min(2, t('booking_errorName', 'Vui lòng nhập họ và tên')),
         phoneNumber: z.string()
             .transform((val) => val.replace(/\s+/g, '')) // Remove spaces automatically
             .pipe(z.string().regex(/^(0|\+84)[0-9]{8,9}$/, t('booking_errorPhone', 'Vui lòng nhập số điện thoại hợp lệ'))),
-        bookingType: z.enum(['showroom', 'home']),
+        bookingType: z.enum(['showroom', 'home', 'waitlist']),
         showroomBranch: z.string().optional(),
         deliveryAddress: z.string().optional(),
-        selectedDate: z.any().refine((val) => val !== null, {
+        selectedDate: isDemoAvailable ? z.any().refine((val) => val !== null, {
             message: t('booking_errorDate', 'Vui lòng chọn ngày lái thử')
-        }),
-        selectedTimeSlot: z.string().min(1, t('booking_errorTime', 'Vui lòng chọn khung giờ')),
+        }) : z.any().optional(),
+        selectedTimeSlot: isDemoAvailable ? z.string().min(1, t('booking_errorTime', 'Vui lòng chọn khung giờ')) : z.string().optional(),
         hasDriverLicense: z.boolean().refine((val) => val === true, {
             message: t('booking_errorLicense', 'Bạn cần có bằng lái để đăng ký')
         }),
@@ -21,14 +25,15 @@ export const getBookingSchema = (t, rescheduleData) => {
             ? z.string().min(5, t('booking_errorReason', 'Vui lòng cung cấp lý do dời lịch (ít nhất 5 ký tự)'))
             : z.string().optional()
     }).superRefine((data, ctx) => {
-        if (data.bookingType === 'showroom' && !data.showroomBranch) {
+        // Only require branch for waitlists or showroom visits
+        if ((data.bookingType === 'showroom' || data.bookingType === 'waitlist') && !data.showroomBranch) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: t('booking_errorBranch', 'Vui lòng chọn chi nhánh'),
                 path: ['showroomBranch']
             });
         }
-        if (data.bookingType === 'home' && (!data.deliveryAddress || data.deliveryAddress.trim().length === 0)) {
+        if (data.bookingType === 'home' && (!data.deliveryAddress || data.deliveryAddress.trim().length === 0) && isDemoAvailable) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: t('booking_errorAddress', 'Vui lòng nhập địa chỉ nhận xe'),
@@ -37,13 +42,20 @@ export const getBookingSchema = (t, rescheduleData) => {
         }
         
         // Custom Rule for Rescheduling: Must change Date OR Time
-        if (rescheduleData) {
-            const newDateStr = data.selectedDate?.format('DD/MM/YYYY');
-            if (newDateStr === rescheduleData.date && data.selectedTimeSlot === rescheduleData.timeSlot) {
+        if (rescheduleData && isDemoAvailable) {
+            const isSameDate = data.selectedDate && dayjs(data.selectedDate).isSame(dayjs(rescheduleData.date, 'DD/MM/YYYY'), 'day');
+            
+            if (isSameDate && data.selectedTimeSlot === rescheduleData.timeSlot) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: t('booking_errorSameTime', 'Bạn đang chọn trùng với lịch hẹn cũ. Vui lòng dời sang giờ/ngày khác!'),
                     path: ['selectedTimeSlot'] // Highlight lỗi ở Khung giờ
+                });
+                
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: t('booking_errorSameDate', 'Bạn chưa thay đổi ngày giờ. Vui lòng điều chỉnh lại!'),
+                    path: ['selectedDate'] // Highlight lỗi ở Cả Ngày
                 });
             }
         }

@@ -1,8 +1,10 @@
 import { Slider } from 'antd';
 import { useTheme } from '../../../../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const FontSizeSliderPanel = () => {
     const { fontSizeMultiplier, setFontSizeMultiplier } = useTheme();
+    const { t } = useTranslation('layout');
 
     // Configuration for Slider Marks mapping percentage to pt sizes (base 16)
     const marks = {
@@ -20,7 +22,7 @@ const FontSizeSliderPanel = () => {
         >
             <div className="flex justify-between items-center mb-6">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest select-none">
-                    Kích cỡ hiển thị
+                    {t('header_fontsize', 'Kích cỡ hiển thị')}
                 </span>
                 <span className="text-xs font-black text-orange-600 dark:text-premium-gold bg-orange-100 dark:bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-200 dark:border-premium-gold/20 flex items-center gap-1 select-none pointer-events-none">
                     <span className="text-[10px] text-orange-500/80">pt</span>

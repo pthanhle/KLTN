@@ -8,6 +8,8 @@ import enAuth from '../locales/en/auth.json';
 import viAuth from '../locales/vi/auth.json';
 import enAdmin from '../locales/en/admin.json';
 import viAdmin from '../locales/vi/admin.json';
+import enAdminCustomers from '../locales/en/adminCustomers.json';
+import viAdminCustomers from '../locales/vi/adminCustomers.json';
 import enError from '../locales/en/error.json';
 import viError from '../locales/vi/error.json';
 import enProducts from '../locales/en/products.json';
@@ -24,6 +26,10 @@ import enWishlist from '../locales/en/wishlist.json';
 import viWishlist from '../locales/vi/wishlist.json';
 import enCheckout from '../locales/en/checkout.json';
 import viCheckout from '../locales/vi/checkout.json';
+import enContact from '../locales/en/contact.json';
+import viContact from '../locales/vi/contact.json';
+import enTracking from '../locales/en/tracking.json';
+import viTracking from '../locales/vi/tracking.json';
 
 i18n
     .use(initReactI18next)
@@ -34,6 +40,7 @@ i18n
                 layout: enLayout,
                 auth: enAuth,
                 admin: enAdmin,
+                adminCustomers: enAdminCustomers,
                 error: enError,
                 products: enProducts,
                 services: enServices,
@@ -42,12 +49,15 @@ i18n
                 booking: enBooking,
                 wishlist: enWishlist,
                 checkout: enCheckout,
+                contact: enContact,
+                tracking: enTracking,
             },
             vi: {
                 translation: viTranslation,
                 layout: viLayout,
                 auth: viAuth,
                 admin: viAdmin,
+                adminCustomers: viAdminCustomers,
                 error: viError,
                 products: viProducts,
                 services: viServices,
@@ -56,6 +66,8 @@ i18n
                 booking: viBooking,
                 wishlist: viWishlist,
                 checkout: viCheckout,
+                contact: viContact,
+                tracking: viTracking,
             },
         },
         lng: 'vi', // Default language

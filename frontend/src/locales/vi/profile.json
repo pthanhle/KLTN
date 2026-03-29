@@ -180,5 +180,22 @@
     "view_terms": "Xem điều khoản chung",
     "empty_hero_title": "Hành trình mới đang chờ bạn",
     "empty_hero_desc": "Bạn chưa có lịch hẹn lái thử nào trong danh sách. Hãy chọn mẫu xe yêu thích và trải nghiệm ngay cảm giác lái thượng lưu cùng TT AUTO.",
-    "empty_hero_btn": "Đăng ký lái thử ngay"
+    "empty_hero_btn": "Đăng ký lái thử ngay",
+    "notif_page_title": "Thông báo",
+    "notif_page_desc": "Cập nhật mới nhất từ hệ thống TT AUTO",
+    "notif_btn_mark_all": "Đánh dấu tất cả là đã đọc",
+    "notif_tab_all": "Tất cả",
+    "notif_tab_unread": "Chưa đọc",
+    "notif_tab_read": "Đã đọc",
+    "notif_group_today": "Hôm nay",
+    "notif_group_yesterday": "Hôm qua",
+    "notif_group_older": "Cũ hơn",
+    "notif_btn_load_more": "Xem thêm thông báo",
+    "notif_action_detail": "Chi tiết",
+    "notif_action_mark_read": "Đánh dấu đã đọc",
+    "notif_action_mark_unread": "Đánh dấu chưa đọc",
+    "notif_action_delete": "Xóa thông báo",
+    "notif_empty_title": "Không có thông báo nào",
+    "notif_empty_desc": "Bạn đã xem hết tất cả thông báo.",
+    "notif_badge_new": "Mới"
 }

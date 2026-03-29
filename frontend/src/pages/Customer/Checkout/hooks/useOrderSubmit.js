@@ -43,14 +43,14 @@ export const useOrderSubmit = (t, setCurrentStep, mockCities, currentDistricts, 
                 image: item.image,
                 quantity: item.quantity,
                 unit_price: item.price,
-                total_price: item.price * item.quantity
+                total_price: item.price * item.quantity,
+                selected_options: item.selected_options || {}
             }))
         };
 
-        // Gửi Đơn hàng thông qua Hệ thống Tự động của React Query
         submitMutation.mutate(payloadInfo, {
             onSuccess: (result) => {
-                setOrderSuccessData(result.data); // result.data chính là payloadInfo trả về từ Mock API
+                setOrderSuccessData(result.data);
                 setCurrentStep(CHECKOUT_STEPS.SUCCESS);
                 window.scrollTo(0, 0);
             },
@@ -68,9 +68,9 @@ export const useOrderSubmit = (t, setCurrentStep, mockCities, currentDistricts, 
     };
 
     return {
-        isLoading: submitMutation.isPending, 
-        orderSuccessData, 
-        handleCheckoutSubmit, 
+        isLoading: submitMutation.isPending,
+        orderSuccessData,
+        handleCheckoutSubmit,
         handleCopyOrderId
     };
 };

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingCart, Bell, LogOut, User, MessageCircle } from 'lucide-react';
+import { Heart, ShoppingCart, Bell, LogOut, User } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useLogoutMutation } from '../../../../services/queries/auth.queries';
 import { App as AntdApp } from 'antd';
 import HeaderUtilities from '../../../../components/HeaderUtilities';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import AIChatbot from '../../../../components/AIChatbot';
+import NotificationDropdown from './Notification/NotificationDropdown';
 
 
 const UserActions = () => {
@@ -16,7 +16,6 @@ const UserActions = () => {
     const cartItems = useSelector((state) => state.cart.items);
     const { mutate: logoutUser } = useLogoutMutation();
     const { message } = AntdApp.useApp();
-    const [isChatOpen, setIsChatOpen] = useState(false);
 
     const handleLogout = () => {
         logoutUser(undefined, {
@@ -32,18 +31,6 @@ const UserActions = () => {
             </div>
 
             <div className="flex items-center gap-5 text-slate-700 dark:text-slate-300">
-                <button 
-                    onClick={() => setIsChatOpen(!isChatOpen)}
-                    className={`relative hover:!text-yellow-500 transition-colors group ${isChatOpen ? '!text-yellow-500' : '!text-slate-700 dark:!text-slate-300'}`}
-                >
-                    <MessageCircle size={20} />
-                    {!isChatOpen && (
-                        <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500 border border-white dark:border-[#0b0f19]"></span>
-                        </span>
-                    )}
-                </button>
                 <Link to="/wishlist" className="relative hover:!text-yellow-500 !text-slate-700 dark:!text-slate-300 transition-colors group">
                     <Heart size={20} />
                     {wishlistItems.length > 0 && (
@@ -60,13 +47,10 @@ const UserActions = () => {
                         </span>
                     )}
                 </Link>
-                <button className="relative hover:text-yellow-500 transition-colors">
-                    <Bell size={20} />
-                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 border-2 border-white dark:border-[#0b0f19] rounded-full animate-pulse"></span>
-                </button>
+                
+                {/* Micro Component: Dropdown thông báo chuẩn API-Ready */}
+                {isAuthenticated && <NotificationDropdown />}
             </div>
-            
-            <AIChatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
 
             <div className="flex items-center gap-3 pl-2">
                 {!isAuthenticated ? (

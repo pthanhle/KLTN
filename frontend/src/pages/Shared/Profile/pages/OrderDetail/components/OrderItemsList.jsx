@@ -23,9 +23,9 @@ export const OrderItemsList = ({ items, isCompleted, handleReview, formatCurrenc
                         <div className="flex-grow text-center sm:text-left">
                             <h4 className="text-lg font-bold text-slate-900 dark:text-white">{item.name}</h4>
                             <p className="text-slate-400 text-xs font-medium mt-1">{t('order_lbl_sku', 'Mã SKU')}: {item.sku}</p>
-                            {item.properties && (
+                            {(item.properties || (item.selected_options && Object.keys(item.selected_options).length > 0)) && (
                                 <p className="text-slate-500 text-xs mt-1 bg-slate-100 dark:bg-slate-800 inline-block px-2 py-1 rounded">
-                                    {item.properties}
+                                    {item.properties || Object.entries(item.selected_options).map(([k, v]) => `${k}: ${v}`).join(' | ')}
                                 </p>
                             )}
                             <div className="mt-2 flex items-center justify-center sm:justify-start gap-4">

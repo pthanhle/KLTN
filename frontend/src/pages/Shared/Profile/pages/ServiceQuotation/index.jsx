@@ -1,9 +1,9 @@
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useQuotationLogic } from './hooks/useQuotationLogic';
-import QuotationDocument from './components/QuotationDocument';
-import QuotationActionBar from './components/QuotationActionBar';
 import { ArrowLeft } from 'lucide-react';
+import { getQuotationData } from '../../../../Customer/ServiceTrackingDetail/data/mockQuotationData';
+import QuotationTab from '../../../../Customer/ServiceTrackingDetail/components/Quotations_Approval/QuotationTab';
 
 const ServiceQuotation = () => {
     const { t } = useTranslation('profile');
@@ -11,14 +11,14 @@ const ServiceQuotation = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     
-    // Pass ID to logic to fetch mock data
-    const { 
-        quotation, 
-        calculations, 
-        formatCurrency, 
-        handleApprove, 
-        handleReject 
-    } = useQuotationLogic(id);
+    // Dùng chung Data Source từ lõi Tracking Data Utils
+    const [quotationData, setQuotationData] = useState(null);
+
+    useEffect(() => {
+        // Đồng bộ hoàn toàn luồng móc Data với trang Tracking Detail
+        const data = getQuotationData(id);
+        setQuotationData(data);
+    }, [id]);
 
     return (
         <section className="w-full relative pb-32 transition-all">
@@ -34,22 +34,15 @@ const ServiceQuotation = () => {
                 </h2>
             </div>
 
-            <main className="w-full flex-col flex items-center mb-12" data-purpose="quotation-modal">
-                <div className="w-full max-w-[850px]">
-                    <QuotationDocument 
-                        quotation={quotation} 
-                        calculations={calculations} 
-                        formatCurrency={formatCurrency} 
-                        t={t}
+            <main className="w-full flex-col flex items-center mb-12">
+                <div className="w-full max-w-4xl relative">
+                    <QuotationTab 
+                        quotationData={quotationData} 
+                        setQuotationData={setQuotationData} 
+                        isFullWidthBar={true}
                     />
                 </div>
             </main>
-
-            <QuotationActionBar 
-                handleApprove={handleApprove} 
-                handleReject={handleReject} 
-                t={t}
-            />
         </section>
     );
 };

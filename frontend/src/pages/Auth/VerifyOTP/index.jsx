@@ -2,21 +2,22 @@ import { CarFront } from 'lucide-react';
 import { useVerifyOTPForm } from './hooks/useVerifyOTPForm';
 import AuthLayout from '../../../layout/AuthLayout';
 import VerifyOTPForm from './components/VerifyOTPForm';
+import BrandLogo from '@/assets/images/brand/logo.png';
 
 const VerifyOTP = () => {
-    const { 
-        otp, 
-        email, 
-        inputRefs, 
-        handleChange, 
-        handleKeyDown, 
-        handlePaste, 
-        onSubmit, 
-        handleResendOTP, 
-        isVerifying, 
+    const {
+        otp,
+        email,
+        inputRefs,
+        handleChange,
+        handleKeyDown,
+        handlePaste,
+        onSubmit,
+        handleResendOTP,
+        isVerifying,
         isResending,
-        minutes, 
-        seconds, 
+        minutes,
+        seconds,
         t,
         navigate
     } = useVerifyOTPForm();
@@ -28,12 +29,14 @@ const VerifyOTP = () => {
     );
 
     return (
-        <AuthLayout 
+        <AuthLayout
             title={t('verifyOTP.title')}
             subtitle={subtitleContent}
             icon={
-                <div className="flex items-center justify-center gap-2 text-yellow-500">
-                    <CarFront size={28} className="text-yellow-500" />
+                <div className="flex items-center justify-center gap-3 text-yellow-500 hover:-translate-y-1 transition-all mb-6">
+                    <div className="w-12 h-12 flex items-center justify-center">
+                        <img src={BrandLogo} alt="Logo" className="w-full h-full object-contain [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.08))] dark:[filter:drop-shadow(0_0_2px_rgba(255,255,255,0.6))_drop-shadow(0_0_12px_rgba(255,255,255,0.15))]" />
+                    </div>
                     <span className="font-bold text-xl tracking-widest uppercase text-white">TT AUTO</span>
                 </div>
             }
@@ -42,7 +45,7 @@ const VerifyOTP = () => {
             overlayClass="bg-slate-950/85"
             cardClass="bg-[#141416]/90 backdrop-blur-xl border border-yellow-900/30 shadow-[0_0_40px_rgba(234,179,8,0.1)] rounded-xl max-w-[480px]"
         >
-            <VerifyOTPForm 
+            <VerifyOTPForm
                 otp={otp}
                 email={email}
                 inputRefs={inputRefs}

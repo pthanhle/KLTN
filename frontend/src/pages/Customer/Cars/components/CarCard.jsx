@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Image, App } from 'antd';
 import { Heart } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import { addToWishlist } from '@/store/slices/wishlistSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
 import { formatVND } from '../utils/formatters';
 
 export const CarCardSkeleton = () => {
@@ -29,15 +29,17 @@ export const CarCardSkeleton = () => {
 
 const CarCard = ({ car, t }) => {
     const { message } = App.useApp();
-    const dispatch = useDispatch();
+    const wishlistItems = useSelector(state => state.wishlist.items);
+    const isWishlisted = wishlistItems.some(item => String(item.product_id) === String(car.id));
 
-    const handleAddToWishlist = (e) => {
+    const handleToggleWishlist = (e) => {
         e.preventDefault();
         e.stopPropagation();
         
-        dispatch(addToWishlist({
+        dispatch(toggleWishlist({
             id: `c_${car.id}`,
             product_id: car.id,
+            type: 'car',
             brand: car.brandName,
             name: car.name,
             image: car.image,
@@ -48,7 +50,11 @@ const CarCard = ({ car, t }) => {
             reviews_count: 0
         }));
 
-        message.success(t('Cập nhật thành công! Đã thêm vào yêu thích.', { name: car.name }));
+        if (isWishlisted) {
+            message.info(t('wishlist_removed', { name: car.name, defaultValue: 'Đã xóa khỏi danh sách yêu thích' }));
+        } else {
+            message.success(t('wishlist_added', { name: car.name, defaultValue: 'Đã thêm vào yêu thích' }));
+        }
     };
 
     return (
@@ -56,10 +62,14 @@ const CarCard = ({ car, t }) => {
             {/* Image Container with scale effect */}
             <div className="relative w-full h-[220px] bg-slate-50 dark:bg-[#0b0f19] overflow-hidden flex items-center justify-center p-4">
                 <button 
-                    onClick={handleAddToWishlist}
-                    className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-[#141416]/90 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-500 hover:bg-white transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-100/50 dark:border-white/10"
+                    onClick={handleToggleWishlist}
+                    className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-[#141416]/90 hover:bg-white transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-100/50 dark:border-white/10 group/btn"
                 >
-                    <Heart size={16} />
+                    <Heart 
+                        size={16} 
+                        fill={isWishlisted ? "currentColor" : "none"} 
+                        className={`transition-colors ${isWishlisted ? 'text-pink-500' : 'text-slate-400 dark:text-slate-500 group-hover/btn:text-pink-500'}`} 
+                    />
                 </button>
                 <Image 
                     src={car.image} 

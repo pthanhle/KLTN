@@ -40,7 +40,7 @@ export const useTestDriveLogic = () => {
     const timeSlots = TIME_SLOTS;
     const branches = SHOWROOM_BRANCHES;
 
-    const schema = useMemo(() => getBookingSchema(t, rescheduleData), [t, rescheduleData]);
+    const schema = useMemo(() => getBookingSchema(t, rescheduleData, car?.isDemoAvailable ?? true), [t, rescheduleData, car]);
 
     // Sử dụng Utils để ánh xạ (Map) Data Lịch sử thành Default Form Values
     const defaultVals = useMemo(() => mapRescheduleDataToForm(rescheduleData), [rescheduleData]);
@@ -57,8 +57,14 @@ export const useTestDriveLogic = () => {
 
     useEffect(() => {
         // Mock fetch car details using ID
-        setCar(getMockCarDetail(id));
-    }, [id]);
+        const mockCar = getMockCarDetail(id);
+        setCar(mockCar);
+        
+        // Auto-switch to 'waitlist' booking tracking if no Demo car is available
+        if (mockCar && !mockCar.isDemoAvailable) {
+            methods.setValue('bookingType', 'waitlist');
+        }
+    }, [id, methods]);
 
     const handleCancel = () => {
         navigate(-1); // Back to previous page

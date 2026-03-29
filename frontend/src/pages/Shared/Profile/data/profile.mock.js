@@ -1,5 +1,6 @@
 export const MOCK_PROFILE_CUSTOMER = {
     id: "65c2e10b923d",
+    customer_code: "CUS-8866",
     username: "nguyenvana_tt",
     email: "customer@ttauto.com",
     full_name: "Nguyễn Văn A",
@@ -8,6 +9,10 @@ export const MOCK_PROFILE_CUSTOMER = {
     avatar: "https://i.pravatar.cc/150?img=11",
     role: { role_name: "Customer" },
     status: "active",
+    tier: "gold",
+    total_spent: 45000000,
+    debt: 0,
+    createdAt: "2023-11-15T08:30:00Z",
     authProvider: "local",
 };
 
@@ -17,7 +22,7 @@ export const MOCK_PROFILE_ADMIN = {
     email: "admin@ttauto.vn",
     full_name: "Nguyễn Quản Trị",
     phone: "0909 111 222",
-    address: "Trung tâm quản trị TT AUTO, Hà Nội",
+    address: "Trung tâm quản trị TT AUTO, TPHCM",
     avatar: "https://i.pravatar.cc/150?img=33",
     role: { role_name: "Admin" },
     status: "active",

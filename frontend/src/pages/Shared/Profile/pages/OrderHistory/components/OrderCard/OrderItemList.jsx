@@ -16,6 +16,11 @@ const OrderItemList = ({ items, t, formatCurrency }) => {
                     />
                     <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-[15px] text-slate-900 dark:text-white truncate">{item.name}</h4>
+                        {item.selected_options && Object.keys(item.selected_options).length > 0 && (
+                            <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1 mb-1">
+                                {Object.entries(item.selected_options).map(([k, v]) => `${k}: ${v}`).join(' | ')}
+                            </p>
+                        )}
                         <p className="text-sm text-slate-500 font-medium">
                             {t('order_qty_lbl', 'Số lượng')}: {item.quantity}
                         </p>

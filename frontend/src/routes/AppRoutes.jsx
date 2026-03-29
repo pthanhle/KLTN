@@ -14,6 +14,7 @@ const ResetPassword = lazy(() => import('../pages/Auth/ResetPassword'));
 const VerifyOTP = lazy(() => import('../pages/Auth/VerifyOTP'));
 
 const CustomersPage = lazy(() => import('../pages/Admin/Customers'));
+const CustomerDetailPage = lazy(() => import('../pages/Admin/CustomerDetail'));
 
 const Home = lazy(() => import('../pages/Customer/Home'));
 
@@ -21,8 +22,12 @@ const ProductsPage = lazy(() => import('../pages/Customer/Products'));
 const CarsPage = lazy(() => import('../pages/Customer/Cars'));
 const CarDetailPage = lazy(() => import('../pages/Customer/CarDetail'));
 const ServicesPage = lazy(() => import('../pages/Customer/Services'));
+const ServiceTrackingPage = lazy(() => import('../pages/Customer/ServiceTracking'));
+const ServiceTrackingDetail = lazy(() => import('../pages/Customer/ServiceTrackingDetail'));
 const PartsPage = lazy(() => import('../pages/Customer/Parts'));
 const PartDetail = lazy(() => import('../pages/Customer/PartDetail'));
+const PreorderPartPage = lazy(() => import('../pages/Customer/Parts/pages/PreorderPart'));
+const ContactPage = lazy(() => import('../pages/Customer/Contact'));
 const TestDriveBookingPage = lazy(() => import('../pages/Customer/TestDriveBooking'));
 const WishlistPage = lazy(() => import('../pages/Customer/Wishlist'));
 const CheckoutFlow = lazy(() => import('../pages/Customer/Checkout'));
@@ -62,15 +67,18 @@ const AppRoutes = () => {
 
                     <Route element={<ProtectedRoute allowedRoles={['customer', 'guest']} />}>
                         <Route path="/" element={<Home />} />
+                        <Route path="/contact" element={<ContactPage />} />
                         <Route path="/products" element={<ProductsPage />} />
                         <Route path="/cars" element={<CarsPage />} />
                         <Route path="/cars/:id" element={<CarDetailPage />} />
                         <Route path="/brand/:brandName" element={<CarsPage />} />
                         <Route path="/test-drive/:id" element={<TestDriveBookingPage />} />
                         <Route path="/services" element={<ServicesPage />} />
+                        <Route path="/tracking" element={<ServiceTrackingPage />} />
+                        <Route path="/tracking/:id" element={<ServiceTrackingDetail />} />
                         <Route path="/parts" element={<PartsPage />} />
                         <Route path="/parts/:id" element={<PartDetail />} />
-                        <Route path="/wishlist" element={<WishlistPage />} />
+                        <Route path="/parts/pre-order/:id" element={<PreorderPartPage />} />
                     </Route>
 
                     <Route element={<ProtectedRoute allowedRoles={['customer']} requireLogin={true} />}>
@@ -80,7 +88,9 @@ const AppRoutes = () => {
                         <Route path="/profile/services" element={<ProfilePage />} />
                         <Route path="/profile/services/:id" element={<ProfilePage />} />
                         <Route path="/profile/test-drives" element={<ProfilePage />} />
+                        <Route path="/profile/notifications" element={<ProfilePage />} />
                         <Route path="/cart" element={<CheckoutFlow />} />
+                        <Route path="/wishlist" element={<WishlistPage />} />
                     </Route>
                 </Route>
 
@@ -89,6 +99,7 @@ const AppRoutes = () => {
                         <Route path="/admin/dashboard" element={<div>Admin Dashboard</div>} />
                         <Route path="/admin/profile" element={<ProfilePage />} />
                         <Route path="/admin/customers" element={<CustomersPage />} />
+                        <Route path="/admin/customers/:id" element={<CustomerDetailPage />} />
                         <Route path="/admin/orders" element={<div>Quản Lý Đơn Hàng</div>} />
                     </Route>
                 </Route>

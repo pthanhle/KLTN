@@ -95,26 +95,21 @@
   }
 }
 
-/* Ngăn chặn Chrome/Edge tự động fill nền và đổi màu chữ bằng Inset Box Shadow (hỗ trợ chuyển đổi dark/light mode mượt mà) */
-html:not(.dark) input:-webkit-autofill,
-html:not(.dark) input:-webkit-autofill:hover,
-html:not(.dark) input:-webkit-autofill:focus,
-html:not(.dark) input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
-  -webkit-text-fill-color: #0f172a !important;
+/* Ngăn chặn Chrome/Edge tự động fill nền và đổi màu chữ (Autofill Hack) */
+/* Transition delay 5000s sẽ khóa chết sự kiện đổi màu nền của Chrome, giữ lại màu trong suốt của Input */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s !important;
+  -webkit-text-fill-color: currentColor !important;
 }
 
-html.dark input:-webkit-autofill,
-html.dark input:-webkit-autofill:hover,
-html.dark input:-webkit-autofill:focus,
-html.dark input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #0a0a0b inset !important;
-  -webkit-text-fill-color: #ffffff !important;
-}
-
-/* Ẩn outline mặc định khi focus vào ô autofill */
-input:-webkit-autofill:focus {
-  outline: none !important;
+/* Override đặc biệt cho trang Auth (Vì AuthLayout luôn mang nền tối kể cả khi đang ở light mode) */
+.bg-slate-800\/50:-webkit-autofill,
+.bg-slate-800\/50:-webkit-autofill:hover,
+.bg-slate-800\/50:-webkit-autofill:focus {
+  -webkit-text-fill-color: white !important;
 }
 
 /* --- OVERRIDE ANT DESIGN MESSAGE --- */

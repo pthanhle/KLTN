@@ -32,7 +32,9 @@
         "serviceCenter": "Trung tâm dịch vụ",
         "parts": "Phụ tùng chính hãng",
         "care": "Chăm sóc xe chuyên nghiệp",
-        "warranty": "Chính sách bảo hành"
+        "warranty": "Chính sách bảo hành",
+        "search_no_results": "Không tìm thấy kết quả nào",
+        "header_fontsize": "Kích cỡ hiển thị"
       },
       "contact": {
         "title": "Kết Nối",
@@ -111,5 +113,37 @@
   },
   "messages": {
     "logoutSuccess": "Đăng xuất thành công"
+  },
+  "chatbot_new_chat": "NHẮN TIN MỚI",
+  "chatbot_history": "Lịch sử",
+  "chatbot_title": "TT AUTO AI",
+  "chatbot_subtitle": "TƯ VẤN 24/7",
+  "chatbot_input_placeholder": "Nhập nội dung cần hỗ trợ...",
+  "chatbot_disclaimer": "AI có thể nhầm lẫn. Vui lòng kiểm tra lại cấu hình xe thực tế.",
+  "chatbot_recent": "Gần đây",
+  "chatbot_today": "Hôm nay",
+  "chatbot_error_msg": "Kết nối gián đoạn. Không thể truy xuất dữ liệu kho.",
+  "chatbot_retry": "Thử lại ngay",
+  "chatbot_welcome": "Xin chào! Tôi là **TT AUTO AI**. Tôi có thể giúp bạn báo giá, đặt lịch bảo dưỡng hoặc tư vấn các dòng xe lướt cao cấp hiện có. Bạn quan tâm đến dịch vụ nào ạ?",
+  "quick_action_pricing": "Báo giá linh kiện",
+  "quick_action_booking": "Đặt lịch bảo dưỡng",
+  "quick_action_consult": "Tư vấn xe lướt",
+  "quick_action_sales": "Liên hệ sales",
+  "plan_standard": "Khách hàng tiêu chuẩn",
+  "plan_premium": "Hội viên cao cấp",
+  "chatbot_you": "BẠN",
+  "chatbot_ai": "AI",
+  "notifications": {
+    "title": "Thông báo",
+    "new": "Mới",
+    "mark_all_read": "Đọc tất cả",
+    "empty": "Không có thông báo nào",
+    "view_all": "Xem tất cả ({{count}})",
+    "time": {
+      "just_now": "Vừa xong",
+      "minutes_ago": "{{count}} phút trước",
+      "hours_ago": "{{count}} giờ trước",
+      "days_ago": "{{count}} ngày trước"
+    }
   }
 }

@@ -30,5 +30,13 @@
     "booking_errorReason": "Vui lòng cung cấp lý do dời lịch.",
     "reschedule_success": "Dời lịch thành công! Cố vấn sẽ liên hệ lại với quý khách.",
     "booking_notFound": "Không tìm thấy lịch hẹn hoặc mã vé đã hết hạn.",
-    "booking_errorDuplicateTime": "Giờ dời lịch bị trùng khớp với lịch hiện tại!"
+    "booking_errorDuplicateTime": "Giờ dời lịch bị trùng khớp với lịch hiện tại!",
+    "booking_errorSameTime": "Giờ đăng ký trùng với vé cũ. Vui lòng chọn khung giờ khác!",
+    "booking_errorSameDate": "Ngày đăng ký trùng với vé cũ. Vui lòng chọn ngày khác!",
+    "booking_no_demo_title": "Tạm Vắng Xe Hơi Tại Showroom",
+    "booking_no_demo_desc1": "Dòng xe này hiện đang cực kỳ hút khách và tạm thời vắng mặt tại Showroom do lịch lái thử đã kín.",
+    "booking_no_demo_desc2": "Tuy nhiên, TT AUTO luôn ưu tiên trải nghiệm của quý khách. Vui lòng để lại Thông tin liên hệ ngay bên dưới, đội ngũ Sales sẽ trực tiếp xếp lịch và",
+    "booking_no_demo_desc3": "điều phối xe đến tận nhà",
+    "booking_no_demo_desc4": "để quý khách có thể trải nghiệm một cách riêng tư và thoải mái nhất!",
+    "booking_btnWaitlist": "Nhận thông báo khi có xe"
 }

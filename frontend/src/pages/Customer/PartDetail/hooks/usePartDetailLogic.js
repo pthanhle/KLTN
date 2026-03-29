@@ -43,13 +43,22 @@ export const usePartDetailLogic = (id) => {
 
     const handleAddToCart = async () => {
         if (!part) return;
+
+        // Validation for missing options
+        if (part.options && part.options.length > 0) {
+            const missingOptions = part.options.filter(opt => !selectedOptions[opt.name]);
+            if (missingOptions.length > 0) {
+                message.warning(t('missing_options_warning', `Vui lòng chọn ${missingOptions[0].name} trước khi thêm vào giỏ!`));
+                return;
+            }
+        }
+
         setIsSubmittingAction(true);
         try {
-            // Giả lập Payload đẩy lên Redux / Backend Database
             await new Promise(resolve => setTimeout(resolve, 800)); // Delay xử lý mạng
-            
-            dispatch(addToCart({ 
-                ...part, 
+
+            dispatch(addToCart({
+                ...part,
                 id: Date.now().toString(),
                 product_id: part.id,
                 quantity: quantity,
@@ -67,12 +76,22 @@ export const usePartDetailLogic = (id) => {
 
     const handleBuyNow = async () => {
         if (!part) return;
+
+        // Validation for missing options
+        if (part.options && part.options.length > 0) {
+            const missingOptions = part.options.filter(opt => !selectedOptions[opt.name]);
+            if (missingOptions.length > 0) {
+                message.warning(t('missing_options_warning', `Vui lòng chọn ${missingOptions[0].name} để Mua Nhanh!`));
+                return;
+            }
+        }
+
         setIsSubmittingAction(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 800));
-            
-            dispatch(addToCart({ 
-                ...part, 
+
+            dispatch(addToCart({
+                ...part,
                 id: Date.now().toString(),
                 product_id: part.id,
                 quantity: quantity,

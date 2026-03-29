@@ -1,39 +1,33 @@
 import { useState, useEffect } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
-import { CategoryAPI } from '../../../../services/api/category';
+import { DEFAULT_PAGE_LIMIT, ITEMS_PER_PAGE, DEBOUNCE_DELAY, FILTER_DELAY } from '../constants/products.constants';
+import { BRANDS_MOCK_DATA } from '../data/products.mock';
 
 export const useProductsLogic = () => {
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [isFiltering, setIsFiltering] = useState(false);
     
     const [search, setSearch] = useState('');
-    const debouncedSearch = useDebounce(search, 500); // 500ms delay for typing
+    const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
 
     const [activeLetter, setActiveLetter] = useState('ALL');
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 8; 
 
     const [allBrands, setAllBrands] = useState([]);
     const [filteredBrands, setFilteredBrands] = useState([]);
     const [paginatedBrands, setPaginatedBrands] = useState([]);
 
-    // Fetch original data from backend
+    // Fetch original data from backend (mocked during development for consistency)
     useEffect(() => {
         const fetchBrands = async () => {
             try {
-                // Lấy số lượng lớn để support filter theo chữ cái ở frontend
-                const res = await CategoryAPI.getCategoryList({ page: 1, limit: 100 });
-                if (res && res.categories) {
-                    const mappedBrands = res.categories.map(c => ({
-                        id: c._id,
-                        name: c.category_name,
-                        image: c.image || 'https://images.unsplash.com/photo-1556189250-72ba954cfc2b?auto=format&fit=crop&q=80&w=400', // fallback ảnh
-                        count: c.count || 0 // Số lượng xe từ backend
-                    }));
-                    setAllBrands(mappedBrands);
-                }
+                // Simulate network latency (200ms)
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Trả về data faked (đồng bộ với mock schema của /parts và /cars)
+                setAllBrands(BRANDS_MOCK_DATA);
             } catch (error) {
-                console.error("Failed to fetch categories:", error);
+                console.error("Failed to fetch mock categories:", error);
             } finally {
                 setIsInitialLoading(false);
             }
@@ -64,15 +58,15 @@ export const useProductsLogic = () => {
             
             setIsFiltering(false);
 
-        }, 300); // Wait a bit for smooth UI transition
+        }, FILTER_DELAY); 
 
         return () => clearTimeout(timer);
     }, [debouncedSearch, activeLetter, allBrands]);
 
     // Pagination slice effect
     useEffect(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
         setPaginatedBrands(filteredBrands.slice(startIndex, endIndex));
     }, [currentPage, filteredBrands]);
 
@@ -80,7 +74,7 @@ export const useProductsLogic = () => {
     const handleLetterChange = (letter) => setActiveLetter(letter);
     const handlePageChange = (page) => setCurrentPage(page);
 
-    const totalPages = Math.ceil(filteredBrands.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredBrands.length / ITEMS_PER_PAGE);
 
     return {
         isInitialLoading,

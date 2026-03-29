@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 
-const ActionButtons = ({ handleCancel, isLoading, isValid, t }) => {
+const ActionButtons = ({ handleCancel, isLoading, isValid, t, isDemoAvailable = true }) => {
     return (
         <div className="pt-8 mt-4 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row items-center justify-end gap-4">
             <Button 
@@ -21,7 +21,7 @@ const ActionButtons = ({ handleCancel, isLoading, isValid, t }) => {
                                 : '!bg-slate-100 dark:!bg-white/5 !border-transparent !text-slate-400 dark:!text-slate-500 !shadow-none !cursor-default'
                            }`}
             >
-                {t('booking_btnSubmit', 'Xác nhận đăng ký')}
+                {!isDemoAvailable ? t('booking_btnWaitlist', 'Nhận thông báo khi có xe') : t('booking_btnSubmit', 'Xác nhận đăng ký')}
             </Button>
         </div>
     );

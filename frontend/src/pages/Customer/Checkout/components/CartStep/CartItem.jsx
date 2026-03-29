@@ -1,8 +1,26 @@
 import { Checkbox, Image, Button } from 'antd';
 import { Heart, Plus, Minus, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
 
-const CartItem = ({ item, updateQuantity, removeItem, moveToWishlist, toggleItemCheck, t }) => {
+const CartItem = ({ item, updateQuantity, removeItem, toggleItemCheck, t }) => {
+    const dispatch = useDispatch();
+    const wishlistItems = useSelector(state => state.wishlist.items);
+    const isWishlisted = wishlistItems.some(wishItem => String(wishItem.product_id) === String(item.product_id || item.id));
+
+    const handleToggleWishlist = () => {
+        dispatch(toggleWishlist({
+            id: `p_${item.product_id || item.id}`,
+            product_id: item.product_id || item.id,
+            type: 'part',
+            brand: 'Phụ kiện',
+            name: item.name,
+            image: item.image,
+            price: item.price,
+            stock_status: item.stock > 0 ? 'in_stock' : 'out_of_stock'
+        }));
+    };
     return (
         <div className={`group flex flex-col md:flex-row items-start md:items-center gap-6 p-4 rounded-3xl bg-white dark:bg-[#141416] hover:shadow-xl dark:hover:shadow-[0_20px_60px_rgba(255,255,255,0.02)] transition-all duration-300 border ${item.checked ? 'border-yellow-500/50' : 'border-slate-100 dark:border-white/5'} hover:border-slate-200 dark:hover:border-white/20`}>
             <Checkbox
@@ -32,11 +50,26 @@ const CartItem = ({ item, updateQuantity, removeItem, moveToWishlist, toggleItem
                             {formatVND(item.price)}
                         </span>
                     </div>
+
+                    {item.selected_options && Object.keys(item.selected_options).length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                            {Object.entries(item.selected_options).map(([key, value]) => (
+                                <span key={key} className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/5">
+                                    <span className="opacity-70 mr-1">{key}:</span> {value}
+                                </span>
+                            ))}
+                        </div>
+                    )}
                     <div className="mt-2 flex flex-wrap items-center gap-4">
                         <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-md">
                             {t('cart_condition', 'Tình trạng:')} <span className="text-slate-900 dark:text-white font-bold">{item.condition}</span>
                         </span>
-                        {item.stock > 5 ? (
+                        
+                        {item.inventory ? (
+                            <span className="text-[11px] font-bold px-2 py-1 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
+                                {t('cart_ready', 'Sẵn')} <span className="text-emerald-600 dark:text-emerald-400">{item.inventory.showroom} {t('cart_showroom', 'Cửa Hàng')}</span> • <span className="text-yellow-600 dark:text-yellow-500">{item.inventory.warehouse} {t('cart_warehouse', 'Tại Kho')}</span>
+                            </span>
+                        ) : item.stock > 5 ? (
                             <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                                 <CheckCircle2 size={14} /> {t('cart_in_stock', 'Còn hàng')}
                             </span>
@@ -64,7 +97,7 @@ const CartItem = ({ item, updateQuantity, removeItem, moveToWishlist, toggleItem
                         <span className="w-10 text-center font-bold text-sm text-slate-900 dark:text-white">{item.quantity}</span>
                         <button
                             onClick={() => updateQuantity(item.id, 1)}
-                            disabled={item.quantity >= item.stock}
+                            disabled={item.quantity >= (item.inventory ? (item.inventory.showroom + item.inventory.warehouse) : (item.stock || 99))}
                             className="w-8 h-8 flex items-center justify-center hover:bg-white dark:hover:bg-white/10 rounded-lg transition-all text-slate-600 dark:text-slate-400 disabled:opacity-30"
                         >
                             +
@@ -73,9 +106,9 @@ const CartItem = ({ item, updateQuantity, removeItem, moveToWishlist, toggleItem
                     <div className="flex items-center gap-2 sm:gap-4">
                         <Button
                             type="text"
-                            onClick={() => moveToWishlist(item.id, item.name)}
-                            icon={<Heart size={18} strokeWidth={2.5} />}
-                            className="p-2 text-slate-400 hover:!text-rose-500 hover:!bg-transparent transition-colors shadow-none group/heart"
+                            onClick={handleToggleWishlist}
+                            icon={<Heart size={18} fill={isWishlisted ? "currentColor" : "none"} strokeWidth={2.5} />}
+                            className={`p-2 transition-colors shadow-none group/heart ${isWishlisted ? 'text-pink-500 hover:text-pink-600' : 'text-slate-400 hover:text-pink-500 hover:!bg-transparent'}`}
                         />
                         <Button
                             type="text"

@@ -30,5 +30,13 @@
     "booking_errorReason": "Please provide a reason for rescheduling.",
     "reschedule_success": "Reschedule successful! Our advisor will contact you shortly.",
     "booking_notFound": "Ticket not found or has been locked.",
-    "booking_errorDuplicateTime": "New time block matches your original booking!"
+    "booking_errorDuplicateTime": "New time block matches your original booking!",
+    "booking_errorSameTime": "Time matches the original ticket. Please choose a different time slot!",
+    "booking_errorSameDate": "Date matches the original ticket. Please choose a different date!",
+    "booking_no_demo_title": "Demo Car Currently Unavailable",
+    "booking_no_demo_desc1": "Due to exceptionally high demand, this specific vehicle model is temporarily unavailable for test drives at our showroom.",
+    "booking_no_demo_desc2": "However, your experience is our top priority. Please leave your contact information below, and our Sales team will personally schedule and",
+    "booking_no_demo_desc3": "deliver the vehicle to your home",
+    "booking_no_demo_desc4": "for a completely private and comfortable test drive experience!",
+    "booking_btnWaitlist": "Notify me when available"
 }

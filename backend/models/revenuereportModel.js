@@ -23,7 +23,6 @@ const revenueReportSchema = mongoose.Schema(
   }
 )
 
-// Compound index to ensure unique month/year combination
 revenueReportSchema.index({ month: 1, year: 1 }, { unique: true })
 
 const RevenueReport = mongoose.model('RevenueReport', revenueReportSchema)

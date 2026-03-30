@@ -38,7 +38,6 @@ export const exportRevenueReportPDF = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Không có báo cáo' })
   }
 
-  // Tạo PDF bằng pdfkit
   const doc = new PDFDocument()
   const filePath = path.join(
     process.cwd(),

@@ -1,6 +1,5 @@
 import SupportRequest from '../../../models/supportRequestModel.js';
 
-// Lấy tất cả yêu cầu hỗ trợ
 export const getAllSupportRequests = async (req, res) => {
   try {
     console.log(' Fetching all support requests...');
@@ -36,7 +35,6 @@ export const getAllSupportRequests = async (req, res) => {
   }
 };
 
-// Lấy chi tiết yêu cầu theo ID
 export const getSupportRequestById = async (req, res) => {
   try {
     const request = await SupportRequest.findById(req.params.id)

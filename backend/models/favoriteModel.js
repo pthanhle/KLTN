@@ -18,7 +18,6 @@ const favoriteSchema = mongoose.Schema(
   }
 )
 
-// Compound index to ensure a user can only favorite a product once
 favoriteSchema.index({ user_id: 1, product_id: 1 }, { unique: true })
 
 const Favorite = mongoose.model('Favorite', favoriteSchema)

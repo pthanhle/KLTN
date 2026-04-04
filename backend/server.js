@@ -18,6 +18,8 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import seedRoles from './seeders/roleSeed.js'
 import { ensureConfigured } from './config/cloudinary.js'
 import { initSocket } from './config/socket.js'
+import './workers/emailWorker.js'
+
 import adminIndexRoutes from './routes/admin/index.route.js'
 import clientIndexRoutes from './routes/client/index.route.js'
 import staffIndexRoutes from './routes/staff/index.route.js'

@@ -6,7 +6,7 @@ const serviceBaySchema = mongoose.Schema(
         bay_number: {
             type: String,
             required: true,
-            unique: true, // Số hiệu khu vực dịch vụ (ví dụ: Bay 1, Bay 2)
+            unique: true,
         },
         status: {
             type: String,
@@ -16,14 +16,14 @@ const serviceBaySchema = mongoose.Schema(
         current_booking: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Booking',
-            default: null, // Lịch hẹn hiện tại (nếu đang occupied)
+            default: null,
         },
         last_maintenance: {
-            type: Date, // Lần bảo trì gần nhất
+            type: Date,
         },
         notes: {
             type: String,
-            default: '', // Ghi chú về khu vực (ví dụ: "Cần thay thiết bị")
+            default: '',
         },
     },
     {

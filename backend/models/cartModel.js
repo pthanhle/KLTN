@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 
-// Sub-schema: từng sản phẩm trong giỏ hàng
 const cartItemSchema = new mongoose.Schema(
   {
     product_id: {
@@ -8,7 +7,6 @@ const cartItemSchema = new mongoose.Schema(
       ref: 'Product',
       required: true,
     },
-    // Snapshot tại thời điểm thêm vào giỏ (tránh thay đổi giá sau)
     name: { type: String },
     sku: { type: String },
     image: { type: String },

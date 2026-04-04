@@ -4,6 +4,7 @@ import User from '../../models/userModel.js'
 import Role from '../../models/roleModel.js'
 import crypto from 'crypto'
 import sendEmail from '../../utils/sendEmail.js'
+import emailQueue from '../../queues/emailQueue.js'
 import { OAuth2Client } from 'google-auth-library'
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken.js'
 
@@ -104,7 +105,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   })
 
   try {
-    await sendEmail({
+    await emailQueue.add('sendEmail', {
       to: user.email,
       subject: 'Mã OTP xác nhận đăng ký',
       html: `
@@ -115,7 +116,7 @@ export const registerUser = asyncHandler(async (req, res) => {
       `,
     })
   } catch (error) {
-    console.log('Error sending email:', error.message)
+    console.log('Error queuing email:', error.message)
   }
 
   res.status(201).json({
@@ -168,7 +169,7 @@ export const resendEmailOTP = asyncHandler(async (req, res) => {
   user.emailOTPExpire = Date.now() + 10 * 60 * 1000
   await user.save()
 
-  await sendEmail({
+  await emailQueue.add('sendEmail', {
     to: user.email,
     subject: 'Mã OTP xác nhận email (gửi lại)',
     html: `
@@ -418,7 +419,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`
 
   try {
-    await sendEmail({
+    await emailQueue.add('sendEmail', {
       to: user.email,
       subject: 'Đặt lại mật khẩu',
       html: `
@@ -450,7 +451,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     user.passwordResetExpire = undefined
     await user.save()
     res.status(500)
-    throw new Error('Không thể gửi email. Vui lòng thử lại sau')
+    throw new Error('Không thể thêm vào hàng đợi gửi mail. Vui lòng thử lại sau')
   }
 })
 

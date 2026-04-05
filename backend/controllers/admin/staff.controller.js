@@ -116,7 +116,7 @@ export const createStaff = asyncHandler(async (req, res) => {
         email,
         phone,
         full_name,
-        full_name,
+        zalo_url: req.body.zalo_url || `https://zalo.me/${phone}`,
         role_id: targetRole._id,
         status: 'active',
     })
@@ -172,6 +172,7 @@ export const updateStaff = asyncHandler(async (req, res) => {
     user.email = email || user.email
     user.phone = phone || user.phone
     user.status = status || user.status
+    user.zalo_url = req.body.zalo_url || user.zalo_url
 
     const updatedUser = await user.save()
 

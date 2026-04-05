@@ -129,7 +129,11 @@ export const updateAppointment = asyncHandler(async (req, res) => {
         try {
             await Notification.create({
                 user_id: appointment.user_id,
+                title: 'Hủy lịch lái thử',
                 message: message,
+                type: 'BOOKING',
+                reference_id: appointment.booking_code,
+                reference_link: '/profile/services',
                 is_read: false,
             })
             console.log('Notification created successfully');
@@ -142,7 +146,11 @@ export const updateAppointment = asyncHandler(async (req, res) => {
         const message = `Lịch lái thử xe của bạn vào ngày ${new Date(appointment.booking_date).toLocaleDateString("vi-VN")} đã được xác nhận. Vui lòng đến đúng giờ.`;
         await Notification.create({
             user_id: appointment.user_id,
+            title: 'Xác nhận lịch lái thử',
             message: message,
+            type: 'BOOKING',
+            reference_id: appointment.booking_code,
+            reference_link: '/profile/services',
             is_read: false,
         })
     }

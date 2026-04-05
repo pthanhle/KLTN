@@ -11,6 +11,9 @@ import productRoutes from './product.route.js'
 import profileRoutes from './profile.route.js'
 import serviceRoutes from './service.route.js'
 import supportRoutes from './support.route.js'
+import favoriteRoutes from './favorite.route.js'
+import contactRoutes from './contact.route.js'
+import trackingRoutes from './tracking.route.js'
 
 const router = express.Router()
 
@@ -26,5 +29,8 @@ router.use('/products', productRoutes)
 router.use('/profile', profileRoutes)
 router.use('/services', serviceRoutes)
 router.use('/support', supportRoutes)
+router.use('/favorites', favoriteRoutes)
+router.use('/contact', contactRoutes)
+router.use('/tracking', trackingRoutes)
 
 export default router

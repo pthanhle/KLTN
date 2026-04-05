@@ -106,7 +106,11 @@ export const updateAppointment = asyncHandler(async (req, res) => {
 
         await Notification.create({
             user_id: appointment.user_id,
+            title: 'Hủy lịch hẹn dịch vụ',
             message: message,
+            type: 'BOOKING',
+            reference_id: appointment.booking_code,
+            reference_link: '/profile/services',
             is_read: false,
         })
     }
@@ -114,7 +118,11 @@ export const updateAppointment = asyncHandler(async (req, res) => {
         const message = `Lịch hẹn dịch vụ ngày ${new Date(appointment.booking_date).toLocaleDateString("vi-VN")} đã được tiếp nhận. Xin vui lòng đến đúng giờ.`;
         await Notification.create({
             user_id: appointment.user_id,
+            title: 'Xác nhận lịch hẹn dịch vụ',
             message: message,
+            type: 'BOOKING',
+            reference_id: appointment.booking_code,
+            reference_link: '/profile/services',
             is_read: false,
         })
     }

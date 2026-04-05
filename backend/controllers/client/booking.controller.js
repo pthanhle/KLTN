@@ -132,7 +132,11 @@ export const createBooking = asyncHandler(async (req, res) => {
     try {
         await Notification.create({
             user_id: req.user._id,
+            title: 'Đặt lịch thành công',
             message: `Bạn đã đặt lịch thành công. Mã: ${booking_code}. Chờ xác nhận từ đội ngũ TT AUTO.`,
+            type: 'BOOKING',
+            reference_id: booking_code,
+            reference_link: '/profile/services',
             is_read: false,
         })
     } catch (e) {

@@ -1,4 +1,4 @@
-import RepairProgress from '../../../models/repairProgressModel.js'
+import RepairProgress from '../../../models/repairprogressModel.js'
 import Booking from '../../../models/bookingModel.js'
 import ServiceBay from '../../../models/serviceBayModel.js'
 import User from '../../../models/userModel.js'
@@ -208,7 +208,11 @@ export const updateRepairProgress = asyncHandler(async (req, res) => {
             if (message) {
                 await Notification.create({
                     user_id: booking.user_id,
+                    title: 'Cập nhật tiến độ dịch vụ',
                     message: message,
+                    type: 'MAINTENANCE',
+                    reference_id: booking.booking_code,
+                    reference_link: `/profile/services/${booking.booking_code}`,
                     is_read: false,
                 });
             }

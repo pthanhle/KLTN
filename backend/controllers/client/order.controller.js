@@ -2,19 +2,16 @@ import asyncHandler from 'express-async-handler'
 import Order from '../../models/orderModel.js'
 import Product from '../../models/productModel.js'
 import Cart from '../../models/cartModel.js'
+import Notification from '../../models/notificationModel.js'
 import mongoose from 'mongoose'
 
-// helper sinh order_code
 const generateOrderCode = () => {
   const datePart = new Date().getFullYear()
   const rand = Math.random().toString(36).substring(2, 6).toUpperCase()
   return `ORD-${datePart}-${rand}`
 }
 
-// ─────────────────────────────────────────────
-// GET /api/orders  – lịch sử đơn hàng của user
-// Query: order_type, order_status, payment_status, page, limit
-// ─────────────────────────────────────────────
+
 export const getMyOrders = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1
   const limit = parseInt(req.query.limit) || 10
@@ -39,9 +36,6 @@ export const getMyOrders = asyncHandler(async (req, res) => {
 })
 
 
-// ─────────────────────────────────────────────
-// GET /api/orders/:id  – chi tiết đơn hàng
-// ─────────────────────────────────────────────
 export const getOrderById = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400)
@@ -63,16 +57,6 @@ export const getOrderById = asyncHandler(async (req, res) => {
 })
 
 
-// ─────────────────────────────────────────────
-// POST /api/orders  – tạo đơn hàng (checkout)
-// Body:
-//   items: [{ product_id, quantity }]
-//   payment_method: 'CASH' | 'BANK_TRANSFER' | 'CARD' | 'E_WALLET'
-//   order_type: 'CAR_PURCHASE' | 'ACCESSORIES'
-//   shipping_fee: number (default 0)
-//   discount_amount: number (default 0)
-//   customer_info: { full_name, phone, address, email }
-// ─────────────────────────────────────────────
 export const createOrder = asyncHandler(async (req, res) => {
   const {
     items, payment_method, order_type,
@@ -89,12 +73,10 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new Error('Vui lòng chọn phương thức thanh toán')
   }
 
-  // Lấy thông tin sản phẩm thực tế từ DB để tính giá
   const productIds = items.map(i => i.product_id).filter(id => mongoose.Types.ObjectId.isValid(id))
   const dbProducts = await Product.find({ _id: { $in: productIds } }).lean()
   const productMap = Object.fromEntries(dbProducts.map(p => [p._id.toString(), p]))
 
-  // Build items với snapshot và tính tổng tiền hàng
   let subtotal = 0
   const orderItems = items.map(item => {
     const p = productMap[item.product_id]
@@ -156,6 +138,20 @@ export const createOrder = asyncHandler(async (req, res) => {
     console.error('Lỗi xóa giỏ hàng:', e)
   }
 
+  try {
+    await Notification.create({
+      user_id: req.user._id,
+      title: 'Đặt hàng thành công',
+      message: `Đơn hàng ${order.order_code} đã được tạo thành công. Vui lòng thanh toán để xác nhận đơn hàng.`,
+      type: 'ORDER',
+      reference_id: order.order_code,
+      reference_link: '/profile/orders',
+      is_read: false,
+    })
+  } catch (e) {
+    console.error('Lỗi tạo thông báo đơn hàng:', e)
+  }
+
   res.status(201).json({
     message: 'Tạo đơn hàng thành công',
     order,
@@ -200,6 +196,20 @@ export const cancelOrder = asyncHandler(async (req, res) => {
       })
     )
   )
+
+  try {
+    await Notification.create({
+      user_id: req.user._id,
+      title: 'Hủy đơn hàng',
+      message: `Đơn hàng ${order.order_code} đã được hủy thành công.`,
+      type: 'ORDER',
+      reference_id: order.order_code,
+      reference_link: '/profile/orders',
+      is_read: false,
+    })
+  } catch (e) {
+    console.error('Lỗi tạo thông báo hủy đơn:', e)
+  }
 
   res.json({ message: 'Hủy đơn hàng thành công', order })
 })

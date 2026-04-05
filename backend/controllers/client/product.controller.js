@@ -23,10 +23,13 @@ export const getProducts = asyncHandler(async (req, res) => {
   if (seats) matchQuery.seats = parseInt(seats)
 
   if (brand) {
-    matchQuery.$or = [
-      { brandId: { $regex: brand, $options: 'i' } },
-      { brandName: { $regex: brand, $options: 'i' } },
-    ]
+    const brands = Array.isArray(brand) ? brand : [brand]
+    matchQuery.$or = brands.map(b => ({
+      $or: [
+        { brandId: { $regex: b, $options: 'i' } },
+        { brandName: { $regex: b, $options: 'i' } },
+      ]
+    }))
   }
 
   if (category && mongoose.Types.ObjectId.isValid(category)) {
@@ -94,6 +97,60 @@ export const getProducts = asyncHandler(async (req, res) => {
   res.json({
     products: result.data,
     pagination: { current: page, pageSize: limit, total }
+  })
+})
+
+
+// @desc    Lấy metadata cho bộ lọc (Brands, Styles, Price Range)
+// @route   GET /api/client/products/filters
+// @access  Public
+export const getProductFilters = asyncHandler(async (req, res) => {
+  const { type } = req.query // 'car', 'part', etc.
+
+  let matchQuery = {}
+  if (type) matchQuery.type = type
+
+  const stats = await Product.aggregate([
+    { $match: matchQuery },
+    {
+      $facet: {
+        brands: [
+          { $group: { _id: "$brandName", count: { $sum: 1 } } },
+          { $project: { name: "$_id", count: 1, _id: 0 } },
+          { $sort: { name: 1 } }
+        ],
+        bodyStyles: [
+          { $match: { bodyStyle: { $exists: true, $ne: null } } },
+          { $group: { _id: "$bodyStyle", count: { $sum: 1 } } },
+          { $project: { name: "$_id", count: 1, _id: 0 } },
+          { $sort: { name: 1 } }
+        ],
+        fuels: [
+          { $match: { fuel: { $exists: true, $ne: null } } },
+          { $group: { _id: "$fuel", count: { $sum: 1 } } },
+          { $project: { name: "$_id", count: 1, _id: 0 } },
+          { $sort: { name: 1 } }
+        ],
+        priceRange: [
+          {
+            $group: {
+              _id: null,
+              min: { $min: "$price" },
+              max: { $max: "$price" }
+            }
+          },
+          { $project: { _id: 0 } }
+        ]
+      }
+    }
+  ])
+
+  const result = stats[0]
+  res.json({
+    brands: result.brands,
+    bodyStyles: result.bodyStyles,
+    fuels: result.fuels,
+    priceRange: result.priceRange[0] || { min: 0, max: 0 }
   })
 })
 

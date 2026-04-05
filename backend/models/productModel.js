@@ -83,13 +83,23 @@ const productSchema = mongoose.Schema(
     gallery: { type: gallerySchema },
     features: { type: [featureSchema], default: [] },
     specs: { type: [specCategorySchema], default: [] },
-
+    threeSixty: { type: [String], default: [] },
     compatible_brands: { type: [String], default: [] },
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 )
+
+productSchema.virtual('name').get(function () {
+  return this.product_name
+})
+
+productSchema.virtual('image').get(function () {
+  return this.images && this.images.length > 0 ? this.images[0] : null
+})
 
 const Product = mongoose.model('Product', productSchema)
 

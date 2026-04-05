@@ -1,6 +1,5 @@
 import User from '../../models/userModel.js'
 import Order from '../../models/orderModel.js'
-import OrderItem from '../../models/orderItemModel.js'
 import Booking from '../../models/bookingModel.js'
 import asyncHandler from 'express-async-handler'
 
@@ -118,7 +117,7 @@ export const deleteCustomer = asyncHandler(async (req, res) => {
 
     const activeOrder = await Order.findOne({
         user_id: customer._id,
-        status: { $in: ['pending', 'processing', 'shipped'] }
+        order_status: { $in: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'] }
     })
     if (activeOrder) {
         res.status(400)
@@ -161,25 +160,21 @@ export const getOrdersByCustomer = asyncHandler(async (req, res) => {
     const customerId = req.params.id
     await assertIsCustomer(customerId)
 
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+
+    const total = await Order.countDocuments({ user_id: customerId })
     const orders = await Order.find({ user_id: customerId })
         .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
         .lean()
 
-    if (!orders.length) {
-        return res.status(404).json({ message: 'Không có lịch sử đơn hàng' })
-    }
-
-    for (let order of orders) {
-        const items = await OrderItem.find({ order_id: order._id })
-            .populate({
-                path: 'product_id',
-                select: 'product_name price images category_id',
-                populate: { path: 'category_id', select: 'category_name' }
-            })
-        order.items = items
-    }
-
-    res.json({ orders })
+    // items đã nhúng thẳng vào Order (embedded), không cần query riêng
+    res.json({
+        orders,
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+    })
 })
 
 

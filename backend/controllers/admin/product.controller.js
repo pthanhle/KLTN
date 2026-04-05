@@ -180,32 +180,68 @@ export const getProductsByCategory = asyncHandler(async (req, res) => {
 export const createProduct = asyncHandler(async (req, res) => {
   const {
     category_id,
+    type,
+    sku,
     product_name,
+    tagline,
     description,
     price,
-    stock_quantity,
-    type,
+    stock,
+    isNew,
+    brandId,
+    brandName,
+    year,
+    odo,
+    engine,
+    fuel,
+    seats,
+    bodyStyle,
+    isDemoAvailable,
+    versions,
+    colors,
+    gallery,
+    features,
+    specs,
+    threeSixty,
+    images: bodyImages,
   } = req.body
 
   if (!category_id || !product_name || !price || !type) {
     res.status(400)
-    throw new Error('Thiếu thông tin bắt buộc của sản phẩm')
+    throw new Error('Thiếu thông tin bắt buộc của sản phẩm (Category, Tên, Giá, Loại)')
   }
 
-
-  let images = []
+  let finalImages = bodyImages || []
   if (req.file) {
-    images = [req.file.path]
+    finalImages = [req.file.path, ...finalImages]
   }
 
   const product = new Product({
     category_id,
+    type,
+    sku,
     product_name,
+    tagline,
     description,
     price,
-    stock_quantity: stock_quantity || 0,
-    type,
-    images,
+    stock: stock || 0,
+    isNew: isNew || false,
+    brandId,
+    brandName,
+    year,
+    odo: odo || 0,
+    engine,
+    fuel,
+    seats,
+    bodyStyle,
+    isDemoAvailable: isDemoAvailable !== undefined ? isDemoAvailable : true,
+    versions: versions || [],
+    colors: colors || [],
+    gallery: gallery || { photos: [], videos: [] },
+    features: features || [],
+    specs: specs || [],
+    threeSixty: threeSixty || [],
+    images: finalImages,
   })
 
   const createdProduct = await product.save()
@@ -215,7 +251,6 @@ export const createProduct = asyncHandler(async (req, res) => {
 
 export const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params
-  const { product_name, description, price, stock_quantity, type } = req.body
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400)
@@ -228,19 +263,22 @@ export const updateProduct = asyncHandler(async (req, res) => {
     throw new Error('Sản phẩm không tồn tại')
   }
 
-  let newImages = []
+  const allowedFields = [
+    'category_id', 'type', 'sku', 'product_name', 'tagline', 'description',
+    'price', 'stock', 'isNew',
+    'brandId', 'brandName', 'year', 'odo', 'engine', 'fuel', 'seats', 'bodyStyle',
+    'isDemoAvailable', 'versions', 'colors', 'gallery', 'features', 'specs',
+    'threeSixty', 'images'
+  ]
+
+  allowedFields.forEach(field => {
+    if (req.body[field] !== undefined) {
+      product[field] = req.body[field]
+    }
+  })
+
   if (req.file) {
-    newImages = [req.file.path]
-  }
-
-  product.product_name = product_name || product.product_name
-  product.description = description || product.description
-  product.price = price || product.price
-  product.stock_quantity = stock_quantity !== undefined ? stock_quantity : product.stock_quantity
-  product.type = type || product.type
-
-  if (newImages.length > 0) {
-    product.images = newImages
+    product.images = [req.file.path, ...(product.images || [])]
   }
 
   const updatedProduct = await product.save()

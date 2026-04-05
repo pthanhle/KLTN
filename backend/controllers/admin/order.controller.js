@@ -1,19 +1,23 @@
 import Order from '../../models/orderModel.js'
-import OrderItem from '../../models/orderItemModel.js';
-import Payment from '../../models/paymentModel.js'
 import Product from '../../models/productModel.js'
 import User from '../../models/userModel.js'
 import asyncHandler from 'express-async-handler'
+
 
 
 export const getOrders = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
     const search = req.query.search || ''
-    const status = req.query.status || ''
+    const order_status = req.query.order_status || ''
+    const payment_status = req.query.payment_status || ''
+    const order_type = req.query.order_type || ''
 
     const query = {}
-    if (status) query.status = status
+    if (order_status) query.order_status = order_status
+    if (payment_status) query.payment_status = payment_status
+    if (order_type) query.order_type = order_type
+
     if (search) {
         const users = await User.find({
             $or: [
@@ -21,41 +25,23 @@ export const getOrders = asyncHandler(async (req, res) => {
                 { email: { $regex: search, $options: 'i' } },
             ],
         }).select('_id')
-        query.user_id = { $in: users.map(u => u._id) }
+        const userIds = users.map(u => u._id)
+        query.$or = [
+            { user_id: { $in: userIds } },
+            { order_code: { $regex: search, $options: 'i' } },
+        ]
     }
 
     const total = await Order.countDocuments(query)
     const orders = await Order.find(query)
         .populate('user_id', 'full_name email phone')
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ createdAt: -1 })
-
-    const detailedOrders = await Promise.all(
-        orders.map(async (order) => {
-            const items = await OrderItem.find({ order_id: order._id }).populate('product_id', 'product_name price')
-            const payment = await Payment.findOne({ order_id: order._id })
-            return {
-                ...order.toObject(),
-                total_amount: parseFloat(order.total_amount),
-                items: items.map(item => ({
-                    product_id: item.product_id._id,
-                    product_name: item.product_id.product_name,
-                    quantity: item.quantity,
-                    price: parseFloat(item.price),
-                })),
-                payment: payment ? {
-                    amount: parseFloat(payment.amount),
-                    method: payment.method,
-                    status: payment.status,
-                    payment_date: payment.payment_date,
-                } : null,
-            }
-        })
-    )
+        .lean()
 
     res.json({
-        orders: detailedOrders,
+        orders,
         pagination: {
             page,
             limit,
@@ -66,44 +52,29 @@ export const getOrders = asyncHandler(async (req, res) => {
 })
 
 
+
 export const getOrderById = asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id).populate('user_id', 'full_name email phone')
+    const order = await Order.findById(req.params.id)
+        .populate('user_id', 'full_name email phone address')
+        .lean()
+
     if (!order) {
         res.status(404)
         throw new Error('Đơn hàng không tồn tại')
     }
 
-    const items = await OrderItem.find({ order_id: order._id }).populate('product_id', 'product_name price')
-    const payment = await Payment.findOne({ order_id: order._id })
-
-    res.json({
-        ...order.toObject(),
-        total_amount: parseFloat(order.total_amount),
-        items: items.map(item => ({
-            product_id: item.product_id._id,
-            product_name: item.product_id.product_name,
-            quantity: item.quantity,
-            price: parseFloat(item.price),
-        })),
-        payment: payment ? {
-            amount: parseFloat(payment.amount),
-            method: payment.method,
-            status: payment.status,
-            payment_date: payment.payment_date,
-        } : null,
-    })
+    res.json(order)
 })
 
 
+
 export const createOrder = asyncHandler(async (req, res) => {
-    const { user_id, items, total_amount, payment_method } = req.body
+    const { user_id, items, payment_method, order_type, shipping_fee, discount_amount } = req.body
 
-
-    if (!user_id || !items || !items.length || !total_amount || !payment_method) {
+    if (!user_id || !items || !items.length || !payment_method) {
         res.status(400)
-        throw new Error('Vui lòng nhập đầy đủ thông tin: khách hàng, sản phẩm, tổng tiền, phương thức thanh toán')
+        throw new Error('Thiếu thông tin bắt buộc: user_id, items, payment_method')
     }
-
 
     const user = await User.findById(user_id)
     if (!user) {
@@ -111,66 +82,74 @@ export const createOrder = asyncHandler(async (req, res) => {
         throw new Error('Khách hàng không tồn tại')
     }
 
+    const productIds = items.map(i => i.product_id)
+    const dbProducts = await Product.find({ _id: { $in: productIds } }).lean()
+    const productMap = Object.fromEntries(dbProducts.map(p => [p._id.toString(), p]))
 
-    const order = await Order.create({
-        user_id,
-        total_amount: parseFloat(total_amount),
-        status: 'pending',
-        payment_method,
+    let subtotal = 0
+    const orderItems = items.map(item => {
+        const p = productMap[item.product_id]
+        if (!p) throw Object.assign(new Error(`Sản phẩm ${item.product_id} không tồn tại`), { statusCode: 404 })
+        if (p.stock < item.quantity) throw Object.assign(new Error(`Sản phẩm "${p.product_name}" không đủ tồn kho`), { statusCode: 400 })
+
+        const unit_price = Number(item.price || p.price)
+        const total_price = unit_price * item.quantity
+        subtotal += total_price
+
+        return {
+            product_id: p._id,
+            sku: p.sku,
+            name: p.product_name,
+            image: p.images?.[0] || '',
+            quantity: item.quantity,
+            unit_price,
+            total_price,
+        }
     })
 
+    const fee = Number(shipping_fee || 0)
+    const discount = Number(discount_amount || 0)
+    const total_amount = subtotal + fee - discount
 
-    for (const item of items) {
-        const product = await Product.findById(item.product_id)
-        if (!product) {
-            await order.deleteOne()
-            res.status(404)
-            throw new Error(`Sản phẩm ${item.product_id} không tồn tại`)
-        }
-        if (product.stock_quantity < item.quantity) {
-            await order.deleteOne()
-            res.status(400)
-            throw new Error(`Sản phẩm ${product.product_name} không đủ số lượng`)
-        }
-
-        await OrderItem.create({
-            order_id: order._id,
-            product_id: item.product_id,
-            quantity: item.quantity,
-            price: parseFloat(item.price || product.price),
-        })
-
-        product.stock_quantity -= item.quantity
-        await product.save()
+    const generateOrderCode = () => {
+        const datePart = new Date().getFullYear()
+        const rand = Math.random().toString(36).substring(2, 6).toUpperCase()
+        return `ORD-${datePart}-${rand}`
     }
 
-
-    const payment = await Payment.create({
-        order_id: order._id,
-        amount: parseFloat(total_amount),
-        method: payment_method,
-        status: 'pending',
-    })
-
-    res.status(201).json({
-        message: 'Tạo đơn hàng thành công',
-        order: {
-            ...order.toObject(),
-            total_amount: parseFloat(order.total_amount),
-            items,
-            payment: {
-                amount: parseFloat(payment.amount),
-                method: payment.method,
-                status: payment.status,
-                payment_date: payment.payment_date,
-            },
+    const order = await Order.create({
+        order_code: generateOrderCode(),
+        user_id,
+        customer_info: {
+            full_name: user.full_name,
+            phone: user.phone,
+            address: user.address,
+            email: user.email,
         },
+        order_type: order_type || 'ACCESSORIES',
+        items: orderItems,
+        shipping_fee: fee,
+        discount_amount: discount,
+        total_amount,
+        payment_method,
+        payment_status: 'UNPAID',
+        order_status: 'PENDING',
+        order_date: new Date(),
     })
+
+    await Promise.all(
+        orderItems.map(item =>
+            Product.findByIdAndUpdate(item.product_id, { $inc: { stock: -item.quantity } })
+        )
+    )
+
+    res.status(201).json({ message: 'Tạo đơn hàng thành công', order })
 })
 
 
+
 export const updateOrder = asyncHandler(async (req, res) => {
-    const { status, payment_status } = req.body
+    const { order_status, payment_status, tracking_info, invoice_url } = req.body
 
     const order = await Order.findById(req.params.id)
     if (!order) {
@@ -178,43 +157,49 @@ export const updateOrder = asyncHandler(async (req, res) => {
         throw new Error('Đơn hàng không tồn tại')
     }
 
-    if (status) {
-        if (order.status === 'delivered' || order.status === 'cancelled') {
+    const validOrderStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'COMPLETED', 'CANCELLED']
+    const validPaymentStatuses = ['UNPAID', 'PAID', 'REFUNDED', 'PARTIAL']
+
+    if (order_status) {
+        if (!validOrderStatuses.includes(order_status)) {
+            res.status(400)
+            throw new Error(`Trạng thái đơn hàng không hợp lệ. Hợp lệ: ${validOrderStatuses.join(', ')}`)
+        }
+        if (['COMPLETED', 'CANCELLED'].includes(order.order_status)) {
             res.status(400)
             throw new Error('Không thể cập nhật đơn hàng đã hoàn thành hoặc đã hủy')
         }
 
-        if (!['pending', 'processing', 'shipped', 'delivered', 'cancelled'].includes(status)) {
-            res.status(400)
-            throw new Error('Trạng thái không hợp lệ')
+        if (order_status === 'CANCELLED' && order.order_status !== 'CANCELLED') {
+            await Promise.all(
+                order.items.map(item =>
+                    Product.findByIdAndUpdate(item.product_id, { $inc: { stock: item.quantity } })
+                )
+            )
         }
-        order.status = status
-    }
 
-    const updatedOrder = await order.save()
+        order.order_status = order_status
+    }
 
     if (payment_status) {
-        const payment = await Payment.findOne({ order_id: order._id })
-        if (!payment) {
-            res.status(404)
-            throw new Error('Thanh toán không tồn tại')
-        }
-        if (!['pending', 'completed', 'failed', 'refunded'].includes(payment_status)) {
+        if (!validPaymentStatuses.includes(payment_status)) {
             res.status(400)
-            throw new Error('Trạng thái thanh toán không hợp lệ')
+            throw new Error(`Trạng thái thanh toán không hợp lệ. Hợp lệ: ${validPaymentStatuses.join(', ')}`)
         }
-        payment.status = payment_status
-        await payment.save()
+        order.payment_status = payment_status
+
+        if (payment_status === 'PAID' && order.order_status === 'PENDING') {
+            order.order_status = 'CONFIRMED'
+        }
     }
 
-    res.json({
-        message: 'Cập nhật đơn hàng thành công',
-        order: {
-            ...updatedOrder.toObject(),
-            total_amount: parseFloat(updatedOrder.total_amount),
-        },
-    })
+    if (tracking_info) order.tracking_info = tracking_info
+    if (invoice_url) order.invoice_url = invoice_url
+
+    const updated = await order.save()
+    res.json({ message: 'Cập nhật đơn hàng thành công', order: updated })
 })
+
 
 
 export const deleteOrder = asyncHandler(async (req, res) => {
@@ -224,18 +209,11 @@ export const deleteOrder = asyncHandler(async (req, res) => {
         throw new Error('Đơn hàng không tồn tại')
     }
 
-    if (order.status !== 'cancelled') {
+    if (order.order_status !== 'CANCELLED') {
         res.status(400)
         throw new Error('Chỉ có thể xóa đơn hàng đã hủy')
     }
 
-
-    await OrderItem.deleteMany({ order_id: order._id })
-
-
-    await Payment.deleteOne({ order_id: order._id })
-
     await order.deleteOne()
-
     res.json({ message: 'Xóa đơn hàng thành công' })
 })

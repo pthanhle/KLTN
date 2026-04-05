@@ -1,0 +1,3 @@
+export const CATEGORY_ASSETS = {
+    DECORATIVE_CAR_BG: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBpYLhiEuwRj8-gYvm2oV5bp74-CVErJJWY6ih0VNgPJ8XgkP2DEr9Kpl8GLm33jtADi5x82um3va9O6XreGKbe0uODyWUtURP8QeOAA3hChPIFSVEFf1PlICfNBJb0q89p7boiGQI2mzAW6P64w_LkpjF3yX4kbXp731LdOoOHcOVzwOdiX737xZJZ8HT_-jSOrm0Lwhnywh9FCykyVFCxjooeDxEDgaB4B0EtlU3-h7R5KI_v6_VYtA7Bn0nthAYlz8ejosv47QM'
+};

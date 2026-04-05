@@ -15,6 +15,8 @@ const VerifyOTP = lazy(() => import('../pages/Auth/VerifyOTP'));
 
 const CustomersPage = lazy(() => import('../pages/Admin/Customers'));
 const CustomerDetailPage = lazy(() => import('../pages/Admin/CustomerDetail'));
+const AdminBrandsPage = lazy(() => import('../pages/Admin/Brands'));
+const AdminCategoriesPage = lazy(() => import('../pages/Admin/Categories'));
 
 const Home = lazy(() => import('../pages/Customer/Home'));
 
@@ -100,6 +102,8 @@ const AppRoutes = () => {
                         <Route path="/admin/profile" element={<ProfilePage />} />
                         <Route path="/admin/customers" element={<CustomersPage />} />
                         <Route path="/admin/customers/:id" element={<CustomerDetailPage />} />
+                        <Route path="/admin/brands" element={<AdminBrandsPage />} />
+                        <Route path="/admin/categories" element={<AdminCategoriesPage />} />
                         <Route path="/admin/orders" element={<div>Quản Lý Đơn Hàng</div>} />
                     </Route>
                 </Route>

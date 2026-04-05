@@ -10,7 +10,8 @@ import {
     UserCog, 
     TicketPercent, 
     CarFront, 
-    TrendingUp
+    TrendingUp,
+    Tag
 } from 'lucide-react';
 
 export const useSiderMenu = (collapsed) => {
@@ -36,6 +37,11 @@ export const useSiderMenu = (collapsed) => {
             key: '/admin/categories',
             icon: <Layers size={iconSize} />,
             label: t('admin.sider.categories'),
+        },
+        {
+            key: '/admin/brands',
+            icon: <Tag size={iconSize} />,
+            label: t('admin.sider.brands', 'Thương Hiệu'),
         },
         {
             key: '/admin/customers',

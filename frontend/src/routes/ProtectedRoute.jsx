@@ -7,7 +7,6 @@ const ProtectedRoute = ({ allowedRoles, requireLogin = false }) => {
     const isAdmin = user?.isAdmin === true;
 
     if (!isAuthenticated) {
-        // Nếu bắt buộc đăng nhập, hoặc route có yêu cầu Role nhưng lại KHÔNG PHẢI là 'guest' -> bắt login
         if (requireLogin || (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes('guest'))) {
             return <Navigate to="/login" replace />;
         }

@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { QueryClientProvider } from '@tanstack/react-query'
+import { HelmetProvider } from 'react-helmet-async'
 
 import App from './App.jsx'
 import { store } from './store/store'
@@ -17,7 +18,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <GoogleOAuthProvider clientId="939950020568-7su5pq39r781kgglsbm8lr7gm55l52gm.apps.googleusercontent.com">
             <Provider store={store}>
                 <QueryClientProvider client={queryClient}>
-                    <App />
+                    <HelmetProvider>
+                        <App />
+                    </HelmetProvider>
                 </QueryClientProvider>
             </Provider>
         </GoogleOAuthProvider>

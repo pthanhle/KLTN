@@ -22,6 +22,10 @@ import enServices from '../locales/en/services.json';
 import viServices from '../locales/vi/services.json';
 import enParts from '../locales/en/parts.json';
 import viParts from '../locales/vi/parts.json';
+import enAdminParts from '../locales/en/adminParts.json';
+import viAdminParts from '../locales/vi/adminParts.json';
+import enAdminPartForm from '../locales/en/adminPartForm.json';
+import viAdminPartForm from '../locales/vi/adminPartForm.json';
 import enProfile from '../locales/en/profile.json';
 import viProfile from '../locales/vi/profile.json';
 import enBooking from '../locales/en/booking.json';
@@ -47,6 +51,8 @@ i18n
                 adminCustomers: enAdminCustomers,
                 adminBrands: enAdminBrands,
                 adminCategories: enAdminCategories,
+                adminParts: enAdminParts,
+                adminPartForm: enAdminPartForm,
                 error: enError,
                 products: enProducts,
                 services: enServices,
@@ -66,6 +72,8 @@ i18n
                 adminCustomers: viAdminCustomers,
                 adminBrands: viAdminBrands,
                 adminCategories: viAdminCategories,
+                adminParts: viAdminParts,
+                adminPartForm: viAdminPartForm,
                 error: viError,
                 products: viProducts,
                 services: viServices,

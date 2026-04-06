@@ -390,9 +390,12 @@ export const getMockPartDetail = (id) => {
             images: [summaryData.image, ...listDetail.images.slice(1)],
             description: listDetail.description, 
             short_description: summaryData.description,
+            landing_blocks: summaryData.landing_blocks,
             compatible_brands: summaryData.compatible_brands,
             options: getOptionsByCategory(summaryData.category),
-            specs: getSpecsByCategory(summaryData.category, summaryData)
+            specs: summaryData.specs && summaryData.specs.length > 0 
+                ? [...summaryData.specs, ...getSpecsByCategory(summaryData.category, summaryData)] 
+                : getSpecsByCategory(summaryData.category, summaryData)
         };
     }
     return listDetail;

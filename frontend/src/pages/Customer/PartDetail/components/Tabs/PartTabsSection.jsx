@@ -4,6 +4,8 @@ import DOMPurify from 'dompurify';
 import SpecsTable from './SpecsTable';
 import ReviewSection from './ReviewSection';
 
+import LandingBlockRenderer from './LandingBlockRenderer';
+
 export const PartTabsSection = ({ part, activeTab, setActiveTab, submitReview, t }) => {
     return (
         <section className="border-t border-slate-200 dark:border-slate-800 pt-16">
@@ -20,10 +22,9 @@ export const PartTabsSection = ({ part, activeTab, setActiveTab, submitReview, t
             </div>
 
             {activeTab === 'description' && (
-                <div
-                    className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(part.description) }}
-                />
+                <div className="w-full">
+                    <LandingBlockRenderer blocks={part.landing_blocks} t={t} />
+                </div>
             )}
 
             {/* Specs Tab */}

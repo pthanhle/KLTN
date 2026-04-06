@@ -1,5 +1,5 @@
-import { Tooltip } from 'antd';
-import { Edit3, Trash2, Layers } from 'lucide-react';
+import { Layers } from 'lucide-react';
+import { EditAction, DeleteAction, DeleteLockedAction } from '../../../../components/TableActions';
 
 export const getCategoryColumns = (t, handleEdit, handleDelete) => [
     {
@@ -47,31 +47,29 @@ export const getCategoryColumns = (t, handleEdit, handleDelete) => [
     {
         title: t('adminCategories:colActions', 'THAO TÁC'),
         key: 'actions',
-        align: 'right',
+        align: 'center',
         render: (_, record) => {
             const isLocked = record.count > 0;
             return (
-                <div className="flex justify-end gap-3">
-                    <button 
-                        onClick={() => handleEdit && handleEdit(record)}
-                        className="w-10 h-10 rounded-full border border-slate-200 dark:border-[#4f4633]/50 bg-white dark:bg-transparent flex items-center justify-center text-slate-400 hover:bg-yellow-50 dark:hover:bg-[#ffd165] hover:text-yellow-600 dark:hover:text-[#251a00] hover:border-transparent transition-all shadow-sm"
-                    >
-                        <Edit3 size={16} strokeWidth={2.5} />
-                    </button>
+                <div className="flex justify-center gap-3">
+                    <EditAction 
+                        onEdit={() => handleEdit && handleEdit(record)} 
+                        tooltipText={t('adminCategories:btnEdit', 'Chỉnh sửa')} 
+                    />
                     
                     {isLocked ? (
-                        <Tooltip title={t('adminCategories:errDeleteLock', { count: record.count, defaultValue: `KHÔNG THỂ XÓA: Đang chứa ${record.count} xe!` })} color="#ef4444">
-                            <button className="w-10 h-10 rounded-full border border-slate-200 dark:border-[#4f4633]/50 bg-white dark:bg-transparent flex items-center justify-center text-slate-400 opacity-50 shadow-sm">
-                                <Trash2 size={16} strokeWidth={2.5} />
-                            </button>
-                        </Tooltip>
+                        <DeleteLockedAction 
+                            tooltipTitle={t('adminCategories:errDeleteLock', { count: record.count, defaultValue: `KHÔNG THỂ XÓA: Đang chứa ${record.count} xe!` })} 
+                        />
                     ) : (
-                        <button 
-                            onClick={() => handleDelete(record)}
-                            className="w-10 h-10 rounded-full border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-transparent flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm"
-                        >
-                            <Trash2 size={16} strokeWidth={2.5} />
-                        </button>
+                        <DeleteAction
+                            onDelete={() => handleDelete(record)}
+                            confirmTitle={t('adminCategories:confirmDelete', 'Xác nhận xóa Danh Mục này?')}
+                            confirmDesc={t('adminCategories:confirmDeleteDesc', 'Bạn có chắc chắn muốn xóa danh mục này khỏi hệ thống?')}
+                            okText={t('common:yes', 'Xóa')}
+                            cancelText={t('common:no', 'Hủy')}
+                            tooltipText={t('adminCategories:btnDelete', 'Xóa')}
+                        />
                     )}
                 </div>
             );

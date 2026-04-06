@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePartDetailLogic } from './hooks/usePartDetailLogic';
@@ -13,6 +14,12 @@ const PartDetail = () => {
 
     return (
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn text-slate-900 dark:text-slate-100">
+            {logic.part && (
+                <Helmet>
+                    <title>{logic.part.seo_title || `${logic.part.name} - TT AUTO`}</title>
+                    <meta name="description" content={logic.part.seo_description || logic.part.short_description || `Chi tiết phụ tùng ${logic.part.name} chính hãng tại TT AUTO`} />
+                </Helmet>
+            )}
             <nav aria-label="Breadcrumb" className="flex text-[13px] font-bold mb-8">
                 <ol className="flex items-center space-x-2">
                     <li><Link to="/" className="!text-slate-900 dark:!text-white hover:!text-yellow-500 transition-colors">{logic.t('nav_home', 'Trang chủ')}</Link></li>

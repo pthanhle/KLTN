@@ -51,6 +51,7 @@
     "msg_warranty": "5-Year Official Warranty",
     "msg_free_install": "Free Installation at Showroom",
     "tab_desc": "Description",
+    "landing_empty": "Content is being updated...",
     "tab_specs": "Specifications",
     "tab_reviews": "Reviews",
     "lbl_avg_rating": "Average Rating",
@@ -94,5 +95,10 @@
     "val_email_invalid": "Invalid email address",
     "val_brand_req": "Please enter your vehicle brand/model",
     "val_qty_min": "Minimum quantity is 1",
-    "val_qty_max": "Quantity exceeds the limit"
+    "val_qty_max": "Quantity exceeds the limit",
+    "videoNotProvided": "Video has not been provided.",
+    "videoTitle": "Product Video",
+    "productImage": "Product Image",
+    "galleryImg": "Gallery image",
+    "videoCover": "Video Cover"
 }

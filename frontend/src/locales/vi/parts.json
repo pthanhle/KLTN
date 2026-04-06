@@ -51,6 +51,7 @@
     "msg_warranty": "Bảo hành 5 năm chính hãng",
     "msg_free_install": "Lắp đặt miễn phí tại Showroom",
     "tab_desc": "Mô tả sản phẩm",
+    "landing_empty": "Nội dung đang được cập nhật...",
     "tab_specs": "Thông số kỹ thuật",
     "tab_reviews": "Đánh giá & Bình luận",
     "lbl_avg_rating": "Đánh giá trung bình",
@@ -94,5 +95,10 @@
     "val_email_invalid": "Email không hợp lệ",
     "val_brand_req": "Vui lòng điền thông tin dòng xe của bạn",
     "val_qty_min": "Số lượng tối thiểu là 1",
-    "val_qty_max": "Số lượng vượt quá giới hạn"
+    "val_qty_max": "Số lượng vượt quá giới hạn",
+    "videoNotProvided": "Video chưa được cung cấp.",
+    "videoTitle": "Video sản phẩm",
+    "productImage": "Hình ảnh sản phẩm",
+    "galleryImg": "Thư viện ảnh",
+    "videoCover": "Ảnh nền video"
 }

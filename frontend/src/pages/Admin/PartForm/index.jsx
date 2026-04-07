@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FormProvider } from 'react-hook-form';
 import { Skeleton, Form } from 'antd';
 
-import { usePartData } from './hooks/usePartData';
+import { useAdminSinglePartData } from '../../../services/queries/adminPart.queries';
 import { usePartForm } from './hooks/usePartForm';
 
 import FormHeader from './components/FormHeader';
@@ -24,7 +24,7 @@ const AdminPartFormIndex = () => {
     const { t } = useTranslation(['adminPartForm', 'adminParts', 'common']);
 
     // 1. Logic Data 
-    const { partData, isLoadingPart, categories, brands, savePart, isSaving, isEditMode } = usePartData(id, t);
+    const { partData, isLoadingPart, categories, brands, savePart, isSaving, isEditMode } = useAdminSinglePartData(id, t);
 
     // 2. Logic Form RHF
     const { formMethods, onSubmit, onDraft, onDuplicate } = usePartForm(partData, isEditMode, savePart, t);

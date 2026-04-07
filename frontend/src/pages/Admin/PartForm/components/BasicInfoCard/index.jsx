@@ -72,7 +72,7 @@ const BasicInfoCard = ({ categories, t }) => {
                         name="category"
                         control={control}
                         placeholder={t('adminPartForm:phSelect')}
-                        options={localCategories.map(c => ({ label: c, value: c }))}
+                        options={localCategories.map(c => ({ label: c?.name || c, value: c?.value || c }))}
                     />
                 </div>
             </div>

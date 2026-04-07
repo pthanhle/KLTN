@@ -24,11 +24,12 @@ export const mockPartsList = {
             'https://lh3.googleusercontent.com/aida-public/AB6AXuCXTq78P7jB4-AvQEqsVozaaApmxjPQbueJq_toiKXv-GUsidri9HBjZ-osKjG1kqH4mJqUBn00U1ksu69jZVW3clpSEEqrgxTPSxMxfXnAboAoW5iZ6r2k7F5XqP5u7QOBXih7yeOLtuQH8OebEfA5L9Ss-g5-6b70iJLiAzL42xFRbu8BKvUVXBnTU1b4Xp1im5PUS1AxhC82W5YgVmj00CPhCjWHzqBcEerkxQAAj0SgaAgEdFZrhVfQYzJd3kdgk_bMnsN84CY'
         ],
         has_fitment_checker: true,
-        fitment_data: {
-            brands: ['Porsche', 'BMW', 'Mercedes', 'Audi'],
-            models: ['911 Carrera', 'Cayenne', 'Panamera', 'X5', 'S450'],
-            years: ['2022', '2023', '2024']
-        },
+        fitment_data: [
+            { brand: 'Porsche', model: '911 Carrera', yearRange: '2022-2024' },
+            { brand: 'BMW', model: 'X5 (G05)', yearRange: '2022-2024' },
+            { brand: 'Mercedes', model: 'S450', yearRange: '2022-2024' },
+            { brand: 'Audi', model: 'RS6 Avant', yearRange: '2020-2024' }
+        ],
         options: [
             {
                 type: 'size',
@@ -272,11 +273,11 @@ export const mockPartsList = {
             'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=800'
         ],
         has_fitment_checker: true,
-        fitment_data: {
-            brands: ['Toyota', 'Honda', 'Ford', 'Mercedes', 'BMW', 'Hyundai'],
-            models: ['Camry', 'CR-V', 'Everest', 'S450', 'X3', 'Santafe'],
-            years: ['2020', '2021', '2022', '2023', '2024']
-        },
+        fitment_data: [
+            { brand: 'Porsche', model: '911 Carrera', yearRange: '2022-2024' },
+            { brand: 'BMW', model: 'X5 (G05)', yearRange: '2022-2024' },
+            { brand: 'Mercedes', model: 'S450', yearRange: '2022-2024' }
+        ],
         options: [
             {
                 type: 'color',
@@ -322,7 +323,7 @@ export const mockPartsList = {
 };
 
 const getOptionsByCategory = (category) => {
-    switch(category) {
+    switch (category) {
         case 'engine':
         case 'suspension':
             return [
@@ -340,7 +341,7 @@ const getOptionsByCategory = (category) => {
         case 'wheels':
             return [
                 { type: 'size', name: 'Kích thước (Inch)', choices: ['18"', '19"', '20"', '21"'] },
-                { type: 'color', name: 'Màu sắc', choices: [{label: 'Đen mờ', colorCode: '#27272a'}, {label: 'Bạc', colorCode: '#cbd5e1'}] }
+                { type: 'color', name: 'Màu sắc', choices: [{ label: 'Đen mờ', colorCode: '#27272a' }, { label: 'Bạc', colorCode: '#cbd5e1' }] }
             ];
         case 'filter':
             return [
@@ -350,7 +351,7 @@ const getOptionsByCategory = (category) => {
         case 'accessory':
         default:
             return [
-                { type: 'color', name: 'Màu sắc/Phiên bản', choices: [{label: 'Đen nhám (Matte Black)', colorCode: '#27272a'}, {label: 'Sợi Carbon thật', colorCode: '#333333'}, {label: 'Nguyên bản (OEM)', colorCode: '#cbd5e1'}] }
+                { type: 'color', name: 'Màu sắc/Phiên bản', choices: [{ label: 'Đen nhám (Matte Black)', colorCode: '#27272a' }, { label: 'Sợi Carbon thật', colorCode: '#333333' }, { label: 'Nguyên bản (OEM)', colorCode: '#cbd5e1' }] }
             ];
     }
 };
@@ -368,9 +369,9 @@ const getSpecsByCategory = (category, data) => {
 };
 
 export const getMockPartDetail = (id) => {
-    const listDetail = mockPartsList['1']; 
+    const listDetail = mockPartsList['1'];
     const summaryData = MOCK_PARTS.find(p => String(p.id) === String(id));
-    
+
     if (summaryData) {
         return {
             ...listDetail,
@@ -386,15 +387,18 @@ export const getMockPartDetail = (id) => {
                 showroom: Math.floor(Math.random() * 5),
                 warehouse: Math.floor(Math.random() * 50) + 10
             },
-            in_stock: summaryData.stock > 0 || true, // Fix logic to reflect the new inventory
+            in_stock: summaryData.stock > 0 || true,
             images: [summaryData.image, ...listDetail.images.slice(1)],
-            description: listDetail.description, 
+            description: listDetail.description,
             short_description: summaryData.description,
             landing_blocks: summaryData.landing_blocks,
             compatible_brands: summaryData.compatible_brands,
-            options: getOptionsByCategory(summaryData.category),
-            specs: summaryData.specs && summaryData.specs.length > 0 
-                ? [...summaryData.specs, ...getSpecsByCategory(summaryData.category, summaryData)] 
+            fitment_data: summaryData.fitment_data || listDetail.fitment_data,
+            options: summaryData.options?.length > 0
+                ? summaryData.options.map(opt => ({ ...opt, name: opt.type }))
+                : getOptionsByCategory(summaryData.category),
+            specs: summaryData.specs && summaryData.specs.length > 0
+                ? [...summaryData.specs, ...getSpecsByCategory(summaryData.category, summaryData)]
                 : getSpecsByCategory(summaryData.category, summaryData)
         };
     }

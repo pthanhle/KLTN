@@ -25,8 +25,8 @@ export const MOCK_PARTS = [
         category: 'engine',
         compatible_brands: ['Audi'],
         fitment_data: [
-            { model: 'R8 V10', yearRange: '2015-2022' },
-            { model: 'RS7 Sportback', yearRange: '2019-2023' }
+            { brand: 'Audi', model: 'R8 V10', yearRange: '2015-2022' },
+            { brand: 'Audi', model: 'RS7 Sportback', yearRange: '2019-2023' }
         ],
         images: ['https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&q=80', 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&q=80',
@@ -70,8 +70,8 @@ export const MOCK_PARTS = [
         category: 'brake',
         compatible_brands: ['Audi'],
         fitment_data: [
-            { model: 'RS7', yearRange: '2020-2024' },
-            { model: 'RS6 Avant', yearRange: '2020-2024' }
+            { brand: 'Audi', model: 'RS7', yearRange: '2020-2024' },
+            { brand: 'Audi', model: 'RS6 Avant', yearRange: '2020-2024' }
         ],
         images: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
@@ -113,8 +113,8 @@ export const MOCK_PARTS = [
         category: 'suspension',
         compatible_brands: ['Audi', 'BMW'],
         fitment_data: [
-            { model: 'Q5', yearRange: '2018-2023' },
-            { model: 'X3', yearRange: '2019-2023' }
+            { brand: 'Audi', model: 'Q5', yearRange: '2018-2023' },
+            { brand: 'BMW', model: 'X3', yearRange: '2019-2023' }
         ],
         images: ['https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80',
@@ -144,7 +144,7 @@ export const MOCK_PARTS = [
         category: 'filter',
         compatible_brands: [],
         fitment_data: [
-            { model: 'Universal', yearRange: 'All Years' }
+            { brand: 'Universal', model: 'Universal', yearRange: 'All Years' }
         ],
         images: ['https://images.unsplash.com/photo-1527515637462-cff94edd56f9?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1527515637462-cff94edd56f9?w=400&q=80',
@@ -173,7 +173,7 @@ export const MOCK_PARTS = [
         category: 'electrical',
         compatible_brands: ['Audi'],
         fitment_data: [
-            { model: 'A4 B9', yearRange: '2016-2023' }
+            { brand: 'Audi', model: 'A4 B9', yearRange: '2016-2023' }
         ],
         images: ['https://images.unsplash.com/photo-1609592424823-e80c7a1b4a09?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1609592424823-e80c7a1b4a09?w=400&q=80',
@@ -257,7 +257,7 @@ export const MOCK_PARTS = [
         category: 'body',
         compatible_brands: ['Audi'],
         fitment_data: [
-            { model: 'A6 C8', yearRange: '2019-2023' }
+            { brand: 'Audi', model: 'A6 C8', yearRange: '2019-2023' }
         ],
         images: ['https://images.unsplash.com/photo-1617531653332-bd46c16f4d68?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1617531653332-bd46c16f4d68?w=400&q=80',
@@ -338,7 +338,7 @@ export const MOCK_PARTS = [
         category: 'tires',
         compatible_brands: ['Mercedes'],
         fitment_data: [
-            { model: 'W205', yearRange: '2015-2021' }
+            { brand: 'Mercedes', model: 'W205', yearRange: '2015-2021' }
         ],
         images: ['https://images.unsplash.com/photo-1599912027611-484b9fc447af?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1599912027611-484b9fc447af?w=400&q=80',

@@ -22,6 +22,7 @@ const PartsPage = () => {
         paginatedParts,
         totalCount,
         allBrands,
+        allCategories,
         sortOptions,
         priceMax,
         brandSearch,
@@ -79,6 +80,7 @@ const PartsPage = () => {
                             activeCategory={activeCategory}
                             onCategoryChange={setActiveCategory}
                             allBrands={allBrands}
+                            allCategories={allCategories}
                             brandsOption={brandsOption}
                             brandSearch={brandSearch}
                             onBrandSearchChange={setBrandSearch}

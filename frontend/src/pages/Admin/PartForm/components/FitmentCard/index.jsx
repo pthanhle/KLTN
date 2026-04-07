@@ -47,7 +47,7 @@ const FitmentCard = ({ brands, t }) => {
                         mode="multiple"
                         allowClear
                         placeholder={t('adminPartForm:addBrand')}
-                        options={localBrands.map(b => ({ label: b, value: b }))}
+                        options={localBrands.map(b => ({ label: b?.name || b, value: b?.name || b }))}
                     />
                 </div>
                 
@@ -60,18 +60,27 @@ const FitmentCard = ({ brands, t }) => {
                     <div className="space-y-4">
                         {fields.map((field, index) => (
                             <div key={field.id} className="p-4 bg-slate-50 dark:bg-[#151b2d] rounded-3xl flex gap-4 items-center border-2 border-transparent hover:border-yellow-500/20 transition-all group">
+                                <div className="w-36">
+                                    <FormSelect
+                                        name={`fitment_data.${index}.brand`}
+                                        control={control}
+                                        placeholder={t('adminPartForm:phBrand', 'Hãng')}
+                                        options={localBrands.map(b => ({ label: b?.name || b, value: b?.name || b }))}
+                                        allowClear
+                                    />
+                                </div>
                                 <div className="flex-1">
                                     <FormInput 
                                         name={`fitment_data.${index}.model`} 
                                         control={control} 
-                                        placeholder={t('adminPartForm:phModels')} 
+                                        placeholder={t('adminPartForm:phModels', 'Tên Model')} 
                                     />
                                 </div>
-                                <div className="w-36 sm:w-48">
+                                <div className="w-32 sm:w-40">
                                     <FormInput 
                                         name={`fitment_data.${index}.yearRange`} 
                                         control={control} 
-                                        placeholder={t('adminPartForm:phYear')} 
+                                        placeholder={t('adminPartForm:phYear', 'Ví dụ: 2020-2024')} 
                                         extraClassName="text-slate-500 dark:text-slate-300 placeholder:font-normal text-sm"
                                     />
                                 </div>
@@ -87,10 +96,10 @@ const FitmentCard = ({ brands, t }) => {
                         
                         <button 
                             type="button" 
-                            onClick={() => append({ model: '', yearRange: '' })}
+                            onClick={() => append({ brand: '', model: '', yearRange: '' })}
                             className="w-full py-4 rounded-[1.25rem] border-2 border-dashed border-slate-300 dark:border-white/10 hover:border-yellow-500/50 hover:bg-yellow-500/5 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-500 transition-all flex items-center justify-center gap-2"
                         >
-                            <Plus size={18} strokeWidth={3} /> {t('adminPartForm:btnAddModel')}
+                            <Plus size={18} strokeWidth={3} /> {t('adminPartForm:btnAddModel', 'Thêm Model')}
                         </button>
                     </div>
                 </div>

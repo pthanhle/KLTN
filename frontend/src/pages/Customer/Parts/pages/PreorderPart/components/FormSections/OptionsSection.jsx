@@ -20,7 +20,7 @@ const OptionsSection = ({ part, control, errors, t }) => {
                                 name={`selectedOptions.${optionName}`}
                                 control={control}
                                 render={({ field }) => (
-                                    <Select 
+                                    <Select
                                         {...field}
                                         placeholder={`Vui lòng chọn ${optionName}`}
                                         status={errors?.selectedOptions?.[optionName] ? 'error' : ''}

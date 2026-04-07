@@ -19,6 +19,7 @@ const feedbackSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Order',
     },
+    variant: { type: String },
 
     rating: {
       type: Number,
@@ -29,6 +30,22 @@ const feedbackSchema = mongoose.Schema(
     comment: { type: String },
 
     images: { type: [String], default: [] },
+
+    likes: { type: Number, default: 0 },
+    liked_by: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
+
+    replies: [{
+      user_id: {
+         type: mongoose.Schema.Types.ObjectId,
+         ref: 'User',
+         required: true
+      },
+      content: { type: String, required: true },
+      createdAt: { type: Date, default: Date.now }
+    }],
 
     status: {
       type: String,

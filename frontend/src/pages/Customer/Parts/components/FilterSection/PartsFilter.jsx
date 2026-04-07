@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { Search, Check } from 'lucide-react';
 import { Input, Button } from 'antd';
-import { MOCK_CATEGORIES } from '../../data/parts.mock';
 
 const PartsFilter = ({
     search, onSearchChange,
     selectedBrands, onBrandToggle,
+    includeUniversal, onUniversalToggle,
     priceRange, onPriceChange, priceMax,
     activeCategory, onCategoryChange,
-    allBrands,
+    allBrands, allCategories,
     brandsOption, brandSearch, onBrandSearchChange
 }) => {
     const { t } = useTranslation('parts');
@@ -79,6 +79,30 @@ const PartsFilter = ({
                             );
                         })}
                     </div>
+
+                    {selectedBrands.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/10">
+                            <label className="flex items-start gap-3 cursor-pointer group">
+                                <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center border transition-all shrink-0 ${includeUniversal ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white' : 'bg-white dark:bg-transparent border-slate-300 dark:border-white/20 group-hover:border-slate-500 dark:group-hover:border-white/50'}`}>
+                                    {includeUniversal && <Check size={14} className="text-white dark:text-slate-900" strokeWidth={3} />}
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className={`text-[13px] font-bold transition-colors ${includeUniversal ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300'}`}>
+                                        {t('filter_universal_parts', 'Kèm phụ tùng dùng chung')}
+                                    </span>
+                                    <span className="text-[11px] text-slate-400 font-medium leading-snug mt-1">
+                                        {t('filter_universal_desc', 'Hiển thị thêm các phụ tùng không kén dòng xe (nhớt, camera,...)')}
+                                    </span>
+                                </div>
+                                <input 
+                                    type="checkbox" 
+                                    className="hidden" 
+                                    checked={includeUniversal}
+                                    onChange={onUniversalToggle} 
+                                />
+                            </label>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -111,7 +135,7 @@ const PartsFilter = ({
             <div>
                 <h3 className="font-bold text-slate-800 dark:text-white text-[14px] mb-4">{t('filter_category_title', 'Danh Mục')}</h3>
                 <div className="flex flex-wrap gap-2">
-                    {MOCK_CATEGORIES.map(cat => {
+                    {[{ id: 'all', name: t('category_all', 'Tất Cả') }, ...allCategories].map(cat => {
                         const isActive = activeCategory === cat.id;
                         return (
                             <button
@@ -123,7 +147,7 @@ const PartsFilter = ({
                                         : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white'
                                 }`}
                             >
-                                {t(`category_${cat.id}`)}
+                                {cat.name}
                             </button>
                         );
                     })}

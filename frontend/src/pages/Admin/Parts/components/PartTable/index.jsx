@@ -2,7 +2,7 @@ import React from 'react';
 import { Table } from 'antd';
 import { getPartColumns } from '../../constants/partColumns';
 
-const PartTable = ({ parts, loading, onEdit, onDelete, t, rowSelection }) => {
+const PartTable = ({ parts, loading, paginationInfo, onChange, onEdit, onDelete, t, rowSelection }) => {
     const columns = getPartColumns(t, onEdit, onDelete);
 
     return (
@@ -13,8 +13,11 @@ const PartTable = ({ parts, loading, onEdit, onDelete, t, rowSelection }) => {
                     dataSource={parts} 
                     rowKey="id"
                     loading={loading}
+                    onChange={onChange}
                     pagination={{
-                        pageSize: 10,
+                        current: paginationInfo?.current || 1,
+                        pageSize: paginationInfo?.pageSize || 10,
+                        total: paginationInfo?.total || 0,
                         showSizeChanger: true,
                         showTotal: (total, range) => (
                             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">

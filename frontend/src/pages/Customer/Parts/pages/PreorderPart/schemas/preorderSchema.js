@@ -18,11 +18,11 @@ export const getPreorderSchema = (t, options = []) => {
             message: t('val_brand_req', 'Vui lòng điền thông tin xe của bạn')
         }),
         quantity: z.number().min(1, t('val_qty_min', 'Số lượng tối thiểu là 1')).max(100, t('val_qty_max', 'Số lượng vượt quá giới hạn')),
-        selectedOptions: Object.keys(optionsShape).length > 0 
-            ? z.object(optionsShape, { 
+        selectedOptions: Object.keys(optionsShape).length > 0
+            ? z.object(optionsShape, {
                 required_error: t('val_option_req', 'Vui lòng chọn đầy đủ các tùy chọn'),
                 invalid_type_error: t('val_option_req', 'Vui lòng chọn đầy đủ các tùy chọn')
-              }) 
+            })
             : z.any().optional(),
     });
 };

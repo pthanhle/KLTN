@@ -1,8 +1,9 @@
 import React from 'react';
-import { Search, Filter, ChevronDown } from 'lucide-react';
-import { Select } from 'antd';
+import { Search, Filter } from 'lucide-react';
+import FilterSelect from './components/FilterSelect';
+import { getStatusOptions, getCategoryOptions, getBrandOptions } from '../../constants/filterConstants';
 
-const PartToolbar = ({ searchTerm, onSearch, categoryFilter, onCategoryFilter, brandFilter, onBrandFilter, categories, brands, t }) => {
+const PartToolbar = ({ searchTerm, onSearch, categoryFilter, onCategoryFilter, brandFilter, onBrandFilter, statusFilter, onStatusFilter, categories, brands, t }) => {
     return (
         <div className="bg-white dark:bg-[#191f31] rounded-2xl p-6 mb-8 border border-slate-200 dark:border-white/5 flex flex-wrap items-center gap-6">
             <div className="flex-1 min-w-[300px] relative group">
@@ -18,30 +19,26 @@ const PartToolbar = ({ searchTerm, onSearch, categoryFilter, onCategoryFilter, b
             
             <div className="flex items-center gap-4 flex-wrap">
                 <div className="relative">
-                    <Select 
-                        className="min-w-[180px] h-[54px] [&_.ant-select-selector]:!bg-slate-50 dark:[&_.ant-select-selector]:!bg-[#151b2d] [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!rounded-full [&_.ant-select-selection-item]:text-slate-700 dark:[&_.ant-select-selection-item]:text-white [&_.ant-select-selection-item]:mt-1.5 [&_.ant-select-selection-item]:!font-bold [&_.ant-select-selection-item]:!uppercase [&_.ant-select-selection-item]:!tracking-wider"
-                        popupClassName="!bg-white dark:!bg-[#191f31] [&_.ant-select-item]:!text-slate-700 dark:[&_.ant-select-item]:!text-slate-300 [&_.ant-select-item-option-selected]:!bg-yellow-50 dark:[&_.ant-select-item-option-selected]:!bg-yellow-500/10 [&_.ant-select-item-option-selected]:!text-yellow-600 dark:[&_.ant-select-item-option-selected]:!text-yellow-500"
+                    <FilterSelect 
+                        value={statusFilter}
+                        onChange={onStatusFilter}
+                        options={getStatusOptions(t)}
+                    />
+                </div>
+
+                <div className="relative">
+                    <FilterSelect 
                         value={categoryFilter}
                         onChange={onCategoryFilter}
-                        suffixIcon={<ChevronDown className="text-slate-400" size={18} />}
-                        options={[
-                            { label: t('adminParts:filterCategory'), value: 'all' },
-                            ...categories.map(c => ({ label: c, value: c }))
-                        ]}
+                        options={getCategoryOptions(categories, t)}
                     />
                 </div>
                 
                 <div className="relative">
-                    <Select 
-                        className="min-w-[180px] h-[54px] [&_.ant-select-selector]:!bg-slate-50 dark:[&_.ant-select-selector]:!bg-[#151b2d] [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!rounded-full [&_.ant-select-selection-item]:text-slate-700 dark:[&_.ant-select-selection-item]:text-white [&_.ant-select-selection-item]:mt-1.5 [&_.ant-select-selection-item]:!font-bold [&_.ant-select-selection-item]:!uppercase [&_.ant-select-selection-item]:!tracking-wider"
-                        popupClassName="!bg-white dark:!bg-[#191f31] [&_.ant-select-item]:!text-slate-700 dark:[&_.ant-select-item]:!text-slate-300 [&_.ant-select-item-option-selected]:!bg-yellow-50 dark:[&_.ant-select-item-option-selected]:!bg-yellow-500/10 [&_.ant-select-item-option-selected]:!text-yellow-600 dark:[&_.ant-select-item-option-selected]:!text-yellow-500"
+                    <FilterSelect 
                         value={brandFilter}
                         onChange={onBrandFilter}
-                        suffixIcon={<ChevronDown className="text-slate-400" size={18} />}
-                        options={[
-                            { label: t('adminParts:filterBrand'), value: 'all' },
-                            ...brands.map(b => ({ label: b, value: b }))
-                        ]}
+                        options={getBrandOptions(brands, t)}
                     />
                 </div>
                 

@@ -62,27 +62,12 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
         if (action === 'draft') apiPayload.status = 'draft';
         if (action === 'save' || action === 'duplicate') apiPayload.status = 'active';
 
-        // 1. Map Specs
-        if (data.specs && data.specs.length > 0) {
-            apiPayload.specs = data.specs.reduce((acc, curr) => {
-                if (curr.label && curr.value) acc[curr.label] = curr.value;
-                return acc;
-            }, {});
-        } else {
-            apiPayload.specs = {};
-        }
-
-        // 2. Map Options
-        if (data.options && data.options.length > 0) {
-            apiPayload.options = data.options.reduce((acc, curr) => {
-                if (curr.type && curr.choices?.length > 0) {
-                    acc[curr.type.toLowerCase()] = curr.choices;
-                }
-                return acc;
-            }, {});
-        } else {
-            apiPayload.options = {};
-        }
+        // No need to map Specs and Options to Objects anymore.
+        // The backend `partModel.js` and frontend `partSchema.js` natively expect Arrays of Objects:
+        // Specs: [{ label, value }]
+        // Options: [{ type, choices }]
+        apiPayload.specs = data.specs || [];
+        apiPayload.options = data.options || [];
 
         // Truyền Payload kèm Action cho Data Layer
         savePart({ payload: apiPayload, action });

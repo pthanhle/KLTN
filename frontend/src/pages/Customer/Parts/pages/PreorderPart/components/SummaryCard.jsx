@@ -27,10 +27,10 @@ const SummaryCard = ({ part, selectedOptions, handleOptionSelect, errors, t }) =
                     </span>
                 )}
             </div>
-            
+
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('lbl_sku', 'SKU')}: {part?.sku}</p>
             <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 leading-tight">{part?.name}</h3>
-            
+
 
 
             {part?.short_description && (
@@ -59,8 +59,8 @@ const SummaryCard = ({ part, selectedOptions, handleOptionSelect, errors, t }) =
                                     opt.choices.map((c) => {
                                         const isSelected = selectedOptions?.[opt.name] === c.label;
                                         return (
-                                            <button 
-                                                key={c.label} 
+                                            <button
+                                                key={c.label}
                                                 type="button"
                                                 onClick={() => handleOptionSelect?.(opt.name, c.label)}
                                                 className={`flex items-center gap-2 p-1.5 rounded-full border-2 transition-all outline-none ${isSelected ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-500/10' : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'}`}
@@ -75,7 +75,7 @@ const SummaryCard = ({ part, selectedOptions, handleOptionSelect, errors, t }) =
                                         const choiceLabel = typeof c === 'object' ? c.label : c;
                                         const isSelected = selectedOptions?.[opt.name] === choiceLabel;
                                         return (
-                                            <button 
+                                            <button
                                                 key={choiceLabel}
                                                 type="button"
                                                 onClick={() => handleOptionSelect?.(opt.name, choiceLabel)}

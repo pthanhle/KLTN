@@ -1,15 +1,9 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
-import { MOCK_PARTS, MOCK_BRANDS } from '../data/parts.mock';
-
-const SORT_OPTIONS = ['newest', 'price_asc', 'price_desc', 'popular'];
-const ITEMS_PER_PAGE = 9;
-const PRICE_MAX = 35000000;
+import { useClientPartsData } from '../../../../services/queries/clientPart.queries';
+import { SORT_OPTIONS, ITEMS_PER_PAGE, PRICE_MAX } from '../constants/parts.constants';
 
 export const usePartsLogic = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [isFiltering, setIsFiltering] = useState(false);
-
     const [search, setSearch] = useState('');
     const [activeCategory, setActiveCategory] = useState('all');
     const [selectedBrands, setSelectedBrands] = useState([]);
@@ -20,68 +14,33 @@ export const usePartsLogic = () => {
     const [brandSearch, setBrandSearch] = useState('');
 
     const debouncedSearch = useDebounce(search, 400);
-
-    const filteredParts = useMemo(() => {
-        let result = MOCK_PARTS;
-
-        if (activeCategory !== 'all') {
-            result = result.filter(p => p.category === activeCategory);
-        }
-
-        if (debouncedSearch) {
-            const q = debouncedSearch.toLowerCase();
-            result = result.filter(p =>
-                p.name.toLowerCase().includes(q) ||
-                p.description.toLowerCase().includes(q)
-            );
-        }
-
-        if (selectedBrands.length > 0) {
-            result = result.filter(p => {
-                const isUniversal = p.compatible_brands.length === 0;
-                const matchesBrand = p.compatible_brands.some(b => selectedBrands.includes(b));
-                return matchesBrand || (includeUniversal && isUniversal);
-            });
-        }
-
-        result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-
-        if (sortBy === 'price_asc') result = [...result].sort((a, b) => a.price - b.price);
-        else if (sortBy === 'price_desc') result = [...result].sort((a, b) => b.price - a.price);
-        else if (sortBy === 'popular') result = [...result].sort((a, b) => b.stock - a.stock);
-
-        return result;
-    }, [debouncedSearch, activeCategory, selectedBrands, includeUniversal, priceRange, sortBy]);
-
-    const paginatedParts = useMemo(() => {
-        const start = (currentPage - 1) * ITEMS_PER_PAGE;
-        return filteredParts.slice(start, start + ITEMS_PER_PAGE);
-    }, [filteredParts, currentPage]);
-
-    const totalPages = Math.ceil(filteredParts.length / ITEMS_PER_PAGE);
+    const debouncedPrice = useDebounce(priceRange, 400);
 
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 600);
-        return () => clearTimeout(timer);
-    }, []);
+        setCurrentPage(1);
+    }, [debouncedSearch, activeCategory, selectedBrands, includeUniversal, debouncedPrice, sortBy]);
 
-    useEffect(() => {
-        if (isLoading) return;
-        setIsFiltering(true);
-        const timer = setTimeout(() => {
-            setCurrentPage(1);
-            setIsFiltering(false);
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [debouncedSearch, activeCategory, selectedBrands, includeUniversal, priceRange, sortBy]);
+    const apiParams = useMemo(() => ({
+        current: currentPage,
+        pageSize: ITEMS_PER_PAGE,
+        search: debouncedSearch,
+        category: activeCategory,
+        brand: selectedBrands.length > 0 ? selectedBrands.join(',') : '',
+        includeUniversal: selectedBrands.length > 0 ? includeUniversal : true,
+        minPrice: debouncedPrice ? debouncedPrice[0] : 0,
+        maxPrice: debouncedPrice ? debouncedPrice[1] : PRICE_MAX,
+        sortBy
+    }), [currentPage, debouncedSearch, activeCategory, selectedBrands, includeUniversal, debouncedPrice, sortBy]);
 
-    const handleBrandToggle = useCallback((brandId) => {
-        if (brandId === null) {
+    const { parts, pagination, isLoadingParts, isFetchingParts, categories, brands, isLoadingFilters } = useClientPartsData(apiParams);
+
+    const handleBrandToggle = useCallback((brandName) => {
+        if (brandName === null) {
             setSelectedBrands([]);
             return;
         }
         setSelectedBrands(prev =>
-            prev.includes(brandId) ? prev.filter(b => b !== brandId) : [...prev, brandId]
+            prev.includes(brandName) ? prev.filter(b => b !== brandName) : [...prev, brandName]
         );
     }, []);
 
@@ -96,15 +55,15 @@ export const usePartsLogic = () => {
     }, []);
 
     const filteredBrandsOption = useMemo(
-        () => MOCK_BRANDS.filter(b => b.name.toLowerCase().includes(brandSearch.toLowerCase())),
-        [brandSearch]
+        () => brands.filter(b => b.name.toLowerCase().includes(brandSearch.toLowerCase())),
+        [brands, brandSearch]
     );
 
     const hasActiveFilters = selectedBrands.length > 0 || activeCategory !== 'all' || !!debouncedSearch;
 
     return {
-        isLoading,
-        isFiltering,
+        isLoading: isLoadingParts || isLoadingFilters,
+        isFiltering: isFetchingParts,
         search,
         activeCategory,
         selectedBrands,
@@ -112,13 +71,14 @@ export const usePartsLogic = () => {
         priceRange,
         sortBy,
         currentPage,
-        totalPages,
-        paginatedParts,
-        totalCount: filteredParts.length,
+        totalPages: pagination?.totalPages || 1,
+        paginatedParts: parts,
+        totalCount: pagination?.total || 0,
         brandSearch,
         brandsOption: filteredBrandsOption,
         hasActiveFilters,
-        allBrands: MOCK_BRANDS,
+        allBrands: brands,
+        allCategories: categories,
         sortOptions: SORT_OPTIONS,
         priceMax: PRICE_MAX,
         setSearch,

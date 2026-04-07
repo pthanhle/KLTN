@@ -25,6 +25,7 @@ import clientIndexRoutes from './routes/client/index.route.js'
 import staffIndexRoutes from './routes/staff/index.route.js'
 import AIroutes from './routes/AI/AI.route.js'
 import paymentRoutes from './routes/client/payment.route.js'
+import uploadRoutes from './routes/common/upload.route.js'
 ensureConfigured()
 
 const initializeDatabase = async () => {
@@ -59,6 +60,7 @@ app.use('/api/client', clientIndexRoutes)
 app.use('/api/staff', staffIndexRoutes)
 app.use('/api/ai', AIroutes)
 app.use('/api/payments', paymentRoutes)
+app.use('/api/upload', uploadRoutes)
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))

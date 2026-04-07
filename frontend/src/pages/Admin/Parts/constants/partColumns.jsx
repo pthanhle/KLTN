@@ -15,7 +15,7 @@ export const getPartColumns = (t, handleEdit, handleDelete) => [
                     <Image 
                         src={record.image} 
                         alt={record.name}
-                        fallback="https://via.placeholder.com/60"
+                        fallback="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNlMmU4ZjAiLz48cGF0aCBkPSJNMzAgMjBhNiA2IDAgMSAwIDAgMTIgNiA2IDAgMCAwIDAtMTJ6bS0xMiAwaC00djE2aDRWMjB6bTIwIDIwaDRWMjBoLTR2MjB6IiBmaWxsPSIjOTRhaTNiIi8+PC9zdmc+"
                         preview={false}
                         className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
                     />

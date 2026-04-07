@@ -9,6 +9,7 @@ export const getPartFormSchema = (t) => z.object({
   images: z.array(z.string()).optional(),
   compatible_brands: z.array(z.string()).optional(),
   fitment_data: z.array(z.object({
+    brand: z.string().optional(),
     model: z.string(),
     yearRange: z.string()
   })).optional(),
@@ -34,8 +35,8 @@ export const getPartFormSchema = (t) => z.object({
     value: z.string()
   })).optional(),
   options: z.array(z.object({
-    type: z.string(),
-    choices: z.array(z.string())
+    type: z.string().min(1, { message: 'Vui lòng nhập loại tùy chọn' }),
+    choices: z.array(z.any()).min(1, { message: 'Vui lòng thêm ít nhất 1 lựa chọn' })
   })).optional(),
   status: z.enum(['active', 'draft']).optional().default('active'),
   slug: z.string().optional(),

@@ -1,36 +1,40 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { App } from 'antd';
-import { getMockPartDetail } from '../data/mockPartDetail';
+import { useClientSinglePartData, useSubmitPartReviewMutation } from '../../../../services/queries/clientPart.queries';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '@/store/slices/cartSlice';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
 export const usePartDetailLogic = (id) => {
-    const { t } = useTranslation('parts');
+    const { t } = useTranslation('partDetail');
     const navigate = useNavigate();
     const { message } = App.useApp();
     const dispatch = useDispatch();
 
-    const [part, setPart] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data, isLoading } = useClientSinglePartData(id);
+    const part = data?.data || null;
+
     const [isSubmittingAction, setIsSubmittingAction] = useState(false);
 
-    // State Options variants
     const [selectedOptions, setSelectedOptions] = useState({});
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('description');
 
-    // Simulate API fetch
     useEffect(() => {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-            setPart(getMockPartDetail(id));
-            setIsLoading(false);
-        }, 600);
-        return () => clearTimeout(timer);
-    }, [id]);
+        if (part && part.options && part.options.length > 0) {
+            const defaults = {};
+            part.options.forEach(opt => {
+                const optIdentifier = opt.type;
+                if (opt.choices && opt.choices.length > 0) {
+                    const firstChoice = opt.choices[0];
+                    defaults[optIdentifier] = typeof firstChoice === 'string' ? firstChoice : firstChoice.label;
+                }
+            });
+            setSelectedOptions(defaults);
+        }
+    }, [part]);
 
     const handleOptionSelect = (optionName, choice) => {
         setSelectedOptions(prev => ({ ...prev, [optionName]: choice }));
@@ -44,18 +48,17 @@ export const usePartDetailLogic = (id) => {
     const handleAddToCart = async () => {
         if (!part) return;
 
-        // Validation for missing options
         if (part.options && part.options.length > 0) {
-            const missingOptions = part.options.filter(opt => !selectedOptions[opt.name]);
+            const missingOptions = part.options.filter(opt => !selectedOptions[opt.type]);
             if (missingOptions.length > 0) {
-                message.warning(t('missing_options_warning', `Vui lòng chọn ${missingOptions[0].name} trước khi thêm vào giỏ!`));
+                message.warning(t('missing_options_warning', `Vui lòng chọn ${missingOptions[0].type} trước khi thêm vào giỏ!`));
                 return;
             }
         }
 
         setIsSubmittingAction(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 800)); // Delay xử lý mạng
+            await new Promise(resolve => setTimeout(resolve, 800));
 
             dispatch(addToCart({
                 ...part,
@@ -77,11 +80,10 @@ export const usePartDetailLogic = (id) => {
     const handleBuyNow = async () => {
         if (!part) return;
 
-        // Validation for missing options
         if (part.options && part.options.length > 0) {
-            const missingOptions = part.options.filter(opt => !selectedOptions[opt.name]);
+            const missingOptions = part.options.filter(opt => !selectedOptions[opt.type]);
             if (missingOptions.length > 0) {
-                message.warning(t('missing_options_warning', `Vui lòng chọn ${missingOptions[0].name} để Mua Nhanh!`));
+                message.warning(t('missing_options_warning', `Vui lòng chọn ${missingOptions[0].type} để Mua Nhanh!`));
                 return;
             }
         }
@@ -110,10 +112,6 @@ export const usePartDetailLogic = (id) => {
         }
     };
 
-    const submitReview = (rating, comment) => {
-        console.log('User submitted review:', rating, comment);
-    };
-
     return {
         t,
         part,
@@ -127,7 +125,6 @@ export const usePartDetailLogic = (id) => {
         formatCurrency: formatVND,
         handleAddToCart,
         handleBuyNow,
-        submitReview,
         isSubmittingAction
     };
 };

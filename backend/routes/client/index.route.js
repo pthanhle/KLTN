@@ -8,6 +8,7 @@ import notificationRoutes from './notification.route.js'
 import orderRoutes from './order.route.js'
 import paymentRoutes from './payment.route.js'
 import productRoutes from './product.route.js'
+import partRoutes from './part.route.js'
 import profileRoutes from './profile.route.js'
 import serviceRoutes from './service.route.js'
 import supportRoutes from './support.route.js'
@@ -26,6 +27,7 @@ router.use('/notifications', notificationRoutes)
 router.use('/orders', orderRoutes)
 router.use('/payments', paymentRoutes)
 router.use('/products', productRoutes)
+router.use('/parts', partRoutes)
 router.use('/profile', profileRoutes)
 router.use('/services', serviceRoutes)
 router.use('/support', supportRoutes)

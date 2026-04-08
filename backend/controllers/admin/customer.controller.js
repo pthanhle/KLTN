@@ -170,7 +170,6 @@ export const getOrdersByCustomer = asyncHandler(async (req, res) => {
         .limit(limit)
         .lean()
 
-    // items đã nhúng thẳng vào Order (embedded), không cần query riêng
     res.json({
         orders,
         pagination: { page, limit, total, pages: Math.ceil(total / limit) }

@@ -101,11 +101,9 @@ export const getProducts = asyncHandler(async (req, res) => {
 })
 
 
-// @desc    Lấy metadata cho bộ lọc (Brands, Styles, Price Range)
-// @route   GET /api/client/products/filters
-// @access  Public
+
 export const getProductFilters = asyncHandler(async (req, res) => {
-  const { type } = req.query // 'car', 'part', etc.
+  const { type } = req.query 
 
   let matchQuery = {}
   if (type) matchQuery.type = type

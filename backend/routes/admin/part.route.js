@@ -13,17 +13,14 @@ import {
 
 const router = express.Router();
 
-// All Part Admin routes must be protected and restricted to appropriate roles
 router.use(protect, admin);
 
-// /api/v1/admin/parts
 router.route('/')
   .get(getAllParts)
   .post(createPart);
 
 router.post('/bulk-delete', bulkDeleteParts);
 
-// /api/v1/admin/parts/:id
 router.route('/:id')
   .get(getPartById)
   .put(updatePart)

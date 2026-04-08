@@ -3,11 +3,7 @@ import mongoose from 'mongoose';
 import Part from '../../models/partModel.js';
 import PartCategory from '../../models/partCategoryModel.js';
 
-/**
- * @desc    Get all parts with Advanced Filtering, Sorting, and Pagination via Aggregation Pipeline
- * @route   GET /api/v1/admin/parts
- * @access  Private/Admin
- */
+
 export const getAllParts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.current || req.query.page) || 1;
   const limit = parseInt(req.query.pageSize || req.query.limit) || 10;
@@ -21,7 +17,6 @@ export const getAllParts = asyncHandler(async (req, res) => {
 
   const pipeline = [];
 
-  // 1. Text Search (Name or SKU)
   if (search) {
     pipeline.push({
       $match: {
@@ -67,12 +62,9 @@ export const getAllParts = asyncHandler(async (req, res) => {
     }
   });
 
-  // Execute main paginated list pipeline
   const result = await Part.aggregate(pipeline);
   const total = result[0].metadata[0] ? result[0].metadata[0].total : 0;
   const parts = result[0].data;
-
-  // Execute independent Global Stats pipeline so cards are not affected by table filters
   const globalStatsPipeline = [
     {
       $addFields: {
@@ -115,11 +107,7 @@ export const getAllParts = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get single part detail
- * @route   GET /api/v1/admin/parts/:id
- * @access  Private/Admin
- */
+
 export const getPartById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -137,11 +125,7 @@ export const getPartById = asyncHandler(async (req, res) => {
   res.json({ success: true, data: part });
 });
 
-/**
- * @desc    Create a new part
- * @route   POST /api/v1/admin/parts
- * @access  Private/Admin
- */
+
 export const createPart = asyncHandler(async (req, res) => {
   try {
     const part = new Part(req.body);
@@ -161,11 +145,7 @@ export const createPart = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * @desc    Update entire part details
- * @route   PUT /api/v1/admin/parts/:id
- * @access  Private/Admin
- */
+
 export const updatePart = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -199,11 +179,7 @@ export const updatePart = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * @desc    Update single status flag
- * @route   PATCH /api/v1/admin/parts/:id/status
- * @access  Private/Admin
- */
+
 export const updatePartStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -236,11 +212,7 @@ export const updatePartStatus = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Delete a part (Soft Delete concept usually preferred, but using Hard Delete here for purity, can be adapted)
- * @route   DELETE /api/v1/admin/parts/:id
- * @access  Private/Admin
- */
+
 export const deletePart = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -259,11 +231,7 @@ export const deletePart = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Phụ tùng đã được xóa vĩnh viễn' });
 });
 
-/**
- * @desc    Bulk Delete Parts
- * @route   POST /api/v1/admin/parts/bulk-delete
- * @access  Private/Admin
- */
+
 export const bulkDeleteParts = asyncHandler(async (req, res) => {
   const { ids } = req.body; // Array of IDs
 
@@ -277,11 +245,7 @@ export const bulkDeleteParts = asyncHandler(async (req, res) => {
   res.json({ success: true, message: `Đã xóa thành công ${ids.length} phụ tùng` });
 });
 
-/**
- * @desc    Reply to a customer part review
- * @route   POST /api/v1/admin/parts/reviews/:reviewId/reply
- * @access  Private/Admin
- */
+
 export const replyPartReview = asyncHandler(async (req, res) => {
   const { reviewId } = req.params;
   const { content } = req.body;

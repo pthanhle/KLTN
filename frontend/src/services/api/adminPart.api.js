@@ -39,19 +39,26 @@ export const adminPartApi = {
 
     // ---- META DATA ----
     getFiltersData: async () => {
-        const [categoriesRes, brandsRes] = await Promise.all([
+        const [categoriesRes, brandsRes, conditionsRes] = await Promise.all([
             axiosClient.get('/admin/part-meta/categories'),
-            axiosClient.get('/admin/part-meta/brands')
+            axiosClient.get('/admin/part-meta/brands'),
+            axiosClient.get('/admin/part-meta/conditions')
         ]);
 
         return {
             categories: categoriesRes.data || [],
-            brands: brandsRes.data || []
+            brands: brandsRes.data || [],
+            conditions: conditionsRes.data || []
         };
     },
 
     createPartBrand: async (name) => {
         const response = await axiosClient.post('/admin/part-meta/brands', { name });
+        return response;
+    },
+
+    createPartCondition: async (name) => {
+        const response = await axiosClient.post('/admin/part-meta/conditions', { name });
         return response;
     }
 };

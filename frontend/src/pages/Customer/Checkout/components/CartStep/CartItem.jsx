@@ -1,26 +1,17 @@
 import { Checkbox, Image, Button } from 'antd';
-import { Heart, Plus, Minus, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Heart, Plus, Minus, Trash2, CheckCircle2, AlertTriangle, Store, Package } from 'lucide-react';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
-import { useSelector, useDispatch } from 'react-redux';
-import { toggleWishlist } from '@/store/slices/wishlistSlice';
+import { useCartItemLogic } from './hooks/useCartItemLogic';
 
 const CartItem = ({ item, updateQuantity, removeItem, toggleItemCheck, t }) => {
-    const dispatch = useDispatch();
-    const wishlistItems = useSelector(state => state.wishlist.items);
-    const isWishlisted = wishlistItems.some(wishItem => String(wishItem.product_id) === String(item.product_id || item.id));
+    const { 
+        isWishlisted, 
+        handleToggleWishlist, 
+        totalStock, 
+        isOutOfStock, 
+        isLowStock 
+    } = useCartItemLogic(item, t);
 
-    const handleToggleWishlist = () => {
-        dispatch(toggleWishlist({
-            id: `p_${item.product_id || item.id}`,
-            product_id: item.product_id || item.id,
-            type: 'part',
-            brand: 'Phụ kiện',
-            name: item.name,
-            image: item.image,
-            price: item.price,
-            stock_status: item.stock > 0 ? 'in_stock' : 'out_of_stock'
-        }));
-    };
     return (
         <div className={`group flex flex-col md:flex-row items-start md:items-center gap-6 p-4 rounded-3xl bg-white dark:bg-[#141416] hover:shadow-xl dark:hover:shadow-[0_20px_60px_rgba(255,255,255,0.02)] transition-all duration-300 border ${item.checked ? 'border-yellow-500/50' : 'border-slate-100 dark:border-white/5'} hover:border-slate-200 dark:hover:border-white/20`}>
             <Checkbox
@@ -41,10 +32,10 @@ const CartItem = ({ item, updateQuantity, removeItem, toggleItemCheck, t }) => {
 
             <div className="flex-grow flex flex-col justify-between py-1 w-full">
                 <div>
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2 sm:mb-0">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
                         <div>
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white line-clamp-1">{item.name}</h3>
-                            <p className="text-xs text-slate-400 mt-0.5">SKU: {item.sku}</p>
+                            <p className="text-xs text-slate-400 mt-1">SKU: {item.sku}</p>
                         </div>
                         <span className="text-xl font-black text-slate-900 dark:text-yellow-500 shrink-0">
                             {formatVND(item.price)}
@@ -52,35 +43,58 @@ const CartItem = ({ item, updateQuantity, removeItem, toggleItemCheck, t }) => {
                     </div>
 
                     {item.selected_options && Object.keys(item.selected_options).length > 0 && (
-                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                        <div className="flex flex-wrap items-center gap-2.5 mb-3.5 mt-1">
                             {Object.entries(item.selected_options).map(([key, value]) => (
-                                <span key={key} className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/5">
-                                    <span className="opacity-70 mr-1">{key}:</span> {value}
-                                </span>
+                                <div key={key} className="flex items-center gap-2 pl-2 pr-2.5 py-1 rounded-md bg-slate-50/50 hover:bg-slate-50 dark:bg-[#1a1d24]/50 dark:hover:bg-[#1a1d24] border border-slate-200/50 dark:border-white/5 transition-colors">
+                                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{key}</span>
+                                    <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+                                    <span className="text-[13px] font-black tracking-tight text-slate-800 dark:text-slate-200">{value}</span>
+                                </div>
                             ))}
                         </div>
                     )}
                     <div className="mt-2 flex flex-wrap items-center gap-4">
-                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-md">
-                            {t('cart_condition', 'Tình trạng:')} <span className="text-slate-900 dark:text-white font-bold">{item.condition}</span>
-                        </span>
-                        
-                        {item.inventory ? (
-                            <span className="text-[11px] font-bold px-2 py-1 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
-                                {t('cart_ready', 'Sẵn')} <span className="text-emerald-600 dark:text-emerald-400">{item.inventory.showroom} {t('cart_showroom', 'Cửa Hàng')}</span> • <span className="text-yellow-600 dark:text-yellow-500">{item.inventory.warehouse} {t('cart_warehouse', 'Tại Kho')}</span>
-                            </span>
-                        ) : item.stock > 5 ? (
-                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                                <CheckCircle2 size={14} /> {t('cart_in_stock', 'Còn hàng')}
-                            </span>
-                        ) : item.stock > 0 ? (
-                            <span className="text-xs font-bold text-orange-500 dark:text-orange-400 flex items-center gap-1">
-                                <AlertTriangle size={14} /> {t('cart_low_stock', { count: item.stock, defaultValue: `Chỉ còn ${item.stock} SP` })}
+                        <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5 border border-slate-100 dark:border-white/5 px-2.5 py-1.5 rounded-lg bg-transparent">
+                            {t('cart_condition', 'Tình trạng:')} <strong className="text-slate-800 dark:text-slate-200 uppercase tracking-widest">{item.condition_name || item.condition || t('cart_condition_new', 'Mới 100%')}</strong>
+                        </div>
+
+                        {isOutOfStock ? (
+                            <span className="text-[11px] font-bold text-rose-500 flex items-center gap-1.5 bg-rose-50 dark:bg-rose-500/10 px-2.5 py-1.5 rounded-lg border border-rose-100 dark:border-rose-500/20">
+                                <AlertTriangle size={14} /> {t('cart_out_of_stock', 'Tạm hết hàng')}
                             </span>
                         ) : (
-                            <span className="text-xs font-bold text-rose-500 flex items-center gap-1">
-                                <AlertTriangle size={14} /> {t('cart_out_of_stock', 'Tạm hết')}
-                            </span>
+                            <div className="flex items-center gap-2 flex-wrap">
+                                {isLowStock && (
+                                    <span className="text-[11px] font-bold text-orange-600 dark:text-orange-400 flex items-center gap-1.5 bg-orange-50 dark:bg-orange-500/10 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-orange-500/20 animate-pulse">
+                                        <AlertTriangle size={14} /> {t('cart_low_stock', { count: totalStock, defaultValue: `Sắp hết (còn ${totalStock})` })}
+                                    </span>
+                                )}
+                                {item.inventory ? (
+                                    <div className="flex flex-col gap-1.5">
+                                        {item.inventory.showroom > 0 ? (
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50/80 dark:bg-emerald-500/10 border border-emerald-100/50 dark:border-emerald-500/20 w-max">
+                                                <Store size={12} className="text-emerald-500" strokeWidth={2.5} />
+                                                <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
+                                                    {t('cart_ready_garage', 'Sẵn sàng lắp ráp tại Garage')}
+                                                </span>
+                                            </div>
+                                        ) : item.inventory.warehouse > 0 ? (
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50/80 dark:bg-blue-500/10 border border-blue-100/50 dark:border-blue-500/20 w-max">
+                                                <Package size={12} className="text-blue-500" strokeWidth={2.5} />
+                                                <span className="text-[11px] font-bold text-blue-700 dark:text-blue-400">
+                                                    {t('cart_ship_warehouse', 'Giao từ Kho (1-2 ngày)')}
+                                                </span>
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                ) : (
+                                    !isLowStock && (
+                                        <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1.5 rounded-lg border border-emerald-100 dark:border-emerald-500/20">
+                                            <CheckCircle2 size={14} /> {t('cart_in_stock', 'Còn hàng')}
+                                        </span>
+                                    )
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

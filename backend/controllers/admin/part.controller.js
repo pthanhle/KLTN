@@ -40,11 +40,25 @@ export const getAllParts = asyncHandler(async (req, res) => {
   }
 
   pipeline.push({
+    $lookup: {
+      from: 'partconditions',
+      localField: 'condition',
+      foreignField: 'value',
+      as: 'condition_data'
+    }
+  });
+
+  pipeline.push({
     $addFields: {
       id: "$_id",
       stock: { $add: [{ $ifNull: ["$inventory.warehouse", 0] }, { $ifNull: ["$inventory.showroom", 0] }] },
-      image: { $arrayElemAt: ["$images", 0] }
+      image: { $arrayElemAt: ["$images", 0] },
+      condition_name: { $ifNull: [{ $arrayElemAt: ["$condition_data.name", 0] }, "$condition", "Mới 100%"] }
     }
+  });
+
+  pipeline.push({
+    $project: { condition_data: 0 }
   });
 
   const sortObj = {};

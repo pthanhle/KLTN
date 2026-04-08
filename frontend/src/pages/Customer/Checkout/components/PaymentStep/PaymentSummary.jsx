@@ -23,9 +23,15 @@ const PaymentSummary = ({ checkedItems, subtotal, isLoading, handleCheckoutSubmi
                             <div className="flex-1 min-w-0 flex flex-col justify-center">
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate" title={item.name}>{item.name}</h4>
                                 {item.selected_options && Object.keys(item.selected_options).length > 0 && (
-                                    <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
-                                        {Object.entries(item.selected_options).map(([k, v]) => `${k}: ${v}`).join(' | ')}
-                                    </p>
+                                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                        {Object.entries(item.selected_options).map(([k, v]) => (
+                                            <div key={k} className="flex items-center gap-1.5 pl-1.5 pr-2 py-0.5 rounded text-[9px] bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5">
+                                                <span className="font-bold text-slate-400 uppercase tracking-wider">{k}</span>
+                                                <div className="w-[3px] h-[3px] rounded-full bg-slate-300 dark:bg-slate-600"></div>
+                                                <span className="font-semibold text-slate-700 dark:text-slate-300">{v}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                                 <div className="flex justify-between items-center mt-1">
                                     <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{t('summary_quantity', { count: String(item.quantity).padStart(2, '0') })}</span>

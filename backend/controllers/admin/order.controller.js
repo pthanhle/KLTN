@@ -1,5 +1,5 @@
 import Order from '../../models/orderModel.js'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 import User from '../../models/userModel.js'
 import asyncHandler from 'express-async-handler'
 
@@ -15,7 +15,7 @@ export const getOrders = asyncHandler(async (req, res) => {
 
     const query = {}
     if (order_status) query.order_status = order_status
-    if (payment_status) query.payment_status = payment_status
+    if (payment_status) query['payment.status'] = payment_status
     if (order_type) query.order_type = order_type
 
     if (search) {
@@ -69,11 +69,16 @@ export const getOrderById = asyncHandler(async (req, res) => {
 
 
 export const createOrder = asyncHandler(async (req, res) => {
-    const { user_id, items, payment_method, order_type, shipping_fee, discount_amount } = req.body
+    const { user_id, financials, payment, shipping, delivery, items, order_type, vat_info, cancel_reason } = req.body
 
-    if (!user_id || !items || !items.length || !payment_method) {
+    if (!user_id || !items || !items.length) {
         res.status(400)
-        throw new Error('Thiếu thông tin bắt buộc: user_id, items, payment_method')
+        throw new Error('Thiếu thông tin bắt buộc: user_id, items')
+    }
+    
+    if (!payment || !payment.method) {
+        res.status(400)
+        throw new Error('Vui lòng chọn phương thức thanh toán')
     }
 
     const user = await User.findById(user_id)
@@ -82,34 +87,36 @@ export const createOrder = asyncHandler(async (req, res) => {
         throw new Error('Khách hàng không tồn tại')
     }
 
-    const productIds = items.map(i => i.product_id)
-    const dbProducts = await Product.find({ _id: { $in: productIds } }).lean()
-    const productMap = Object.fromEntries(dbProducts.map(p => [p._id.toString(), p]))
+    const partIds = items.map(i => i.part_id)
+    const dbParts = await Part.find({ _id: { $in: partIds } }).lean()
+    const partMap = Object.fromEntries(dbParts.map(p => [p._id.toString(), p]))
 
-    let subtotal = 0
+    let computedSubtotal = 0
     const orderItems = items.map(item => {
-        const p = productMap[item.product_id]
-        if (!p) throw Object.assign(new Error(`Sản phẩm ${item.product_id} không tồn tại`), { statusCode: 404 })
-        if (p.stock < item.quantity) throw Object.assign(new Error(`Sản phẩm "${p.product_name}" không đủ tồn kho`), { statusCode: 400 })
+        const p = partMap[item.part_id]
+        if (!p) throw Object.assign(new Error(`Sản phẩm ${item.part_id} không tồn tại`), { statusCode: 404 })
+        
+        const currentStock = p.inventory?.warehouse + p.inventory?.showroom || 0
+        if (currentStock < item.quantity) throw Object.assign(new Error(`Sản phẩm "${p.name}" không đủ tồn kho`), { statusCode: 400 })
 
         const unit_price = Number(item.price || p.price)
         const total_price = unit_price * item.quantity
-        subtotal += total_price
+        computedSubtotal += total_price
 
         return {
-            product_id: p._id,
+            part_id: p._id,
             sku: p.sku,
-            name: p.product_name,
+            name: p.name,
             image: p.images?.[0] || '',
+            properties: item.properties || p.description || '',
             quantity: item.quantity,
+            original_price: item.original_price || p.original_price || null,
             unit_price,
             total_price,
+            selected_options: item.selected_options || {},
+            is_reviewed: false
         }
     })
-
-    const fee = Number(shipping_fee || 0)
-    const discount = Number(discount_amount || 0)
-    const total_amount = subtotal + fee - discount
 
     const generateOrderCode = () => {
         const datePart = new Date().getFullYear()
@@ -117,29 +124,51 @@ export const createOrder = asyncHandler(async (req, res) => {
         return `ORD-${datePart}-${rand}`
     }
 
+    const final_total = financials?.grand_total && typeof financials.grand_total === 'number'
+        ? financials.grand_total 
+        : computedSubtotal
+
     const order = await Order.create({
         order_code: generateOrderCode(),
         user_id,
-        customer_info: {
-            full_name: user.full_name,
-            phone: user.phone,
-            address: user.address,
-            email: user.email,
-        },
         order_type: order_type || 'ACCESSORIES',
-        items: orderItems,
-        shipping_fee: fee,
-        discount_amount: discount,
-        total_amount,
-        payment_method,
-        payment_status: 'UNPAID',
         order_status: 'PENDING',
+        cancel_reason: cancel_reason || null,
+        financials: {
+            subtotal: financials?.subtotal || computedSubtotal,
+            shipping_fee: financials?.shipping_fee || 0,
+            discount: financials?.discount || 0,
+            vat: financials?.vat || 0,
+            grand_total: final_total
+        },
+        payment: {
+            method: payment.method,
+            method_name: payment.method_name || '',
+            card_tail: payment.card_tail || '',
+            transaction_id: payment.transaction_id || '',
+            status: payment.status || 'UNPAID'
+        },
+        shipping: {
+            provider: shipping?.provider || '',
+            tracking_code: shipping?.tracking_code || '',
+            estimated_delivery: shipping?.estimated_delivery || ''
+        },
+        delivery: {
+            receiver_name: delivery?.receiver_name || user.full_name,
+            phone: delivery?.phone || user.phone,
+            email: delivery?.email || user.email,
+            masked_email: delivery?.masked_email || '',
+            address: delivery?.address || user.address || '',
+            note: delivery?.note || ''
+        },
+        vat_info: vat_info || null,
+        items: orderItems,
         order_date: new Date(),
     })
 
     await Promise.all(
         orderItems.map(item =>
-            Product.findByIdAndUpdate(item.product_id, { $inc: { stock: -item.quantity } })
+            Part.findByIdAndUpdate(item.part_id, { $inc: { 'inventory.warehouse': -item.quantity } })
         )
     )
 
@@ -157,7 +186,7 @@ export const updateOrder = asyncHandler(async (req, res) => {
         throw new Error('Đơn hàng không tồn tại')
     }
 
-    const validOrderStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'COMPLETED', 'CANCELLED']
+    const validOrderStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED']
     const validPaymentStatuses = ['UNPAID', 'PAID', 'REFUNDED', 'PARTIAL']
 
     if (order_status) {
@@ -173,7 +202,7 @@ export const updateOrder = asyncHandler(async (req, res) => {
         if (order_status === 'CANCELLED' && order.order_status !== 'CANCELLED') {
             await Promise.all(
                 order.items.map(item =>
-                    Product.findByIdAndUpdate(item.product_id, { $inc: { stock: item.quantity } })
+                    Part.findByIdAndUpdate(item.part_id, { $inc: { 'inventory.warehouse': item.quantity } })
                 )
             )
         }
@@ -186,14 +215,20 @@ export const updateOrder = asyncHandler(async (req, res) => {
             res.status(400)
             throw new Error(`Trạng thái thanh toán không hợp lệ. Hợp lệ: ${validPaymentStatuses.join(', ')}`)
         }
-        order.payment_status = payment_status
+        if (!order.payment) order.payment = {}
+        order.payment.status = payment_status
 
         if (payment_status === 'PAID' && order.order_status === 'PENDING') {
             order.order_status = 'CONFIRMED'
         }
     }
 
-    if (tracking_info) order.tracking_info = tracking_info
+    if (tracking_info) {
+        if (!order.shipping) order.shipping = {}
+        if (tracking_info.provider) order.shipping.provider = tracking_info.provider
+        if (tracking_info.tracking_code) order.shipping.tracking_code = tracking_info.tracking_code
+    }
+    
     if (invoice_url) order.invoice_url = invoice_url
 
     const updated = await order.save()

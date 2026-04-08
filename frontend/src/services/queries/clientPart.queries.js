@@ -1,12 +1,28 @@
-import { useQuery, useMutation, keepPreviousData } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useMutation, keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import { clientPartApi } from '../api/clientPart.api';
 
 export const useClientPartsData = (params) => {
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        const bc = new BroadcastChannel('kltn_sync_channel');
+        bc.onmessage = (event) => {
+            if (event.data?.type === 'PARTS_UPDATED') {
+                queryClient.invalidateQueries({ queryKey: ['clientParts'] });
+                queryClient.invalidateQueries({ queryKey: ['clientPart'] });
+            } else if (event.data?.type === 'FILTERS_UPDATED') {
+                queryClient.invalidateQueries({ queryKey: ['partFilters'] });
+            }
+        };
+        return () => bc.close();
+    }, [queryClient]);
+
     const partsQuery = useQuery({
         queryKey: ['clientParts', params],
         queryFn: () => clientPartApi.getActiveParts(params),
         placeholderData: keepPreviousData,
-        staleTime: 5 * 60 * 1000,
+        staleTime: 10 * 1000,
     });
 
     const filtersQuery = useQuery({
@@ -49,7 +65,7 @@ export const useClientSinglePartData = (slug) => {
         queryKey: ['clientPart', slug],
         queryFn: () => clientPartApi.getPartBySlug(slug),
         enabled: !!slug,
-        staleTime: 5 * 60 * 1000,
+        staleTime: 10 * 1000,
     });
 };
 

@@ -9,8 +9,8 @@ export const useOrderCard = (order, t) => {
 
     const isPending = order.order_status === 'PENDING';
     const isShipping = order.order_status === 'SHIPPING';
-    const isPaid = order.payment_status === 'PAID';
-    const isUnpaid = order.payment_status === 'UNPAID';
+    const isPaid = order.payment?.status === 'PAID';
+    const isUnpaid = order.payment?.status === 'UNPAID';
 
     return {
         statusConfig,

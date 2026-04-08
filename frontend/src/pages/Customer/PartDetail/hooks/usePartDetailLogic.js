@@ -4,7 +4,7 @@ import { App } from 'antd';
 import { useClientSinglePartData, useSubmitPartReviewMutation } from '../../../../services/queries/clientPart.queries';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '@/store/slices/cartSlice';
+import { useAddToCart } from '@/services/queries/clientCart.queries';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
 export const usePartDetailLogic = (id) => {
@@ -15,8 +15,6 @@ export const usePartDetailLogic = (id) => {
 
     const { data, isLoading } = useClientSinglePartData(id);
     const part = data?.data || null;
-
-    const [isSubmittingAction, setIsSubmittingAction] = useState(false);
 
     const [selectedOptions, setSelectedOptions] = useState({});
     const [quantity, setQuantity] = useState(1);
@@ -45,7 +43,10 @@ export const usePartDetailLogic = (id) => {
         if (type === 'decrement' && quantity > 1) setQuantity(q => q - 1);
     };
 
-    const handleAddToCart = async () => {
+    // API hooks
+    const { mutate: addToCartApi, isPending: isAdding } = useAddToCart();
+
+    const handleAddToCart = () => {
         if (!part) return;
 
         if (part.options && part.options.length > 0) {
@@ -56,28 +57,21 @@ export const usePartDetailLogic = (id) => {
             }
         }
 
-        setIsSubmittingAction(true);
-        try {
-            await new Promise(resolve => setTimeout(resolve, 800));
-
-            dispatch(addToCart({
-                ...part,
-                id: Date.now().toString(),
-                product_id: part.id,
-                quantity: quantity,
-                condition: 'New',
-                selected_options: selectedOptions
-            }));
-
-            message.success(t('add_to_cart_success', 'Đã thêm sản phẩm vào Giỏ Hàng!'));
-        } catch (error) {
-            message.error(t('action_error', 'Có lỗi xảy ra, vui lòng thử lại!'));
-        } finally {
-            setIsSubmittingAction(false);
-        }
+        addToCartApi({
+            part_id: part.id,
+            quantity: quantity,
+            selected_options: selectedOptions
+        }, {
+            onSuccess: () => {
+                message.success(t('add_to_cart_success', 'Đã thêm sản phẩm vào Giỏ Hàng!'));
+            },
+            onError: (err) => {
+                message.error(err.response?.data?.message || t('action_error', 'Có lỗi xảy ra, vui lòng thử lại!'));
+            }
+        });
     };
 
-    const handleBuyNow = async () => {
+    const handleBuyNow = () => {
         if (!part) return;
 
         if (part.options && part.options.length > 0) {
@@ -88,28 +82,22 @@ export const usePartDetailLogic = (id) => {
             }
         }
 
-        setIsSubmittingAction(true);
-        try {
-            await new Promise(resolve => setTimeout(resolve, 800));
-
-            dispatch(addToCart({
-                ...part,
-                id: Date.now().toString(),
-                product_id: part.id,
-                quantity: quantity,
-                condition: 'New',
-                selected_options: selectedOptions,
-                isBuyNow: true
-            }));
-
-            message.success(t('buy_now_processing', 'Đã thêm vào giỏ. Đang chuyển hướng...'));
-
-            navigate('/cart');
-        } catch (error) {
-            message.error(t('action_error', 'Có lỗi xảy ra, vui lòng thử lại!'));
-        } finally {
-            setIsSubmittingAction(false);
-        }
+        addToCartApi({
+            part_id: part.id,
+            quantity: quantity,
+            selected_options: selectedOptions
+        }, {
+            onSuccess: () => {
+                import('@/store/slices/cartSlice').then(({ isolateCheckedItem }) => {
+                    dispatch(isolateCheckedItem(part.id));
+                    message.success(t('add_to_cart_success', 'Đã thêm sản phẩm vào Giỏ Hàng!'));
+                    navigate('/cart');
+                });
+            },
+            onError: (err) => {
+                message.error(err.response?.data?.message || t('action_error', 'Có lỗi xảy ra, vui lòng thử lại!'));
+            }
+        });
     };
 
     return {
@@ -125,6 +113,6 @@ export const usePartDetailLogic = (id) => {
         formatCurrency: formatVND,
         handleAddToCart,
         handleBuyNow,
-        isSubmittingAction
+        isSubmittingAction: isAdding
     };
 };

@@ -24,10 +24,10 @@ const AdminPartFormIndex = () => {
     const { t } = useTranslation(['adminPartForm', 'adminParts', 'common']);
 
     // 1. Logic Data 
-    const { partData, isLoadingPart, categories, brands, savePart, isSaving, isEditMode } = useAdminSinglePartData(id, t);
+    const { partData, isLoadingPart, categories, brands, conditions, savePart, isSaving, isEditMode, createConditionAsync } = useAdminSinglePartData(id, t);
 
     // 2. Logic Form RHF
-    const { formMethods, onSubmit, onDraft, onDuplicate } = usePartForm(partData, isEditMode, savePart, t);
+    const { formMethods, onSubmit, onApply, onDraft, onDuplicate } = usePartForm(partData, isEditMode, savePart, t);
 
     if (isLoadingPart) {
         return <FormSkeleton />;
@@ -39,6 +39,7 @@ const AdminPartFormIndex = () => {
                 <FormHeader 
                     isEditMode={isEditMode} 
                     onSubmit={onSubmit} 
+                    onApply={onApply}
                     onDraft={onDraft}
                     onDuplicate={onDuplicate}
                     isSaving={isSaving} 
@@ -48,7 +49,7 @@ const AdminPartFormIndex = () => {
                 <Form component="form" layout="vertical" onFinish={onSubmit} className="grid grid-cols-12 gap-8">
 
                     <div className="col-span-12 xl:col-span-8 space-y-8">
-                        <BasicInfoCard categories={categories} t={t} />
+                        <BasicInfoCard categories={categories} conditions={conditions} createConditionAsync={createConditionAsync} t={t} />
                         <PricingCard watch={formMethods.watch} t={t} />
                         <MediaGalleryCard control={formMethods.control} name="images" t={t} />
                         <FitmentCard control={formMethods.control} brands={brands} t={t} />

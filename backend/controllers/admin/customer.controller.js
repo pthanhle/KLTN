@@ -66,7 +66,11 @@ export const getCustomerById = asyncHandler(async (req, res) => {
 
 
 export const updateCustomer = asyncHandler(async (req, res) => {
-    const { full_name, email, phone, address, status } = req.body
+    const { 
+        full_name, email, phone, address, status,
+        addresses, garage, customer_type, tax_info,
+        loyalty, debt, source, admin_notes, last_visit_date
+    } = req.body
 
     const customer = await User.findById(req.params.id)
     if (!customer) {
@@ -80,24 +84,35 @@ export const updateCustomer = asyncHandler(async (req, res) => {
         throw new Error('Không thể cập nhật: không phải khách hàng')
     }
 
-    customer.full_name = full_name || customer.full_name
-    customer.email = email || customer.email
-    customer.phone = phone || customer.phone
-    customer.address = address || customer.address
-    customer.status = status || customer.status
+    if (full_name !== undefined) customer.full_name = full_name
+    if (email !== undefined) customer.email = email
+    if (phone !== undefined) customer.phone = phone
+    if (address !== undefined) customer.address = address
+    if (status !== undefined) customer.status = status
+
+    // Enterprise Fields (Admins can update everything, including Loyalty & Debt)
+    if (addresses !== undefined) customer.addresses = addresses
+    if (garage !== undefined) customer.garage = garage
+    if (customer_type !== undefined) customer.customer_type = customer_type
+    if (tax_info !== undefined) customer.tax_info = tax_info
+    
+    // Loyalty might be sent as an entire object from Admin UI
+    if (loyalty !== undefined) {
+        if (loyalty.points !== undefined) customer.loyalty.points = loyalty.points
+        if (loyalty.tier !== undefined) customer.loyalty.tier = loyalty.tier
+        if (loyalty.total_spent !== undefined) customer.loyalty.total_spent = loyalty.total_spent
+        if (loyalty.active_vouchers !== undefined) customer.loyalty.active_vouchers = loyalty.active_vouchers
+    }
+
+    if (debt !== undefined) customer.debt = debt
+    if (source !== undefined) customer.source = source
+    if (admin_notes !== undefined) customer.admin_notes = admin_notes
+    if (last_visit_date !== undefined) customer.last_visit_date = last_visit_date
 
     const updated = await customer.save()
     res.json({
         message: 'Cập nhật khách hàng thành công',
-        customer: {
-            _id: updated._id,
-            username: updated.username,
-            full_name: updated.full_name,
-            email: updated.email,
-            phone: updated.phone,
-            address: updated.address,
-            status: updated.status,
-        },
+        customer: updated,
     })
 })
 

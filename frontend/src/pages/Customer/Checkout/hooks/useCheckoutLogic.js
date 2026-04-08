@@ -27,8 +27,6 @@ export const useCheckoutLogic = () => {
     const orderSubmit = useOrderSubmit(
         t,
         setCurrentStep,
-        formContext.mockCities,
-        formContext.currentDistricts,
         formContext.mockPaymentMethods,
         formContext.mockShippingMethods
     );

@@ -37,5 +37,13 @@
   "errDeleteLock": "KHÔNG THỂ XÓA: Hãng này đang chứa {{count}} tài sản!",
   "msgDeleteSuccess": "Đã xóa thương hiệu thành công.",
   "msgUpdateSuccess": "Cập nhật thương hiệu thành công!",
-  "msgCreateSuccess": "Thêm mới thương hiệu thành công!"
+  "msgCreateSuccess": "Thêm mới thương hiệu thành công!",
+  "partnerToggleLbl": "Thương Hiệu Đối Tác",
+  "partnerTooltip": "Nếu bật, thương hiệu này sẽ được ưu tiên hiển thị logo trên Trang Chủ.",
+  "partnerDesc": "Hiển thị nổi bật ở khu vực Đối Tác Đồng Hành.",
+  "msgUploadSuccess": "Tải ảnh thành công!",
+  "msgUploadError": "Có lỗi xảy ra khi tải ảnh",
+  "btnRemoveImage": "Xóa ảnh",
+  "lblUploaded": "Đã tải lên",
+  "lblUploading": "Đang tải ảnh..."
 }

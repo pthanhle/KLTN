@@ -49,14 +49,25 @@ export const useReviewFormLogic = (part, selectedOptions, t) => {
 
     const handleReviewSubmit = () => {
         if (!part) return;
-        
-        // Zod validation
+
+        if (rating === 0) {
+            message.warning(t('rating_required', 'Vui lòng chọn số sao đánh giá!'));
+            return;
+        }
+        if (!comment.trim()) {
+            message.warning(t('comment_required', 'Vui lòng viết bình luận trước khi gửi đánh giá!'));
+            return;
+        }
+
         const validationResult = reviewFormSchema.safeParse({ rating, comment, images: uploadedImages });
-        
+
         if (!validationResult.success) {
-            // Get first error message
-            const firstError = validationResult.error.errors[0];
-            message.warning(firstError.message);
+            const firstError = validationResult.error?.issues?.[0] || validationResult.error?.errors?.[0];
+            if (firstError) {
+                message.warning(firstError.message);
+            } else {
+                message.warning(t('action_error', 'Dữ liệu không hợp lệ'));
+            }
             return;
         }
 

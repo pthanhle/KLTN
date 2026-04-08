@@ -4,14 +4,12 @@ import { useSubmitOrder } from '../../../../services/queries/checkoutQueries';
 import { maskEmailAddress, generateOrderId } from '../utils/stringFormatter';
 import { CHECKOUT_STEPS } from '../constants/checkoutConfig';
 
-export const useOrderSubmit = (t, setCurrentStep, mockCities, currentDistricts, mockPaymentMethods, mockShippingMethods) => {
+export const useOrderSubmit = (t, setCurrentStep, mockPaymentMethods, mockShippingMethods) => {
     const [orderSuccessData, setOrderSuccessData] = useState(null);
     const submitMutation = useSubmitOrder();
     const { message } = App.useApp();
 
     const handleCheckoutSubmit = (data, paymentMethod, shippingMethod, checkedItems, finalTotal) => {
-        const cityLabel = mockCities.find(c => c.value === data.city)?.label || data.city;
-        const districtLabel = currentDistricts.find(d => d.value === data.district)?.label || data.district;
 
         const payloadInfo = {
             order_code: generateOrderId(),
@@ -19,7 +17,7 @@ export const useOrderSubmit = (t, setCurrentStep, mockCities, currentDistricts, 
                 grand_total: finalTotal
             },
             payment: {
-                method: paymentMethod, // ID phương thức: credit_card, vnpay
+                method: paymentMethod,
                 method_name: mockPaymentMethods.find(m => m.id === paymentMethod)?.label || 'Tiền mặt',
                 card_tail: paymentMethod === 'credit_card' ? '8899' : null,
                 status: 'PAID'
@@ -33,11 +31,11 @@ export const useOrderSubmit = (t, setCurrentStep, mockCities, currentDistricts, 
                 phone: data.phone,
                 email: data.email,
                 masked_email: maskEmailAddress(data.email),
-                address: `${data.address}, ${districtLabel}, ${cityLabel}`
+                address: [data.address, data.ward, data.district, data.city].filter(Boolean).join(', ')
             },
             items: checkedItems.map(item => ({
                 id: item.id,
-                product_id: item.id,
+                part_id: item.part_id,
                 sku: item.sku,
                 name: item.name,
                 image: item.image,
@@ -50,7 +48,7 @@ export const useOrderSubmit = (t, setCurrentStep, mockCities, currentDistricts, 
 
         submitMutation.mutate(payloadInfo, {
             onSuccess: (result) => {
-                setOrderSuccessData(result.data);
+                setOrderSuccessData(result?.order || result);
                 setCurrentStep(CHECKOUT_STEPS.SUCCESS);
                 window.scrollTo(0, 0);
             },

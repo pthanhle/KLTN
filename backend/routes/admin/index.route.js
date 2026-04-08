@@ -1,5 +1,6 @@
 import express from 'express'
 import categoryRoutes from './category.route.js'
+import brandRoutes from './brandRoutes.js'
 import productRoutes from './product.route.js'
 import partRoutes from './part.route.js'
 import partMetaRoutes from './partMeta.route.js'
@@ -17,6 +18,7 @@ import settingsRoutes from './settings.route.js'
 const router = express.Router()
 
 router.use('/categories', categoryRoutes)
+router.use('/brands', brandRoutes)
 router.use('/products', productRoutes)
 router.use('/parts', partRoutes)
 router.use('/part-meta', partMetaRoutes)

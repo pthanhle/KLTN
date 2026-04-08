@@ -16,6 +16,7 @@ const Home = () => {
         handleViewCars,
         handleViewCarDetail,
         handleTradeIn,
+        handleViewBrand,
         isLoading
     } = useHomeLogic();
 
@@ -26,7 +27,7 @@ const Home = () => {
                 onBookService={handleBookService}
             />
 
-            <BrandsSection brands={brands} />
+            <BrandsSection brands={brands} onBrandClick={handleViewBrand} isLoading={isLoading} />
 
             <FeaturedCars 
                 cars={featuredCars} 

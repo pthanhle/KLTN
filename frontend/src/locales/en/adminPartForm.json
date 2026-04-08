@@ -50,7 +50,6 @@
   "btnUploadImg": "Upload Image",
   "livePreview": "Live Preview",
   "dragToReorderBlock": "Drag and drop to rearrange",
-  
   "lblFeatures": "Features List",
   "phFeatureTitle": "Feature title (e.g. Superconductive core)",
   "phFeatureDesc": "Short description...",
@@ -69,7 +68,6 @@
   "defFeatureDesc": "Feature description",
   "galleryImg": "Gallery image",
   "videoCover": "Video cover",
-
   "inventory": "Inventory Status",
   "inStock": "IN STOCK",
   "warehouse": "Warehouse",
@@ -115,11 +113,15 @@
   "seoAuto": "Auto",
   "seoMetaTitle": "Meta Title",
   "seoMetaDesc": "Meta Description",
-  "quickAddName": "New Name",
+  "quickAddName": "Display Name",
   "btnAddQuick": "Add New",
   "modalTitleCat": "Quick Add Category",
   "modalPhCat": "Ex: Sprockets",
   "modalTitleBrand": "Quick Add Brand",
   "modalPhBrand": "Ex: VinFast",
-  "msgAddSuccess": "Successfully added: {{name}}"
+  "msgAddSuccess": "Successfully added: {{name}}",
+  "condition": "Inventory Condition",
+  "modalTitleCondition": "Add New Condition",
+  "modalPhCondition": "Ex: OEM Part",
+  "btnApply": "Save"
 }

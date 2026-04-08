@@ -1,8 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { mockWishlistItems } from '@/pages/Customer/Wishlist/data/mockWishlist';
 
 const initialState = {
-    items: [...mockWishlistItems],
+    items: [],
 };
 
 const wishlistSlice = createSlice({
@@ -10,7 +9,7 @@ const wishlistSlice = createSlice({
     initialState,
     reducers: {
         toggleWishlist: (state, action) => {
-            const index = state.items.findIndex(item => item.product_id === action.payload.product_id);
+            const index = state.items.findIndex(item => (item.part_id === action.payload.part_id || item.product_id === action.payload.product_id));
             if (index >= 0) {
                 state.items.splice(index, 1);
             } else {
@@ -18,13 +17,13 @@ const wishlistSlice = createSlice({
             }
         },
         addToWishlist: (state, action) => {
-            const exists = state.items.find(item => item.product_id === action.payload.product_id);
+            const exists = state.items.find(item => (item.part_id === action.payload.part_id || item.product_id === action.payload.product_id));
             if (!exists) {
                 state.items.push(action.payload);
             }
         },
         removeFromWishlist: (state, action) => {
-            state.items = state.items.filter(item => item.id !== action.payload && item.product_id !== action.payload);
+            state.items = state.items.filter(item => item.id !== action.payload && item.part_id !== action.payload && item.product_id !== action.payload);
         },
         clearWishlist: (state) => {
             state.items = [];

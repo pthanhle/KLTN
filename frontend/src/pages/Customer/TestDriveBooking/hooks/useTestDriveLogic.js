@@ -9,6 +9,7 @@ import { TIME_SLOTS, SHOWROOM_BRANCHES } from '../data/testDrive.mock';
 import { getBookingSchema } from '../schemas/bookingSchema';
 import { mapRescheduleDataToForm, mapFormToBookingPayload } from '../utils/bookingFormMapper';
 import { useGetTestDriveById, useSubmitTestDrive } from '../../../../services/queries/bookingQueries';
+import { useGetCheckoutProfile } from '../../../../services/queries/checkoutQueries';
 
 export const useTestDriveLogic = () => {
     const { message } = App.useApp();
@@ -23,6 +24,7 @@ export const useTestDriveLogic = () => {
 
     // [REACT QUERY] Gọi API GET vé cũ
     const { data: rescheduleData, error: fetchError } = useGetTestDriveById(rescheduleId);
+    const { data: userProfile } = useGetCheckoutProfile();
     
     // Xử lý Lỗi ném ra từ API GET
     useEffect(() => {
@@ -43,7 +45,7 @@ export const useTestDriveLogic = () => {
     const schema = useMemo(() => getBookingSchema(t, rescheduleData, car?.isDemoAvailable ?? true), [t, rescheduleData, car]);
 
     // Sử dụng Utils để ánh xạ (Map) Data Lịch sử thành Default Form Values
-    const defaultVals = useMemo(() => mapRescheduleDataToForm(rescheduleData), [rescheduleData]);
+    const defaultVals = useMemo(() => mapRescheduleDataToForm(rescheduleData, userProfile), [rescheduleData, userProfile]);
 
     const methods = useForm({
         resolver: zodResolver(schema),

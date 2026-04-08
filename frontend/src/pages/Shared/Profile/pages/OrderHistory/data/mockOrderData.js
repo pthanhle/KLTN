@@ -1,4 +1,3 @@
-import { DUMMY_CARS } from '@/pages/Customer/Cars/data/cars.mock';
 import { MOCK_PARTS } from '@/pages/Customer/Parts/data/parts.mock';
 import { MOCK_PROFILE_CUSTOMER } from '@/pages/Shared/Profile/data/profile.mock';
 
@@ -6,75 +5,115 @@ export const mockOrders = [
     {
         order_code: 'ORD-2026-X89A',
         user_id: 'USR-08912',
-        customer_info: {
-            full_name: MOCK_PROFILE_CUSTOMER.full_name,
-            phone: MOCK_PROFILE_CUSTOMER.phone,
-            address: MOCK_PROFILE_CUSTOMER.address
-        },
-        order_type: 'CAR_PURCHASE',
+        order_type: 'PART_PURCHASE',
         order_date: '12/10/2026',
         order_status: 'COMPLETED',
-        payment_method: 'BANK_TRANSFER',
-        payment_status: 'PAID',
-        shipping_fee: 0,
-        discount_amount: 15000000,
-        total_amount: 8365000000,
-        invoice_url: 'https://ttauto.vn/invoice/INV-2026-X89A.pdf',
-        tracking_info: {
-            provider: 'Giao Hàng Đặc Biệt',
-            tracking_code: 'TT-VIP-89A-001'
+        financials: {
+            subtotal: 8380000000,
+            shipping_fee: 0,
+            discount: 15000000,
+            vat: 0,
+            grand_total: 8365000000
         },
+        payment: {
+            method: 'BANK_TRANSFER',
+            method_name: 'Chuyển khoản / VNPAY',
+            status: 'PAID',
+            transaction_id: '#VNP129930X'
+        },
+        shipping: {
+            provider: 'Giao Hàng Đặc Biệt TT',
+            tracking_code: 'TT-VIP-89A-001',
+            estimated_delivery: '15/10/2026'
+        },
+        delivery: {
+            receiver_name: MOCK_PROFILE_CUSTOMER.full_name,
+            phone: MOCK_PROFILE_CUSTOMER.phone,
+            email: MOCK_PROFILE_CUSTOMER.email,
+            masked_email: '',
+            address: MOCK_PROFILE_CUSTOMER.address,
+            note: 'Giao giờ hành chính, bọc kỹ xước xe'
+        },
+        vat_info: null,
+        cancel_reason: null,
+        invoice_url: 'https://ttauto.vn/invoice/INV-2026-X89A.pdf',
         items: [
             {
-                product_id: DUMMY_CARS[8].id,
-                sku: DUMMY_CARS[8].sku,
-                name: DUMMY_CARS[8].name,
+                _id: 'ITEM-1',
+                part_id: MOCK_PARTS[2].id,
+                sku: MOCK_PARTS[2].sku,
+                name: MOCK_PARTS[2].name,
+                image: MOCK_PARTS[2].image,
+                properties: 'Màu Hỏa Tinh | Mâm 19"',
                 quantity: 1,
-                unit_price: DUMMY_CARS[8].price,
-                total_price: DUMMY_CARS[8].price,
-                image: DUMMY_CARS[8].image
+                original_price: MOCK_PARTS[2].original_price || MOCK_PARTS[2].price + 50000,
+                unit_price: MOCK_PARTS[2].price,
+                total_price: MOCK_PARTS[2].price,
+                is_reviewed: false
             },
             {
-                product_id: MOCK_PARTS[1].id,
+                _id: 'ITEM-2',
+                part_id: MOCK_PARTS[1].id,
                 sku: MOCK_PARTS[1].sku,
                 name: MOCK_PARTS[1].name,
+                image: MOCK_PARTS[1].image,
+                properties: 'Custom Size X',
                 quantity: 1,
+                original_price: MOCK_PARTS[1].original_price,
                 unit_price: MOCK_PARTS[1].price,
                 total_price: MOCK_PARTS[1].price,
-                image: MOCK_PARTS[1].image
+                is_reviewed: true
             }
         ]
     },
     {
         order_code: 'ORD-2026-V12K',
         user_id: 'USR-08912',
-        customer_info: {
-            full_name: MOCK_PROFILE_CUSTOMER.full_name,
-            phone: MOCK_PROFILE_CUSTOMER.phone,
-            address: MOCK_PROFILE_CUSTOMER.address
-        },
         order_type: 'ACCESSORIES',
         order_date: '05/11/2026',
         order_status: 'PENDING',
-        payment_method: 'CASH',
-        payment_status: 'UNPAID',
-        shipping_fee: 50000,
-        discount_amount: 0,
-        total_amount: 12550000,
-        invoice_url: null,
-        tracking_info: {
-            provider: 'Giao Hàng Tiết Kiệm',
-            tracking_code: 'GHTK-V12K-999'
+        financials: {
+            subtotal: 12500000,
+            shipping_fee: 50000,
+            discount: 0,
+            vat: 1000000,
+            grand_total: 13550000
         },
+        payment: {
+            method: 'CASH',
+            method_name: 'Thanh toán tiền mặt',
+            status: 'UNPAID',
+            transaction_id: ''
+        },
+        shipping: {
+            provider: 'Giao Hàng Tiết Kiệm',
+            tracking_code: 'GHTK-V12K-999',
+            estimated_delivery: '08/11/2026'
+        },
+        delivery: {
+            receiver_name: MOCK_PROFILE_CUSTOMER.full_name,
+            phone: MOCK_PROFILE_CUSTOMER.phone,
+            email: MOCK_PROFILE_CUSTOMER.email,
+            masked_email: '',
+            address: MOCK_PROFILE_CUSTOMER.address,
+            note: ''
+        },
+        vat_info: null,
+        cancel_reason: null,
+        invoice_url: null,
         items: [
             {
-                product_id: MOCK_PARTS[5].id,
-                sku: MOCK_PARTS[5].sku,
-                name: MOCK_PARTS[5].name,
+                _id: 'ITEM-3',
+                part_id: MOCK_PARTS[5] ? MOCK_PARTS[5].id : 'PRT-X',
+                sku: MOCK_PARTS[5] ? MOCK_PARTS[5].sku : 'SKU-XX',
+                name: MOCK_PARTS[5] ? MOCK_PARTS[5].name : 'Linh kiện X',
+                image: MOCK_PARTS[5] ? MOCK_PARTS[5].image : '',
+                properties: 'Màu xám | Loại B',
                 quantity: 1,
-                unit_price: MOCK_PARTS[5].price,
-                total_price: MOCK_PARTS[5].price,
-                image: MOCK_PARTS[5].image
+                original_price: null,
+                unit_price: 12500000,
+                total_price: 12500000,
+                is_reviewed: false
             }
         ]
     }

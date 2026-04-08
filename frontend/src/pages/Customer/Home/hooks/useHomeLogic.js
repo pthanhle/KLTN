@@ -1,27 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MOCK_FEATURED_CARS, MOCK_RECENT_HISTORY, MOCK_BRANDS_LIST } from '../data/home.mock';
+import { MOCK_FEATURED_CARS, MOCK_RECENT_HISTORY } from '../data/home.mock';
+import { useClientBrandsQuery } from '../../../../services/queries/brandQueries';
 
 export const useHomeLogic = () => {
     const navigate = useNavigate();
 
     const [featuredCars, setFeaturedCars] = useState([]);
     const [recentHistory, setRecentHistory] = useState([]);
-    const [brands, setBrands] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+
+    const { data: brands = [], isLoading: isBrandsLoading } = useClientBrandsQuery(true);
+    const [isDataReady, setIsDataReady] = useState(false);
 
     useEffect(() => {
         setFeaturedCars(MOCK_FEATURED_CARS);
         setRecentHistory(MOCK_RECENT_HISTORY);
-        setBrands(MOCK_BRANDS_LIST);
-        setIsLoading(false);
+        setIsDataReady(true);
     }, []);
 
-    // Handlers
     const handleBookService = () => navigate('/services');
-    const handleViewCars = () => navigate('/products');
+    const handleViewCars = () => navigate('/brands');
     const handleViewCarDetail = (id) => navigate(`/cars/${id}`);
     const handleTradeIn = () => navigate('/contact');
+    const handleViewBrand = (brandId) => navigate(`/brand/${brandId}`);
 
     return {
         featuredCars,
@@ -31,6 +32,7 @@ export const useHomeLogic = () => {
         handleViewCars,
         handleViewCarDetail,
         handleTradeIn,
-        isLoading
+        handleViewBrand,
+        isLoading: !isDataReady || isBrandsLoading
     };
 };

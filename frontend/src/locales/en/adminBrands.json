@@ -37,5 +37,13 @@
   "errDeleteLock": "UNABLE TO DELETE: This brand is currently holding {{count}} assets!",
   "msgDeleteSuccess": "Successfully deleted the brand.",
   "msgUpdateSuccess": "Brand has been updated successfully!",
-  "msgCreateSuccess": "New brand created successfully!"
+  "msgCreateSuccess": "New brand created successfully!",
+  "partnerToggleLbl": "Partner Brand",
+  "partnerTooltip": "If enabled, this brand's logo will be prominently featured on the Homepage.",
+  "partnerDesc": "Display prominently in the Accompanying Partners section.",
+  "msgUploadSuccess": "Image uploaded successfully!",
+  "msgUploadError": "An error occurred while uploading",
+  "btnRemoveImage": "Remove Image",
+  "lblUploaded": "Uploaded",
+  "lblUploading": "Uploading image..."
 }

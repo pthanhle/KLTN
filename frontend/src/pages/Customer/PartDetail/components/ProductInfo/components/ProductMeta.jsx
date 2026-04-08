@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, CheckCircle } from 'lucide-react';
+import { Star, CheckCircle, Barcode, Package } from 'lucide-react';
 
 export const ProductMeta = ({ part, t, formatCurrency, setActiveTab }) => {
     return (
@@ -19,8 +19,8 @@ export const ProductMeta = ({ part, t, formatCurrency, setActiveTab }) => {
                 {part.name}
             </h1>
             
-            <div className="flex flex-wrap items-center gap-y-2 gap-x-3 mb-6 text-sm text-slate-500">
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 rounded-full cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/40 transition-colors"
+            <div className="flex flex-wrap items-center gap-y-3 gap-x-3 mb-6 text-sm text-slate-500">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 rounded-full cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/40 transition-colors"
                      onClick={() => setActiveTab('reviews')}>
                     <Star className="w-4 h-4 fill-current" />
                     <span className="font-bold">{part.reviews_summary?.average || part.rating || 0}</span>
@@ -28,12 +28,20 @@ export const ProductMeta = ({ part, t, formatCurrency, setActiveTab }) => {
                         ({part.reviews_summary?.total || part.reviews_count || part.reviews?.length || 0} {t('lbl_reviews', 'đánh giá')})
                     </span>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>{t('lbl_sold', 'Đã bán')} {part.sold_count || 0}</span>
                 </div>
-                <span className="text-slate-300 dark:text-slate-700">|</span>
-                <span className="font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">{t('lbl_sku', 'SKU')}: {part.sku}</span>
+                
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-full">
+                    <Barcode className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                    <span className="font-black uppercase tracking-widest text-[11px]">{t('lbl_sku', 'SKU')}: {part.sku}</span>
+                </div>
+
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-full shadow-sm">
+                    <Package className="w-4 h-4" />
+                    <span className="font-black uppercase tracking-widest text-[11px]">{part.condition_name || part.condition || t('cart_condition_new', 'Mới 100%')}</span>
+                </div>
             </div>
 
             <div className="flex items-baseline gap-4">

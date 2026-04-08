@@ -112,11 +112,16 @@
   "seoAuto": "Tự động",
   "seoMetaTitle": "Thẻ Meta Title",
   "seoMetaDesc": "Thẻ Meta Description",
-  "quickAddName": "Tên mới",
+  "quickAddName": "Tên Thêm Nhanh (Hiển thị)",
   "btnAddQuick": "Thêm Mới",
   "modalTitleCat": "Thêm Danh Mục Nhanh",
   "modalPhCat": "VD: Nhông sên dĩa",
   "modalTitleBrand": "Thêm Thương Hiệu Nhanh",
   "modalPhBrand": "VD: VinFast",
-  "msgAddSuccess": "Đã thêm thành công: {{name}}"
+  "msgAddSuccess": "Đã thêm thành công: {{name}}",
+  "condition": "Tình Trạng Kho",
+  "modalTitleCondition": "Thêm Tình Trạng Hiện Loại",
+  "modalPhCondition": "Nhập tên tình trạng mới... (VD: Hàng OEM)",
+  "btnApply": "Lưu",
+  "btnApplying": "Đang lưu..."
 }

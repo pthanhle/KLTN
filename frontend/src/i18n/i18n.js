@@ -38,6 +38,8 @@ import enContact from '../locales/en/contact.json';
 import viContact from '../locales/vi/contact.json';
 import enTracking from '../locales/en/tracking.json';
 import viTracking from '../locales/vi/tracking.json';
+import enPartDetail from '../locales/en/partDetail.json';
+import viPartDetail from '../locales/vi/partDetail.json';
 
 i18n
     .use(initReactI18next)
@@ -63,6 +65,7 @@ i18n
                 checkout: enCheckout,
                 contact: enContact,
                 tracking: enTracking,
+                partDetail: enPartDetail,
             },
             vi: {
                 translation: viTranslation,
@@ -84,6 +87,7 @@ i18n
                 checkout: viCheckout,
                 contact: viContact,
                 tracking: viTracking,
+                partDetail: viPartDetail,
             },
         },
         lng: 'vi', // Default language

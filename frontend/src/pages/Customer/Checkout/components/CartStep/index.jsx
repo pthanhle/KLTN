@@ -1,4 +1,5 @@
 import { Checkbox, Image, Button } from 'antd';
+import { Skeleton } from '@/components/ui/skeleton';
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
 import { Link } from 'react-router-dom';
@@ -7,13 +8,14 @@ import EmptyCart from './EmptyCart';
 const CartStep = ({ hookState }) => {
     const { 
         t, cartItems, subtotal, hasCheckedItems, 
-        toggleItemCheck, toggleAllChecks, updateQuantity, removeItem, moveToWishlist, proceedToPayment 
+        toggleItemCheck, toggleAllChecks, updateQuantity, removeItem, moveToWishlist, proceedToPayment,
+        isLoadingCart
     } = hookState;
 
     const allChecked = cartItems.length > 0 && cartItems.every(item => item.checked);
     const checkedCount = cartItems.filter(item => item.checked).length;
 
-    if (cartItems.length === 0) {
+    if (!isLoadingCart && cartItems.length === 0) {
         return <EmptyCart t={t} />;
     }
 
@@ -27,30 +29,38 @@ const CartStep = ({ hookState }) => {
                             {t('cart_items', { count: cartItems.length })}
                         </span>
                     </div>
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                        <Checkbox 
-                            checked={allChecked} 
-                            onChange={(e) => toggleAllChecks(e.target.checked)}
-                            className="[&_.ant-checkbox-inner]:border-slate-300 dark:[&_.ant-checkbox-inner]:border-white/20 [&_.ant-checkbox-checked_.ant-checkbox-inner]:bg-yellow-500 [&_.ant-checkbox-checked_.ant-checkbox-inner]:border-yellow-500"
-                        />
-                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors uppercase tracking-widest pt-0.5">
-                            {t('cart_select_all')} ({checkedCount})
-                        </span>
-                    </label>
+                    {cartItems.length > 0 && (
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                            <Checkbox 
+                                checked={allChecked} 
+                                onChange={(e) => toggleAllChecks(e.target.checked)}
+                                className="[&_.ant-checkbox-inner]:border-slate-300 dark:[&_.ant-checkbox-inner]:border-white/20 [&_.ant-checkbox-checked_.ant-checkbox-inner]:bg-yellow-500 [&_.ant-checkbox-checked_.ant-checkbox-inner]:border-yellow-500"
+                            />
+                            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors uppercase tracking-widest pt-0.5">
+                                {t('cart_select_all')} ({checkedCount})
+                            </span>
+                        </label>
+                    )}
                 </div>
                 
                 <div className="space-y-6">
-                    {cartItems.map((item) => (
-                        <CartItem 
-                            key={item.id} 
-                            item={item} 
-                            updateQuantity={updateQuantity}
-                            removeItem={removeItem}
-                            moveToWishlist={moveToWishlist}
-                            toggleItemCheck={toggleItemCheck}
-                            t={t}
-                        />
-                    ))}
+                    {isLoadingCart ? (
+                        [1, 2, 3].map(idx => (
+                            <Skeleton key={idx} className="w-full h-[160px] rounded-3xl" />
+                        ))
+                    ) : (
+                        cartItems.map((item) => (
+                            <CartItem 
+                                key={item.id} 
+                                item={item} 
+                                updateQuantity={updateQuantity}
+                                removeItem={removeItem}
+                                moveToWishlist={moveToWishlist}
+                                toggleItemCheck={toggleItemCheck}
+                                t={t}
+                            />
+                        ))
+                    )}
                 </div>
             </div>
 

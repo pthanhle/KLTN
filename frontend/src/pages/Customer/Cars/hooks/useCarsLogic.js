@@ -8,12 +8,12 @@ export const useCarsLogic = () => {
 
     const [isLoading, setIsLoading] = useState(true);
     const [isFiltering, setIsFiltering] = useState(false);
-    
+
     // UI states
     const [cars, setCars] = useState([]);
     const [totalCars, setTotalCars] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    
+
     // Filters state
     const [filters, setFilters] = useState({
         keyword: '',
@@ -30,15 +30,15 @@ export const useCarsLogic = () => {
     // Reset filters and sync with URL when route changes
     useEffect(() => {
         if (brandName) {
-            setFilters(prev => ({ 
-                ...prev, 
-                brandIds: [brandName.toLowerCase()] 
+            setFilters(prev => ({
+                ...prev,
+                brandIds: [brandName.toLowerCase()]
             }));
         } else {
             // Keep brandIds empty if on `/cars` root
-            setFilters(prev => ({ 
-                ...prev, 
-                brandIds: [] 
+            setFilters(prev => ({
+                ...prev,
+                brandIds: []
             }));
         }
     }, [brandName]);
@@ -46,7 +46,7 @@ export const useCarsLogic = () => {
     // Data Fetching logic (debounced implicitly by button click or setTimeout)
     useEffect(() => {
         let isMounted = true;
-        
+
         setIsFiltering(true);
         if (cars.length === 0) setIsLoading(true);
 
@@ -82,7 +82,7 @@ export const useCarsLogic = () => {
             } else if (sort === 'priceDesc') {
                 result.sort((a, b) => b.price - a.price);
             } else {
-                result.sort((a, b) => b.id - a.id); // Default newest
+                result.sort((a, b) => b.id - a.id);
             }
 
             // 6. Pagination
@@ -142,7 +142,7 @@ export const useCarsLogic = () => {
 
     const handlePageChange = (page) => setCurrentPage(page);
     const handleSortChange = (value) => setSort(value);
-    
+
     return {
         brandNameParam: brandName,
         isLoading,

@@ -7,7 +7,7 @@ const Navigation = () => {
 
     const NAV_LINKS = [
         { name: t('customer.header.home'), path: '/' },
-        { name: t('customer.header.categories'), path: '/products' },
+        { name: t('customer.header.categories'), path: '/brands' },
         { name: t('customer.header.products'), path: '/cars' },
         { name: t('customer.header.parts'), path: '/parts' },
         { name: t('customer.header.services'), path: '/services' },
@@ -18,8 +18,8 @@ const Navigation = () => {
     return (
         <nav className="flex items-center gap-8 xl:gap-10">
             {NAV_LINKS.map((link) => {
-                const isActive = 
-                    location.pathname === link.path || 
+                const isActive =
+                    location.pathname === link.path ||
                     (link.path !== '/' && location.pathname.startsWith(link.path)) ||
                     (link.path === '/cars' && location.pathname.startsWith('/brand/'));
                 return (
@@ -27,8 +27,8 @@ const Navigation = () => {
                         key={link.name}
                         to={link.path}
                         className={`text-[13px] font-bold flex items-center gap-1.5 whitespace-nowrap transition-colors relative group py-2 h-full ${isActive
-                                ? '!text-yellow-500 dark:!text-yellow-500'
-                                : '!text-slate-900 dark:!text-white hover:!text-yellow-500 dark:hover:!text-yellow-400'
+                            ? '!text-yellow-500 dark:!text-yellow-500'
+                            : '!text-slate-900 dark:!text-white hover:!text-yellow-500 dark:hover:!text-yellow-400'
                             }`}
                     >
                         {link.name}

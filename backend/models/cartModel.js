@@ -1,42 +1,43 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const cartItemSchema = new mongoose.Schema(
   {
-    product_id: {
+    part: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: 'Part',
       required: true,
     },
-    name: { type: String },
-    sku: { type: String },
-    image: { type: String },
-    unit_price: { type: Number },
     quantity: {
       type: Number,
       required: true,
       min: 1,
+      default: 1
     },
+    selected_options: {
+      type: Map,
+      of: String,
+      default: {}
+    }
   },
-  { _id: false }
-)
+  { _id: true, timestamps: true } // Mongoose will automatically generate an _id for each item in the array, helpful for uniquely identifying items with different options
+);
 
-const cartSchema = mongoose.Schema(
+const cartSchema = new mongoose.Schema(
   {
-    user_id: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
       unique: true,
     },
-    items: { type: [cartItemSchema], default: [] },
+    items: {
+      type: [cartItemSchema],
+      default: []
+    }
   },
   {
     timestamps: true,
   }
-)
+);
 
-cartSchema.index({ user_id: 1 }, { unique: true })
-
-const Cart = mongoose.model('Cart', cartSchema)
-
-export default Cart
+export default mongoose.model('Cart', cartSchema);

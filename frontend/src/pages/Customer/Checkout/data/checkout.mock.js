@@ -1,4 +1,4 @@
-import { MOCK_PROFILE_CUSTOMER } from '../../../Shared/Profile/data/profile.mock';
+
 import { MOCK_PARTS } from '../../Parts/data/parts.mock';
 
 export const mockCartItems = [
@@ -56,28 +56,7 @@ export const mockBuyNowItem = {
     checked: true
 };
 
-export const mockCities = [
-    { value: 'hcm', label: 'Hồ Chí Minh' },
-    { value: 'hn', label: 'Hà Nội' },
-    { value: 'dn', label: 'Đà Nẵng' },
-];
 
-export const mockDistricts = {
-    hcm: [
-        { value: 'q1', label: 'Quận 1' },
-        { value: 'q7', label: 'Quận 7' },
-        { value: 'td', label: 'Thủ Đức' },
-    ],
-    hn: [
-        { value: 'hk', label: 'Hoàn Kiếm' },
-        { value: 'bd', label: 'Ba Đình' },
-        { value: 'cg', label: 'Cầu Giấy' },
-    ],
-    dn: [
-        { value: 'hc', label: 'Hải Châu' },
-        { value: 'st', label: 'Sơn Trà' },
-    ]
-};
 
 export const mockShippingMethods = [
     { id: 'economy', label: 'Tiết kiệm', desc: '5-7 ngày làm việc', price: 0, priceLabel: 'Miễn phí' },
@@ -92,11 +71,4 @@ export const mockPaymentMethods = [
     { id: 'cod', label: 'Thanh toán khi nhận hàng (COD)', tags: [] },
 ];
 
-export const mockUserProfile = {
-    full_name: MOCK_PROFILE_CUSTOMER.full_name,
-    phone: MOCK_PROFILE_CUSTOMER.phone,
-    email: MOCK_PROFILE_CUSTOMER.email,
-    city: 'hcm',
-    district: 'q1',
-    address: MOCK_PROFILE_CUSTOMER.address
-};
+

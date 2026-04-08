@@ -8,6 +8,7 @@ import { BrandFormFooter } from './components/BrandFormFooter';
 import { BrandNameField } from './components/BrandNameField';
 import { BrandIdField } from './components/BrandIdField';
 import { BrandLogoDragger } from './components/BrandLogoDragger';
+import { BrandPartnerSwitch } from './components/BrandPartnerSwitch';
 
 export const BrandFormModal = ({ isOpen, onClose, onSave, editingData, t }) => {
     // Tách riêng logic xử lý State Data
@@ -45,6 +46,7 @@ export const BrandFormModal = ({ isOpen, onClose, onSave, editingData, t }) => {
                 <BrandNameField t={t} />
                 <BrandIdField isEditing={isEditing} t={t} />
                 <BrandLogoDragger t={t} />
+                <BrandPartnerSwitch t={t} />
 
                 <BrandFormFooter onClose={onClose} isEditing={isEditing} t={t} />
             </Form>

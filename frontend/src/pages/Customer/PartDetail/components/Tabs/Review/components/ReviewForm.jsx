@@ -69,7 +69,7 @@ export const ReviewForm = ({ part, selectedOptions, t }) => {
                             </Button>
                         </Tooltip>
                     </Upload>
-                    <Button type="primary" loading={isSubmittingReview} onClick={handleReviewSubmit} disabled={rating === 0 || !comment.trim()} className="!bg-slate-900 dark:!bg-yellow-500 !text-white dark:!text-black !px-8 !py-3 !h-auto !rounded-xl !font-bold border-0 hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20 dark:shadow-yellow-500/20 disabled:hover:scale-100 transition-all w-full sm:w-auto">
+                    <Button type="primary" loading={isSubmittingReview} onClick={handleReviewSubmit} className="!bg-slate-900 dark:!bg-yellow-500 !text-white dark:!text-black !px-8 !py-3 !h-auto !rounded-xl !font-bold border-0 hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20 dark:shadow-yellow-500/20 transition-all w-full sm:w-auto">
                         {t('btn_submit_review', 'Gửi đánh giá')}
                     </Button>
                 </div>

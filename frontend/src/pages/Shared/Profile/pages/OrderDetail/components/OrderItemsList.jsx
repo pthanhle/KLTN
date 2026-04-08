@@ -11,7 +11,7 @@ export const OrderItemsList = ({ items, isCompleted, handleReview, formatCurrenc
             </div>
             <div className="divide-y divide-slate-100 dark:divide-white/5">
                 {items.map((item) => (
-                    <div key={item.id} className="p-6 flex flex-col sm:flex-row items-center gap-6 group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                    <div key={item._id} className="p-6 flex flex-col sm:flex-row items-center gap-6 group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                         <div className="w-32 h-24 bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden flex-shrink-0">
                             <Image 
                                 alt={item.name} 
@@ -41,7 +41,7 @@ export const OrderItemsList = ({ items, isCompleted, handleReview, formatCurrenc
                                 </p>
                             )}
                             <p className="text-xl font-extrabold text-slate-900 dark:text-white">
-                                {formatCurrency(item.price)}
+                                {formatCurrency(item.unit_price)}
                             </p>
                             
                             {isCompleted && (

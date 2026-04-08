@@ -1,6 +1,6 @@
 import asyncHandler from 'express-async-handler'
 import Order from '../../models/orderModel.js'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 import Cart from '../../models/cartModel.js'
 import Notification from '../../models/notificationModel.js'
 import mongoose from 'mongoose'
@@ -11,7 +11,6 @@ const generateOrderCode = () => {
   return `ORD-${datePart}-${rand}`
 }
 
-
 export const getMyOrders = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1
   const limit = parseInt(req.query.limit) || 10
@@ -20,7 +19,7 @@ export const getMyOrders = asyncHandler(async (req, res) => {
   const query = { user_id: req.user._id }
   if (order_type) query.order_type = order_type
   if (order_status) query.order_status = order_status
-  if (payment_status) query.payment_status = payment_status
+  if (payment_status) query['payment.status'] = payment_status
 
   const total = await Order.countDocuments(query)
   const orders = await Order.find(query)
@@ -34,7 +33,6 @@ export const getMyOrders = asyncHandler(async (req, res) => {
     pagination: { page, limit, total, pages: Math.ceil(total / limit) }
   })
 })
-
 
 export const getOrderById = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -56,11 +54,9 @@ export const getOrderById = asyncHandler(async (req, res) => {
   res.json(order)
 })
 
-
 export const createOrder = asyncHandler(async (req, res) => {
   const {
-    items, payment_method, order_type,
-    shipping_fee, discount_amount, customer_info,
+    financials, payment, shipping, delivery, items, order_type, vat_info, cancel_reason
   } = req.body
 
   if (!items || items.length === 0) {
@@ -68,66 +64,103 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new Error('Đơn hàng phải có ít nhất một sản phẩm')
   }
 
-  if (!payment_method) {
+  if (!payment || !payment.method) {
     res.status(400)
     throw new Error('Vui lòng chọn phương thức thanh toán')
   }
 
-  const productIds = items.map(i => i.product_id).filter(id => mongoose.Types.ObjectId.isValid(id))
-  const dbProducts = await Product.find({ _id: { $in: productIds } }).lean()
-  const productMap = Object.fromEntries(dbProducts.map(p => [p._id.toString(), p]))
+  const partIds = items.map(i => i.part_id).filter(id => mongoose.Types.ObjectId.isValid(id))
+  const dbParts = await Part.find({ _id: { $in: partIds } }).lean()
+  const partMap = Object.fromEntries(dbParts.map(p => [p._id.toString(), p]))
 
-  let subtotal = 0
-  const orderItems = items.map(item => {
-    const p = productMap[item.product_id]
-    if (!p) throw Object.assign(new Error(`Sản phẩm ${item.product_id} không tồn tại`), { status: 404 })
-    if (p.stock < item.quantity) throw Object.assign(new Error(`Sản phẩm "${p.product_name}" không đủ hàng`), { status: 400 })
+  let computedSubtotal = 0
+  const orderItems = []
+
+  for (const item of items) {
+    const p = partMap[item.part_id]
+    if (!p) {
+      return res.status(404).json({
+        message: `Sản phẩm có ID ${item.part_id} không tồn tại (Có thể đã bị xóa). Vui lòng cập nhật lại giỏ hàng!`,
+        error_type: "INVALID_CART"
+      })
+    }
+
+    const currentStock = p.inventory?.warehouse + p.inventory?.showroom || 0
+    if (currentStock < item.quantity) {
+      return res.status(400).json({
+        message: `Sản phẩm "${p.name}" chỉ còn ${currentStock} cái trong kho, không đủ số lượng ${item.quantity}!`,
+        error_type: "OUT_OF_STOCK"
+      })
+    }
 
     const unit_price = p.price
     const total_price = unit_price * item.quantity
-    subtotal += total_price
+    computedSubtotal += total_price
 
-    return {
-      product_id: p._id,
+    orderItems.push({
+      part_id: p._id,
       sku: p.sku,
-      name: p.product_name,
+      name: p.name,
       image: p.images?.[0] || '',
+      properties: item.properties || p.description || '',
       quantity: item.quantity,
+      original_price: item.original_price || p.original_price || null,
       unit_price,
       total_price,
-    }
-  })
-
-  const fee = Number(shipping_fee || 0)
-  const discount = Number(discount_amount || 0)
-  const total_amount = subtotal + fee - discount
-
-  const resolvedCustomerInfo = customer_info || {
-    full_name: req.user.full_name,
-    phone: req.user.phone,
-    address: req.user.address,
-    email: req.user.email,
+      selected_options: item.selected_options || {},
+      is_reviewed: false
+    })
   }
 
+
+  const order_code_gen = generateOrderCode()
+
+  const final_total = financials?.grand_total && typeof financials.grand_total === 'number'
+    ? financials.grand_total
+    : computedSubtotal
+
   const order = await Order.create({
-    order_code: generateOrderCode(),
+    order_code: order_code_gen,
     user_id: req.user._id,
-    customer_info: resolvedCustomerInfo,
     order_type: order_type || 'ACCESSORIES',
-    items: orderItems,
-    shipping_fee: fee,
-    discount_amount: discount,
-    total_amount,
-    payment_method,
-    payment_status: 'UNPAID',
     order_status: 'PENDING',
+    cancel_reason: cancel_reason || null,
+    financials: {
+      subtotal: financials?.subtotal || computedSubtotal,
+      shipping_fee: financials?.shipping_fee || 0,
+      discount: financials?.discount || 0,
+      vat: financials?.vat || 0,
+      grand_total: final_total
+    },
+    payment: {
+      method: payment.method,
+      method_name: payment.method_name || '',
+      card_tail: payment.card_tail || '',
+      transaction_id: payment.transaction_id || '',
+      status: payment.status || 'UNPAID'
+    },
+    shipping: {
+      provider: shipping?.provider || '',
+      tracking_code: shipping?.tracking_code || '',
+      estimated_delivery: shipping?.estimated_delivery || ''
+    },
+    delivery: {
+      receiver_name: delivery?.receiver_name || req.user.full_name,
+      phone: delivery?.phone || req.user.phone,
+      email: delivery?.email || req.user.email,
+      masked_email: delivery?.masked_email || '',
+      address: delivery?.address || req.user.address || '',
+      note: delivery?.note || ''
+    },
+    vat_info: vat_info || null,
+    items: orderItems,
     order_date: new Date(),
   })
 
   await Promise.all(
     orderItems.map(item =>
-      Product.findByIdAndUpdate(item.product_id, {
-        $inc: { stock: -item.quantity }
+      Part.findByIdAndUpdate(item.part_id, {
+        $inc: { 'inventory.warehouse': -item.quantity }
       })
     )
   )
@@ -181,7 +214,7 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     throw new Error('Không thể hủy đơn hàng ở trạng thái này')
   }
 
-  if (order.payment_status === 'PAID') {
+  if (order.payment?.status === 'PAID') {
     res.status(400)
     throw new Error('Đơn hàng đã thanh toán, không thể hủy trực tiếp')
   }
@@ -191,8 +224,8 @@ export const cancelOrder = asyncHandler(async (req, res) => {
 
   await Promise.all(
     order.items.map(item =>
-      Product.findByIdAndUpdate(item.product_id, {
-        $inc: { stock: item.quantity }
+      Part.findByIdAndUpdate(item.part_id, {
+        $inc: { 'inventory.warehouse': item.quantity }
       })
     )
   )
@@ -229,7 +262,10 @@ export const updatePaymentStatus = asyncHandler(async (req, res) => {
     throw new Error('Không tìm thấy đơn hàng')
   }
 
-  if (payment_status) order.payment_status = payment_status
+  if (payment_status) {
+    if (!order.payment) order.payment = {};
+    order.payment.status = payment_status;
+  }
   if (invoice_url) order.invoice_url = invoice_url
 
   if (payment_status === 'PAID' && order.order_status === 'PENDING') {

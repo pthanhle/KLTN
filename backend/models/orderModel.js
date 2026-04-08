@@ -1,36 +1,28 @@
 import mongoose from 'mongoose'
 
-const customerInfoSchema = new mongoose.Schema(
+const itemsSchema = new mongoose.Schema(
   {
-    full_name: { type: String },
-    phone: { type: String },
-    address: { type: String },
-    email: { type: String },
-  },
-  { _id: false }
-)
-
-const trackingInfoSchema = new mongoose.Schema(
-  {
-    provider: { type: String },
-    tracking_code: { type: String },
-  },
-  { _id: false }
-)
-
-const orderItemSchema = new mongoose.Schema(
-  {
-    product_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true,
-    },
+    part_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Part', required: true },
     sku: { type: String },
     name: { type: String },
     image: { type: String },
-    quantity: { type: Number, required: true, min: 1 },
+    properties: { type: String },
+    quantity: { type: Number, required: true },
+    original_price: { type: Number },
     unit_price: { type: Number, required: true },
     total_price: { type: Number, required: true },
+    selected_options: { type: mongoose.Schema.Types.Mixed },
+    is_reviewed: { type: Boolean, default: false }
+  },
+  { _id: false }
+)
+
+const vatInfoSchema = new mongoose.Schema(
+  {
+    is_requested: { type: Boolean, default: false },
+    company_name: { type: String },
+    tax_code: { type: String },
+    company_address: { type: String },
   },
   { _id: false }
 )
@@ -43,37 +35,52 @@ const orderSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    customer_info: { type: customerInfoSchema },
-
     order_type: {
       type: String,
-      enum: ['CAR_PURCHASE', 'ACCESSORIES',],
+      enum: ['CAR_PURCHASE', 'ACCESSORIES'],
       default: 'ACCESSORIES',
-    },
-
-    items: { type: [orderItemSchema], default: [] },
-
-    shipping_fee: { type: Number, default: 0 },
-    discount_amount: { type: Number, default: 0 },
-    total_amount: { type: Number, required: true },
-
-    payment_method: {
-      type: String,
-      enum: ['CASH', 'BANK_TRANSFER', 'CARD', 'E_WALLET'],
-      required: true,
-    },
-    payment_status: {
-      type: String,
-      enum: ['UNPAID', 'PAID', 'REFUNDED', 'PARTIAL'],
-      default: 'UNPAID',
     },
     order_status: {
       type: String,
-      enum: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'COMPLETED', 'CANCELLED',],
+      enum: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED'],
       default: 'PENDING',
     },
+    cancel_reason: { type: String },
 
-    tracking_info: { type: trackingInfoSchema },
+    financials: {
+      subtotal: { type: Number },
+      shipping_fee: { type: Number },
+      discount: { type: Number },
+      vat: { type: Number },
+      grand_total: { type: Number, required: true },
+    },
+
+    payment: {
+      method: { type: String, required: true },
+      method_name: { type: String },
+      card_tail: { type: String },
+      transaction_id: { type: String },
+      status: { type: String, enum: ['UNPAID', 'PAID', 'REFUNDED', 'PARTIAL'], default: 'UNPAID' },
+    },
+
+    shipping: {
+      provider: { type: String },
+      tracking_code: { type: String },
+      estimated_delivery: { type: String },
+    },
+
+    delivery: {
+      receiver_name: { type: String, required: true },
+      phone: { type: String, required: true },
+      email: { type: String },
+      masked_email: { type: String },
+      address: { type: String, required: true },
+      note: { type: String },
+    },
+
+    vat_info: { type: vatInfoSchema },
+
+    items: { type: [itemsSchema], default: [] },
 
     invoice_url: { type: String, default: null },
 

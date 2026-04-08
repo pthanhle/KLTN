@@ -2,12 +2,23 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { adminPartApi } from '../api/adminPart.api';
 import { App } from 'antd';
 import { useNavigate } from 'react-router-dom';
-
-// ----------------------------------------
-// HOOKS CHO BẢNG DANH SÁCH (PARTS INDEX)
-// ----------------------------------------
+import { useEffect } from 'react';
 
 export const useAdminPartsData = (queryParams = {}) => {
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        const bc = new BroadcastChannel('kltn_sync_channel');
+        bc.onmessage = (event) => {
+            if (event.data?.type === 'PARTS_UPDATED') {
+                queryClient.invalidateQueries({ queryKey: ['admin_parts'] });
+            } else if (event.data?.type === 'FILTERS_UPDATED') {
+                queryClient.invalidateQueries({ queryKey: ['admin_parts_filters'] });
+            }
+        };
+        return () => bc.close();
+    }, [queryClient]);
+
     const partsQuery = useQuery({
         queryKey: ['admin_parts', queryParams],
         queryFn: () => adminPartApi.getAllParts(queryParams),
@@ -28,6 +39,7 @@ export const useAdminPartsData = (queryParams = {}) => {
         isLoadingParts: partsQuery.isLoading,
         categories: filtersQuery.data?.categories || [],
         brands: filtersQuery.data?.brands || [],
+        conditions: filtersQuery.data?.conditions || [],
         isLoadingFilters: filtersQuery.isLoading,
         refetchParts: partsQuery.refetch
     };
@@ -102,6 +114,16 @@ export const useAdminSinglePartData = (id, t) => {
     const navigate = useNavigate();
     const { message } = App.useApp();
 
+    useEffect(() => {
+        const bc = new BroadcastChannel('kltn_sync_channel');
+        bc.onmessage = (event) => {
+            if (event.data?.type === 'FILTERS_UPDATED') {
+                queryClient.invalidateQueries({ queryKey: ['admin_parts_filters'] });
+            }
+        };
+        return () => bc.close();
+    }, [queryClient]);
+
     const partQuery = useQuery({
         queryKey: ['admin_part', id],
         queryFn: () => adminPartApi.getPartById(id),
@@ -133,15 +155,28 @@ export const useAdminSinglePartData = (id, t) => {
         onSuccess: (data, variables) => {
             const { action } = variables;
             queryClient.invalidateQueries({ queryKey: ['admin_parts'] });
+            try {
+                const bc = new BroadcastChannel('kltn_sync_channel');
+                bc.postMessage({ type: 'PARTS_UPDATED', timestamp: Date.now() });
+                bc.close();
+            } catch (e) {
+                console.warn('BroadcastChannel not supported', e);
+            }
+
+            const editedId = data.data?._id || data._id || data.id || id;
 
             if (action === 'draft') {
                 message.success('Đã lưu bản nháp an toàn!');
-                navigate('/admin/parts');
+                if (!isEditMode) navigate(`/admin/parts/edit/${editedId}`, { replace: true });
+            } else if (action === 'apply') {
+                message.success(t('common:saveSuccess', 'Đã lưu thay đổi!'));
+                if (!isEditMode) navigate(`/admin/parts/edit/${editedId}`, { replace: true });
             } else if (action === 'duplicate') {
                 message.success('Nhân bản thành công! Hãy tiếp tục chỉnh sửa bản sao.');
-                navigate(`/admin/parts/edit/${data.id}`);
+                navigate(`/admin/parts/edit/${editedId}`);
             } else {
-                message.success(t('common:saveSuccess', 'Đã lưu thành công!'));
+                // Default 'save' redirect to list
+                message.success(t('common:saveSuccess', 'Đã đăng thành công!'));
                 navigate('/admin/parts');
             }
         },
@@ -150,10 +185,27 @@ export const useAdminSinglePartData = (id, t) => {
         }
     });
 
+    const notifyFiltersChanged = () => {
+        try {
+            const bc = new BroadcastChannel('kltn_sync_channel');
+            bc.postMessage({ type: 'FILTERS_UPDATED', timestamp: Date.now() });
+            bc.close();
+        } catch (e) { }
+    };
+
     const createBrandMutation = useMutation({
         mutationFn: adminPartApi.createPartBrand,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin_parts_filters'] });
+            notifyFiltersChanged();
+        }
+    });
+
+    const createConditionMutation = useMutation({
+        mutationFn: adminPartApi.createPartCondition,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin_parts_filters'] });
+            notifyFiltersChanged();
         }
     });
 
@@ -162,9 +214,11 @@ export const useAdminSinglePartData = (id, t) => {
         isLoadingPart: partQuery.isLoading && isEditMode,
         categories: filtersQuery.data?.categories || [],
         brands: filtersQuery.data?.brands || [],
+        conditions: filtersQuery.data?.conditions || [],
         savePart: saveMutation.mutate,
         isSaving: saveMutation.isPending,
         createBrandAsync: createBrandMutation.mutateAsync,
+        createConditionAsync: createConditionMutation.mutateAsync,
         isEditMode
     };
 };

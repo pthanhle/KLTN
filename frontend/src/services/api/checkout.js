@@ -1,45 +1,28 @@
+import axiosClient from '../../utils/axiosClient';
+
 export const CheckoutAPI = {
-    // API GET - Lấy danh sách sản phẩm trong giỏ hàng
     getCartItems: async () => {
-        await new Promise(resolve => setTimeout(resolve, 500)); // Giả lập ping
-        // Hiện tại trả về từ mock data, sau này thay bằng axios.get('/cart')
-        return []; 
+        const response = await axiosClient.get('/client/cart');
+        return response.data.items;
     },
 
-    // API POST - Nộp đơn hàng
     submitOrder: async (payload) => {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        console.log('[API Global Service] => Đã gửi Order:', payload);
-        return {
-            status: 200,
-            success: true,
-            data: payload
-        };
+        const res = await axiosClient.post('/client/orders', payload);
+        return res;
     },
 
-    // API POST - Chuyển sang danh sách yêu thích
-    moveToWishlist: async (id) => {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        return { success: true };
+    moveToWishlist: async (payload) => {
+        const res = await axiosClient.post('/client/wishlist/toggle', payload);
+        return res;
     },
 
-    // API VERIFY - Áp dụng mã giảm giá
     applyPromoCode: async (code) => {
-        await new Promise(resolve => setTimeout(resolve, 600));
-        return { valid: true, discount: 10 }; // Giả định Giảm 10%
+        const res = await axiosClient.post('/client/cart/apply-promo', { code });
+        return res;
     },
 
-    // API GET - Lấy thông tin tài khoản người dùng đổ vào Form
     getUserProfile: async () => {
-        await new Promise(resolve => setTimeout(resolve, 400));
-        // Đáng lẽ import từ file data, nhưng mình mock trực tiếp ở API layer để render hook
-        return {
-            full_name: 'Nguyễn Văn Định',
-            phone: '0901234567',
-            email: 'dinh.nguyen.sv@gmail.com',
-            city: 'hcm',
-            district: 'q7',
-            address: '123 Đường Nam Kỳ Khởi Nghĩa, Phường 3'
-        };
+        const data = await axiosClient.get('/client/profile');
+        return data || null;
     }
 };

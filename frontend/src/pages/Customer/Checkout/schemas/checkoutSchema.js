@@ -20,6 +20,9 @@ export const getCheckoutSchema = (t) => {
         district: z.string({ required_error: t('val_required', 'Vui lòng chọn Quận/Huyện') })
             .min(1, { message: t('val_required', 'Vui lòng chọn Quận/Huyện') }),
             
+        ward: z.string({ required_error: t('val_required', 'Vui lòng chọn Phường/Xã') })
+            .min(1, { message: t('val_required', 'Vui lòng chọn Phường/Xã') }),
+            
         address: z.string()
             .min(1, { message: t('val_required', 'Vui lòng nhập địa chỉ cụ thể') })
             .min(5, { message: t('val_address_min', 'Địa chỉ quá ngắn') })

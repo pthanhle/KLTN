@@ -26,25 +26,23 @@ const OrderCard = ({ order, t }) => {
                 </Tag>
             </div>
 
-            {/* Item List Component */}
             <OrderItemList items={order.items} t={t} formatCurrency={formatCurrency} />
 
-            {/* Card Footer */}
             <div className="flex flex-wrap items-center justify-between pt-6 border-t border-slate-50 dark:border-white/5 gap-4">
                 <div>
                     <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">
                         {t('order_total_lbl', 'Tổng thanh toán')}
                     </p>
                     <p className="text-[20px] font-black text-slate-900 dark:text-white">
-                        {formatCurrency(order.total_amount)}
+                        {formatCurrency(order.financials?.grand_total)}
                     </p>
                     {isPaid ? (
                         <p className="text-[11px] text-green-500 font-bold mt-1 uppercase tracking-wider">
-                            {t('order_paid_msg', 'Đã thanh toán')} ({t(`pay_method_${order.payment_method?.toLowerCase()}`, order.payment_method)})
+                            {t('order_paid_msg', 'Đã thanh toán')} ({t(`pay_method_${order.payment?.method?.toLowerCase()}`, order.payment?.method)})
                         </p>
                     ) : (
                         <p className="text-[11px] text-orange-500 font-bold mt-1 uppercase tracking-wider">
-                            {t('order_unpaid_msg', 'Chờ thanh toán')} ({t(`pay_method_${order.payment_method?.toLowerCase()}`, order.payment_method)})
+                            {t('order_unpaid_msg', 'Chờ thanh toán')} ({t(`pay_method_${order.payment?.method?.toLowerCase()}`, order.payment?.method)})
                         </p>
                     )}
                 </div>
@@ -61,8 +59,8 @@ const OrderCard = ({ order, t }) => {
                         </Tooltip>
                     )}
 
-                    {isShipping && order.tracking_info && (
-                        <Tooltip title={`${order.tracking_info.provider} - ${order.tracking_info.tracking_code}`}>
+                    {(isShipping || order.order_status === 'DELIVERED') && order.shipping?.tracking_code && (
+                        <Tooltip title={`${order.shipping.provider} - ${order.shipping.tracking_code}`}>
                             <Button
                                 type="text"
                                 className="!h-10 !px-4 !rounded-full !text-blue-500 hover:!bg-blue-50 dark:hover:!bg-blue-500/10 transition-colors flex items-center gap-2 font-bold text-sm"

@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useAdminBrandsMutations } from '../../../../services/queries/brandQueries';
 
-export const useBrandsForm = (setBrands, messageApi, t) => {
+export const useBrandsForm = (messageApi, t) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBrand, setEditingBrand] = useState(null);
+    const { createBrand, updateBrand, isCreating, isUpdating } = useAdminBrandsMutations();
 
     const handleAddBrand = () => {
         setEditingBrand(null);
@@ -14,16 +16,19 @@ export const useBrandsForm = (setBrands, messageApi, t) => {
         setIsModalOpen(true);
     };
 
-    const handleSaveBrand = (values) => {
-        if (editingBrand) {
-            setBrands(prev => prev.map(b => b.id === editingBrand.id ? { ...b, ...values } : b));
-            messageApi.success(t('adminBrands:msgUpdateSuccess', 'Cập nhật thương hiệu thành công!'));
-        } else {
-            const newBrand = { ...values, count: 0 };
-            setBrands(prev => [newBrand, ...prev]);
-            messageApi.success(t('adminBrands:msgCreateSuccess', 'Thêm mới thương hiệu thành công!'));
+    const handleSaveBrand = async (values) => {
+        try {
+            if (editingBrand) {
+                await updateBrand({ id: editingBrand.id, data: values });
+                messageApi.success(t('adminBrands:msgUpdateSuccess', 'Cập nhật thương hiệu thành công!'));
+            } else {
+                await createBrand(values);
+                messageApi.success(t('adminBrands:msgCreateSuccess', 'Thêm mới thương hiệu thành công!'));
+            }
+            setIsModalOpen(false);
+        } catch (error) {
+            messageApi.error(error.response?.data?.message || 'Có lỗi xảy ra khi lưu thương hiệu');
         }
-        setIsModalOpen(false);
     };
 
     return {
@@ -32,6 +37,7 @@ export const useBrandsForm = (setBrands, messageApi, t) => {
         editingBrand,
         handleAddBrand,
         handleEditBrand,
-        handleSaveBrand
+        handleSaveBrand,
+        isSaving: isCreating || isUpdating
     };
 };

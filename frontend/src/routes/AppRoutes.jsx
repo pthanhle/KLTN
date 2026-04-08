@@ -72,7 +72,7 @@ const AppRoutes = () => {
                     <Route element={<ProtectedRoute allowedRoles={['customer', 'guest']} />}>
                         <Route path="/" element={<Home />} />
                         <Route path="/contact" element={<ContactPage />} />
-                        <Route path="/products" element={<ProductsPage />} />
+                        <Route path="/brands" element={<ProductsPage />} />
                         <Route path="/cars" element={<CarsPage />} />
                         <Route path="/cars/:id" element={<CarDetailPage />} />
                         <Route path="/brand/:brandName" element={<CarsPage />} />

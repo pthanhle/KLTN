@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 
 const StickyNav = ({ t }) => {
     const { scrollY } = useScroll();
-    const y = useTransform(scrollY, [0, 100], [0, -100]); // Adjust these values as needed
+    const y = useTransform(scrollY, [0, 100], [0, -100]);
 
     const navItems = [
         { id: 'price-color', label: t('products:detail.priceColor') },
@@ -31,7 +31,7 @@ const StickyNav = ({ t }) => {
                     .car-nav-link.active-nav { color: #ca8a04 !important; border-bottom-color: #ca8a04 !important; }
                     html.dark .car-nav-link.active-nav { color: #eab308 !important; border-bottom-color: #eab308 !important; }
                 `}</style>
-                <div className="container mx-auto px-10 max-w-[1440px] flex items-center justify-between">
+                <div className="container mx-auto px-10 max-w-[1440px] flex items-center justify-center">
                     <ul className="flex items-center gap-8 xl:gap-14">
                         {navItems.map((item) => (
                             <li key={item.id}>
@@ -39,7 +39,7 @@ const StickyNav = ({ t }) => {
                                     to={item.id}
                                     spy={true}
                                     smooth={true}
-                                    offset={-136} // 72px header + 64px sticky nav
+                                    offset={-136}
                                     duration={600}
                                     className="car-nav-link inline-block py-5 text-[13px] font-bold uppercase tracking-widest cursor-pointer transition-all border-b-2"
                                     activeClass="active-nav"
@@ -49,14 +49,6 @@ const StickyNav = ({ t }) => {
                             </li>
                         ))}
                     </ul>
-                    <div className="flex gap-4 items-center">
-                        <button className="hidden md:flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">
-                            {t('hero.testDrive')}
-                        </button>
-                        <button className="bg-white text-black px-6 md:px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-slate-200 transition-colors">
-                            {t('hero.buyNow')}
-                        </button>
-                    </div>
                 </div>
             </motion.div>
         </>

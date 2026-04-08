@@ -12,6 +12,7 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
             name: '',
             sku: '',
             category: null,
+            condition: 'new',
             original_price: 0,
             price: 0,
             status: 'active',
@@ -32,10 +33,18 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
 
     useEffect(() => {
         if (isEditMode && initialData) {
+            
+            // Map the choices if they are objects, convert them to strings for the UI tags
+            const mappedOptions = (initialData.options || []).map(opt => ({
+                ...opt,
+                choices: opt.choices?.map(c => typeof c === 'object' ? c.label : c) || []
+            }));
+
             reset({
                 ...initialData,
                 inventory: initialData.inventory || { warehouse: 0, showroom: 0 },
-                specs: initialData.specs || []
+                specs: initialData.specs || [],
+                options: mappedOptions
             });
         }
     }, [initialData, isEditMode, reset]);
@@ -60,12 +69,11 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
         
         // Ghi đè Status tuỳ theo nút được bấm
         if (action === 'draft') apiPayload.status = 'draft';
-        if (action === 'save' || action === 'duplicate') apiPayload.status = 'active';
+        if (action === 'save' || action === 'duplicate' || action === 'apply') {
+            apiPayload.status = 'active';
+        }
 
-        // No need to map Specs and Options to Objects anymore.
-        // The backend `partModel.js` and frontend `partSchema.js` natively expect Arrays of Objects:
-        // Specs: [{ label, value }]
-        // Options: [{ type, choices }]
+        // The backend `partModel.js` and frontend `partSchema.js` natively expect Arrays of Objects
         apiPayload.specs = data.specs || [];
         apiPayload.options = data.options || [];
 
@@ -76,6 +84,7 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
     return {
         formMethods,
         onSubmit: handleSubmit(submitWithAction('save')),
+        onApply: handleSubmit(submitWithAction('apply')),
         onDraft: handleSubmit(submitWithAction('draft')),
         onDuplicate: handleSubmit(submitWithAction('duplicate'))
     };

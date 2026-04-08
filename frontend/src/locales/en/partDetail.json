@@ -1,4 +1,6 @@
 {
+    "nav_home": "Home",
+    "nav_parts": "Parts",
     "in_stock": "{{count}} in stock",
     "out_of_stock": "Out of stock",
     "add_to_cart": "Add to cart",
@@ -28,6 +30,8 @@
     "btn_see_all_reviews": "See all reviews",
     "lbl_sku": "SKU",
     "lbl_brand": "Brand",
+    "lbl_condition": "Condition",
+    "cart_condition_new": "100% Brand New",
     "lbl_attribute": "Attribute",
     "lbl_detail_value": "Detail Value",
     "btn_preorder": "Pre-order",

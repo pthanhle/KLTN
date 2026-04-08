@@ -1,9 +1,12 @@
-import React, { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { App } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart, updateQuantity as updateReduxQuantity, toggleChecked, toggleAllChecks as toggleAllRedux } from '@/store/slices/cartSlice';
-import { addToWishlist } from '@/store/slices/wishlistSlice';
+import { toggleChecked, toggleAllChecks as toggleAllRedux, setCartItems, removeFromCart as removeFromReduxCart } from '@/store/slices/cartSlice';
+
+import { useGetCart, useUpdateCartItem, useRemoveFromCart } from '@/services/queries/clientCart.queries';
+import { useToggleWishlist } from '@/services/queries/clientWishlist.queries';
+
 import { useApplyPromoCode } from '../../../../services/queries/checkoutQueries';
 import { calculateSubtotal } from '../utils/calculator';
 
@@ -11,8 +14,20 @@ export const useCart = (t) => {
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const cartItems = useSelector(state => state.cart.items);
-    
+
+    // Wire up React Query hooks
+    const { data: serverCart, refetch: refetchCart, isLoading: isLoadingCart } = useGetCart();
+    const { mutate: updateApiQuantity } = useUpdateCartItem();
+    const { mutate: removeApiItem } = useRemoveFromCart();
+    const { mutate: toggleWishlist } = useToggleWishlist();
+
     const { message } = App.useApp();
+
+    useEffect(() => {
+        if (serverCart?.data?.items) {
+            dispatch(setCartItems(serverCart.data.items));
+        }
+    }, [serverCart, dispatch]);
 
     const checkedItems = useMemo(() => cartItems.filter(item => item.checked), [cartItems]);
     const subtotal = useMemo(() => calculateSubtotal(checkedItems), [checkedItems]);
@@ -32,15 +47,31 @@ export const useCart = (t) => {
         const item = cartItems.find(i => i.id === id);
         if (!item) return;
         const newQuantity = item.quantity + delta;
-        const maxStock = item.inventory ? (item.inventory.showroom + item.inventory.warehouse) : (item.stock || 99); 
+        const maxStock = item.inventory ? (item.inventory.showroom + item.inventory.warehouse) : (item.stock || 99);
+
         if (newQuantity >= 1 && newQuantity <= maxStock) {
-            dispatch(updateReduxQuantity({ id, quantity: newQuantity }));
+            updateApiQuantity({ item_id: id, quantity: newQuantity }, {
+                onError: (err) => {
+                    message.error(err.response?.data?.message || 'Không thể cập nhật số lượng');
+                    refetchCart(); // rollback on error
+                }
+            });
         }
     };
 
     const removeItem = (id) => {
-        dispatch(removeFromCart(id));
-        message.success(t('remove_success', "Đã xóa sản phẩm"));
+        // Optimistic UI update: Remove instantly so the user doesn't wait
+        dispatch(removeFromReduxCart(id));
+
+        removeApiItem(id, {
+            onSuccess: () => {
+                message.success(t('remove_success', "Đã xóa sản phẩm khỏi giỏ hàng."));
+            },
+            onError: (err) => {
+                message.error(err.response?.data?.message || 'Có lỗi khi xóa');
+                refetchCart(); // Rollback if API fails
+            }
+        });
     };
 
     const applyPromoMutation = useApplyPromoCode();
@@ -48,19 +79,16 @@ export const useCart = (t) => {
     const handleAddToWishlist = (id, name) => {
         const item = cartItems.find(i => i.id === id);
         if (item) {
-            dispatch(addToWishlist({
-                id: `p_${item.product_id || item.id}`,
-                product_id: item.product_id || item.id,
-                brand: item.brand || 'Phụ kiện',
-                name: item.name,
-                image: item.image,
-                price: item.price,
-                original_price: item.original_price,
-                stock_status: item.stock > 0 ? 'in_stock' : 'out_of_stock',
-                rating: item.rating || 5.0,
-                reviews_count: item.reviews_count || 0
-            }));
-            message.success({ content: t('move_wishlist_success', `Đã lưu "${name}" vào mục Yêu thích!`), key: 'wishlist' });
+            toggleWishlist(item.part_id, {
+                onSuccess: () => {
+                    message.success({ content: t('move_wishlist_success', `Đã chuyển "${name}" vào mục Yêu thích!`), key: 'wishlist' });
+                    // Remove from cart when moved to wishlist natively
+                    removeItem(item.id);
+                },
+                onError: (err) => {
+                    message.error(err.response?.data?.message || 'Lỗi lưu yêu thích');
+                }
+            });
         }
     };
 
@@ -75,6 +103,7 @@ export const useCart = (t) => {
 
     return {
         cartItems, checkedItems, subtotal, hasItems, hasCheckedItems,
-        toggleItemCheck, toggleAllChecks, updateQuantity, removeItem, moveToWishlist: handleAddToWishlist, applyPromoCode
+        toggleItemCheck, toggleAllChecks, updateQuantity, removeItem, moveToWishlist: handleAddToWishlist, applyPromoCode,
+        isLoadingCart
     };
 };

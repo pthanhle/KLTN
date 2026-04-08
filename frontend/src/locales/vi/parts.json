@@ -121,5 +121,16 @@
     "reply_delete_success": "Đã xóa phản hồi thành công!",
     "lbl_delete_review_title": "Xóa đánh giá",
     "msg_confirm_delete_review": "Bạn có chắc chắn muốn xóa đánh giá này?",
-    "review_delete_success": "Đã xóa đánh giá thành công!"
+    "review_delete_success": "Đã xóa đánh giá thành công!",
+    "breadcrumb_home": "Trang chủ",
+    "breadcrumb_parts": "Linh kiện",
+    "page_title1": "Linh Kiện & Phụ Tùng",
+    "page_title2": "Cao Cấp",
+    "page_desc": "Phân phối linh kiện chính hãng cho các dòng xe hạng sang. Đảm bảo hiệu suất tối ưu và độ bền vượt trội cho xế yêu của bạn.",
+    "showing_results": "Hiển thị",
+    "out_of": "trên",
+    "products": "sản phẩm",
+    "sort_by": "Sắp xếp:",
+    "filter_apply": "Lọc Kết Quả",
+    "retail_price": "GIÁ BÁN LẺ"
 }

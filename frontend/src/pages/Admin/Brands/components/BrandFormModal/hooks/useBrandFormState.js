@@ -11,7 +11,8 @@ export const useBrandFormState = (isOpen, editingData) => {
                 form.setFieldsValue({
                     name: editingData.name,
                     id: editingData.id,
-                    image: editingData.image || null
+                    image: editingData.image || null,
+                    is_partner: editingData.is_partner || false
                 });
             } else {
                 form.resetFields();

@@ -1,5 +1,6 @@
 import { Camera, Shield, User, Clock, ShoppingBag, Wrench, Car } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Image } from 'antd';
 
 const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
     const location = useLocation();
@@ -7,27 +8,38 @@ const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
     const currentPath = location.pathname;
 
     if (!profile) return null;
-    const isAdminRole = profile.role.role_name === 'Admin' || profile.role.role_name === 'Manager';
+
+    const roleName = profile.role?.role_name || profile.role_id?.role_name || '';
+    const isAdminRole = ['admin', 'manager', 'Admin', 'Manager'].includes(roleName);
 
     return (
         <div className="flex flex-col items-center">
-            {/* Avatar Section */}
             <div className="relative mb-6">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-50 dark:border-[#1a1c23] shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
-                    <img src={profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-50 dark:border-[#1a1c23] shadow-[0_8px_30px_rgb(0,0,0,0.12)] bg-slate-100 flex items-center justify-center">
+                    {profile.avatar ? (
+                        <Image
+                            src={profile.avatar}
+                            alt="Avatar"
+                            width="100%"
+                            height="100%"
+                            className="object-cover"
+                            preview={false}
+                        />
+                    ) : (
+                        <User size={40} className="text-slate-300" />
+                    )}
                 </div>
                 <button className="absolute bottom-1 right-1 bg-yellow-500 text-slate-900 w-9 h-9 rounded-full flex items-center justify-center hover:bg-yellow-400 transition-colors shadow">
                     <Camera size={16} strokeWidth={2.5} />
                 </button>
             </div>
 
-            {/* Name and Role */}
             <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 text-center">{profile.full_name}</h2>
             <span className={`px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest ${isAdminRole
-                    ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/10 dark:text-yellow-500'
-                    : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'
+                ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/10 dark:text-yellow-500'
+                : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'
                 }`}>
-                {profile.role.role_name}
+                {profile.role?.role_name || profile.role_id?.role_name || 'CUSTOMER'}
             </span>
             <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-4 text-center">
                 {isAdminRole ? t('roles_adminDesc', 'Quản lý hệ thống TT AUTO. Chuyên gia tư vấn dòng xe hạng sang.') : t('roles_customerDesc', 'Khách hàng thân thiết của TT AUTO. Cảm ơn bạn đã tin tưởng dịch vụ chúng tôi.')}
@@ -35,15 +47,13 @@ const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
 
             <div className="w-full h-[1px] bg-slate-100 dark:bg-white/5 my-8"></div>
 
-            {/* Navigation Menu */}
             <div className="w-full flex flex-col gap-2">
-                <button 
+                <button
                     onClick={() => navigate('/profile')}
-                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${
-                        currentPath === '/profile' 
-                            ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]' 
-                            : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
-                    }`}
+                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${currentPath === '/profile'
+                        ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]'
+                        : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
+                        }`}
                 >
                     <div className="flex items-center gap-3">
                         <User size={18} className={currentPath === '/profile' ? 'text-yellow-500' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors'} strokeWidth={2.5} />
@@ -53,13 +63,12 @@ const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
                     </div>
                 </button>
 
-                <button 
+                <button
                     onClick={() => navigate('/profile/orders')}
-                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${
-                        currentPath === '/profile/orders' 
-                            ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]' 
-                            : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
-                    }`}
+                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${currentPath === '/profile/orders'
+                        ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]'
+                        : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
+                        }`}
                 >
                     <div className="flex items-center gap-3">
                         <ShoppingBag size={18} className={currentPath === '/profile/orders' ? 'text-yellow-500' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors'} strokeWidth={2.5} />
@@ -69,13 +78,12 @@ const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
                     </div>
                 </button>
 
-                <button 
+                <button
                     onClick={() => navigate('/profile/services')}
-                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${
-                        currentPath === '/profile/services' 
-                            ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]' 
-                            : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
-                    }`}
+                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${currentPath === '/profile/services'
+                        ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]'
+                        : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
+                        }`}
                 >
                     <div className="flex items-center gap-3">
                         <Wrench size={18} className={currentPath === '/profile/services' ? 'text-yellow-500' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors'} strokeWidth={2.5} />
@@ -85,13 +93,12 @@ const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
                     </div>
                 </button>
 
-                <button 
+                <button
                     onClick={() => navigate('/profile/test-drives')}
-                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${
-                        currentPath === '/profile/test-drives' 
-                            ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]' 
-                            : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
-                    }`}
+                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${currentPath === '/profile/test-drives'
+                        ? 'bg-white dark:bg-[#141416] border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]'
+                        : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
+                        }`}
                 >
                     <div className="flex items-center gap-3">
                         <Car size={18} className={currentPath === '/profile/test-drives' ? 'text-yellow-500' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors'} strokeWidth={2.5} />

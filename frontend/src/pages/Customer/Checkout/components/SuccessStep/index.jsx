@@ -10,7 +10,7 @@ import SupportBanner from './components/SupportBanner';
 const SuccessStep = ({ hookState }) => {
     const { t, orderSuccessData, timelineSteps, handleCopyOrderId } = hookState;
 
-    if (!orderSuccessData) {
+    if (!orderSuccessData || !orderSuccessData.items) {
         return (
             <div className="max-w-5xl mx-auto pt-6 pb-20 px-4">
                 <div className="flex items-center justify-center mb-10"><Skeleton.Avatar active size={100} /></div>

@@ -4,7 +4,14 @@ export const getProfileSchema = (t) => {
     return z.object({
         full_name: z.string().min(1, t('form_errorRequired', 'Vui lòng nhập họ và tên')),
         phone: z.string().regex(/^(0|\+84)[0-9]{8,9}$/, t('form_errorPhone', 'Vui lòng nhập số điện thoại hợp lệ')),
-        address: z.string().min(1, t('form_errorRequired', 'Vui lòng nhập địa chỉ'))
+        cityUrlCode: z.number().or(z.string()).nullable().optional(),
+        districtUrlCode: z.number().or(z.string()).nullable().optional(),
+        wardUrlCode: z.number().or(z.string()).nullable().optional(),
+        street: z.string().optional(),
+        
+        city: z.string().optional(),
+        district: z.string().optional(),
+        ward: z.string().optional()
     });
 };
 

@@ -3,8 +3,8 @@ import { Button, Image, Tooltip, App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '@/store/slices/cartSlice';
-import { toggleWishlist } from '@/store/slices/wishlistSlice';
+import { useAddToCart } from '@/services/queries/clientCart.queries';
+import { useToggleWishlist, useGetWishlist } from '@/services/queries/clientWishlist.queries';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
 export const PartCardSkeleton = () => (
@@ -35,48 +35,53 @@ const PartCard = ({ part }) => {
         navigate(`/parts/${part.id}`);
     };
 
-    const wishlistItems = useSelector(state => state.wishlist.items);
-    const isWishlisted = wishlistItems.some(item => String(item.product_id) === String(part.id));
+    const { data: wishlistData } = useGetWishlist();
+    const isWishlisted = (wishlistData?.data?.items || []).some(item => String(item.part_id) === String(part.id));
+
+    // API Hooks
+    const { mutate: toggleWishlistApi } = useToggleWishlist();
+    const { mutate: addToCartApi } = useAddToCart();
 
     const handleToggleWishlist = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
-        dispatch(toggleWishlist({
-            id: `p_${part.id}`,
-            product_id: part.id,
-            type: 'part',
-            brand: part.compatible_brands?.[0] || 'Phụ kiện',
-            name: part.name,
-            image: part.image,
-            price: part.price,
-            original_price: null,
-            stock_status: part.stock > 0 ? 'in_stock' : 'out_of_stock',
-            rating: part.rating || 5.0,
-            reviews_count: part.reviews_count || 0
-        }));
 
-        if (isWishlisted) {
-            message.info(t('wishlist_removed', `Đã xóa ${part.name} khỏi danh sách yêu thích.`));
-        } else {
-            message.success(t('wishlist_added', `Đã thêm ${part.name} vào danh sách yêu thích!`));
-        }
+        toggleWishlistApi(part.id, {
+            onSuccess: () => {
+                if (isWishlisted) {
+                    message.info(t('wishlist_removed', `Đã xóa ${part.name} khỏi danh sách yêu thích.`));
+                } else {
+                    message.success(t('wishlist_added', `Đã thêm ${part.name} vào danh sách yêu thích!`));
+                }
+            },
+            onError: (err) => {
+                message.error(err.response?.data?.message || 'Có lỗi xảy ra khi cập nhật Yêu thích');
+            }
+        });
     };
 
     const handleAddToCart = (e) => {
         e.preventDefault();
         e.stopPropagation();
         if (isOutOfStock) return;
+        if (part.options && part.options.length > 0) {
+            message.info(t('require_options', 'Vui lòng chọn biến thể trước khi thêm vào giỏ.'));
+            navigate(`/parts/${part.id}`);
+            return;
+        }
 
-        dispatch(addToCart({ 
-            ...part, 
-            id: Date.now().toString(),
-            product_id: part.id,
+        addToCartApi({
+            part_id: part.id,
             quantity: 1,
-            condition: 'New'
-        }));
-
-        message.success(t('cart_added', `Đã thêm ${part.name} vào Giỏ hàng!`));
+            selected_options: {}
+        }, {
+            onSuccess: () => {
+                message.success(t('cart_added', `Đã thêm ${part.name} vào Giỏ hàng!`));
+            },
+            onError: (err) => {
+                message.error(err.response?.data?.message || 'Có lỗi xảy ra khi thêm vào Giỏ hàng');
+            }
+        });
     };
 
     return (
@@ -94,14 +99,14 @@ const PartCard = ({ part }) => {
                     <span className="text-slate-300 dark:text-slate-600 text-sm font-medium">{t('no_image', 'No Image')}</span>
                 )}
 
-                <button 
+                <button
                     onClick={handleToggleWishlist}
                     className="absolute top-3 right-3 w-8 h-8 z-10 flex items-center justify-center rounded-full bg-white/95 dark:bg-[#141416]/90 hover:bg-white transition-colors cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-slate-100/50 dark:border-white/10 group/btn"
                 >
-                    <Heart 
-                        size={14} 
+                    <Heart
+                        size={14}
                         fill={isWishlisted ? "currentColor" : "none"}
-                        className={isWishlisted ? 'text-pink-500' : 'text-slate-400 dark:text-slate-500 group-hover/btn:text-pink-500'} 
+                        className={isWishlisted ? 'text-pink-500' : 'text-slate-400 dark:text-slate-500 group-hover/btn:text-pink-500'}
                     />
                 </button>
 
@@ -112,14 +117,14 @@ const PartCard = ({ part }) => {
                 )}
             </div>
 
-            <div 
-                className="flex flex-col flex-1 pl-1 pr-1 cursor-pointer" 
+            <div
+                className="flex flex-col flex-1 pl-1 pr-1 cursor-pointer"
                 onClick={handleCardClick}
             >
                 <h3 className="text-lg font-black text-slate-900 dark:text-white leading-[1.3] mb-2 line-clamp-2 transition-colors hover:text-yellow-600 dark:hover:text-yellow-500">
                     {part.name}
                 </h3>
-                
+
                 <p className="text-[12px] sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium mb-4">
                     {subInfo}
                 </p>
@@ -139,7 +144,7 @@ const PartCard = ({ part }) => {
                     </div>
 
                     {isOutOfStock ? (
-                        <Button 
+                        <Button
                             type="default"
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/parts/pre-order/${part.id}`); }}
                             className="!h-[42px] px-3 sm:px-4 !rounded-[12px] !bg-slate-50 hover:!bg-slate-100 dark:!bg-[#1a1c23] dark:hover:!bg-[#22252d] !border-slate-200 dark:!border-white/10 !text-slate-600 dark:!text-slate-400 hover:!text-slate-900 dark:hover:!text-white !font-bold !text-[11px] transition-all tracking-wider uppercase shadow-none border flex-shrink-0 active:scale-95"

@@ -1,16 +1,15 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { defaultBookingValues } from '../schemas/bookingSchema';
-import { MOCK_PROFILE_CUSTOMER } from '../../../Shared/Profile/data/profile.mock';
 
 dayjs.extend(customParseFormat);
 
-export const mapRescheduleDataToForm = (rescheduleData) => {
+export const mapRescheduleDataToForm = (rescheduleData, userProfile) => {
     if (!rescheduleData) {
         return {
             ...defaultBookingValues,
-            fullName: MOCK_PROFILE_CUSTOMER.full_name,
-            phoneNumber: MOCK_PROFILE_CUSTOMER.phone
+            fullName: userProfile?.full_name || '',
+            phoneNumber: userProfile?.phone || ''
         };
     }
 
@@ -22,8 +21,8 @@ export const mapRescheduleDataToForm = (rescheduleData) => {
         selectedDate: dayjs(rescheduleData.booking_date, 'YYYY-MM-DD'),
         selectedTimeSlot: rescheduleData.time_slot,
         note: rescheduleData.customer_note || '',
-        fullName: rescheduleData.customer_info?.full_name || MOCK_PROFILE_CUSTOMER.full_name,
-        phoneNumber: rescheduleData.customer_info?.contact_phone || MOCK_PROFILE_CUSTOMER.phone,
+        fullName: rescheduleData.customer_info?.full_name || userProfile?.full_name || '',
+        phoneNumber: rescheduleData.customer_info?.contact_phone || userProfile?.phone || '',
         hasDriverLicense: true,
         rescheduleReason: '',
     };

@@ -16,7 +16,7 @@ router.route('/')
     .put(protect, updateCartItem)
     .delete(protect, clearCart)
 
-router.route('/:product_id')
+router.route('/:item_id')
     .delete(protect, removeFromCart)
 
 export default router

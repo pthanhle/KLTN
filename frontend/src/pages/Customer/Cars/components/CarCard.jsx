@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Image, App } from 'antd';
 import { Heart } from 'lucide-react';
-import { useSelector, useDispatch } from 'react-redux';
-import { toggleWishlist } from '@/store/slices/wishlistSlice';
+import { useSelector } from 'react-redux';
+import { useToggleWishlist, useGetWishlist } from '@/services/queries/clientWishlist.queries';
 import { formatVND } from '../utils/formatters';
 
 export const CarCardSkeleton = () => {
@@ -29,32 +29,27 @@ export const CarCardSkeleton = () => {
 
 const CarCard = ({ car, t }) => {
     const { message } = App.useApp();
-    const wishlistItems = useSelector(state => state.wishlist.items);
-    const isWishlisted = wishlistItems.some(item => String(item.product_id) === String(car.id));
+    const { data: wishlistData } = useGetWishlist();
+    const isWishlisted = (wishlistData?.data?.items || []).some(item => String(item.part_id) === String(car.id));
+
+    const { mutate: toggleWishlistApi } = useToggleWishlist();
 
     const handleToggleWishlist = (e) => {
         e.preventDefault();
         e.stopPropagation();
         
-        dispatch(toggleWishlist({
-            id: `c_${car.id}`,
-            product_id: car.id,
-            type: 'car',
-            brand: car.brandName,
-            name: car.name,
-            image: car.image,
-            price: car.price,
-            original_price: null,
-            stock_status: 'in_stock',
-            rating: 5.0,
-            reviews_count: 0
-        }));
-
-        if (isWishlisted) {
-            message.info(t('wishlist_removed', { name: car.name, defaultValue: 'Đã xóa khỏi danh sách yêu thích' }));
-        } else {
-            message.success(t('wishlist_added', { name: car.name, defaultValue: 'Đã thêm vào yêu thích' }));
-        }
+        toggleWishlistApi(car.id, {
+            onSuccess: () => {
+                if (isWishlisted) {
+                    message.info(t('wishlist_removed', { name: car.name, defaultValue: 'Đã xóa khỏi danh sách yêu thích' }));
+                } else {
+                    message.success(t('wishlist_added', { name: car.name, defaultValue: 'Đã thêm vào yêu thích' }));
+                }
+            },
+            onError: (err) => {
+                message.error(err.response?.data?.message || 'Có lỗi xảy ra khi cập nhật Yêu thích');
+            }
+        });
     };
 
     return (

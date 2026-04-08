@@ -1,4 +1,6 @@
 {
+    "nav_home": "Trang chủ",
+    "nav_parts": "Linh kiện",
     "in_stock": "Còn {{count}} cái",
     "out_of_stock": "Hết hàng",
     "add_to_cart": "Thêm vào giỏ",
@@ -28,6 +30,8 @@
     "btn_see_all_reviews": "Xem tất cả đánh giá",
     "lbl_sku": "SKU",
     "lbl_brand": "Thương hiệu",
+    "lbl_condition": "Tình trạng",
+    "cart_condition_new": "Mới 100%",
     "lbl_attribute": "Thuộc tính",
     "lbl_detail_value": "Giá trị chi tiết",
     "btn_preorder": "Đặt hàng",

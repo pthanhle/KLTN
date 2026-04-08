@@ -63,14 +63,29 @@ export const getActiveParts = asyncHandler(async (req, res) => {
     });
   }
 
+  // Lookup Master Data Condition
+  pipeline.push({
+    $lookup: {
+      from: 'partconditions',
+      localField: 'condition',
+      foreignField: 'value',
+      as: 'condition_data'
+    }
+  });
+
   // Formatting identical to admin
   pipeline.push({
     $addFields: {
       id: "$_id",
       stock: { $add: [{ $ifNull: ["$inventory.warehouse", 0] }, { $ifNull: ["$inventory.showroom", 0] }] },
       image: { $arrayElemAt: ["$images", 0] },
-      description: "$seo_description"
+      description: "$seo_description",
+      condition_name: { $ifNull: [{ $arrayElemAt: ["$condition_data.name", 0] }, "$condition", "Mới 100%"] }
     }
+  });
+
+  pipeline.push({
+    $project: { condition_data: 0 }
   });
 
   // Sorting
@@ -179,6 +194,16 @@ export const getPartBySlug = asyncHandler(async (req, res) => {
     // Override root rating and count with the accurate summary values
     partObj.rating = partObj.reviews_summary.average || partObj.rating || 0;
     partObj.reviews_count = partObj.reviews_summary.total || partObj.reviews_count || 0;
+  }
+
+  try {
+    const PartCondition = (await import('../../models/partConditionModel.js')).default;
+    const mappedCondition = await PartCondition.findOne({ value: partObj.condition }).lean();
+    if (mappedCondition) {
+      partObj.condition_name = mappedCondition.name;
+    }
+  } catch (err) {
+    console.error("Condition lookup failed in client API", err);
   }
 
   res.json({ success: true, data: partObj });

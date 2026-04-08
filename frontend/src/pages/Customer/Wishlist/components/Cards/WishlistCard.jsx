@@ -72,7 +72,7 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, isBuyingNow, onRemove,
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                     <div>
                         <p className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">{item.brand}</p>
-                        <Link to={item.type === 'car' ? `/cars/${item.product_id}` : `/parts/${item.product_id}`} className="hover:text-yellow-500 transition-colors block">
+                        <Link to={item.type === 'car' ? `/cars/${item.part_id}` : `/parts/${item.part_id}`} className="hover:text-yellow-500 transition-colors block">
                             <h3 className="font-extrabold text-xl md:text-2xl leading-tight text-slate-900 dark:text-white line-clamp-2 md:line-clamp-none">{item.name}</h3>
                         </Link>
                     </div>
@@ -114,7 +114,7 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, isBuyingNow, onRemove,
 
                 <div className="w-full space-y-3 mt-2">
                     {item.type === 'car' ? (
-                        <Link to={`/cars/${item.product_id}`} className="block w-full">
+                        <Link to={`/cars/${item.part_id}`} className="block w-full">
                             <Button
                                 type="primary"
                                 className="w-full !h-auto !py-3.5 !rounded-2xl !font-bold !text-[14px] transition-all duration-300 flex items-center justify-center active:scale-95 !bg-yellow-500 hover:!bg-yellow-400 !text-slate-900 !border-0 shadow-lg shadow-yellow-500/20"
@@ -134,8 +134,8 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, isBuyingNow, onRemove,
                                 }}
                                 disabled={item.stock_status === 'out_of_stock'}
                                 className={`w-full !h-auto !py-3.5 !rounded-2xl !font-bold !text-[14px] transition-all duration-300 flex items-center justify-center active:scale-95 ${item.stock_status === 'out_of_stock'
-                                        ? '!bg-slate-200 dark:!bg-slate-800 !text-slate-400 !shadow-none !border-0'
-                                        : '!bg-yellow-500 hover:!bg-yellow-400 !text-slate-900 !border-0 shadow-lg shadow-yellow-500/20'
+                                    ? '!bg-slate-200 dark:!bg-slate-800 !text-slate-400 !shadow-none !border-0'
+                                    : '!bg-yellow-500 hover:!bg-yellow-400 !text-slate-900 !border-0 shadow-lg shadow-yellow-500/20'
                                     }`}
                             >
                                 {item.stock_status === 'out_of_stock'
@@ -150,8 +150,8 @@ const WishlistCard = ({ item, isRemoving, isAddingToCart, isBuyingNow, onRemove,
                                 onClick={() => onAddToCart(item)}
                                 disabled={item.stock_status === 'out_of_stock'}
                                 className={`w-full !h-auto !py-3.5 !rounded-2xl !font-bold !text-[14px] transition-all duration-300 flex items-center justify-center active:scale-95 ${item.stock_status === 'out_of_stock'
-                                        ? '!bg-slate-100 dark:!bg-white/5 !text-slate-500 dark:!text-slate-500 !border-slate-200 dark:!border-white/5 opacity-50'
-                                        : '!bg-white dark:!bg-transparent hover:!bg-slate-50 dark:hover:!bg-white/5 !text-slate-700 dark:!text-slate-300 !border-slate-200 dark:!border-white/10'
+                                    ? '!bg-slate-100 dark:!bg-white/5 !text-slate-500 dark:!text-slate-500 !border-slate-200 dark:!border-white/5 opacity-50'
+                                    : '!bg-white dark:!bg-transparent hover:!bg-slate-50 dark:hover:!bg-white/5 !text-slate-700 dark:!text-slate-300 !border-slate-200 dark:!border-white/10'
                                     }`}
                             >
                                 {t('wishlist:add_to_cart', 'Thêm vào giỏ hàng')}

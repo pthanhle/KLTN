@@ -3,7 +3,9 @@ import { protect } from '../../middleware/authMiddleware.js';
 import { 
   getPartCategories, 
   getPartBrands, 
-  createPartBrand 
+  createPartBrand,
+  getPartConditions,
+  createPartCondition
 } from '../../controllers/admin/partMeta.controller.js';
 
 const router = express.Router();
@@ -11,6 +13,9 @@ const router = express.Router();
 router.use(protect);
 
 router.get('/categories', getPartCategories);
+router.route('/conditions')
+  .get(getPartConditions)
+  .post(createPartCondition);
 router.route('/brands')
   .get(getPartBrands)
   .post(createPartBrand);

@@ -1,8 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { mockCartItems } from '@/pages/Customer/Checkout/data/checkout.mock';
 
 const initialState = {
-    items: [...mockCartItems],
+    items: [],
 };
 
 const cartSlice = createSlice({
@@ -10,17 +9,21 @@ const cartSlice = createSlice({
     initialState,
     reducers: {
         addToCart: (state, action) => {
-            const { isBuyNow, ...productData } = action.payload;
-            const exists = state.items.find(item => item.product_id === productData.product_id);
-            
+            const { isBuyNow, ...partData } = action.payload;
+
+            const exists = state.items.find(item =>
+                item.part_id === partData.part_id &&
+                JSON.stringify(item.selected_options || {}) === JSON.stringify(partData.selected_options || {})
+            );
+
             if (isBuyNow) {
                 state.items.forEach(item => { item.checked = false; });
             }
 
             if (!exists) {
-                state.items.push({ ...productData, quantity: productData.quantity || 1, checked: true });
+                state.items.push({ ...partData, quantity: partData.quantity || 1, checked: true });
             } else {
-                exists.quantity += (productData.quantity || 1);
+                exists.quantity += (partData.quantity || 1);
                 if (isBuyNow) exists.checked = true;
             }
         },
@@ -31,7 +34,11 @@ const cartSlice = createSlice({
             state.items = [];
         },
         setCartItems: (state, action) => {
-            state.items = action.payload; // Dùng khi call API GET /cart thành công
+            const newItems = action.payload;
+            state.items = newItems.map(item => {
+                const existing = state.items.find(i => i.id === item.id);
+                return { ...item, checked: existing ? existing.checked : true };
+            });
         },
         updateQuantity: (state, action) => {
             const item = state.items.find(i => i.id === action.payload.id);
@@ -41,11 +48,16 @@ const cartSlice = createSlice({
             const item = state.items.find(i => i.id === action.payload);
             if (item) item.checked = !item.checked;
         },
+        isolateCheckedItem: (state, action) => {
+            state.items.forEach(item => {
+                item.checked = String(item.part_id) === String(action.payload);
+            });
+        },
         toggleAllChecks: (state, action) => {
             state.items.forEach(i => i.checked = action.payload);
         }
     }
 });
 
-export const { addToCart, removeFromCart, clearCart, setCartItems, updateQuantity, toggleChecked, toggleAllChecks } = cartSlice.actions;
+export const { addToCart, removeFromCart, clearCart, setCartItems, updateQuantity, toggleChecked, toggleAllChecks, isolateCheckedItem } = cartSlice.actions;
 export default cartSlice.reducer;

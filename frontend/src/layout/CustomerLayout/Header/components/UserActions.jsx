@@ -2,18 +2,23 @@ import { Link } from 'react-router-dom';
 import { Heart, ShoppingCart, Bell, LogOut, User } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useLogoutMutation } from '../../../../services/queries/auth.queries';
+import { useGetCart } from '../../../../services/queries/clientCart.queries';
+import { useGetWishlist } from '../../../../services/queries/clientWishlist.queries';
 import { App as AntdApp } from 'antd';
 import HeaderUtilities from '../../../../components/HeaderUtilities';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import NotificationDropdown from './Notification/NotificationDropdown';
 
-
 const UserActions = () => {
     const { t } = useTranslation('layout');
     const { isAuthenticated, user } = useSelector((state) => state.auth);
     const wishlistItems = useSelector((state) => state.wishlist.items);
     const cartItems = useSelector((state) => state.cart.items);
+
+    useGetCart(isAuthenticated);
+    useGetWishlist(isAuthenticated);
+
     const { mutate: logoutUser } = useLogoutMutation();
     const { message } = AntdApp.useApp();
 
@@ -47,8 +52,7 @@ const UserActions = () => {
                         </span>
                     )}
                 </Link>
-                
-                {/* Micro Component: Dropdown thông báo chuẩn API-Ready */}
+
                 {isAuthenticated && <NotificationDropdown />}
             </div>
 

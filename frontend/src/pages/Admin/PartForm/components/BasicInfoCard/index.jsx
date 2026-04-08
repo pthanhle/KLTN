@@ -6,14 +6,17 @@ import FormInput from '../ui/FormInput';
 import FormSelect from '../ui/FormSelect';
 import { useBasicInfoLogic } from './hooks/useBasicInfoLogic';
 
-const BasicInfoCard = ({ categories, t }) => {
+const BasicInfoCard = ({ categories, conditions = [], createConditionAsync, t }) => {
     const {
         control,
         localCategories,
         isCategoryModalOpen,
         setIsCategoryModalOpen,
-        handleAddCategory
-    } = useBasicInfoLogic(categories, t);
+        handleAddCategory,
+        isConditionModalOpen,
+        setIsConditionModalOpen,
+        handleAddCondition
+    } = useBasicInfoLogic(categories, conditions, createConditionAsync, t);
 
 
     return (
@@ -55,6 +58,7 @@ const BasicInfoCard = ({ categories, t }) => {
                     />
                 </div>
                 
+                
                 <div>
                     <div className="flex justify-between items-center h-[28px] mb-3">
                         <label className="block text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">
@@ -75,6 +79,27 @@ const BasicInfoCard = ({ categories, t }) => {
                         options={localCategories.map(c => ({ label: c?.name || c, value: c?.value || c }))}
                     />
                 </div>
+
+                <div>
+                    <div className="flex justify-between items-center h-[28px] mb-3">
+                        <label className="block text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">
+                            {t('adminPartForm:condition', 'Tình trạng')}
+                        </label>
+                        <button 
+                            type="button" 
+                            onClick={() => setIsConditionModalOpen(true)}
+                            className="text-[11px] uppercase font-black text-yellow-600 dark:text-yellow-500 flex items-center gap-1 hover:brightness-110 active:scale-95 transition-all bg-yellow-500/10 px-3 py-1.5 rounded-lg"
+                        >
+                            <Plus size={14} strokeWidth={3} /> {t('adminPartForm:btnAddQuick', 'Thêm Nhanh')}
+                        </button>
+                    </div>
+                    <FormSelect
+                        name="condition"
+                        control={control}
+                        placeholder={t('adminPartForm:phSelect')}
+                        options={conditions.map(c => ({ label: c?.name || c.value, value: c?.value }))}
+                    />
+                </div>
             </div>
 
             <QuickAddModal 
@@ -83,6 +108,15 @@ const BasicInfoCard = ({ categories, t }) => {
                 visible={isCategoryModalOpen}
                 onCancel={() => setIsCategoryModalOpen(false)}
                 onAdd={handleAddCategory}
+                t={t}
+            />
+
+            <QuickAddModal 
+                title={t('adminPartForm:modalTitleCondition', 'Thêm tình trạng mới')}
+                placeholder={t('adminPartForm:modalPhCondition', 'Nhập tên tình trạng mới... (VD: Hàng OEM)')}
+                visible={isConditionModalOpen}
+                onCancel={() => setIsConditionModalOpen(false)}
+                onAdd={handleAddCondition}
                 t={t}
             />
         </section>

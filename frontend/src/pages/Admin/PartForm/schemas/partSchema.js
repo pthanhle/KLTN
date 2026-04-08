@@ -4,6 +4,7 @@ export const getPartFormSchema = (t) => z.object({
   name: z.string().min(1, { message: t('adminPartForm:reqName', 'Vui lòng nhập tên linh kiện') }),
   sku: z.string().min(1, { message: t('adminPartForm:reqSku', 'Vui lòng nhập mã SKU') }),
   category: z.string().min(1, { message: t('adminPartForm:reqCategory', 'Vui lòng chọn danh mục') }),
+  condition: z.string().min(1, { message: 'Vui lòng chọn tình trạng' }).default('new'),
   original_price: z.number().min(0, { message: 'Giá gốc không hợp lệ' }),
   price: z.number().min(0, { message: 'Giá bán không hợp lệ' }),
   images: z.array(z.string()).optional(),

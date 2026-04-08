@@ -30,25 +30,27 @@ export const getMockOrderDetail = (id) => {
         cancel_reason: null, // 'Thay đổi ý định mua hàng' Nếu status là CANCELLED
         items: [
             {
-                id: '1',
+                _id: '1',
                 sku: 'TT-GT-2026',
                 name: 'TT GranTurismo S-Line (Mâm gốc)',
                 properties: 'Màu: Đen tuyền | Kích cỡ: Tiêu chuẩn 19"',
                 image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCmK6T48q5swrv1iMKE3-C-6oXmhq7sh-IbB9B0zfPwjZxkhsh96PwYSOrdqDquJ-9ByDg7Coqmor7-cNaemhGQpUIyOL90l4oDXk2713cLK05H1TXdQJdaIur488fe8nc_hHj4HcV4DsHedtJ5LneTIC5Uwc_FleIJ4xb50Yz7oubhdBFloOT-erI000pv_qN5-UgjRDbLzVbYuuVvLAh9aUJL7TF0udf7ck09iUIXMvPBH8reCWRhNM8Dyx51RLrnzcVqQ4npaOs',
                 quantity: 1,
                 original_price: null,
-                price: 1425000000,
+                unit_price: 1425000000,
+                total_price: 1425000000,
                 is_reviewed: false
             },
             {
-                id: '2',
+                _id: '2',
                 sku: 'WH-FORGED-20',
                 name: 'Forged Alloy Wheel Set (Thay thế)',
                 properties: 'Custom: Phay xước 20" | Tương thích: GT-2026',
                 image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-nY0YrxmMzWnV6CR6Q6ME7Vwe3G_sIV7Yhctnqh1v8aEWMym3Bigh6n6z_iCbkZTqo24E43D2rNk66zJrFjnLK66BPLTC7Yeure1cznon_EXhIONsCbZZheTLu41iOqyDQ6S6_QK2ePx6XI-qcbGiwGzdKUpMhGC78EAmludfX5wp-hilS2QGRwhEMN5USwhaTXfv4nbl8bOR-YNm7hvScpD36C7G6l3Y3hb3wubvDojlYaFmvFxy0ZCA4fDH8HbRPMlmCf1YIuA',
                 quantity: 1,
                 original_price: 95000000,
-                price: 85000000,
+                unit_price: 85000000,
+                total_price: 85000000,
                 is_reviewed: true
             }
         ],

@@ -3,8 +3,8 @@ import { Image } from 'antd';
 const OrderItemList = ({ items, t, formatCurrency }) => {
     return (
         <div className="space-y-4 mb-6">
-            {items.map(item => (
-                <div key={item.product_id || item.id} className="flex items-center gap-4">
+            {items.map((item) => (
+                <div key={item._id} className="flex items-center gap-4">
                     <Image 
                         src={item.image} 
                         alt={item.name}

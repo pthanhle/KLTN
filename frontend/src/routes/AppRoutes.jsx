@@ -15,6 +15,8 @@ const VerifyOTP = lazy(() => import('../pages/Auth/VerifyOTP'));
 
 const CustomersPage = lazy(() => import('../pages/Admin/Customers'));
 const CustomerDetailPage = lazy(() => import('../pages/Admin/CustomerDetail'));
+const AdminCarsPage = lazy(() => import('../pages/Admin/Cars'));
+const AdminCarFormPage = lazy(() => import('../pages/Admin/CarForm'));
 const AdminBrandsPage = lazy(() => import('../pages/Admin/Brands'));
 const AdminCategoriesPage = lazy(() => import('../pages/Admin/Categories'));
 const AdminPartsPage = lazy(() => import('../pages/Admin/Parts'));
@@ -103,6 +105,9 @@ const AppRoutes = () => {
                         <Route path="/admin/profile" element={<ProfilePage />} />
                         <Route path="/admin/customers" element={<CustomersPage />} />
                         <Route path="/admin/customers/:id" element={<CustomerDetailPage />} />
+                        <Route path="/admin/cars" element={<AdminCarsPage />} />
+                        <Route path="/admin/cars/create" element={<AdminCarFormPage />} />
+                        <Route path="/admin/cars/edit/:id" element={<AdminCarFormPage />} />
                         <Route path="/admin/brands" element={<AdminBrandsPage />} />
                         <Route path="/admin/categories" element={<AdminCategoriesPage />} />
                         <Route path="/admin/parts" element={<AdminPartsPage />} />

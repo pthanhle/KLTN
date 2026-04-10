@@ -29,7 +29,7 @@ const OptionsSection = ({ part, control, errors, t }) => {
                                             const label = typeof choice === 'object' ? choice.label : choice;
                                             return { label, value: label };
                                         })}
-                                        popupClassName="dark:bg-[#141416] p-2 rounded-2xl border border-slate-100 dark:border-white/5 shadow-xl"
+                                        classNames={{ popup: "dark:bg-[#141416] p-2 rounded-2xl border border-slate-100 dark:border-white/5 shadow-xl" }}
                                     />
                                 )}
                             />

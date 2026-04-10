@@ -14,6 +14,10 @@ import enAdminBrands from '../locales/en/adminBrands.json';
 import viAdminBrands from '../locales/vi/adminBrands.json';
 import enAdminCategories from '../locales/en/adminCategories.json';
 import viAdminCategories from '../locales/vi/adminCategories.json';
+import enAdminCars from '../locales/en/adminCars.json';
+import viAdminCars from '../locales/vi/adminCars.json';
+import enAdminCarForm from '../locales/en/adminCarForm.json';
+import viAdminCarForm from '../locales/vi/adminCarForm.json';
 import enError from '../locales/en/error.json';
 import viError from '../locales/vi/error.json';
 import enProducts from '../locales/en/products.json';
@@ -53,6 +57,8 @@ i18n
                 adminCustomers: enAdminCustomers,
                 adminBrands: enAdminBrands,
                 adminCategories: enAdminCategories,
+                adminCars: enAdminCars,
+                adminCarForm: enAdminCarForm,
                 adminParts: enAdminParts,
                 adminPartForm: enAdminPartForm,
                 error: enError,
@@ -75,6 +81,8 @@ i18n
                 adminCustomers: viAdminCustomers,
                 adminBrands: viAdminBrands,
                 adminCategories: viAdminCategories,
+                adminCars: viAdminCars,
+                adminCarForm: viAdminCarForm,
                 adminParts: viAdminParts,
                 adminPartForm: viAdminPartForm,
                 error: viError,
@@ -90,10 +98,10 @@ i18n
                 partDetail: viPartDetail,
             },
         },
-        lng: 'vi', // Default language
+        lng: 'vi',
         fallbackLng: 'en',
         interpolation: {
-            escapeValue: false, // React already safeguards from XSS
+            escapeValue: false,
         },
     });
 

@@ -82,7 +82,7 @@ const ContactForm = ({ control, errors, isSubmitting, handleSubmit, t }) => {
                             <Select
                                 {...field}
                                 className="w-full !h-[56px]"
-                                popupClassName="!rounded-2xl dark:bg-slate-800"
+                                classNames={{ popup: "!rounded-2xl dark:bg-slate-800" }}
                                 suffixIcon={<ChevronDown className="w-5 h-5 text-slate-400" />}
                                 options={Object.values(CONTACT_SUBJECTS).map((subject) => ({
                                     value: subject,

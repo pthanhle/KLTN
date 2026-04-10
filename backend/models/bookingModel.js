@@ -90,7 +90,9 @@ const bookingSchema = mongoose.Schema(
       enum: ['showroom', 'home'],
       default: 'showroom',
     },
-    delivery_address: { type: String },
+    delivery_address: {
+      type: mongoose.Schema.Types.Mixed, // Accept old strings OR new {street, ward, district, city} objects
+    },
 
     service_type: {
       type: String,

@@ -28,16 +28,16 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                 
                 {/* Checkbox "Tất cả" */}
                 <label className="flex items-center gap-3 cursor-pointer group mb-4">
-                    <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${filters.brandIds.length === 0 ? 'bg-yellow-500 border-yellow-500' : 'bg-white dark:bg-transparent border-slate-300 dark:border-white/20 group-hover:border-yellow-500'}`}>
-                        {filters.brandIds.length === 0 && <Check size={14} className="text-white dark:text-slate-900" strokeWidth={3} />}
+                    <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${filters.brandSlugs.length === 0 ? 'bg-yellow-500 border-yellow-500' : 'bg-white dark:bg-transparent border-slate-300 dark:border-white/20 group-hover:border-yellow-500'}`}>
+                        {filters.brandSlugs.length === 0 && <Check size={14} className="text-white dark:text-slate-900" strokeWidth={3} />}
                     </div>
-                    <span className={`text-[14px] font-medium transition-colors ${filters.brandIds.length === 0 ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white'}`}>
+                    <span className={`text-[14px] font-medium transition-colors ${filters.brandSlugs.length === 0 ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white'}`}>
                         {t('cars.filters.allBrands')}
                     </span>
                     <input 
                         type="checkbox" 
                         className="hidden" 
-                        checked={filters.brandIds.length === 0}
+                        checked={filters.brandSlugs.length === 0}
                         onChange={handleSelectAllBrands} 
                     />
                 </label>
@@ -59,7 +59,7 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                 {/* Scrollable list of brands (custom scrollbar utility class) */}
                 <div className="flex flex-col gap-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
                     {filteredBrandsList.map(brand => {
-                        const isChecked = filters.brandIds.includes(brand.id);
+                        const isChecked = filters.brandSlugs.includes(brand.slug);
                         return (
                             <label key={brand.id} className="flex items-center justify-between cursor-pointer group">
                                 <div className="flex items-center gap-3">
@@ -75,7 +75,7 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                                     type="checkbox" 
                                     className="hidden" 
                                     checked={isChecked}
-                                    onChange={() => handleBrandToggle(brand.id)} 
+                                    onChange={() => handleBrandToggle(brand.slug)} 
                                 />
                             </label>
                         );

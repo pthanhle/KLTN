@@ -24,7 +24,7 @@ const BrandsSection = ({ brands, onBrandClick, isLoading }) => {
                         brands?.map((brand, idx) => (
                             <div 
                                 key={brand.id || idx} 
-                                onClick={() => onBrandClick && onBrandClick(brand.name.toLowerCase())}
+                                onClick={() => onBrandClick && onBrandClick(brand.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-'))}
                                 className="w-20 h-10 sm:w-28 sm:h-14 bg-transparent flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
                                 title={brand.name}
                             >

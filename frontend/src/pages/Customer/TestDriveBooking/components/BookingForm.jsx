@@ -11,7 +11,7 @@ import WaitlistNotification from './BookingForm/WaitlistNotification';
 
 const BookingForm = ({ hookState }) => {
     const {
-        handleCancel, isLoading, isReschedule, methods, onSubmit, timeSlots, branches, t, car
+        handleCancel, isLoading, isReschedule, methods, onSubmit, timeSlots, branches, t, car, locationData
     } = hookState;
 
     return (
@@ -43,9 +43,8 @@ const BookingForm = ({ hookState }) => {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <ContactInput t={t} />
                             </div>
-                            <div className="max-w-md">
-                                <LocationSelector branches={branches} t={t} />
-                            </div>
+                            
+                            <LocationSelector branches={branches} t={t} locationData={locationData} />
 
                             <DateTimeSelector timeSlots={timeSlots} t={t} />
                             <RescheduleReasonInput t={t} isReschedule={isReschedule} />
@@ -56,9 +55,9 @@ const BookingForm = ({ hookState }) => {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <ContactInput t={t} />
                             </div>
-                            <div className="max-w-md">
-                                <LocationSelector branches={branches} t={t} />
-                            </div>
+                            
+                            <LocationSelector branches={branches} t={t} locationData={locationData} />
+                            
                             <AdditionalInfo t={t} />
                         </>
                     )}

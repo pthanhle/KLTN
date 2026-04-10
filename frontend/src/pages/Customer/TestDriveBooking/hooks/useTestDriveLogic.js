@@ -10,6 +10,7 @@ import { getBookingSchema } from '../schemas/bookingSchema';
 import { mapRescheduleDataToForm, mapFormToBookingPayload } from '../utils/bookingFormMapper';
 import { useGetTestDriveById, useSubmitTestDrive } from '../../../../services/queries/bookingQueries';
 import { useGetCheckoutProfile } from '../../../../services/queries/checkoutQueries';
+import { useLocationCascade } from './useLocationCascade';
 
 export const useTestDriveLogic = () => {
     const { message } = App.useApp();
@@ -18,15 +19,12 @@ export const useTestDriveLogic = () => {
     const [searchParams] = useSearchParams();
     const { t } = useTranslation(['booking']);
 
-    // Tách Param từ URL Thanh điều hướng
     const rescheduleId = searchParams.get('reschedule_id');
     const isReschedule = !!rescheduleId;
 
-    // [REACT QUERY] Gọi API GET vé cũ
     const { data: rescheduleData, error: fetchError } = useGetTestDriveById(rescheduleId);
     const { data: userProfile } = useGetCheckoutProfile();
     
-    // Xử lý Lỗi ném ra từ API GET
     useEffect(() => {
         if (fetchError) {
             message.error(t('booking_notFound', 'Không tìm thấy lịch hẹn cần dời hoặc vé đã bị khóa.'));
@@ -34,17 +32,13 @@ export const useTestDriveLogic = () => {
         }
     }, [fetchError, t, navigate]);
 
-    // [REACT QUERY] Gọi API POST gửi vé
     const submitMutation = useSubmitTestDrive();
-
     const [car, setCar] = useState(null);
 
     const timeSlots = TIME_SLOTS;
     const branches = SHOWROOM_BRANCHES;
 
     const schema = useMemo(() => getBookingSchema(t, rescheduleData, car?.isDemoAvailable ?? true), [t, rescheduleData, car]);
-
-    // Sử dụng Utils để ánh xạ (Map) Data Lịch sử thành Default Form Values
     const defaultVals = useMemo(() => mapRescheduleDataToForm(rescheduleData, userProfile), [rescheduleData, userProfile]);
 
     const methods = useForm({
@@ -58,25 +52,22 @@ export const useTestDriveLogic = () => {
     }, [defaultVals, methods]);
 
     useEffect(() => {
-        // Mock fetch car details using ID
         const mockCar = getMockCarDetail(id);
         setCar(mockCar);
-        
-        // Auto-switch to 'waitlist' booking tracking if no Demo car is available
         if (mockCar && !mockCar.isDemoAvailable) {
             methods.setValue('bookingType', 'waitlist');
         }
     }, [id, methods]);
 
+    // Phân tách Logic Đổ dữ liệu cấp tỉnh huyện ra một Custom Hook độc lập
+    const locationData = useLocationCascade(methods);
+
     const handleCancel = () => {
-        navigate(-1); // Back to previous page
+        navigate(-1);
     };
 
     const onSubmit = (data) => {
-        // Sử dụng Utils để phân giải Data thô từ Form thành Payload chuẩn API
         const payload = mapFormToBookingPayload(data, car?.id, isReschedule, rescheduleData);
-
-        // Bắn Lệnh Đột Biến (Mutation) của React Query
         submitMutation.mutate(payload, {
             onSuccess: () => {
                 message.success(isReschedule 
@@ -92,11 +83,12 @@ export const useTestDriveLogic = () => {
 
     return {
         car,
-        isLoading: submitMutation.isPending, // Chuyển state loading thủ công qua tự động
+        isLoading: submitMutation.isPending,
         isReschedule,
         handleCancel,
         methods,
         onSubmit: methods.handleSubmit(onSubmit),
-        timeSlots, branches, t
+        timeSlots, branches, t,
+        locationData
     };
 };

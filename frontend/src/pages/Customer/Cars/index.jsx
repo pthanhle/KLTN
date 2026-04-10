@@ -40,9 +40,9 @@ const CarsPage = () => {
                     <Link to="/" className="!text-slate-900 dark:!text-white hover:!text-yellow-500 transition-colors">{t('layout:customer.header.home')}</Link>
                     <ChevronRight size={14} className="text-slate-400" />
                     {!brandNameParam ? (
-                        <span className="text-yellow-500 font-bold">{t('layout:customer.header.categories')}</span>
+                        <span className="text-yellow-500 font-bold">{t('layout:customer.header.products')}</span>
                     ) : (
-                        <Link to="/products" className="!text-slate-900 dark:!text-white hover:!text-yellow-500 transition-colors">{t('layout:customer.header.categories')}</Link>
+                        <Link to="/cars" className="!text-slate-900 dark:!text-white hover:!text-yellow-500 transition-colors">{t('layout:customer.header.products')}</Link>
                     )}
                     {brandNameParam && (
                         <>

@@ -8,9 +8,9 @@ const HeroSection = ({ onViewCars, onBookService }) => {
         <section className="relative w-full h-[85vh] min-h-[600px] flex items-center bg-[#0a0a0b] overflow-hidden transition-colors duration-300">
             {/* Background Image Area */}
             <div className="absolute inset-0 z-0">
-                <Image 
-                    src="https://images.unsplash.com/photo-1617531653332-bd46c24f2068?q=80&w=2400&auto=format&fit=crop" 
-                    alt="TT AUTO Luxury Car" 
+                <Image
+                    src="https://images.unsplash.com/photo-1617531653332-bd46c24f2068?q=80&w=2400&auto=format&fit=crop"
+                    alt="TT AUTO"
                     rootClassName="w-full h-full absolute inset-0"
                     className="!w-full !h-full object-cover object-center scale-105"
                     preview={false}
@@ -34,15 +34,15 @@ const HeroSection = ({ onViewCars, onBookService }) => {
                     <p className="text-base sm:text-lg text-slate-300 mb-10 max-w-lg leading-relaxed font-medium">
                         {t('customer.home.hero.description')}
                     </p>
-                    
+
                     <div className="flex flex-wrap items-center gap-4">
-                        <button 
+                        <button
                             onClick={onViewCars}
                             className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold px-8 py-3.5 rounded-full shadow-lg shadow-yellow-500/20 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex items-center gap-2"
                         >
                             {t('customer.home.hero.viewCarsBtn')}
                         </button>
-                        <button 
+                        <button
                             onClick={onBookService}
                             className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/20 text-white font-bold px-8 py-3.5 rounded-full transition-all hover:border-white/30 active:scale-95 text-sm sm:text-base"
                         >

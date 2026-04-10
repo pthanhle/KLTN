@@ -36,26 +36,6 @@ export const DUMMY_CARS = [
     }
 }));
 
-export const BRAND_LIST = [
-    { id: 'mercedes-benz', name: 'Mercedes-Benz', count: 48 },
-    { id: 'bmw', name: 'BMW', count: 32 },
-    { id: 'audi', name: 'Audi', count: 15 },
-    { id: 'porsche', name: 'Porsche', count: 12 },
-    { id: 'bentley', name: 'Bentley', count: 11 },
-    { id: 'land-rover', name: 'Land Rover', count: 9 },
-    { id: 'lexus', name: 'Lexus', count: 21 },
-    { id: 'lamborghini', name: 'Lamborghini', count: 5 },
-    { id: 'ferrari', name: 'Ferrari', count: 3 },
-    { id: 'rolls-royce', name: 'Rolls-Royce', count: 8 },
-    { id: 'kia', name: 'Kia', count: 1 },
-    { id: 'hyundai', name: 'Hyundai', count: 0 },
-    { id: 'honda', name: 'Honda', count: 2 },
-    { id: 'toyota', name: 'Toyota', count: 12 },
-    { id: 'mazda', name: 'Mazda', count: 8 },
-    { id: 'volvo', name: 'Volvo', count: 10 },
-    { id: 'mini', name: 'Mini', count: 4 },
-];
-
 export const BODY_STYLES = [
     { label: 'Tất cả', value: 'Tất cả' },
     { label: 'Sedan', value: 'Sedan' },

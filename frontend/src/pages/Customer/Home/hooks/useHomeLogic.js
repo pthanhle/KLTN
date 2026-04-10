@@ -22,7 +22,7 @@ export const useHomeLogic = () => {
     const handleViewCars = () => navigate('/brands');
     const handleViewCarDetail = (id) => navigate(`/cars/${id}`);
     const handleTradeIn = () => navigate('/contact');
-    const handleViewBrand = (brandId) => navigate(`/brand/${brandId}`);
+    const handleViewBrand = (brandId) => navigate(`/cars?brand=${brandId}`);
 
     return {
         featuredCars,

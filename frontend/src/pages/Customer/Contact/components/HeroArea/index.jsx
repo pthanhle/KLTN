@@ -9,9 +9,9 @@ const ContactHero = ({ t }) => {
                     alt="Luxury dark sports car parked in a modern minimalist garage"
                     preview={false}
                     className="w-full h-full object-cover grayscale-[20%] brightness-[0.4] scale-105 select-none"
-                    wrapperClassName="w-full h-full absolute inset-0 block"
+                    rootClassName="w-full h-full absolute inset-0 block"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    wrapperStyle={{ width: '100%', height: '100%', display: 'block' }}
+                    styles={{ root: { width: '100%', height: '100%', display: 'block' } }}
                     placeholder={<div className="w-full h-full bg-slate-900 animate-pulse" />}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#0c1324]/20 to-[#f8fafc] dark:from-[#060608]/40 dark:to-[#0c1324] pointer-events-none"></div>

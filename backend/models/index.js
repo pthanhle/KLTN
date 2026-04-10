@@ -2,7 +2,7 @@
 import './userModel.js'
 import './roleModel.js'
 import './categoryModel.js'
-import './productModel.js'
+import './carModel.js'
 import './cartModel.js'
 import './repairProgressModel.js'
 import './serviceBayModel.js'

@@ -12,7 +12,7 @@ import {
     Menu
 } from 'lucide-react';
 
-const Header = ({ collapsed, onToggle }) => {
+const Header = ({ collapsed, onToggle, hideToggle }) => {
     const navigate = useNavigate();
     const { t } = useTranslation('layout');
     const { user } = useSelector((state) => state.auth);
@@ -32,12 +32,14 @@ const Header = ({ collapsed, onToggle }) => {
 
             {/* TOGGLE BUTTON FOR SIDER */}
             <div className="flex-1 flex items-center">
-                <button
-                    onClick={onToggle}
-                    className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
-                >
-                    <Menu size={20} className="text-slate-600 dark:text-slate-300" />
-                </button>
+                {!hideToggle && (
+                    <button
+                        onClick={onToggle}
+                        className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
+                    >
+                        <Menu size={20} className="text-slate-600 dark:text-slate-300" />
+                    </button>
+                )}
             </div>
 
             {/* HEADER ACTIONS */}

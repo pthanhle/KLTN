@@ -1,4 +1,5 @@
 import { Calendar, Clock, MapPin, MessageSquareText } from 'lucide-react';
+import { formatDriveLocation, formatDriveDate } from '../../utils/historyUtils';
 
 const TicketDetails = ({ drive, t }) => {
     return (
@@ -21,11 +22,12 @@ const TicketDetails = ({ drive, t }) => {
                     </div>
                     <div>
                         <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">{t('date', 'Ngày hẹn')}</div>
-                        {/* Format YYYY-MM-DD on UI */}
-                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300 whitespace-nowrap">{drive.booking_date.split('-').reverse().join('/')}</div>
+                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300 whitespace-nowrap">
+                            {formatDriveDate(drive.booking_date)}
+                        </div>
                     </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 min-w-[130px]">
                     <div className="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 dark:text-slate-500 shrink-0 border border-slate-100 dark:border-white/5 transition-colors duration-300">
                         <Clock size={18} />
@@ -42,7 +44,9 @@ const TicketDetails = ({ drive, t }) => {
                     </div>
                     <div>
                         <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">{t('location', 'Địa điểm nhận xe')}</div>
-                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-2 transition-colors duration-300">{drive.delivery_address}</div>
+                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-2 transition-colors duration-300">
+                            {formatDriveLocation(drive, t)}
+                        </div>
                     </div>
                 </div>
             </div>

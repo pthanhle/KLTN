@@ -13,7 +13,8 @@ export const mockTestDrives = [
         booking_date: "2026-10-24",
         time_slot: "14:00 - 15:00",
         test_drive_type: "showroom",
-        delivery_address: "Showroom Elite Quận 7",
+        showroom_branch: '1',
+        delivery_address: null,
         customer_note: "Vui lòng chuẩn bị xe rửa sạch. Tôi muốn test kỹ hệ thống MBUX.",
         advisor_name: "Alex Tran",
         customer_info: {
@@ -32,7 +33,13 @@ export const mockTestDrives = [
         booking_date: "2026-10-28",
         time_slot: "10:00 - 11:30",
         test_drive_type: "home",
-        delivery_address: "123 Đường Nam Kỳ Khởi Nghĩa, Quận 3",
+        showroom_branch: null,
+        delivery_address: {
+            street: "123 Đường Nam Kỳ Khởi Nghĩa",
+            ward: "Phường Võ Thị Sáu",
+            district: "Quận 3",
+            city: "Thành phố Hồ Chí Minh"
+        },
         customer_note: "Trời mưa nên nhớ mang theo ô (dù) xe giúp em nhé.",
         advisor_name: null,
         customer_info: {

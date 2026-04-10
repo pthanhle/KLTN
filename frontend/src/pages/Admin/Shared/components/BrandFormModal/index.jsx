@@ -25,11 +25,12 @@ export const BrandFormModal = ({ isOpen, onClose, onSave, editingData, t }) => {
             width={520}
             footer={null}
             closeIcon={false}
+            centered
             focusable={{ focusTriggerAfterClose: false }}
             destroyOnHidden
             classNames={{
                 mask: "bg-[#070d1f]/80 backdrop-blur-md",
-                content: "!p-0 bg-white dark:bg-[#151b2d] rounded-[32px] overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.5)] dark:border dark:border-white/5",
+                content: "!p-0 bg-white dark:bg-[#141416] rounded-[32px] overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/5",
                 body: "bg-transparent",
             }}
         >

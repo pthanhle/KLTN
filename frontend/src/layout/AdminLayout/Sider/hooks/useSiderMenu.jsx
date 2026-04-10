@@ -12,7 +12,8 @@ import {
     CarFront, 
     TrendingUp,
     Tag,
-    Settings
+    Settings,
+    Car
 } from 'lucide-react';
 
 export const useSiderMenu = (collapsed) => {
@@ -30,9 +31,9 @@ export const useSiderMenu = (collapsed) => {
             label: t('admin.sider.dashboard'),
         },
         {
-            key: '/admin/products',
-            icon: <Box size={iconSize} />,
-            label: t('admin.sider.products'),
+            key: '/admin/cars',
+            icon: <Car size={iconSize} />,
+            label: t('admin.sider.cars', 'Kho Xe'),
         },
         {
             key: '/admin/categories',

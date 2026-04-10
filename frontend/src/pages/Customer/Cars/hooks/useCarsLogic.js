@@ -1,97 +1,61 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { DUMMY_CARS, BRAND_LIST, BODY_STYLES } from '../data/cars.mock';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { DUMMY_CARS, BODY_STYLES } from '../data/cars.mock';
+import { useClientBrandsQuery } from '../../../../services/queries/brandQueries';
+import { useCarsURLSync } from './useCarsURLSync';
+import { applyCarsFilters, paginateCars } from '../utils/carsFilterUtils';
 
 export const useCarsLogic = () => {
-    const { brandName } = useParams(); // URL params for brand integration
-    const navigate = useNavigate();
-
+    // 1. Core API & State Data Initialization
+    const [searchParams] = useSearchParams();
+    const { data: apiBrandsData = [], isLoading: isBrandsLoading } = useClientBrandsQuery();
+    
     const [isLoading, setIsLoading] = useState(true);
     const [isFiltering, setIsFiltering] = useState(false);
-
-    // UI states
     const [cars, setCars] = useState([]);
     const [totalCars, setTotalCars] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-
-    // Filters state
-    const [filters, setFilters] = useState({
-        keyword: '',
-        brandIds: brandName ? [brandName.toLowerCase()] : [],
-        minPrice: '',
-        maxPrice: '',
-        bodyStyle: 'Tất cả' // 'Tất cả', 'Sedan', 'SUV', 'Coupe', 'Cabriolet'
-    });
-
-    const [sort, setSort] = useState('newest'); // 'newest', 'priceAsc', 'priceDesc'
-
     const itemsPerPage = 9;
 
-    // Reset filters and sync with URL when route changes
-    useEffect(() => {
-        if (brandName) {
-            setFilters(prev => ({
-                ...prev,
-                brandIds: [brandName.toLowerCase()]
-            }));
-        } else {
-            // Keep brandIds empty if on `/cars` root
-            setFilters(prev => ({
-                ...prev,
-                brandIds: []
-            }));
-        }
-    }, [brandName]);
+    const [filters, setFilters] = useState({
+        keyword: searchParams.get('keyword') || '',
+        brandSlugs: searchParams.getAll('brand'),
+        minPrice: searchParams.get('minPrice') || '',
+        maxPrice: searchParams.get('maxPrice') || '',
+        bodyStyle: searchParams.get('bodyStyle') || 'Tất cả'
+    });
+    
+    const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
 
-    // Data Fetching logic (debounced implicitly by button click or setTimeout)
+    // 2. URL Synchronization logic (Extracted Custom Hook)
+    const { updateURL } = useCarsURLSync(setFilters, setSort);
+
+    // 3. Processed Brands mapping (Memoized)
+    const processedBrandsData = useMemo(() => {
+        return apiBrandsData.map(brand => {
+            const brandSlug = brand.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-');
+            return {
+                ...brand,
+                slug: brandSlug,
+                count: DUMMY_CARS.filter(c => c.brandId === brandSlug).length
+            };
+        });
+    }, [apiBrandsData]);
+
+    // 4. Data Filter / Sorting Simulation (Debounced internally)
     useEffect(() => {
         let isMounted = true;
-
+        
         setIsFiltering(true);
         if (cars.length === 0) setIsLoading(true);
 
         const timer = setTimeout(() => {
-            let result = [...DUMMY_CARS];
-
-            // 1. Keyword filter
-            if (filters.keyword) {
-                result = result.filter(c => c.name.toLowerCase().includes(filters.keyword.toLowerCase()));
-            }
-
-            // 2. Brand Filter
-            if (filters.brandIds.length > 0) {
-                result = result.filter(c => filters.brandIds.includes(c.brandId));
-            }
-
-            // 3. Price Filter
-            if (filters.minPrice) {
-                result = result.filter(c => c.price >= Number(filters.minPrice));
-            }
-            if (filters.maxPrice) {
-                result = result.filter(c => c.price <= Number(filters.maxPrice));
-            }
-
-            // 4. Body Style filter
-            if (filters.bodyStyle && filters.bodyStyle !== 'Tất cả') {
-                result = result.filter(c => c.bodyStyle === filters.bodyStyle);
-            }
-
-            // 5. SORTING
-            if (sort === 'priceAsc') {
-                result.sort((a, b) => a.price - b.price);
-            } else if (sort === 'priceDesc') {
-                result.sort((a, b) => b.price - a.price);
-            } else {
-                result.sort((a, b) => b.id - a.id);
-            }
-
-            // 6. Pagination
-            setTotalCars(result.length);
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            result = result.slice(startIndex, startIndex + itemsPerPage);
+            const filteredResult = applyCarsFilters(DUMMY_CARS, filters, sort);
+            const paginatedResult = paginateCars(filteredResult, currentPage, itemsPerPage);
 
             if (isMounted) {
-                setCars(result);
+                setTotalCars(filteredResult.length);
+                setCars(paginatedResult);
                 setIsFiltering(false);
                 setIsLoading(false);
             }
@@ -103,49 +67,44 @@ export const useCarsLogic = () => {
         };
     }, [filters, sort, currentPage, cars.length]);
 
+    // 5. Interaction Handlers
     const handleFilterChange = (key, value) => {
-        setFilters(prev => ({ ...prev, [key]: value }));
+        const newFilters = { ...filters, [key]: value };
+        setFilters(newFilters);
+        updateURL(newFilters, sort);
         setCurrentPage(1);
     };
 
-    const handleBrandToggle = (brandId) => {
-        setFilters(prev => {
-            const isSelected = prev.brandIds.includes(brandId);
-            let newBrandIds;
-            if (isSelected) {
-                newBrandIds = prev.brandIds.filter(id => id !== brandId);
-            } else {
-                newBrandIds = [...prev.brandIds, brandId];
-            }
+    const handleBrandToggle = (brandSlug) => {
+        const isSelected = filters.brandSlugs.includes(brandSlug);
+        const newBrandSlugs = isSelected 
+            ? filters.brandSlugs.filter(slug => slug !== brandSlug)
+            : [...filters.brandSlugs, brandSlug];
 
-            // Optional: If you want URL to reflect the first brand selected, 
-            // you can pushState here, but sticking to standard filter logic is easier.
-            // When clicking a brand checkbox, we stay on current URL but update state.
-            // If they deselect all brands and they were on /brand/:brandName, 
-            // you might want to redirect them to /cars for clean semantic URL.
-            if (brandName && newBrandIds.length === 0) {
-                // Remove parameter from URL by navigating to /cars
-                navigate('/cars', { replace: true });
-                return { ...prev, brandIds: [] };
-            }
-
-            return { ...prev, brandIds: newBrandIds };
-        });
+        const newFilters = { ...filters, brandSlugs: newBrandSlugs };
+        setFilters(newFilters);
+        updateURL(newFilters, sort);
         setCurrentPage(1);
     };
 
     const handleSelectAllBrands = () => {
-        setFilters(prev => ({ ...prev, brandIds: [] }));
-        if (brandName) navigate('/cars', { replace: true });
+        const newFilters = { ...filters, brandSlugs: [] };
+        setFilters(newFilters);
+        updateURL(newFilters, sort);
         setCurrentPage(1);
     };
 
     const handlePageChange = (page) => setCurrentPage(page);
-    const handleSortChange = (value) => setSort(value);
 
+    const handleSortChange = (value) => {
+        setSort(value);
+        updateURL(filters, value);
+    };
+
+    // 6. Return standard context bundle
     return {
-        brandNameParam: brandName,
-        isLoading,
+        brandNameParam: filters.brandSlugs.length === 1 ? filters.brandSlugs[0] : null,
+        isLoading: isLoading || isBrandsLoading,
         isFiltering,
         cars,
         totalCars,
@@ -158,7 +117,7 @@ export const useCarsLogic = () => {
         handleSelectAllBrands,
         handlePageChange,
         handleSortChange,
-        brandsData: BRAND_LIST,
+        brandsData: processedBrandsData,
         bodyStylesData: BODY_STYLES,
     };
 };

@@ -5,19 +5,53 @@ import { defaultBookingValues } from '../schemas/bookingSchema';
 dayjs.extend(customParseFormat);
 
 export const mapRescheduleDataToForm = (rescheduleData, userProfile) => {
+    // Attempt to extract default address from User Profile
+    const defaultAddr = userProfile?.addresses?.find(a => a.is_default) || userProfile?.addresses?.[0];
+
     if (!rescheduleData) {
         return {
             ...defaultBookingValues,
             fullName: userProfile?.full_name || '',
-            phoneNumber: userProfile?.phone || ''
+            phoneNumber: userProfile?.phone || '',
+            city: defaultAddr?.city || undefined,
+            district: defaultAddr?.district || undefined,
+            ward: defaultAddr?.ward || undefined,
+            addressDetail: defaultAddr?.street || userProfile?.address || '',
         };
+    }
+
+    // Map Reschedule Data using structured object directly if it exists
+    let rescheduleCity, rescheduleDistrict, rescheduleWard, rescheduleDetail = '';
+    
+    if (rescheduleData.test_drive_type === 'home' && rescheduleData.delivery_address) {
+        if (typeof rescheduleData.delivery_address === 'object') {
+            const addr = rescheduleData.delivery_address;
+            rescheduleCity = addr.city;
+            rescheduleDistrict = addr.district;
+            rescheduleWard = addr.ward;
+            rescheduleDetail = addr.street;
+        } else {
+            // Fallback for old legacy string-based format
+            const parts = rescheduleData.delivery_address.split(', ');
+            if (parts.length >= 4) {
+                rescheduleCity = parts[parts.length - 1];
+                rescheduleDistrict = parts[parts.length - 2];
+                rescheduleWard = parts[parts.length - 3];
+                rescheduleDetail = parts.slice(0, parts.length - 3).join(', ');
+            } else {
+                rescheduleDetail = rescheduleData.delivery_address;
+            }
+        }
     }
 
     return {
         ...defaultBookingValues,
         bookingType: rescheduleData.test_drive_type === 'home' ? 'home' : 'showroom',
         showroomBranch: rescheduleData.test_drive_type === 'showroom' ? '1' : undefined,
-        deliveryAddress: rescheduleData.test_drive_type === 'home' ? rescheduleData.delivery_address : '',
+        city: rescheduleCity || defaultAddr?.city || undefined,
+        district: rescheduleDistrict || defaultAddr?.district || undefined,
+        ward: rescheduleWard || defaultAddr?.ward || undefined,
+        addressDetail: rescheduleDetail || defaultAddr?.street || userProfile?.address || '',
         selectedDate: dayjs(rescheduleData.booking_date, 'YYYY-MM-DD'),
         selectedTimeSlot: rescheduleData.time_slot,
         note: rescheduleData.customer_note || '',
@@ -29,12 +63,21 @@ export const mapRescheduleDataToForm = (rescheduleData, userProfile) => {
 };
 
 export const mapFormToBookingPayload = (data, carId, isReschedule, rescheduleData) => {
+    // Send standard object payload instead of temporary string
+    const deliveryAddressObj = data.bookingType === 'home' 
+        ? {
+            street: data.addressDetail,
+            ward: data.ward,
+            district: data.district,
+            city: data.city
+        } : null;
+
     return {
         product_id: carId,
         booking_type: 'vehicle',
         test_drive_type: data.bookingType,
         showroom_branch: data.bookingType === 'showroom' ? data.showroomBranch : null,
-        delivery_address: data.bookingType === 'home' ? data.deliveryAddress : null,
+        delivery_address: deliveryAddressObj,
         full_name: data.fullName,
         contact_phone: data.phoneNumber,
         booking_date: data.selectedDate.format('YYYY-MM-DD'),

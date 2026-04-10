@@ -46,8 +46,9 @@ const AdminCategoriesIndex = () => {
     };
 
     return (
-        <div className="pt-24 px-12 pb-20 max-w-[1400px] relative z-10 w-full min-h-screen">
-            {contextHolder}
+        <div className="w-full flex justify-center pb-20 pt-4 md:pt-6">
+            <div className="w-full max-w-[1400px] relative z-10">
+                {contextHolder}
             
             <CategoryHeader t={t} onAddCategory={handleAddCategory} />
             
@@ -81,6 +82,7 @@ const AdminCategoriesIndex = () => {
                 t={t}
             />
             
+            </div>
         </div>
     );
 };

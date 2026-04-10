@@ -12,7 +12,10 @@ export const getBookingSchema = (t, rescheduleData, isDemoAvailable = true) => {
             .pipe(z.string().regex(/^(0|\+84)[0-9]{8,9}$/, t('booking_errorPhone', 'Vui lòng nhập số điện thoại hợp lệ'))),
         bookingType: z.enum(['showroom', 'home', 'waitlist']),
         showroomBranch: z.string().optional(),
-        deliveryAddress: z.string().optional(),
+        city: z.string().optional(),
+        district: z.string().optional(),
+        ward: z.string().optional(),
+        addressDetail: z.string().optional(),
         selectedDate: isDemoAvailable ? z.any().refine((val) => val !== null, {
             message: t('booking_errorDate', 'Vui lòng chọn ngày lái thử')
         }) : z.any().optional(),
@@ -33,29 +36,36 @@ export const getBookingSchema = (t, rescheduleData, isDemoAvailable = true) => {
                 path: ['showroomBranch']
             });
         }
-        if (data.bookingType === 'home' && (!data.deliveryAddress || data.deliveryAddress.trim().length === 0) && isDemoAvailable) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: t('booking_errorAddress', 'Vui lòng nhập địa chỉ nhận xe'),
-                path: ['deliveryAddress']
-            });
+        if (data.bookingType === 'home' && isDemoAvailable) {
+            if (!data.city) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('booking_errorCity', 'Vui lòng chọn Thành phố'), path: ['city'] });
+            }
+            if (!data.district) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('booking_errorDistrict', 'Vui lòng chọn Quận/Huyện'), path: ['district'] });
+            }
+            if (!data.ward) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('booking_errorWard', 'Vui lòng chọn Phường/Xã'), path: ['ward'] });
+            }
+            if (!data.addressDetail || data.addressDetail.trim().length === 0) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('booking_errorAddress', 'Vui lòng nhập địa chỉ nhận xe cụ thể'), path: ['addressDetail'] });
+            }
         }
-        
+
         // Custom Rule for Rescheduling: Must change Date OR Time
         if (rescheduleData && isDemoAvailable) {
             const isSameDate = data.selectedDate && dayjs(data.selectedDate).isSame(dayjs(rescheduleData.date, 'DD/MM/YYYY'), 'day');
-            
+
             if (isSameDate && data.selectedTimeSlot === rescheduleData.timeSlot) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: t('booking_errorSameTime', 'Bạn đang chọn trùng với lịch hẹn cũ. Vui lòng dời sang giờ/ngày khác!'),
                     path: ['selectedTimeSlot'] // Highlight lỗi ở Khung giờ
                 });
-                
+
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: t('booking_errorSameDate', 'Bạn chưa thay đổi ngày giờ. Vui lòng điều chỉnh lại!'),
-                    path: ['selectedDate'] // Highlight lỗi ở Cả Ngày
+                    path: ['selectedDate']
                 });
             }
         }
@@ -67,7 +77,10 @@ export const defaultBookingValues = {
     phoneNumber: '',
     bookingType: 'showroom',
     showroomBranch: '1',
-    deliveryAddress: '',
+    city: undefined,
+    district: undefined,
+    ward: undefined,
+    addressDetail: '',
     selectedDate: null,
     selectedTimeSlot: '',
     hasDriverLicense: false,

@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { Image } from 'antd';
 
 const BrandCard = ({ brand, t }) => {
+    const brandSlug = brand.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-');
     return (
         <Link 
-            to={`/brand/${brand.name.toLowerCase()}`}
+            to={`/cars?brand=${brandSlug}`}
             className="flex flex-col items-center justify-center p-8 bg-white dark:bg-[#141416] border border-slate-100/80 dark:border-white/5 rounded-[32px] hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-none hover:-translate-y-1 transition-all duration-300 group"
         >
             <div className="w-full h-24 mb-6 relative flex items-center justify-center overflow-hidden mix-blend-multiply dark:mix-blend-normal">

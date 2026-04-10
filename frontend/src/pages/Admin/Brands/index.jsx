@@ -5,7 +5,7 @@ import { BrandHeader } from './components/BrandHeader';
 import { BrandToolbar } from './components/BrandToolbar';
 import { BrandTable } from './components/BrandTable';
 import { BrandStats } from './components/BrandStats';
-import { BrandFormModal } from './components/BrandFormModal';
+import { BrandFormModal } from '../Shared/components/BrandFormModal';
 import { Skeleton } from 'antd';
 
 const AdminBrandsIndex = () => {

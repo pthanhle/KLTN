@@ -65,3 +65,4 @@ $RECYCLE.BIN/
 
 # ======== Project Specific ========
 /backend/uploads
+/.agents/

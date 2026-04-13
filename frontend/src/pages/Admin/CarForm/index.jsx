@@ -4,6 +4,7 @@ import BuilderSidebar from './components/BuilderSidebar';
 import BuilderHeader from './components/BuilderHeader';
 import OverviewTab from './components/Tabs/Overview/index';
 import PricingInventoryTab from './components/Tabs/PricingInventory/index';
+import SpecsTab from './components/Tabs/Specs/index';
 import { useTranslation } from 'react-i18next';
 import { Form } from 'antd';
 
@@ -17,7 +18,7 @@ const CarForm = () => {
         switch (activeTab) {
             case 'overview': return <OverviewTab form={form} />;
             case 'pricing': return <PricingInventoryTab form={form} />;
-            case 'specs': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('specsPending', 'Specs Module Pending...')}</div>;
+            case 'specs': return <SpecsTab form={form} />;
             case 'colors': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('colorsPending', 'Colors Module Pending...')}</div>;
             case 'features': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('featuresPending', 'Features Module Pending...')}</div>;
             case 'seo': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('seoPending', 'SEO Module Pending...')}</div>;

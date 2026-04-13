@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 import mongoose from 'mongoose'
 
 
@@ -91,7 +91,7 @@ export const getProducts = asyncHandler(async (req, res) => {
     }
   })
 
-  const [result] = await Product.aggregate(pipeline)
+  const [result] = await Part.aggregate(pipeline)
   const total = result.metadata.length > 0 ? result.metadata[0].total : 0
 
   res.json({
@@ -108,7 +108,7 @@ export const getProductFilters = asyncHandler(async (req, res) => {
   let matchQuery = {}
   if (type) matchQuery.type = type
 
-  const stats = await Product.aggregate([
+  const stats = await Part.aggregate([
     { $match: matchQuery },
     {
       $facet: {
@@ -154,7 +154,7 @@ export const getProductFilters = asyncHandler(async (req, res) => {
 
 
 export const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({})
+  const products = await Part.find({})
     .populate('category_id', 'category_name')
     .select('-gallery -specs -features')
   res.json(products)
@@ -166,18 +166,18 @@ export const getProductById = asyncHandler(async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400)
-    throw new Error('Product ID không hợp lệ')
+    throw new Error('Part ID không hợp lệ')
   }
 
-  const product = await Product.findById(id)
+  const Part = await Part.findById(id)
     .populate('category_id', 'category_name image')
 
-  if (!product) {
+  if (!Part) {
     res.status(404)
     throw new Error('Không tìm thấy sản phẩm')
   }
 
-  res.json(product)
+  res.json(Part)
 })
 
 
@@ -189,7 +189,7 @@ export const getProductsByCategory = asyncHandler(async (req, res) => {
     throw new Error('Category ID không hợp lệ')
   }
 
-  const products = await Product.find({ category_id: categoryId })
+  const products = await Part.find({ category_id: categoryId })
   res.json(products)
 })
 
@@ -219,7 +219,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   }
 
 
-  const product = await Product.create({
+  const Part = await Part.create({
     category_id: category_id || null,
     type: type || 'part',
     sku: sku || undefined,
@@ -242,7 +242,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     compatible_brands: compatible_brands || [],
   })
 
-  res.status(201).json(product)
+  res.status(201).json(Part)
 })
 
 
@@ -251,11 +251,11 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400)
-    throw new Error('Product ID không hợp lệ')
+    throw new Error('Part ID không hợp lệ')
   }
 
-  const product = await Product.findById(id)
-  if (!product) {
+  const Part = await Part.findById(id)
+  if (!Part) {
     res.status(404)
     throw new Error('Không tìm thấy sản phẩm')
   }
@@ -270,11 +270,11 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   allowedFields.forEach(field => {
     if (req.body[field] !== undefined) {
-      product[field] = req.body[field]
+      Part[field] = req.body[field]
     }
   })
 
-  const updated = await product.save()
+  const updated = await Part.save()
   res.json(updated)
 })
 
@@ -285,15 +285,15 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400)
-    throw new Error('Product ID không hợp lệ')
+    throw new Error('Part ID không hợp lệ')
   }
 
-  const product = await Product.findById(id)
-  if (!product) {
+  const Part = await Part.findById(id)
+  if (!Part) {
     res.status(404)
     throw new Error('Không tìm thấy sản phẩm')
   }
 
-  await product.deleteOne()
+  await Part.deleteOne()
   res.json({ message: 'Xóa sản phẩm thành công' })
 })

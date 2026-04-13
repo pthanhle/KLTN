@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import Order from '../../models/orderModel.js'
 import User from '../../models/userModel.js'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 import RevenueReport from '../../models/revenueReportModel.js'
 import Booking from '../../models/bookingModel.js'
 import Role from '../../models/roleModel.js'
@@ -36,8 +36,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         createdAt: { $gte: start.toDate(), $lte: end.toDate() },
     })
 
-    const lowStockProducts = await Product.countDocuments({
-        stock_quantity: { $lt: 5 },
+    const lowStockProducts = await Part.countDocuments({
+        "inventory.warehouse": { $lt: 5 },
     })
 
     const bookings = await Booking.countDocuments({
@@ -123,7 +123,7 @@ export const getTopProducts = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-                from: 'products',
+                from: 'parts',
                 localField: '_id',
                 foreignField: '_id',
                 as: 'product',
@@ -133,7 +133,7 @@ export const getTopProducts = asyncHandler(async (req, res) => {
         {
             $project: {
                 product_id: '$_id',
-                product_name: '$product.product_name',
+                product_name: '$product.name',
                 totalSold: 1,
                 totalRevenue: 1,
             },

@@ -1,12 +1,12 @@
 import asyncHandler from "express-async-handler";
 import StockTransaction from "../../../models/stockModel.js";
 import Inventory from "../../../models/inventoryModel.js";
-import Product from "../../../models/productModel.js";
+import Part from "../../../models/partModel.js";
 
 
 export const getStockTransactions = asyncHandler(async (req, res) => {
   const history = await StockTransaction.find()
-    .populate("product_id", "product_name price images stock_quantity")
+    .populate("product_id", "name price images inventory")
     .populate("created_by", "full_name email")
     .sort({ createdAt: -1 });
 
@@ -36,8 +36,8 @@ export const createStockTransaction = asyncHandler(async (req, res) => {
   } else if (type === "outbound") {
     inventory.quantity_available -= quantity;
 
-    await Product.findByIdAndUpdate(product_id, {
-      $inc: { stock_quantity: quantity }
+    await Part.findByIdAndUpdate(product_id, {
+      $inc: { "inventory.warehouse": quantity }
     });
   }
 

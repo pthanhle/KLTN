@@ -1,5 +1,5 @@
 import Booking from '../../models/bookingModel.js'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 import Notification from '../../models/notificationModel.js'
 import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'

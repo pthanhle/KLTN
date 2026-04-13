@@ -1,6 +1,6 @@
 import asyncHandler from 'express-async-handler'
 import Category from '../../models/categoryModel.js'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 
 export const getCategories = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.current || req.query.page) || 1;
@@ -29,7 +29,7 @@ export const getCategories = asyncHandler(async (req, res) => {
 
   const categoriesWithCount = await Promise.all(
     categories.map(async (category) => {
-      const count = await Product.countDocuments({ category_id: category._id });
+      const count = await Part.countDocuments({ category: category.category_name });
       return { ...category, count };
     })
   );

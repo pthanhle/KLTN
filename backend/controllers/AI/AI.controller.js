@@ -1,5 +1,5 @@
 import { model } from "../../config/geminiAI.js";
-import Product from "../../models/productModel.js";
+import Part from "../../models/partModel.js";
 import ServicePackage from "../../models/servicepackageModel.js";
 import Category from "../../models/categoryModel.js";
 import Order from "../../models/orderModel.js";
@@ -88,11 +88,11 @@ export const AiChatController = {
             const categoryIds = categories.map(c => c._id);
 
             const orConditions = [
-              { product_name: regex },
-              { type: regex },
-              { description: regex }
+              { name: regex },
+              { category: regex },
+              { seo_description: regex }
             ];
-            if (categoryIds.length > 0) orConditions.push({ category_id: { $in: categoryIds } });
+            if (categoryIds.length > 0) orConditions.push({ category: regex });
             andConditions.push({ $or: orConditions });
           }
 
@@ -100,14 +100,13 @@ export const AiChatController = {
           if (andConditions.length > 0) filter = { $and: andConditions };
         }
 
-        const products = await Product.find(filter)
-          .populate("category_id", "category_name")
+        const products = await Part.find(filter)
           .limit(6)
           .sort({ createdAt: -1 });
 
         if (products.length > 0) {
           dbContext = (q.mode === "list_all" ? "Danh sách sản phẩm nổi bật:\n" : "Kết quả tìm kiếm:\n") +
-            products.map(p => `- [${p.type || p.category_id?.category_name}] ${p.product_name}: ${p.price.toLocaleString()} VND.\n  Mô tả: ${p.description}`).join("\n\n");
+            products.map(p => `- [${p.category || 'Phụ tùng'}] ${p.name}: ${p.price.toLocaleString()} VND.\n  Mô tả: ${p.seo_description || 'Không có mô tả'}`).join("\n\n");
         } else {
           dbContext = "Không tìm thấy sản phẩm nào phù hợp.";
         }
@@ -150,11 +149,11 @@ export const AiChatController = {
             else filter.status = regex;
           }
 
-          const orders = await Order.find(filter).sort({ createdAt: -1 }).limit(5).populate("items.product_id", "product_name");
+          const orders = await Order.find(filter).sort({ createdAt: -1 }).limit(5);
 
           if (orders.length > 0) {
             dbContext = orders.map(o => {
-              const names = o.items.map(i => i.product_id?.product_name).join(', ');
+              const names = o.items.map(i => i.product_name || 'Sản phẩm').join(', ');
               return `📦 Đơn ${o._id}: [${o.status}] - ${o.total_amount.toLocaleString()} VND.\n   Gồm: ${names}`;
             }).join("\n\n");
           } else {

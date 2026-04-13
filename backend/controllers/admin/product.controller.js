@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 import mongoose from 'mongoose'
 
 
@@ -75,7 +75,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     }
   });
 
-  const result = await Product.aggregate(pipeline);
+  const result = await Part.aggregate(pipeline);
   const total = result[0].metadata[0] ? result[0].metadata[0].total : 0;
   const products = result[0].data;
 
@@ -162,7 +162,7 @@ export const getProductsByCategory = asyncHandler(async (req, res) => {
     }
   });
 
-  const result = await Product.aggregate(pipeline);
+  const result = await Part.aggregate(pipeline);
   const total = result[0].metadata[0] ? result[0].metadata[0].total : 0;
   const products = result[0].data;
 
@@ -216,7 +216,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     finalImages = [req.file.path, ...finalImages]
   }
 
-  const product = new Product({
+  const Part = new Part({
     category_id,
     type,
     sku,
@@ -244,7 +244,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     images: finalImages,
   })
 
-  const createdProduct = await product.save()
+  const createdProduct = await Part.save()
   res.status(201).json(createdProduct)
 })
 
@@ -254,11 +254,11 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400)
-    throw new Error('Product ID không hợp lệ')
+    throw new Error('Part ID không hợp lệ')
   }
 
-  const product = await Product.findById(id)
-  if (!product) {
+  const Part = await Part.findById(id)
+  if (!Part) {
     res.status(404)
     throw new Error('Sản phẩm không tồn tại')
   }
@@ -273,15 +273,15 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   allowedFields.forEach(field => {
     if (req.body[field] !== undefined) {
-      product[field] = req.body[field]
+      Part[field] = req.body[field]
     }
   })
 
   if (req.file) {
-    product.images = [req.file.path, ...(product.images || [])]
+    Part.images = [req.file.path, ...(Part.images || [])]
   }
 
-  const updatedProduct = await product.save()
+  const updatedProduct = await Part.save()
   res.json(updatedProduct)
 })
 
@@ -291,15 +291,15 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400)
-    throw new Error('Product ID không hợp lệ')
+    throw new Error('Part ID không hợp lệ')
   }
 
-  const product = await Product.findById(id)
-  if (!product) {
+  const Part = await Part.findById(id)
+  if (!Part) {
     res.status(404)
     throw new Error('Sản phẩm không tồn tại')
   }
 
-  await product.deleteOne()
+  await Part.deleteOne()
   res.json({ message: 'Sản phẩm đã được xóa' })
 })

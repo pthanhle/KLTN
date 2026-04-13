@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 import Category from '../../models/categoryModel.js'
 import mongoose from 'mongoose'
 
@@ -118,7 +118,7 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     throw new Error('Danh mục không tồn tại')
   }
 
-  const productsCount = await Product.countDocuments({ category_id: id })
+  const productsCount = await Part.countDocuments({ category: category.category_name })
   if (productsCount > 0) {
     res.status(400)
     throw new Error(`Không thể xóa danh mục này vì còn ${productsCount} sản phẩm. Vui lòng xóa hoặc chuyển sản phẩm sang danh mục khác trước.`)

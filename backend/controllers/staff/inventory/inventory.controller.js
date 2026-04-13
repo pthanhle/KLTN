@@ -1,13 +1,13 @@
 import asyncHandler from "express-async-handler";
 import Inventory from "../../../models/inventoryModel.js";
-import Product from "../../../models/productModel.js";
+import Part from "../../../models/partModel.js";
 import Category from "../../../models/categoryModel.js";
 
 export const getInventoryList = asyncHandler(async (req, res) => {
   const inventory = await Inventory.find()
     .populate({
       path: "product_id",
-      select: "product_name price images category_id type stock_quantity"
+      select: "name price images category type inventory"
     });
 
   res.status(200).json(inventory);
@@ -21,7 +21,7 @@ export const addInventory = asyncHandler(async (req, res) => {
   if (quantity_available < 0)
     return res.status(400).json({ message: "Số lượng không hợp lệ" });
 
-  const product = await Product.findById(product_id);
+  const product = await Part.findById(product_id);
   if (!product) return res.status(404).json({ message: "Sản phẩm không tồn tại" });
 
   const existed = await Inventory.findOne({ product_id });
@@ -63,17 +63,16 @@ export const addInventoryByName = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Danh mục không tồn tại. Hãy tạo danh mục trước." });
   }
 
-  let product = await Product.findOne({ product_name });
+  let product = await Part.findOne({ name: product_name });
 
   if (!product) {
-    product = await Product.create({
-      product_name,
+    product = await Part.create({
+      name: product_name,
       price: price || 0,
       images: images || [],
-      category_id: category._id,
+      category: category_name,
       type: "product",
-      type: "product",
-      stock_quantity: 0
+      "inventory.warehouse": 0
     });
   } else {
     const existedInventory = await Inventory.findOne({ product_id: product._id });
@@ -124,7 +123,7 @@ export const deleteInventory = asyncHandler(async (req, res) => {
   if (!inventory)
     return res.status(404).json({ message: "Không tìm thấy mục kho" });
 
-  await Product.findByIdAndUpdate(inventory.product_id, { stock_quantity: 0 });
+  await Part.findByIdAndUpdate(inventory.product_id, { "inventory.warehouse": 0 });
 
   await inventory.deleteOne();
   res.status(200).json({ message: "Xoá sản phẩm khỏi kho thành công" });

@@ -1,10 +1,9 @@
 import Feedback from '../../models/feedbackModel.js'
-import Product from '../../models/productModel.js'
+import Part from '../../models/partModel.js'
 import Booking from '../../models/bookingModel.js'
 import Order from '../../models/orderModel.js'
 import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
-import Part from '../../models/partModel.js'
 
 export const getMyFeedbacks = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1

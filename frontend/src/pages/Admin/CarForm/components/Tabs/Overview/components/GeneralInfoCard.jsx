@@ -28,14 +28,15 @@ const GeneralInfoCard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <Form.Item 
                         name="sku" 
-                        label={<span className="text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-black mb-1 block">{t('skuLabel', 'Đường Dẫn SKU')}</span>}
+                        label={<span className="text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-black mb-1 block">{t('skuLabel', 'Mã SKU')}</span>}
                         rules={rules.sku}
                         className="mb-0"
                     >
                         <Input 
                             prefix={<span className="text-slate-400 dark:text-slate-600 font-mono text-lg mr-2 font-bold">#</span>}
                             className="w-full !bg-slate-50 dark:!bg-white/5 !border-none !rounded-xl !px-5 !py-3.5 font-mono !text-base text-slate-700 dark:text-[#4edea3] focus:!ring-2 focus:!ring-yellow-500/30 transition-all hover:!bg-slate-100 dark:hover:!bg-white/10" 
-                            placeholder={t('skuPlaceholder', 'porsche-911-gt3')} 
+                            placeholder={t('skuPlaceholder', 'POR-911-GT3')} 
+                            style={{ textTransform: 'uppercase' }}
                         />
                     </Form.Item>
 

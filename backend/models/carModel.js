@@ -43,10 +43,20 @@ const specCategorySchema = new mongoose.Schema(
   { _id: false }
 );
 
+const videoSchema = new mongoose.Schema(
+  {
+    url: { type: String, required: true },
+    title: { type: String },
+    duration: { type: String },
+    thumbnail: { type: String },
+  },
+  { _id: false }
+);
+
 const gallerySchema = new mongoose.Schema(
   {
     photos: { type: [String], default: [] },
-    videos: { type: [String], default: [] },
+    videos: [videoSchema],
   },
   { _id: false }
 );
@@ -90,7 +100,11 @@ const carSchema = new mongoose.Schema(
 
     image: { type: String },
     gallery: { type: gallerySchema, default: () => ({}) },
-    threeSixty: { type: [String], default: [] },
+    threeSixty: {
+      images: { type: [String], default: [] },
+      lighting: { type: String, default: 'Studio' },
+      environment: { type: String, default: 'Minimalist Studio' }
+    },
 
     colors: [colorSchema],
     features: [featureSchema],
@@ -98,7 +112,8 @@ const carSchema = new mongoose.Schema(
 
     metaTitle: { type: String },
     metaDescription: { type: String },
-    metaKeywords: { type: String },
+    metaKeywords: { type: [String], default: [] },
+    ogImage: { type: String },
   },
   {
     timestamps: true,

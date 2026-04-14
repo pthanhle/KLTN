@@ -15,9 +15,9 @@ const CoreSpecsCard = () => {
         </span>
     );
 
-    const globalInputClasses = "!bg-slate-50 dark:!bg-[#1a1a1c] !border-none !rounded-xl text-slate-900 dark:text-white !text-sm font-semibold focus-within:!ring-2 focus-within:!ring-yellow-500/50 transition-all [&_input]:!text-sm";
+    const globalInputClasses = "!w-full !bg-slate-50 dark:!bg-[#1a1a1c] !border-none !rounded-xl text-slate-900 dark:text-white !text-sm font-semibold focus-within:!ring-2 focus-within:!ring-yellow-500/50 transition-all [&_input]:!text-sm";
 
-    const inputHeightClasses = "w-full !h-[50px] [&_input]:!h-[50px] [&_input]:leading-[50px] flex items-center";
+    const inputHeightClasses = "!h-[50px] [&_input]:!h-[50px] [&_input]:leading-[50px]";
 
     return (
         <section className="bg-white dark:bg-[#141416] rounded-3xl p-8 lg:p-10 shadow-sm dark:shadow-[0_15px_30px_rgba(0,0,0,0.2)] border border-slate-100 dark:border-white/5">
@@ -35,6 +35,7 @@ const CoreSpecsCard = () => {
                     rules={rules.year}
                     label={<SpecLabel text={t('year', 'Năm Sản Xuất')} />}
                     layout="vertical"
+                    required={false}
                 >
                     <InputNumber
                         prefix={<CalendarDays size={18} className="text-yellow-500 mr-2" />}
@@ -50,6 +51,7 @@ const CoreSpecsCard = () => {
                     rules={rules.odo}
                     label={<SpecLabel text={t('odo', 'ODO')} />}
                     layout="vertical"
+                    required={false}
                 >
                     <InputNumber
                         prefix={<Gauge size={18} className="text-yellow-500 mr-2" />}
@@ -66,6 +68,7 @@ const CoreSpecsCard = () => {
                     rules={rules.engine}
                     label={<SpecLabel text={t('engine', 'Động cơ')} />}
                     layout="vertical"
+                    required={false}
                 >
                     <Input
                         prefix={<Settings2 size={18} className="text-yellow-500 mr-2" />}
@@ -79,6 +82,7 @@ const CoreSpecsCard = () => {
                     rules={rules.power}
                     label={<SpecLabel text={t('power', 'Công suất')} />}
                     layout="vertical"
+                    required={false}
                 >
                     <Input
                         prefix={<Zap size={18} className="text-yellow-500 mr-2" />}
@@ -92,6 +96,7 @@ const CoreSpecsCard = () => {
                     rules={rules.fuel}
                     label={<SpecLabel text={t('fuel', 'Nhiên liệu')} />}
                     layout="vertical"
+                    required={false}
                 >
                     {isLoading ? (
                         <Skeleton.Input active block style={{ height: '50px', borderRadius: '12px' }} />
@@ -116,6 +121,7 @@ const CoreSpecsCard = () => {
                     rules={rules.seats}
                     label={<SpecLabel text={t('seats', 'Số chỗ')} />}
                     layout="vertical"
+                    required={false}
                 >
                     <InputNumber
                         prefix={<Users size={18} className="text-yellow-500 mr-2" />}

@@ -7,7 +7,7 @@ export const getOverviewRules = () => {
             { max: 100, message: i18n.t('adminCarForm:maxName', 'Tên quá dài, tối đa 100 ký tự') }
         ],
         sku: [
-            { pattern: /^[a-z0-9-]+$/, message: i18n.t('adminCarForm:invalidSku', 'SKU chỉ được chứa chữ thường, số và dấu gạch ngang') },
+            { pattern: /^[a-zA-Z0-9-_]+$/, message: i18n.t('adminCarForm:invalidSku', 'SKU chỉ được chứa chữ cái không dấu, số, gạch ngang hoặc gạch dưới') },
             { max: 50, message: i18n.t('adminCarForm:maxSku', 'SKU tối đa 50 ký tự') }
         ],
         tagline: [

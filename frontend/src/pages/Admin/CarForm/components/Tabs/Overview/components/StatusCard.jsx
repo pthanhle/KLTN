@@ -13,7 +13,13 @@ const StatusCard = () => {
                     <span className="text-base font-black tracking-tight text-slate-900 dark:text-white">{t('isNewLabel', 'Mô hình xe lướt')}</span>
                     <span className="text-[12px] font-medium text-slate-500 dark:text-slate-400 mt-1">{t('isNewDesc', 'Sản phẩm đã qua sử dụng (Pre-owned)')}</span>
                 </div>
-                <Form.Item name="isNew" valuePropName="checked" className="mb-0">
+                <Form.Item 
+                    name="isNew" 
+                    valuePropName="checked" 
+                    getValueProps={(value) => ({ checked: !value })}
+                    getValueFromEvent={(checked) => !checked}
+                    className="mb-0"
+                >
                     <Switch className="bg-slate-300 dark:bg-[#2e3447] scale-110" />
                 </Form.Item>
             </div>

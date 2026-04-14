@@ -16,12 +16,12 @@ export const useCarsTableColumns = (handleToggleDemo) => {
             fixed: 'left',
             width: 380,
             render: (_, record) => (
-                <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0 shadow-sm">
-                        <Image src={record.image} alt={record.name} className="w-full h-full object-cover" preview={false} />
+                <div className="flex items-center space-x-4 cursor-pointer group" onClick={() => navigate(`/admin/cars/edit/${record.id}`)}>
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0 shadow-sm group-hover:shadow-md transition-all">
+                        <img src={record.image} alt={record.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div>
-                        <p className="font-bold text-slate-900 dark:text-white line-clamp-1 text-left">{record.name}</p>
+                        <p className="font-bold text-slate-900 dark:text-white line-clamp-1 text-left group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">{record.name}</p>
                         <p className="text-[10px] font-medium text-slate-500 uppercase mt-1 text-left">SKU: {record.sku}</p>
                     </div>
                 </div>

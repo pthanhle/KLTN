@@ -7,18 +7,16 @@ export const useDynamicTaxonomies = () => {
     const [isLoadingTaxonomies, setIsLoadingTaxonomies] = useState(true);
 
     useEffect(() => {
-        // Simulate fetching dynamic taxonomies from BE
         const fetchTaxonomies = async () => {
             setIsLoadingTaxonomies(true);
             setTimeout(() => {
                 setBrands([
-                    { value: 'Porsche', label: 'Porsche' },
-                    { value: 'Mercedes-Benz', label: 'Mercedes-Benz' },
-                    { value: 'BMW', label: 'BMW' },
-                    { value: 'Audi', label: 'Audi' },
-                    { value: 'Lexus', label: 'Lexus' }
+                    { value: 'porsche', label: 'Porsche' },
+                    { value: 'mercedes-benz', label: 'Mercedes-Benz' },
+                    { value: 'bmw', label: 'BMW' },
+                    { value: 'audi', label: 'Audi' },
+                    { value: 'lexus', label: 'Lexus' }
                 ]);
-                // We map from Customer's mocked BODY_STYLES
                 setBodyStyles(
                     BODY_STYLES.filter(b => b.value !== 'Tất cả')
                 );

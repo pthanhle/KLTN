@@ -5,25 +5,34 @@ import BuilderHeader from './components/BuilderHeader';
 import OverviewTab from './components/Tabs/Overview/index';
 import PricingInventoryTab from './components/Tabs/PricingInventory/index';
 import SpecsTab from './components/Tabs/Specs/index';
+import ColorsTab from './components/Tabs/Colors/index';
+import FeaturesTab from './components/Tabs/Features/index';
+import SEOTab from './components/Tabs/SEO/index';
+import MediaLibraryTab from './components/Tabs/MediaLibrary/index';
+import ThreeSixtyTab from './components/Tabs/ThreeSixty/index';
 import { useTranslation } from 'react-i18next';
-import { Form } from 'antd';
+import { Form, Skeleton, Space } from 'antd';
+import { useParams } from 'react-router-dom';
+import { useCarFormInit } from './hooks/useCarFormInit';
 
 const CarForm = () => {
     const { activeTab, setActiveTab } = useCarFormUI();
     const { t } = useTranslation('adminCarForm');
+    const { id } = useParams();
     const [form] = Form.useForm();
     const { isSubmitting, handleSaveDraft, handlePublish } = useCarFormSubmit(form);
+    const { isInitializing } = useCarFormInit(id, form);
 
     const renderTabContent = () => {
         switch (activeTab) {
             case 'overview': return <OverviewTab form={form} />;
             case 'pricing': return <PricingInventoryTab form={form} />;
             case 'specs': return <SpecsTab form={form} />;
-            case 'colors': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('colorsPending', 'Colors Module Pending...')}</div>;
-            case 'features': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('featuresPending', 'Features Module Pending...')}</div>;
-            case 'seo': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('seoPending', 'SEO Module Pending...')}</div>;
-            case 'library': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('libraryPending', 'Library Module Pending...')}</div>;
-            case '360': return <div className="text-center p-20 dark:text-slate-400 font-medium border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl">{t('360Pending', '360 View Module Pending...')}</div>;
+            case 'colors': return <ColorsTab form={form} />;
+            case 'features': return <FeaturesTab form={form} />;
+            case 'seo': return <SEOTab form={form} />;
+            case 'library': return <MediaLibraryTab form={form} />;
+            case '360': return <ThreeSixtyTab form={form} />;
             default: return null;
         }
     };
@@ -39,15 +48,33 @@ const CarForm = () => {
                     isSubmitting={isSubmitting} 
                 />
                 
-                <main className="flex-1 overflow-y-auto custom-scrollbar">
+                <main className="flex-1 overflow-y-auto custom-scrollbar relative">
                     <div className="w-full max-w-[1600px] mx-auto px-6 md:px-10 xl:px-12 py-6">
-                        <Form 
-                            form={form} 
-                            layout="vertical"
-                            className="w-full"
-                        >
-                            {renderTabContent()}
-                        </Form>
+                        {isInitializing ? (
+                            <div className="w-full max-w-4xl mx-auto mt-4 p-8 bg-white dark:bg-[#141416] rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm">
+                                <Skeleton active paragraph={{ rows: 2 }} className="mb-8" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <Space direction="vertical" size="large" className="w-full">
+                                        <Skeleton.Input active block size="large" />
+                                        <Skeleton.Input active block size="large" />
+                                        <Skeleton.Input active block size="large" />
+                                    </Space>
+                                    <Space direction="vertical" size="large" className="w-full">
+                                        <Skeleton.Input active block size="large" />
+                                        <Skeleton.Input active block size="large" />
+                                        <Skeleton.Image active className="!w-full !h-[120px]" />
+                                    </Space>
+                                </div>
+                            </div>
+                        ) : (
+                            <Form 
+                                form={form} 
+                                layout="vertical"
+                                className="w-full"
+                            >
+                                {renderTabContent()}
+                            </Form>
+                        )}
                     </div>
                 </main>
             </div>

@@ -1,37 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { FUEL_TYPES_MOCK, MOCK_API_DELAY } from '../data/carSpecs.mock';
 
 export const useCarSpecsEnums = () => {
-    const [fuelTypes, setFuelTypes] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: fuelTypes = [], isLoading } = useQuery({
+        queryKey: ['car-specs-enums'],
+        queryFn: async () => {
+            await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY));
 
-    useEffect(() => {
-        let isMounted = true;
-        
-        const fetchEnums = async () => {
-            try {
-                setIsLoading(true);
-                // Simulate API Call
-                await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY));
-                
-                if (isMounted) {
-                    setFuelTypes(FUEL_TYPES_MOCK);
-                }
-            } catch (error) {
-                console.error("Failed to fetch car spec enums:", error);
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        fetchEnums();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+            return FUEL_TYPES_MOCK;
+        },
+        staleTime: 1000 * 60 * 60,
+        refetchOnWindowFocus: false,
+    });
 
     return {
         fuelTypes,

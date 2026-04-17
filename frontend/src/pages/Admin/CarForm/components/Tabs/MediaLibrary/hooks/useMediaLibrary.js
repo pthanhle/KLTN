@@ -1,38 +1,90 @@
+import React from 'react';
 import { Form } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 export const useMediaLibrary = () => {
     const { t } = useTranslation('adminCarForm');
     const form = Form.useFormInstance();
-    
-    // Watch fields to trigger re-renders
+
     const rawHeroImage = Form.useWatch('image', form);
     const photos = Form.useWatch(['gallery', 'photos'], form) || [];
     const newPhotos = Form.useWatch('new_photos', form) || [];
     const videos = Form.useWatch(['gallery', 'videos'], form) || [];
 
-    // Local state for previews (since we don't want to pollute form values with blobs if possible, 
-    // but actually putting them in the heroImage field is easier for rendering)
-    // Using a wrapper logic to return the best available URI
-    const heroImageUri = React.useMemo(() => {
-        if (!rawHeroImage) return null;
-        if (rawHeroImage instanceof File) {
-            return URL.createObjectURL(rawHeroImage);
+    const getRealFile = (val) => {
+        if (!val) return null;
+        if (val instanceof File || val instanceof Blob) return val;
+        if (val.originFileObj instanceof File || val.originFileObj instanceof Blob) return val.originFileObj;
+        if (val.file instanceof File || val.file instanceof Blob) return val.file;
+        return null;
+    };
+
+    const [heroImageUri, setHeroImageUri] = React.useState(null);
+
+    React.useEffect(() => {
+        if (!rawHeroImage) {
+            setHeroImageUri(null);
+            return;
         }
-        return rawHeroImage;
+
+        const fileObj = getRealFile(rawHeroImage);
+
+        if (fileObj) {
+            const url = URL.createObjectURL(fileObj);
+            setHeroImageUri(url);
+
+            return () => {
+                if (url.startsWith('blob:')) {
+                    URL.revokeObjectURL(url);
+                }
+            };
+        }
+
+        if (typeof rawHeroImage === 'string' && (rawHeroImage.startsWith('http') || rawHeroImage.startsWith('/') || rawHeroImage.startsWith('blob:'))) {
+            setHeroImageUri(rawHeroImage);
+        } else {
+            setHeroImageUri(null);
+        }
     }, [rawHeroImage]);
 
-    // Helper functions
+    const [displayPhotos, setDisplayPhotos] = React.useState([]);
+
+    React.useEffect(() => {
+        const urlsToCleanup = [];
+
+        const localPreviews = (newPhotos || []).map(file => {
+            if (file instanceof File || file instanceof Blob) {
+                const url = URL.createObjectURL(file);
+                urlsToCleanup.push(url);
+                return { url, raw: file };
+            }
+            return null;
+        }).filter(Boolean);
+
+        const remotePhotos = (photos || []).map(url => ({
+            url: url,
+            raw: url
+        }));
+
+        setDisplayPhotos([...remotePhotos, ...localPreviews]);
+
+        return () => {
+            urlsToCleanup.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [photos, newPhotos]);
+
     const handleSetHeroImage = (fileOrUrl) => {
+        if (!form) return;
         form.setFieldValue('image', fileOrUrl);
     };
 
     const handleRemoveHeroImage = () => {
+        if (!form) return;
         form.setFieldValue('image', null);
     };
 
     const handleAddPhotos = (newPhotosArr) => {
-        // Here we track files to upload separately from existing photo URLs
+        if (!form) return;
         const filesToUpload = newPhotosArr.filter(p => p instanceof File);
         const existingUrls = newPhotosArr.filter(p => typeof p === 'string');
 
@@ -51,12 +103,11 @@ export const useMediaLibrary = () => {
     };
 
     const handleRemovePhoto = (photoToRemove) => {
-        // Check if it's in the existing photos
+        if (!form) return;
         const currentGallery = form.getFieldValue('gallery') || { photos: [], videos: [] };
         const updatedPhotos = (currentGallery.photos || []).filter(p => p !== photoToRemove);
         form.setFieldValue('gallery', { ...currentGallery, photos: updatedPhotos });
 
-        // Check if it's in the new photos (Files)
         const currentFiles = form.getFieldValue('new_photos') || [];
         const updatedFiles = currentFiles.filter(f => f !== photoToRemove);
         form.setFieldValue('new_photos', updatedFiles);
@@ -67,6 +118,7 @@ export const useMediaLibrary = () => {
     };
 
     const handleAddVideo = (videoObj) => {
+        if (!form) return;
         const currentGallery = form.getFieldValue('gallery') || { photos: [], videos: [] };
         form.setFieldValue('gallery', {
             ...currentGallery,
@@ -75,6 +127,7 @@ export const useMediaLibrary = () => {
     };
 
     const handleRemoveVideo = (indexToRemove) => {
+        if (!form) return;
         const currentGallery = form.getFieldValue('gallery') || { photos: [], videos: [] };
         form.setFieldValue('gallery', {
             ...currentGallery,
@@ -82,22 +135,9 @@ export const useMediaLibrary = () => {
         });
     };
 
-    // UI Representation of photos
-    const displayPhotos = React.useMemo(() => {
-        const localPreviews = (newPhotos || []).map(file => ({
-            url: URL.createObjectURL(file),
-            raw: file
-        }));
-        const remotePhotos = (photos || []).map(url => ({
-            url: url,
-            raw: url
-        }));
-        return [...remotePhotos, ...localPreviews];
-    }, [photos, newPhotos]);
-
     return {
         heroImage: heroImageUri,
-        photos: displayPhotos, 
+        photos: displayPhotos,
         videos,
         handleSetHeroImage,
         handleRemoveHeroImage,

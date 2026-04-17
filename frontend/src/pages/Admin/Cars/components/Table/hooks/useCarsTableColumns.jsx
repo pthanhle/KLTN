@@ -46,7 +46,7 @@ export const useCarsTableColumns = (handleToggleDemo) => {
             width: 200,
             render: (_, record) => (
                 <div className="flex flex-col items-start gap-1 text-left">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{record.year} <span className="mx-1 text-slate-300">•</span> {(record.odo).toLocaleString()} km</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{record.year} <span className="mx-1 text-slate-300">•</span> {(record.odo || 0).toLocaleString('vi-VN')} km</p>
                     {record.isNew ? (
                         <Tag color="success" className="m-0 uppercase font-bold text-[9px] border-none px-2 py-0.5">{t('brandNew', 'Mới (Brand New)')}</Tag>
                     ) : (
@@ -106,7 +106,7 @@ export const useCarsTableColumns = (handleToggleDemo) => {
             width: 120,
             render: (_, record) => (
                 <div className="flex items-center justify-center space-x-1">
-                    <button 
+                    <button
                         onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/admin/cars/edit/${record.id}`);
@@ -115,7 +115,7 @@ export const useCarsTableColumns = (handleToggleDemo) => {
                     >
                         <Edit2 size={16} strokeWidth={1.75} />
                     </button>
-                    <button 
+                    <button
                         onClick={(e) => e.stopPropagation()}
                         className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:text-[#ffb4ab] dark:hover:bg-red-500/10 transition-colors opacity-70 hover:opacity-100 cursor-pointer outline-none"
                     >

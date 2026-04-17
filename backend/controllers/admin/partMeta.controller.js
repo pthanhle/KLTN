@@ -10,8 +10,7 @@ export const getPartCategories = asyncHandler(async (req, res) => {
 
 export const getPartConditions = asyncHandler(async (req, res) => {
   let conditions = await PartCondition.find({}).sort('name').lean();
-  
-  // If no conditions exist yet in the DB, gracefully seed the base enterprise taxonomies
+
   if (conditions.length === 0) {
     const baseConditions = [
       { name: 'Mới 100%', value: 'new', description: 'Hàng chính hãng mới 100%' },
@@ -23,7 +22,7 @@ export const getPartConditions = asyncHandler(async (req, res) => {
     await PartCondition.insertMany(baseConditions);
     conditions = await PartCondition.find({}).sort('name').lean();
   }
-  
+
   res.json({ success: true, data: conditions });
 });
 

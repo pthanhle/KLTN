@@ -2,15 +2,17 @@ import asyncHandler from 'express-async-handler'
 import Car from '../../models/carModel.js'
 import mongoose from 'mongoose'
 
-const safeParse = (data) => {
+const safeParse = (data, defaultValue = null) => {
   if (typeof data === 'string') {
+    if (data === 'undefined' || data === 'null' || data === '') return defaultValue;
     try {
       return JSON.parse(data);
     } catch (e) {
-      return data;
+      console.warn(`Failed to parse JSON: ${data}`);
+      return defaultValue;
     }
   }
-  return data;
+  return data || defaultValue;
 };
 
 export const getAllProducts = asyncHandler(async (req, res) => {
@@ -25,22 +27,22 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 
   const pipeline = [];
   const matchStage = {};
-  
+
   if (search) {
     matchStage.$or = [
       { name: { $regex: search, $options: 'i' } },
       { description: { $regex: search, $options: 'i' } }
     ];
   }
-  
+
   if (brand && brand !== 'all' && brand !== 'Tất cả') {
     matchStage.brandName = { $regex: brand, $options: 'i' };
   }
-  
+
   if (bodyStyle && bodyStyle !== 'all' && bodyStyle !== 'Tất cả') {
     matchStage.bodyStyle = bodyStyle;
   }
-  
+
   if (status && status !== 'all' && status !== 'Tất cả') {
     matchStage.status = status;
   }
@@ -118,30 +120,23 @@ export const getProductById = asyncHandler(async (req, res) => {
 
   const carObj = car.toJSON();
   carObj.id = carObj._id;
-  
+
   res.json({ success: true, data: carObj });
 })
 
 export const createProduct = asyncHandler(async (req, res) => {
-  const parsedBody = {};
-  [
-    'versions', 'colors', 'gallery', 'features', 'specs', 'threeSixty'
-  ].forEach(field => {
-    if (req.body[field]) parsedBody[field] = safeParse(req.body[field]);
-  });
-
   const {
     name, product_name, type, sku, tagline, description,
     price, stock, isNew, brandId, brandName, year, odo, engine, power, fuel,
     seats, bodyStyle, isDemoAvailable, status, images: bodyImages,
   } = req.body
 
-  const versions = parsedBody.versions || [];
-  const colors = parsedBody.colors || [];
-  const gallery = parsedBody.gallery || { photos: [], videos: [] };
-  const features = parsedBody.features || [];
-  const specs = parsedBody.specs || [];
-  const threeSixty = parsedBody.threeSixty || { images: [], lighting: 'Studio', environment: 'Minimalist Studio' };
+  const versions = safeParse(req.body.versions, []);
+  const colors = safeParse(req.body.colors, []);
+  const gallery = safeParse(req.body.gallery, { photos: [], videos: [] });
+  const features = safeParse(req.body.features, []);
+  const specs = safeParse(req.body.specs, []);
+  const threeSixty = safeParse(req.body.threeSixty, { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
 
   const finalName = name || product_name;
 
@@ -150,7 +145,6 @@ export const createProduct = asyncHandler(async (req, res) => {
     throw new Error('Thiếu thông tin bắt buộc của xe (Tên, Giá)')
   }
 
-  // Handle uploaded files
   let heroImage = null;
   let galleryPhotos = gallery.photos || [];
 
@@ -201,11 +195,6 @@ export const createProduct = asyncHandler(async (req, res) => {
     image: heroImage || galleryPhotos[0] || null,
   })
 
-  // Ensure primary image exists
-  if (finalImages.length > 0 && !car.image) {
-    car.image = finalImages[0];
-  }
-
   const createdProduct = await car.save()
   res.status(201).json({ success: true, data: createdProduct, message: 'Thêm xe mới thành công' })
 })
@@ -235,8 +224,21 @@ export const updateProduct = asyncHandler(async (req, res) => {
   allowedFields.forEach(field => {
     if (req.body[field] !== undefined) {
       if (field === 'product_name') car.name = req.body[field];
-      else if (['versions', 'colors', 'gallery', 'features', 'specs', 'threeSixty'].includes(field)) {
-        car[field] = safeParse(req.body[field]);
+      else if (['versions', 'colors', 'features'].includes(field)) {
+        car[field] = safeParse(req.body[field], []);
+      }
+      else if (['gallery', 'threeSixty'].includes(field)) {
+        car[field] = safeParse(req.body[field], field === 'gallery' ? { photos: [], videos: [] } : { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
+      }
+      else if (field === 'specs') {
+        car[field] = safeParse(req.body[field], []);
+      }
+      else if (field === 'isDemoAvailable' || field === 'isNew') {
+        car[field] = req.body[field] === 'true' || req.body[field] === true;
+      }
+      else if (['price', 'salePrice', 'stock', 'year', 'odo', 'seats'].includes(field)) {
+        const numVal = Number(req.body[field]);
+        if (!isNaN(numVal)) car[field] = numVal;
       }
       else car[field] = req.body[field]
     }
@@ -245,7 +247,6 @@ export const updateProduct = asyncHandler(async (req, res) => {
   if (req.files) {
     if (req.files.image && req.files.image[0]) {
       car.image = req.files.image[0].path;
-      // Also potentially update gallery if hero image should be there
       if (car.gallery && car.gallery.photos) {
         car.gallery.photos = [car.image, ...car.gallery.photos];
       }

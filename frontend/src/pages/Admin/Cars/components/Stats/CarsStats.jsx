@@ -22,11 +22,24 @@ const CarsStats = ({ stats, isLoading }) => {
 
     const lastUpdateStr = i18n.language === 'en' ? stats.lastUpdateEn : stats.lastUpdateVi;
 
+    const formatBillion = (val) => {
+        if (!val) return '0';
+        const inBillion = val / 1000000000;
+        return new Intl.NumberFormat('vi-VN', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 3
+        }).format(inBillion);
+    };
+
+    const formatNumber = (val) => {
+        if (!val) return '0';
+        return new Intl.NumberFormat('vi-VN').format(val);
+    };
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10 w-full relative z-10">
             <StatCard
                 title={t('statsTitleFleet', 'Tổng Quy Mô Xe')}
-                value={stats.totalFleet}
+                value={formatNumber(stats.totalFleet)}
                 unit={t('statsUnitCar', 'Xe')}
                 icon={Car}
                 valueColorClass="text-slate-900 dark:text-white"
@@ -45,7 +58,7 @@ const CarsStats = ({ stats, isLoading }) => {
 
             <StatCard
                 title={t('statsTitleValue', 'Tổng Giá Trị Kho')}
-                value={stats.totalValue}
+                value={formatBillion(stats.totalValue)}
                 unit={t('statsUnitBillion', 'Tỷ')}
                 icon={Wallet}
                 valueColorClass="text-amber-600 dark:text-[#ffd165]"
@@ -58,7 +71,7 @@ const CarsStats = ({ stats, isLoading }) => {
 
             <StatCard
                 title={t('statsTitleLowStock', 'Cảnh Báo Sắp Hết Hàng')}
-                value={stats.lowStockModels}
+                value={formatNumber(stats.lowStockModels)}
                 unit={t('statsUnitModel', 'Mẫu')}
                 icon={AlertTriangle}
                 valueColorClass="text-slate-900 dark:text-white"
@@ -75,7 +88,7 @@ const CarsStats = ({ stats, isLoading }) => {
 
             <StatCard
                 title={t('statsTitleDemo', 'Đội Xe Lái Thử')}
-                value={stats.demoCars}
+                value={formatNumber(stats.demoCars)}
                 unit={t('statsUnitCar', 'Xe')}
                 icon={Key}
                 valueColorClass="text-slate-900 dark:text-white"

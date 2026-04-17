@@ -23,7 +23,6 @@ export const getStep2Schema = (t) => {
     });
 };
 
-// Tổng hợp schema cho review
 export const getServiceBookingSchema = (t) => {
     return getStep1Schema(t).and(getStep2Schema(t));
 };

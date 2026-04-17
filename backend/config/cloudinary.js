@@ -57,6 +57,10 @@ export const upload = {
   array(fieldName, maxCount) {
     ensureConfigured()
     return multerInstance.array(fieldName, maxCount)
+  },
+  fields(fieldsArray) {
+    ensureConfigured()
+    return multerInstance.fields(fieldsArray)
   }
 }
 

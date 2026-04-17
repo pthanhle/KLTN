@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from 'antd';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
@@ -12,7 +12,11 @@ const AdminLayout = () => {
     const { isDarkMode } = useTheme();
     const location = useLocation();
 
-    const isBuilderMode = location.pathname.startsWith('/admin/cars/edit') || location.pathname.startsWith('/admin/cars/create');
+    const isBuilderMode = location.pathname.includes('/admin/cars/edit') || location.pathname.includes('/admin/cars/create');
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
 
     return (
         <Layout key={location.key} style={{ minHeight: '100vh' }} hasSider={!isBuilderMode} className={isDarkMode ? 'dark' : ''}>

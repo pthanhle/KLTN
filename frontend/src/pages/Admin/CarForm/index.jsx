@@ -72,6 +72,11 @@ const CarForm = () => {
                                 layout="vertical"
                                 className="w-full"
                             >
+                                <Form.Item name="image" hidden />
+                                <Form.Item name="new_photos" hidden />
+                                <Form.Item name={['gallery', 'photos']} hidden />
+                                <Form.Item name={['gallery', 'videos']} hidden />
+
                                 {renderTabContent()}
                             </Form>
                         )}

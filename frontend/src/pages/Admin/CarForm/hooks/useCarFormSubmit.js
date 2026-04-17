@@ -11,14 +11,13 @@ export const useCarFormSubmit = (form) => {
     const queryClient = useQueryClient();
 
     // Helper to extract real File/Blob from various wrappers (AntD, raw browser, etc.)
+    // Tightened to ONLY return real binary data to ensure FormData works correctly.
     const getRealFile = (val) => {
         if (!val) return null;
-        // Check if it's already a File or Blob
         if (val instanceof File || val instanceof Blob) return val;
-        // Check if it's an AntD Upload File object
         if (val.originFileObj instanceof File || val.originFileObj instanceof Blob) return val.originFileObj;
-        // Check if it's a wrapped object with a 'file' property (sometimes happens in custom setups)
         if (val.file instanceof File || val.file instanceof Blob) return val.file;
+        // DO NOT return metadata objects {uid, name, etc} as they break FormData binary uploads
         return null;
     };
 
@@ -28,19 +27,16 @@ export const useCarFormSubmit = (form) => {
         Object.keys(values).forEach(key => {
             const value = values[key];
 
-            // 1. Specific File handling for Hero Image (the 'image' field)
             if (key === 'image') {
                 const heroFile = getRealFile(value);
                 if (heroFile) {
                     formData.append('image', heroFile);
-                } else if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('/'))) {
-                    // Only send as string if it looks like a real URL/Path
+                } else if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('/') || value.startsWith('blob:'))) {
                     formData.append('image', value);
                 }
-                return; // Move to next key
+                return;
             }
 
-            // 2. Specific File handling for Gallery Photos (new_photos)
             if (key === 'new_photos' && Array.isArray(value)) {
                 value.forEach(item => {
                     const photoFile = getRealFile(item);
@@ -48,14 +44,12 @@ export const useCarFormSubmit = (form) => {
                         formData.append('photos', photoFile);
                     }
                 });
-                return; // Move to next key
+                return;
             }
 
-            // 3. Handle complex objects/arrays (stringify for multipart)
             if (value !== null && typeof value === 'object' && !(value instanceof File) && !(value instanceof Blob)) {
                 formData.append(key, JSON.stringify(value));
             }
-            // 4. Regular primitives
             else if (value !== undefined && value !== null) {
                 formData.append(key, value);
             }
@@ -77,7 +71,6 @@ export const useCarFormSubmit = (form) => {
                 response = await createAdminProduct(payload);
             }
 
-            // Refresh form with latest data from server
             if (response && response.data) {
                 form.setFieldsValue({
                     ...response.data,
@@ -109,7 +102,8 @@ export const useCarFormSubmit = (form) => {
             await queryClient.invalidateQueries(['admin-products']);
             message.success('Xe mới đã được cập nhật lên Showroom!');
 
-            window.location.href = '/admin/cars';
+            // Use replace to avoid sticky history entries that cause back-button loops
+            window.location.replace('/admin/cars');
 
         } catch (error) {
             console.error("Form submit error:", error);

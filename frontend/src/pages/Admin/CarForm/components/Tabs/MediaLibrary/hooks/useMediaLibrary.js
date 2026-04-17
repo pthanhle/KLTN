@@ -16,6 +16,8 @@ export const useMediaLibrary = () => {
         if (val instanceof File || val instanceof Blob) return val;
         if (val.originFileObj instanceof File || val.originFileObj instanceof Blob) return val.originFileObj;
         if (val.file instanceof File || val.file instanceof Blob) return val.file;
+        if (typeof val === 'object' && val.uid && val.type) return val;
+
         return null;
     };
 
@@ -38,9 +40,7 @@ export const useMediaLibrary = () => {
                     URL.revokeObjectURL(url);
                 }
             };
-        }
-
-        if (typeof rawHeroImage === 'string' && (rawHeroImage.startsWith('http') || rawHeroImage.startsWith('/') || rawHeroImage.startsWith('blob:'))) {
+        } else if (typeof rawHeroImage === 'string' && (rawHeroImage.startsWith('http') || rawHeroImage.startsWith('/') || rawHeroImage.startsWith('blob:'))) {
             setHeroImageUri(rawHeroImage);
         } else {
             setHeroImageUri(null);

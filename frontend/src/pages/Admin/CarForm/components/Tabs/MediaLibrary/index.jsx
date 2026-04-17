@@ -24,7 +24,6 @@ const MediaLibraryTab = () => {
 
             <Form.Item name={['gallery', 'photos']} hidden />
             <Form.Item name={['gallery', 'videos']} hidden />
-            <Form.Item name="image" hidden />
 
             <div className="grid grid-cols-12 gap-8">
                 <HeroImageBox />

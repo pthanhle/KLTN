@@ -81,7 +81,7 @@ export const useCarFormSubmit = (form) => {
             if (response && response.data) {
                 form.setFieldsValue({
                     ...response.data,
-                    new_photos: [] 
+                    new_photos: []
                 });
                 await queryClient.invalidateQueries(['admin-products']);
                 message.success('Đã lưu nháp phân bổ xe thành công!');
@@ -106,13 +106,10 @@ export const useCarFormSubmit = (form) => {
                 await createAdminProduct(payload);
             }
 
-            // Invalidate and show message
             await queryClient.invalidateQueries(['admin-products']);
             message.success('Xe mới đã được cập nhật lên Showroom!');
 
-            // Navigate immediately but after the current promise chain
-            // Use replace: true to ensure history is clean
-            navigate('/admin/cars', { replace: true });
+            window.location.href = '/admin/cars';
 
         } catch (error) {
             console.error("Form submit error:", error);

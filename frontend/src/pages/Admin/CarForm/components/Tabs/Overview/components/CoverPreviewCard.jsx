@@ -20,18 +20,15 @@ const CoverPreviewCard = () => {
     return (
         <div className="bg-white dark:bg-[#141416] rounded-xl p-8 shadow-sm dark:shadow-[0_15px_30px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-white/5">
             <label className="block text-[11px] uppercase tracking-widest text-slate-500 font-black mb-6">{t('coverImageHeading', 'Ảnh Bìa Đại Diện')}</label>
-            <Form.Item name="image" className="mb-0">
+            <Form.Item className="mb-0">
                 <Upload {...uploadProps} className="w-full block" style={{ width: '100%' }}>
                     <div className="relative group overflow-hidden rounded-2xl bg-slate-50 dark:bg-white/5 h-64 w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-white/10 hover:border-yellow-500 dark:hover:border-yellow-500/50 transition-all hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer">
-                        {heroImage && typeof heroImage === 'string' ? (
+                        {heroImage ? (
                             <>
                                 <img 
                                     src={heroImage} 
                                     alt="Cover Preview" 
                                     className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-                                    onError={(e) => {
-                                        e.target.style.display = 'none';
-                                    }}
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full text-slate-900 font-bold text-xs shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">

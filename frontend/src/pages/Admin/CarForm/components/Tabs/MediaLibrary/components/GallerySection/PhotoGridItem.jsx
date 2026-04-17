@@ -11,7 +11,7 @@ const PhotoGridItem = ({ photo, index, onMakeHero, onRemove }) => {
             <Image 
                 wrapperClassName="w-full h-full"
                 className="w-full h-full object-cover" 
-                src={photo} 
+                src={photo.url} 
                 alt={`Gallery ${index}`} 
                 preview={{
                     maskClassName: 'hidden' // Hide default antd hover mask
@@ -30,7 +30,7 @@ const PhotoGridItem = ({ photo, index, onMakeHero, onRemove }) => {
                 </button>
                 <button 
                     type="button"
-                    onClick={(e) => { e.stopPropagation(); onMakeHero(photo); }}
+                    onClick={(e) => { e.stopPropagation(); onMakeHero(photo.raw); }}
                     className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center hover:bg-yellow-500 hover:border-yellow-500 transition-all pointer-events-auto" 
                     title={t('mediaActionSetHero', 'Đặt làm Hero')}
                 >
@@ -38,7 +38,7 @@ const PhotoGridItem = ({ photo, index, onMakeHero, onRemove }) => {
                 </button>
                 <button 
                     type="button"
-                    onClick={(e) => { e.stopPropagation(); onRemove(photo); }}
+                    onClick={(e) => { e.stopPropagation(); onRemove(photo.raw); }}
                     className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center hover:bg-red-500 hover:border-red-500 transition-all pointer-events-auto" 
                     title={t('mediaActionDelete', 'Xóa')}
                 >

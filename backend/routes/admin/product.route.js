@@ -14,8 +14,11 @@ const router = express.Router()
 
 router.use(protect, admin)
 
-const uploadImageWrapper = (req, res, next) => {
-  upload.single('image')(req, res, (err) => {
+const uploadImageFields = (req, res, next) => {
+  upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'photos', maxCount: 10 }
+  ])(req, res, (err) => {
     if (err) {
       console.error('Multer Error:', err)
       return res.status(400).json({ message: err.message })
@@ -26,11 +29,11 @@ const uploadImageWrapper = (req, res, next) => {
 
 router.route('/')
   .get(getAllProducts)
-  .post(uploadImageWrapper, createProduct)
+  .post(uploadImageFields, createProduct)
 
 router.route('/:id')
   .get(getProductById)
-  .put(uploadImageWrapper, updateProduct)
+  .put(uploadImageFields, updateProduct)
   .delete(deleteProduct)
 
 router.get('/:categoryId', getProductsByCategory)

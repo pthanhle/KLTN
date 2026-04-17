@@ -1,44 +1,41 @@
 import asyncHandler from 'express-async-handler'
-import Part from '../../models/partModel.js'
+import Car from '../../models/carModel.js'
 import mongoose from 'mongoose'
-
 
 export const getProducts = asyncHandler(async (req, res) => {
   const {
-    category, minPrice, maxPrice,
-    type, brand, bodyStyle, fuel, seats, isNew,
+    keyword, minPrice, maxPrice,
+    brand, bodyStyle, fuel, seats, isNew,
   } = req.query
   const page = parseInt(req.query.current || req.query.page) || 1
   const limit = parseInt(req.query.pageSize || req.query.limit) || 12
-  const search = req.query.search || ''
-  const sortField = req.query.sortField || 'createdAt'
-  const sortOrder = (req.query.sortOrder === 'ascend' || req.query.sortOrder === 'asc') ? 1 : -1
+  const search = req.query.search || keyword || ''
+  const sortParam = req.query.sort || 'newest';
+  
+  let sortField = 'createdAt';
+  let sortOrder = -1;
+  if(sortParam === 'price_asc') { sortField = 'price'; sortOrder = 1; }
+  else if(sortParam === 'price_desc') { sortField = 'price'; sortOrder = -1; }
+  else if(sortParam === 'name_asc') { sortField = 'name'; sortOrder = 1; }
+  else if(sortParam === 'name_desc') { sortField = 'name'; sortOrder = -1; }
 
-  let matchQuery = {}
+  let matchQuery = { status: 'Published' }
 
-  if (type) matchQuery.type = type
-  if (bodyStyle) matchQuery.bodyStyle = bodyStyle
+  if (bodyStyle && bodyStyle !== 'Tất cả') matchQuery.bodyStyle = bodyStyle
   if (fuel) matchQuery.fuel = fuel
   if (isNew !== undefined) matchQuery.isNew = isNew === 'true'
   if (seats) matchQuery.seats = parseInt(seats)
 
   if (brand) {
-    const brands = Array.isArray(brand) ? brand : [brand]
-    matchQuery.$or = brands.map(b => ({
-      $or: [
-        { brandId: { $regex: b, $options: 'i' } },
-        { brandName: { $regex: b, $options: 'i' } },
-      ]
-    }))
-  }
-
-  if (category && mongoose.Types.ObjectId.isValid(category)) {
-    matchQuery.category_id = new mongoose.Types.ObjectId(category)
+    const brands = Array.isArray(brand) ? brand : brand.split(',');
+    if(brands.length > 0 && brands[0] !== '') {
+       matchQuery.$or = brands.map(b => ({ brandId: b }))
+    }
   }
 
   if (search) {
     const searchOr = [
-      { product_name: { $regex: search, $options: 'i' } },
+      { name: { $regex: search, $options: 'i' } },
       { brandName: { $regex: search, $options: 'i' } },
       { description: { $regex: search, $options: 'i' } },
       { sku: { $regex: search, $options: 'i' } },
@@ -51,47 +48,27 @@ export const getProducts = asyncHandler(async (req, res) => {
     }
   }
 
+  if (minPrice || maxPrice) {
+    matchQuery.price = {}
+    if (minPrice) matchQuery.price.$gte = Number(minPrice)
+    if (maxPrice) matchQuery.price.$lte = Number(maxPrice)
+  }
+
   const pipeline = [
     { $match: matchQuery },
+    { $sort: { [sortField]: sortOrder } },
     {
-      $addFields: {
-        cleanPrice: { $toDouble: '$price' }
+      $facet: {
+        metadata: [{ $count: 'total' }],
+        data: [
+          { $skip: (page - 1) * limit },
+          { $limit: limit }
+        ]
       }
     }
   ]
 
-  if (minPrice || maxPrice) {
-    const priceFilter = {}
-    if (minPrice) priceFilter.$gte = Number(minPrice)
-    if (maxPrice) priceFilter.$lte = Number(maxPrice)
-    pipeline.push({ $match: { cleanPrice: priceFilter } })
-  }
-
-  const sortKey = sortField === 'price' ? 'cleanPrice' : sortField
-  pipeline.push({ $sort: { [sortKey]: sortOrder } })
-
-  pipeline.push({
-    $facet: {
-      metadata: [{ $count: 'total' }],
-      data: [
-        { $skip: (page - 1) * limit },
-        { $limit: limit },
-        {
-          $lookup: {
-            from: 'categories',
-            localField: 'category_id',
-            foreignField: '_id',
-            as: 'category_info',
-          }
-        },
-        { $unwind: { path: '$category_info', preserveNullAndEmptyArrays: true } },
-        { $addFields: { category_id: '$category_info' } },
-        { $project: { category_info: 0, cleanPrice: 0 } }
-      ]
-    }
-  })
-
-  const [result] = await Part.aggregate(pipeline)
+  const [result] = await Car.aggregate(pipeline)
   const total = result.metadata.length > 0 ? result.metadata[0].total : 0
 
   res.json({
@@ -100,16 +77,9 @@ export const getProducts = asyncHandler(async (req, res) => {
   })
 })
 
-
-
 export const getProductFilters = asyncHandler(async (req, res) => {
-  const { type } = req.query 
-
-  let matchQuery = {}
-  if (type) matchQuery.type = type
-
-  const stats = await Part.aggregate([
-    { $match: matchQuery },
+  const stats = await Car.aggregate([
+    { $match: { status: 'Published' } },
     {
       $facet: {
         brands: [
@@ -120,12 +90,6 @@ export const getProductFilters = asyncHandler(async (req, res) => {
         bodyStyles: [
           { $match: { bodyStyle: { $exists: true, $ne: null } } },
           { $group: { _id: "$bodyStyle", count: { $sum: 1 } } },
-          { $project: { name: "$_id", count: 1, _id: 0 } },
-          { $sort: { name: 1 } }
-        ],
-        fuels: [
-          { $match: { fuel: { $exists: true, $ne: null } } },
-          { $group: { _id: "$fuel", count: { $sum: 1 } } },
           { $project: { name: "$_id", count: 1, _id: 0 } },
           { $sort: { name: 1 } }
         ],
@@ -147,153 +111,30 @@ export const getProductFilters = asyncHandler(async (req, res) => {
   res.json({
     brands: result.brands,
     bodyStyles: result.bodyStyles,
-    fuels: result.fuels,
     priceRange: result.priceRange[0] || { min: 0, max: 0 }
   })
 })
 
-
 export const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Part.find({})
-    .populate('category_id', 'category_name')
-    .select('-gallery -specs -features')
+  const products = await Car.find({ status: 'Published' })
   res.json(products)
 })
-
 
 export const getProductById = asyncHandler(async (req, res) => {
   const { id } = req.params
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    res.status(400)
-    throw new Error('Part ID không hợp lệ')
-  }
+  let query = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { slug: id };
 
-  const Part = await Part.findById(id)
-    .populate('category_id', 'category_name image')
+  const car = await Car.findOne(query)
 
-  if (!Part) {
+  if (!car) {
     res.status(404)
-    throw new Error('Không tìm thấy sản phẩm')
+    throw new Error('Không tìm thấy xe')
   }
 
-  res.json(Part)
+  res.json(car)
 })
-
 
 export const getProductsByCategory = asyncHandler(async (req, res) => {
-  const { categoryId } = req.params
-
-  if (!mongoose.Types.ObjectId.isValid(categoryId)) {
-    res.status(400)
-    throw new Error('Category ID không hợp lệ')
-  }
-
-  const products = await Part.find({ category_id: categoryId })
-  res.json(products)
-})
-
-
-export const createProduct = asyncHandler(async (req, res) => {
-  const {
-    category_id, type, sku, product_name, tagline, description,
-    price, stock, isNew, images,
-    brandId, brandName, year, odo, engine, fuel, seats, bodyStyle,
-    isDemoAvailable, versions, colors, gallery, features, specs,
-    compatible_brands,
-  } = req.body
-
-  if (!product_name) {
-    res.status(400)
-    throw new Error('Tên sản phẩm là bắt buộc')
-  }
-
-  if (!price || price <= 0) {
-    res.status(400)
-    throw new Error('Giá sản phẩm phải lớn hơn 0')
-  }
-
-  if (category_id && !mongoose.Types.ObjectId.isValid(category_id)) {
-    res.status(400)
-    throw new Error('Category ID không hợp lệ')
-  }
-
-
-  const Part = await Part.create({
-    category_id: category_id || null,
-    type: type || 'part',
-    sku: sku || undefined,
-    product_name,
-    tagline,
-    description,
-    price,
-    stock: stock || 0,
-    isNew: isNew || false,
-    images: images || [],
-    brandId, brandName, year,
-    odo: odo || 0,
-    engine, fuel, seats, bodyStyle,
-    isDemoAvailable: isDemoAvailable !== undefined ? isDemoAvailable : true,
-    versions: versions || [],
-    colors: colors || [],
-    gallery: gallery || { photos: [], videos: [] },
-    features: features || [],
-    specs: specs || [],
-    compatible_brands: compatible_brands || [],
-  })
-
-  res.status(201).json(Part)
-})
-
-
-export const updateProduct = asyncHandler(async (req, res) => {
-  const { id } = req.params
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    res.status(400)
-    throw new Error('Part ID không hợp lệ')
-  }
-
-  const Part = await Part.findById(id)
-  if (!Part) {
-    res.status(404)
-    throw new Error('Không tìm thấy sản phẩm')
-  }
-
-  const allowedFields = [
-    'category_id', 'type', 'sku', 'product_name', 'tagline', 'description',
-    'price', 'stock', 'isNew', 'images',
-    'brandId', 'brandName', 'year', 'odo', 'engine', 'fuel', 'seats', 'bodyStyle',
-    'isDemoAvailable', 'versions', 'colors', 'gallery', 'features', 'specs',
-    'compatible_brands',
-  ]
-
-  allowedFields.forEach(field => {
-    if (req.body[field] !== undefined) {
-      Part[field] = req.body[field]
-    }
-  })
-
-  const updated = await Part.save()
-  res.json(updated)
-})
-
-
-
-export const deleteProduct = asyncHandler(async (req, res) => {
-  const { id } = req.params
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    res.status(400)
-    throw new Error('Part ID không hợp lệ')
-  }
-
-  const Part = await Part.findById(id)
-  if (!Part) {
-    res.status(404)
-    throw new Error('Không tìm thấy sản phẩm')
-  }
-
-  await Part.deleteOne()
-  res.json({ message: 'Xóa sản phẩm thành công' })
+  res.json([])
 })

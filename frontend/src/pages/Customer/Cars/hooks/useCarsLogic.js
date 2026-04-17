@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { DUMMY_CARS, BODY_STYLES } from '../data/cars.mock';
+import { BODY_STYLES } from '../data/cars.mock';
 import { useClientBrandsQuery } from '../../../../services/queries/brandQueries';
 import { useCarsURLSync } from './useCarsURLSync';
-import { applyCarsFilters, paginateCars } from '../utils/carsFilterUtils';
+import { getClientProducts } from '../../../../services/api/clientProduct.api';
 
 export const useCarsLogic = () => {
     // 1. Core API & State Data Initialization
@@ -37,35 +37,56 @@ export const useCarsLogic = () => {
             return {
                 ...brand,
                 slug: brandSlug,
-                count: DUMMY_CARS.filter(c => c.brandId === brandSlug).length
+                count: 0 // Optional: fetch count from api if needed
             };
         });
     }, [apiBrandsData]);
 
-    // 4. Data Filter / Sorting Simulation (Debounced internally)
+    // 4. Data Filter / Sorting Simulation -> changed to real API call
     useEffect(() => {
         let isMounted = true;
         
         setIsFiltering(true);
         if (cars.length === 0) setIsLoading(true);
 
-        const timer = setTimeout(() => {
-            const filteredResult = applyCarsFilters(DUMMY_CARS, filters, sort);
-            const paginatedResult = paginateCars(filteredResult, currentPage, itemsPerPage);
-
-            if (isMounted) {
-                setTotalCars(filteredResult.length);
-                setCars(paginatedResult);
-                setIsFiltering(false);
-                setIsLoading(false);
+        const fetchCars = async () => {
+            try {
+                const params = {
+                    current: currentPage,
+                    pageSize: itemsPerPage,
+                    keyword: filters.keyword,
+                    brand: filters.brandSlugs.join(','),
+                    minPrice: filters.minPrice,
+                    maxPrice: filters.maxPrice,
+                    bodyStyle: filters.bodyStyle,
+                    sort: sort
+                };
+                const res = await getClientProducts(params);
+                
+                if (isMounted) {
+                    setTotalCars(res.pagination.total);
+                    setCars(res.products);
+                    setIsFiltering(false);
+                    setIsLoading(false);
+                }
+            } catch (error) {
+                console.error("Failed to fetch cars:", error);
+                if (isMounted) {
+                    setIsFiltering(false);
+                    setIsLoading(false);
+                }
             }
+        };
+
+        const timer = setTimeout(() => {
+            fetchCars();
         }, 500);
 
         return () => {
             isMounted = false;
             clearTimeout(timer);
         };
-    }, [filters, sort, currentPage, cars.length]);
+    }, [filters, sort, currentPage]);
 
     // 5. Interaction Handlers
     const handleFilterChange = (key, value) => {

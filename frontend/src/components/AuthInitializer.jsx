@@ -24,7 +24,7 @@ const AuthInitializer = () => {
                     dispatch(logout());
                 });
         }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
     return null;
 };

@@ -1,7 +1,6 @@
 import asyncHandler from 'express-async-handler'
-import Part from '../../models/partModel.js'
+import Car from '../../models/carModel.js'
 import mongoose from 'mongoose'
-
 
 export const getAllProducts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.current || req.query.page) || 1;
@@ -9,63 +8,38 @@ export const getAllProducts = asyncHandler(async (req, res) => {
   const search = req.query.search || '';
   const sortField = req.query.sortField || 'createdAt';
   const sortOrder = (req.query.sortOrder === 'ascend' || req.query.sortOrder === 'asc') ? 1 : -1;
+  const brand = req.query.brand || '';
+  const bodyStyle = req.query.bodyStyle || '';
+  const status = req.query.status || '';
 
   const pipeline = [];
-
+  const matchStage = {};
+  
   if (search) {
-    pipeline.push({
-      $match: {
-        $or: [
-          { product_name: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } }
-        ]
-      }
-    });
+    matchStage.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } }
+    ];
+  }
+  
+  if (brand && brand !== 'all') {
+    matchStage.brandName = { $regex: brand, $options: 'i' };
+  }
+  
+  if (bodyStyle && bodyStyle !== 'all') {
+    matchStage.bodyStyle = bodyStyle;
+  }
+  
+  if (status && status !== 'all') {
+    matchStage.status = status;
   }
 
-  pipeline.push(
-    {
-      $lookup: {
-        from: 'inventories',
-        localField: '_id',
-        foreignField: 'product_id',
-        as: 'inventory_data'
-      }
-    },
-    {
-      $lookup: {
-        from: 'categories',
-        localField: 'category_id',
-        foreignField: '_id',
-        as: 'category_doc'
-      }
-    },
-    {
-      $addFields: {
-        inventory_quantity: {
-          $ifNull: [{ $arrayElemAt: ["$inventory_data.quantity_available", 0] }, 0]
-        },
-        category_id: { $arrayElemAt: ["$category_doc", 0] },
-        cleanPrice: {
-          $cond: {
-            if: { $eq: [{ $type: "$price" }, "object"] },
-            then: { $toDouble: { $getField: { field: { $literal: "$numberDecimal" }, input: "$price" } } },
-            else: { $toDouble: "$price" }
-          }
-        }
-      }
-    },
-    {
-      $project: {
-        inventory_data: 0,
-        category_doc: 0,
-        cleanPrice: 0
-      }
-    }
-  );
+  if (Object.keys(matchStage).length > 0) {
+    pipeline.push({ $match: matchStage });
+  }
 
   const sortObj = {};
-  sortObj[sortField === 'price' ? 'cleanPrice' : sortField] = sortOrder;
+  sortObj[sortField] = sortOrder;
   pipeline.push({ $sort: sortObj });
 
   pipeline.push({
@@ -75,7 +49,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     }
   });
 
-  const result = await Part.aggregate(pipeline);
+  const result = await Car.aggregate(pipeline);
   const total = result[0].metadata[0] ? result[0].metadata[0].total : 0;
   const products = result[0].data;
 
@@ -88,218 +62,133 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     }
   });
 })
-
 
 export const getProductsByCategory = asyncHandler(async (req, res) => {
-  const { categoryId } = req.params;
-  const page = parseInt(req.query.current || req.query.page) || 1;
-  const limit = parseInt(req.query.pageSize || req.query.limit) || 10;
-  const search = req.query.search || '';
-  const sortField = req.query.sortField || 'createdAt';
-  const sortOrder = (req.query.sortOrder === 'ascend' || req.query.sortOrder === 'asc') ? 1 : -1;
-
-  if (!mongoose.Types.ObjectId.isValid(categoryId)) {
-    res.status(400);
-    throw new Error('Category ID không hợp lệ');
-  }
-
-  const pipeline = [
-    {
-      $match: { category_id: new mongoose.Types.ObjectId(categoryId) }
-    }
-  ];
-
-  if (search) {
-    pipeline.push({
-      $match: {
-        $or: [
-          { product_name: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } }
-        ]
-      }
-    });
-  }
-
-  pipeline.push(
-    {
-      $lookup: {
-        from: 'inventories',
-        localField: '_id',
-        foreignField: 'product_id',
-        as: 'inventory_data'
-      }
-    },
-    {
-      $addFields: {
-        inventory_quantity: {
-          $ifNull: [{ $arrayElemAt: ["$inventory_data.quantity_available", 0] }, 0]
-        },
-        cleanPrice: {
-          $cond: {
-            if: { $eq: [{ $type: "$price" }, "object"] },
-            then: { $toDouble: { $getField: { field: { $literal: "$numberDecimal" }, input: "$price" } } },
-            else: { $toDouble: "$price" }
-          }
-        }
-      }
-    },
-    {
-      $project: {
-        inventory_data: 0,
-        cleanPrice: 0
-      }
-    }
-  );
-
-  const sortObj = {};
-  sortObj[sortField === 'price' ? 'cleanPrice' : sortField] = sortOrder;
-  pipeline.push({ $sort: sortObj });
-
-  pipeline.push({
-    $facet: {
-      metadata: [{ $count: "total" }],
-      data: [{ $skip: (page - 1) * limit }, { $limit: limit }]
-    }
-  });
-
-  const result = await Part.aggregate(pipeline);
-  const total = result[0].metadata[0] ? result[0].metadata[0].total : 0;
-  const products = result[0].data;
-
-  res.json({
-    products,
-    pagination: {
-      current: page,
-      pageSize: limit,
-      total
-    }
-  });
+  res.json({ products: [], pagination: { current: 1, pageSize: 10, total: 0 } });
 })
-
 
 export const createProduct = asyncHandler(async (req, res) => {
   const {
-    category_id,
-    type,
-    sku,
-    product_name,
-    tagline,
-    description,
-    price,
-    stock,
-    isNew,
-    brandId,
-    brandName,
-    year,
-    odo,
-    engine,
-    fuel,
-    seats,
-    bodyStyle,
-    isDemoAvailable,
-    versions,
-    colors,
-    gallery,
-    features,
-    specs,
-    threeSixty,
-    images: bodyImages,
+    name, product_name, type, sku, tagline, description,
+    price, stock, isNew, brandId, brandName, year, odo, engine, power, fuel,
+    seats, bodyStyle, isDemoAvailable, status, versions, colors,
+    gallery, features, specs, threeSixty, images: bodyImages,
   } = req.body
 
-  if (!category_id || !product_name || !price || !type) {
+  const finalName = name || product_name;
+
+  if (!finalName || !price) {
     res.status(400)
-    throw new Error('Thiếu thông tin bắt buộc của sản phẩm (Category, Tên, Giá, Loại)')
+    throw new Error('Thiếu thông tin bắt buộc của xe (Tên, Giá)')
   }
 
   let finalImages = bodyImages || []
   if (req.file) {
     finalImages = [req.file.path, ...finalImages]
   }
+  
+  let slug = finalName.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
 
-  const Part = new Part({
-    category_id,
-    type,
+  const count = await Car.countDocuments({ slug: new RegExp(`^${slug}`, 'i') });
+  if (count > 0) slug = `${slug}-${count + 1}`;
+
+  const car = new Car({
+    name: finalName,
+    slug,
     sku,
-    product_name,
+    status: status || 'Published',
     tagline,
     description,
     price,
     stock: stock || 0,
     isNew: isNew || false,
-    brandId,
+    brandId: brandId || slug.split('-')[0],
     brandName,
     year,
     odo: odo || 0,
     engine,
+    power,
     fuel,
     seats,
     bodyStyle,
     isDemoAvailable: isDemoAvailable !== undefined ? isDemoAvailable : true,
     versions: versions || [],
     colors: colors || [],
-    gallery: gallery || { photos: [], videos: [] },
+    gallery: gallery || { photos: finalImages, videos: [] },
     features: features || [],
     specs: specs || [],
-    threeSixty: threeSixty || [],
-    images: finalImages,
+    threeSixty: threeSixty || { images: [], lighting: 'Studio', environment: 'Minimalist Studio' },
+    image: finalImages[0] || null,
   })
 
-  const createdProduct = await Part.save()
+  // Ensure primary image exists
+  if (finalImages.length > 0 && !car.image) {
+    car.image = finalImages[0];
+  }
+
+  const createdProduct = await car.save()
   res.status(201).json(createdProduct)
 })
-
 
 export const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400)
-    throw new Error('Part ID không hợp lệ')
+    throw new Error('ID không hợp lệ')
   }
 
-  const Part = await Part.findById(id)
-  if (!Part) {
+  const car = await Car.findById(id)
+  if (!car) {
     res.status(404)
-    throw new Error('Sản phẩm không tồn tại')
+    throw new Error('Xe không tồn tại')
   }
 
   const allowedFields = [
-    'category_id', 'type', 'sku', 'product_name', 'tagline', 'description',
-    'price', 'stock', 'isNew',
-    'brandId', 'brandName', 'year', 'odo', 'engine', 'fuel', 'seats', 'bodyStyle',
+    'name', 'product_name', 'sku', 'status', 'tagline', 'description',
+    'price', 'salePrice', 'stock', 'isNew', 'brandId', 'brandName',
+    'year', 'odo', 'engine', 'power', 'fuel', 'seats', 'bodyStyle',
     'isDemoAvailable', 'versions', 'colors', 'gallery', 'features', 'specs',
-    'threeSixty', 'images'
+    'threeSixty'
   ]
 
   allowedFields.forEach(field => {
     if (req.body[field] !== undefined) {
-      Part[field] = req.body[field]
+      if (field === 'product_name') car.name = req.body[field];
+      else car[field] = req.body[field]
     }
   })
 
   if (req.file) {
-    Part.images = [req.file.path, ...(Part.images || [])]
+    if (car.gallery && car.gallery.photos) {
+      car.gallery.photos = [req.file.path, ...(car.gallery.photos || [])];
+    } else {
+      car.gallery = { photos: [req.file.path], videos: [] };
+    }
+    car.image = req.file.path;
   }
 
-  const updatedProduct = await Part.save()
+  const updatedProduct = await car.save()
   res.json(updatedProduct)
 })
-
 
 export const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400)
-    throw new Error('Part ID không hợp lệ')
+    throw new Error('ID không hợp lệ')
   }
 
-  const Part = await Part.findById(id)
-  if (!Part) {
+  const car = await Car.findById(id)
+  if (!car) {
     res.status(404)
-    throw new Error('Sản phẩm không tồn tại')
+    throw new Error('Xe không tồn tại')
   }
 
-  await Part.deleteOne()
-  res.json({ message: 'Sản phẩm đã được xóa' })
+  await car.deleteOne()
+  res.json({ message: 'Xe đã được xóa' })
 })

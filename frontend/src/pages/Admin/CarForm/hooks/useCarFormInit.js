@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ADMIN_MOCK_CARS } from '../../Cars/data/carsCatalog.mock';
+import { getAdminProductById } from '../../../../services/api/adminProduct.api';
 
 export const useCarFormInit = (id, form) => {
     const [isInitializing, setIsInitializing] = useState(true);
@@ -8,15 +8,11 @@ export const useCarFormInit = (id, form) => {
         let isMounted = true;
         setIsInitializing(true);
 
-        // Simulate an API call latency to prepare for true backend integration
         const fetchCarData = async () => {
             try {
                 if (id) {
-                    await new Promise(resolve => setTimeout(resolve, 300)); // Simulating network
-                    if (!isMounted) return;
-
-                    const carDetail = ADMIN_MOCK_CARS.find(c => String(c.id) === String(id));
-                    if (carDetail) {
+                    const carDetail = await getAdminProductById(id);
+                    if (isMounted && carDetail) {
                         form.setFieldsValue(carDetail);
                     }
                 } else {

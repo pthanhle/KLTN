@@ -12,7 +12,7 @@ const partCategorySchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      trim: true // example: 'engine', 'brake'
+      trim: true
     },
     description: {
       type: String,

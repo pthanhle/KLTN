@@ -22,25 +22,25 @@ const BuilderHeader = ({ handleSaveDraft, handlePublish, isSubmitting }) => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                <button 
-                    type="button"
-                    onClick={handleSaveDraft}
-                    disabled={isSubmitting}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 dark:bg-[#191f31] text-slate-600 dark:text-slate-300 text-[13px] font-bold hover:bg-slate-200 dark:hover:bg-[#2e3447] transition-all border border-transparent cursor-pointer shadow-sm disabled:opacity-50"
-                >
-                    {isSubmitting && <Loader2 size={14} className="animate-spin" />}
-                    {t('saveDraftBtn', 'Lưu Nháp')}
-                </button>
-                <button 
-                    type="button"
-                    onClick={handlePublish}
-                    disabled={isSubmitting}
-                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-slate-900 dark:bg-gradient-to-r dark:from-[#eab308] dark:to-[#ffd165] text-white dark:text-slate-900 text-[13px] font-black tracking-wide shadow-xl shadow-slate-900/10 dark:shadow-yellow-500/10 active:scale-95 transition-all cursor-pointer border-none disabled:opacity-50"
-                >
-                    {isSubmitting && <Loader2 size={14} className="animate-spin" />}
-                    {t('publishBtn', 'Xuất Bản')}
-                </button>
-            </div>
+                    <button
+                        type="button"
+                        onClick={handleSaveDraft}
+                        disabled={isSubmitting}
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 dark:bg-[#191f31] text-slate-600 dark:text-slate-300 text-[13px] font-bold hover:bg-slate-200 dark:hover:bg-[#2e3447] transition-all border border-transparent cursor-pointer shadow-sm disabled:opacity-50"
+                    >
+                        {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+                        {t('saveDraftBtn', 'Lưu Nháp')}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handlePublish}
+                        disabled={isSubmitting}
+                        className="flex items-center gap-2 px-8 py-3 rounded-xl bg-slate-900 dark:bg-gradient-to-r dark:from-[#eab308] dark:to-[#ffd165] text-white dark:text-slate-900 text-[13px] font-black tracking-wide shadow-xl shadow-slate-900/10 dark:shadow-yellow-500/10 active:scale-95 transition-all cursor-pointer border-none disabled:opacity-50"
+                    >
+                        {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+                        {t('publishBtn', 'Xuất Bản')}
+                    </button>
+                </div>
             </div>
         </header>
     );

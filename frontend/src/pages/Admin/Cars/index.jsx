@@ -4,7 +4,6 @@ import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PageBreadcrumbs from '../../../components/PageBreadcrumbs';
 import { useCarsCatalogLogic } from './hooks/useCarsCatalogLogic';
-import { useCarsStats } from './hooks/useCarsStats';
 import CarsStats from './components/Stats/CarsStats';
 import FilterBar from './components/Toolbar/FilterBar';
 import CarsTable from './components/Table/CarsTable';
@@ -15,12 +14,8 @@ const CarsCatalog = () => {
     const navigate = useNavigate();
 
     const {
-        stats,
-        isLoading: isStatsLoading
-    } = useCarsStats();
-
-    const {
         cars,
+        globalStats,
         searchTerm, setSearchTerm,
         filterBrand, setFilterBrand,
         filterBodyStyle, setFilterBodyStyle,
@@ -62,7 +57,7 @@ const CarsCatalog = () => {
                     </div>
                 </div>
 
-                <CarsStats stats={stats} isLoading={isStatsLoading} />
+                <CarsStats stats={globalStats} isLoading={isLoading} />
 
             {/* Filters Skeleton vs Real */}
             {isLoadingTaxonomies ? (

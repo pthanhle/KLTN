@@ -2,6 +2,7 @@ import express from 'express'
 import {
   getProductsByCategory,
   getAllProducts,
+  getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -28,6 +29,7 @@ router.route('/')
   .post(uploadImageWrapper, createProduct)
 
 router.route('/:id')
+  .get(getProductById)
   .put(uploadImageWrapper, updateProduct)
   .delete(deleteProduct)
 

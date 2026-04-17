@@ -1,23 +1,19 @@
-import axios from 'axios';
-
-const CLIENT_PRODUCT_URL = 'http://localhost:5000/api/client/products';
+import axiosClient from '../../utils/axiosClient';
 
 export const getClientProducts = async (params) => {
-    const { data } = await axios.get(CLIENT_PRODUCT_URL, { params });
-    return data;
+    const response = await axiosClient.get('/client/products', { params });
+    return response.data;
 };
 
 export const getClientProductFilters = async () => {
-    const { data } = await axios.get(`${CLIENT_PRODUCT_URL}/filters`);
-    return data;
+    return await axiosClient.get('/client/products/filters');
 };
 
 export const getAllClientProducts = async () => {
-    const { data } = await axios.get(`${CLIENT_PRODUCT_URL}/all`);
-    return data;
+    return await axiosClient.get('/client/products/all');
 };
 
 export const getClientProductById = async (id) => {
-    const { data } = await axios.get(`${CLIENT_PRODUCT_URL}/${id}`);
-    return data;
+    const response = await axiosClient.get(`/client/products/${id}`);
+    return response.data;
 };

@@ -51,20 +51,60 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 
   const result = await Car.aggregate(pipeline);
   const total = result[0].metadata[0] ? result[0].metadata[0].total : 0;
-  const products = result[0].data;
+  const products = result[0].data.map(d => ({ ...d, id: d._id }));
+
+  const globalStatsPipeline = [
+    {
+      $group: {
+        _id: null,
+        totalCars: { $sum: 1 },
+        outOfStock: { $sum: { $cond: [{ $lte: ["$stock", 0] }, 1, 0] } },
+        totalValue: { $sum: { $multiply: [{ $ifNull: ["$price", 0] }, { $ifNull: ["$stock", 0] }] } },
+        activeTestDrives: { $sum: { $cond: [{ $eq: ["$isDemoAvailable", true] }, 1, 0] } }
+      }
+    }
+  ];
+
+  const [globalStatsResult] = await Car.aggregate(globalStatsPipeline);
+  const rawStats = globalStatsResult || { totalCars: 0, outOfStock: 0, totalValue: 0, activeTestDrives: 0 };
+
+  const stats = {
+    totalCars: rawStats.totalCars || total,
+    outOfStockCars: rawStats.outOfStock || 0,
+    totalValue: rawStats.totalValue || 0,
+    activeTestDrives: rawStats.activeTestDrives || 0
+  };
 
   res.json({
     products,
     pagination: {
       current: page,
       pageSize: limit,
-      total
-    }
+      total,
+      totalPages: Math.ceil(total / limit)
+    },
+    stats
   });
 })
 
 export const getProductsByCategory = asyncHandler(async (req, res) => {
   res.json({ products: [], pagination: { current: 1, pageSize: 10, total: 0 } });
+})
+
+export const getProductById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  let query = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { slug: id };
+
+  const car = await Car.findOne(query);
+  if (!car) {
+    res.status(404);
+    throw new Error('Không tìm thấy xe');
+  }
+
+  const carObj = car.toJSON();
+  carObj.id = carObj._id;
+  
+  res.json({ success: true, data: carObj });
 })
 
 export const createProduct = asyncHandler(async (req, res) => {
@@ -130,7 +170,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   }
 
   const createdProduct = await car.save()
-  res.status(201).json(createdProduct)
+  res.status(201).json({ success: true, data: createdProduct, message: 'Thêm xe mới thành công' })
 })
 
 export const updateProduct = asyncHandler(async (req, res) => {
@@ -172,7 +212,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   }
 
   const updatedProduct = await car.save()
-  res.json(updatedProduct)
+  res.json({ success: true, data: updatedProduct, message: 'Cập nhật xe thành công' })
 })
 
 export const deleteProduct = asyncHandler(async (req, res) => {
@@ -190,5 +230,5 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   }
 
   await car.deleteOne()
-  res.json({ message: 'Xe đã được xóa' })
+  res.json({ success: true, message: 'Xe đã được xóa thành công' })
 })

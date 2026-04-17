@@ -8,6 +8,7 @@ export const useCarsCatalogLogic = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [carsData, setCarsData] = useState([]);
     const [totalCars, setTotalCars] = useState(0);
+    const [globalStats, setGlobalStats] = useState(null);
 
     // 1. Compose Micro-Hooks
     const filterState = useCarsFilter();
@@ -37,7 +38,8 @@ export const useCarsCatalogLogic = () => {
                 const response = await getAdminProducts(params);
                 if (isMounted) {
                     setCarsData(response.products);
-                    setTotalCars(response.pagination.total);
+                    setTotalCars(response.pagination?.total || 0);
+                    setGlobalStats(response.stats || null);
                     setIsLoading(false);
                 }
             } catch (error) {
@@ -74,6 +76,7 @@ export const useCarsCatalogLogic = () => {
     return {
         cars: carsData,
         totalCars,
+        globalStats,
         isLoading,
         ...filterState,
         ...selectionState,

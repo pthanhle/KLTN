@@ -70,10 +70,19 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const [result] = await Car.aggregate(pipeline)
   const total = result.metadata.length > 0 ? result.metadata[0].total : 0
+  const products = result.data.map(d => ({ ...d, id: d._id }))
 
   res.json({
-    products: result.data,
-    pagination: { current: page, pageSize: limit, total }
+    success: true,
+    data: {
+      products,
+      pagination: { 
+        current: page, 
+        pageSize: limit, 
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
   })
 })
 
@@ -132,7 +141,10 @@ export const getProductById = asyncHandler(async (req, res) => {
     throw new Error('Không tìm thấy xe')
   }
 
-  res.json(car)
+  const carObj = car.toJSON();
+  carObj.id = carObj._id;
+
+  res.json({ success: true, data: carObj })
 })
 
 export const getProductsByCategory = asyncHandler(async (req, res) => {

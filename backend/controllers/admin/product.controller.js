@@ -126,15 +126,38 @@ export const getProductById = asyncHandler(async (req, res) => {
 
 export const createProduct = asyncHandler(async (req, res) => {
   const {
-    name, product_name, type, sku, tagline, description,
+    name, product_name, sku, tagline, description,
     price, stock, isNew, brandId, brandName, year, odo, engine, power, fuel,
-    seats, bodyStyle, isDemoAvailable, status, images: bodyImages,
+    seats, bodyStyle, isDemoAvailable, status
   } = req.body
 
   const versions = safeParse(req.body.versions, []);
-  const colors = safeParse(req.body.colors, []);
+  let colors = safeParse(req.body.colors, []);
+  let features = safeParse(req.body.features, []);
+
+  const files = req.files || [];
+
+  colors = colors.map((color, index) => {
+    const isPending = color.image && typeof color.image === 'string' && color.image.startsWith('PEND_COL_');
+    if (isPending) {
+      const fileKey = color.image.replace('PEND_COL_', 'color_file_');
+      const colorFile = files.find(f => f.fieldname === fileKey);
+      if (colorFile) return { ...color, image: colorFile.path };
+    }
+    return color;
+  });
+
+  features = features.map((feature, index) => {
+    const isPending = feature.image && typeof feature.image === 'string' && feature.image.startsWith('PEND_FEAT_');
+    if (isPending) {
+      const fileKey = feature.image.replace('PEND_FEAT_', 'feature_file_');
+      const featureFile = files.find(f => f.fieldname === fileKey);
+      if (featureFile) return { ...feature, image: featureFile.path };
+    }
+    return feature;
+  });
+
   const gallery = safeParse(req.body.gallery, { photos: [], videos: [] });
-  const features = safeParse(req.body.features, []);
   const specs = safeParse(req.body.specs, []);
   const threeSixty = safeParse(req.body.threeSixty, { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
 
@@ -148,14 +171,13 @@ export const createProduct = asyncHandler(async (req, res) => {
   let heroImage = null;
   let galleryPhotos = gallery.photos || [];
 
-  if (req.files) {
-    if (req.files.image && req.files.image[0]) {
-      heroImage = req.files.image[0].path;
-    }
-    if (req.files.photos) {
-      const newPhotos = req.files.photos.map(file => file.path);
-      galleryPhotos = [...galleryPhotos, ...newPhotos];
-    }
+  const singleFile = files.find(f => f.fieldname === 'image');
+  if (singleFile) heroImage = singleFile.path;
+
+  const photoFiles = files.filter(f => f.fieldname === 'photos');
+  if (photoFiles.length > 0) {
+    const newPhotos = photoFiles.map(file => file.path);
+    galleryPhotos = [...galleryPhotos, ...newPhotos];
   }
 
   let slug = finalName.toLowerCase()
@@ -213,25 +235,68 @@ export const updateProduct = asyncHandler(async (req, res) => {
     throw new Error('Xe không tồn tại')
   }
 
+  const files = req.files || [];
+
+  console.log(`[Diagnostic] Updating product: ${id}`);
+  console.log(`[Diagnostic] Files received: ${files.length}`);
+
   const allowedFields = [
     'name', 'product_name', 'sku', 'status', 'tagline', 'description',
     'price', 'salePrice', 'stock', 'isNew', 'brandId', 'brandName',
     'year', 'odo', 'engine', 'power', 'fuel', 'seats', 'bodyStyle',
     'isDemoAvailable', 'versions', 'colors', 'gallery', 'features', 'specs',
-    'threeSixty'
+    'threeSixty', 'image'
   ]
 
   allowedFields.forEach(field => {
     if (req.body[field] !== undefined) {
       if (field === 'product_name') car.name = req.body[field];
-      else if (['versions', 'colors', 'features'].includes(field)) {
-        car[field] = safeParse(req.body[field], []);
+      else if (['versions', 'colors', 'features', 'specs'].includes(field)) {
+        let parsed = safeParse(req.body[field], []);
+
+        if (field === 'colors') {
+          parsed = parsed.map((color, index) => {
+            const isPending = color.image && typeof color.image === 'string' && color.image.startsWith('PEND_COL_');
+            if (isPending) {
+              const fileKey = color.image.replace('PEND_COL_', 'color_file_');
+              const colorFile = files.find(f => f.fieldname === fileKey);
+              if (colorFile) {
+                console.log(`  - color match found for ${fileKey}`);
+                return { ...color, image: colorFile.path };
+              }
+              console.warn(`  - color match NOT found for ${fileKey}. Reverting...`);
+              const oldItem = car.colors && car.colors[index];
+              if (oldItem && oldItem.image) return { ...color, image: oldItem.image };
+            }
+            return color;
+          });
+        }
+
+        if (field === 'features') {
+          parsed = parsed.map((feature, index) => {
+            const isPending = feature.image && typeof feature.image === 'string' && feature.image.startsWith('PEND_FEAT_');
+            if (isPending) {
+              const fileKey = feature.image.replace('PEND_FEAT_', 'feature_file_');
+              const featureFile = files.find(f => f.fieldname === fileKey);
+              if (featureFile) {
+                console.log(`  - feature match found for ${fileKey}`);
+                return { ...feature, image: featureFile.path };
+              }
+              console.warn(`  - feature match NOT found for ${fileKey}. Reverting...`);
+              const oldItem = car.features && car.features[index];
+              if (oldItem && oldItem.image) return { ...feature, image: oldItem.image };
+            }
+            return feature;
+          });
+        }
+
+        car.set(field, parsed);
+        car.markModified(field);
       }
       else if (['gallery', 'threeSixty'].includes(field)) {
-        car[field] = safeParse(req.body[field], field === 'gallery' ? { photos: [], videos: [] } : { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
-      }
-      else if (field === 'specs') {
-        car[field] = safeParse(req.body[field], []);
+        const parsed = safeParse(req.body[field], field === 'gallery' ? { photos: [], videos: [] } : { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
+        car.set(field, parsed);
+        car.markModified(field);
       }
       else if (field === 'isDemoAvailable' || field === 'isNew') {
         car[field] = req.body[field] === 'true' || req.body[field] === true;
@@ -240,25 +305,32 @@ export const updateProduct = asyncHandler(async (req, res) => {
         const numVal = Number(req.body[field]);
         if (!isNaN(numVal)) car[field] = numVal;
       }
+      else if (field === 'image') {
+        const val = req.body[field];
+        if (typeof val === 'string' && (val.startsWith('http') || val.startsWith('/') || val.startsWith('blob:'))) {
+          car.image = val;
+        }
+      }
       else car[field] = req.body[field]
     }
   })
 
-  if (req.files) {
-    if (req.files.image && req.files.image[0]) {
-      car.image = req.files.image[0].path;
-      if (car.gallery && car.gallery.photos) {
-        car.gallery.photos = [car.image, ...car.gallery.photos];
-      }
+  const singleFile = files.find(f => f.fieldname === 'image');
+  if (singleFile) {
+    car.image = singleFile.path;
+    if (!car.gallery) car.gallery = { photos: [], videos: [] };
+    if (!car.gallery.photos.includes(singleFile.path)) {
+      car.gallery.photos = [singleFile.path, ...car.gallery.photos];
+      car.markModified('gallery.photos');
     }
-    if (req.files.photos) {
-      const newPhotos = req.files.photos.map(file => file.path);
-      if (car.gallery) {
-        car.gallery.photos = [...(car.gallery.photos || []), ...newPhotos];
-      } else {
-        car.gallery = { photos: newPhotos, videos: [] };
-      }
-    }
+  }
+
+  const photoFiles = files.filter(f => f.fieldname === 'photos');
+  if (photoFiles.length > 0) {
+    const newPhotos = photoFiles.map(file => file.path);
+    if (!car.gallery) car.gallery = { photos: [], videos: [] };
+    car.gallery.photos = [...car.gallery.photos, ...newPhotos];
+    car.markModified('gallery.photos');
   }
 
   const updatedProduct = await car.save()

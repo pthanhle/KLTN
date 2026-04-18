@@ -1,11 +1,11 @@
+import React from 'react';
 import { Trash2 } from 'lucide-react';
 import FeatureInputFields from './FeatureInputFields';
 import FeatureCoverPreview from './FeatureCoverPreview';
 
 const FeatureBlock = ({ name, restField, removeFeature }) => {
     return (
-        <section className="relative bg-white dark:bg-[#1a1a1c] rounded-3xl p-6 md:p-10 shadow-sm transition-all hover:shadow-yellow-500/5 group border border-slate-100 dark:border-white/5 w-full block">
-            {/* Delete Block Button */}
+        <section className="relative bg-white dark:bg-[#1a1a1c] rounded-3xl p-6 md:p-10 shadow-sm transition-all hover:shadow-yellow-500/5 group border border-slate-100 dark:border-white/5 w-full">
             <button
                 type="button"
                 onClick={() => removeFeature(name)}
@@ -16,8 +16,13 @@ const FeatureBlock = ({ name, restField, removeFeature }) => {
             </button>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full xl:pr-10">
-                <FeatureInputFields name={name} restField={restField} />
-                <FeatureCoverPreview name={name} />
+                <div className="flex flex-col gap-6">
+                    <FeatureInputFields name={name} restField={restField} />
+                </div>
+                <div className="flex flex-col gap-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Xem trước hình ảnh</p>
+                    <FeatureCoverPreview name={name} />
+                </div>
             </div>
         </section>
     );

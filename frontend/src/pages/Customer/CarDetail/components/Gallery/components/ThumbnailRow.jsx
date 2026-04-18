@@ -1,4 +1,5 @@
 import { Image } from 'antd';
+import { Play } from 'lucide-react';
 
 export const ThumbnailRow = ({ galleryItems, currentIndex, setCurrentIndex, activeTab, hasItems }) => {
     if (!hasItems) return null;
@@ -14,8 +15,8 @@ export const ThumbnailRow = ({ galleryItems, currentIndex, setCurrentIndex, acti
                     <Image src={img.thumbnail} rootClassName="w-full h-full" className="!w-full !h-full object-cover" alt={`Thumbnail ${idx}`} preview={false} />
                     {activeTab === 'videos' && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                            <div className="w-8 h-8 rounded-full bg-[#1db954] flex items-center justify-center text-white">
-                                <div className="w-0 h-0 border-t-4 border-t-transparent border-l-[6px] border-l-white border-b-4 border-b-transparent ml-0.5"></div>
+                            <div className="w-8 h-8 rounded-full bg-[#ff0000] flex items-center justify-center text-white shadow-lg">
+                                <Play size={14} fill="white" className="ml-0.5" />
                             </div>
                         </div>
                     )}

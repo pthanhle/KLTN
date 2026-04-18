@@ -12,7 +12,7 @@ const servicePackageSchema = mongoose.Schema(
       default: 'OTHER',
     },
     image: { type: String },
-    isActive: { type: Boolean, default: true },
+    is_active: { type: Boolean, default: true },
   },
   {
     timestamps: true,

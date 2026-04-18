@@ -10,12 +10,20 @@ export const getAdminProductById = async (id) => {
 };
 
 export const createAdminProduct = async (productData) => {
-    const response = await axiosClient.post('/admin/products', productData);
+    const response = await axiosClient.post('/admin/products', productData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
     return response.data;
 };
 
 export const updateAdminProduct = async (id, productData) => {
-    const response = await axiosClient.put(`/admin/products/${id}`, productData);
+    const response = await axiosClient.put(`/admin/products/${id}`, productData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
     return response.data;
 };
 

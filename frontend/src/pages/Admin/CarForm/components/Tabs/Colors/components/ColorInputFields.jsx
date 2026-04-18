@@ -1,12 +1,28 @@
-import { Form, Input } from 'antd';
+import { Form, Input, Upload, message } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { Palette, Image as ImageIcon, Sliders, Trash2 } from 'lucide-react';
+import { Palette, Image as ImageIcon, Plus, Trash2, Upload as UploadIcon } from 'lucide-react';
 import { getCarColorRules } from '../../../../schemas/carColorsSchema';
 import ColorPickerInput from './ColorPickerInput';
 
 const ColorInputFields = ({ name, restField }) => {
     const { t } = useTranslation('adminCarForm');
     const rules = getCarColorRules(t);
+    const form = Form.useFormInstance();
+
+    const handleFileChange = (info, fieldIndex) => {
+        if (info.file.status === 'done') {
+            message.success(`${info.file.name} uploaded successfully`);
+        }
+    };
+
+    const uploadProps = {
+        name: 'file',
+        maxCount: 1,
+        showUploadList: false,
+        customRequest: ({ file, onSuccess }) => {
+            onSuccess("ok");
+        },
+    };
 
     return (
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-6 w-full xl:pr-4">
@@ -32,35 +48,47 @@ const ColorInputFields = ({ name, restField }) => {
                 <ColorPickerInput name={name} restField={restField} rules={rules} />
             </div>
 
-            <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-slate-400 font-bold px-1 block mb-2">{t('colorImageLabel', 'Ảnh Render (URL)')}</label>
+            <div className="space-y-2 xl:col-span-2">
+                <label className="text-[10px] uppercase tracking-widest text-slate-400 font-bold px-1 block mb-2">{t('colorImageLabel', 'Ảnh Render')}</label>
                 <Form.Item
                     {...restField}
                     name={[name, 'image']}
-                    className="mb-0 [&_.ant-form-item-explain-error]:text-right"
+                    className="mb-0"
                     required={false}
+                    getValueFromEvent={(e) => {
+                        if (Array.isArray(e)) return e;
+                        return e?.file;
+                    }}
                 >
-                    <Input
-                        prefix={<ImageIcon size={18} className="text-slate-400 mr-2" />}
-                        className="w-full !h-[50px] !bg-slate-50 dark:!bg-[#222225] !border-none !rounded-xl !px-4 text-sm font-medium text-slate-900 dark:text-white focus:!ring-2 focus:!ring-yellow-500/50 transition-all hover:bg-slate-100 dark:hover:bg-[#2a2a2e]"
-                        placeholder={t('colorImagePlaceholder', 'VD: https://storage.com/red_car.png')}
-                    />
-                </Form.Item>
-            </div>
+                    <Upload {...uploadProps}>
+                        <div className="flex items-center gap-4 w-full h-[50px] bg-slate-50 dark:bg-[#222225] rounded-xl px-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-[#2a2a2e] transition-all border-none">
+                            <UploadIcon size={18} className="text-slate-400" />
+                            <Form.Item
+                                noStyle
+                                shouldUpdate={(prevValues, currentValues) => {
+                                    const prevColor = prevValues.colors?.[name]?.image;
+                                    const currentColor = currentValues.colors?.[name]?.image;
+                                    return prevColor !== currentColor;
+                                }}
+                            >
+                                {({ getFieldValue }) => {
+                                    const imageValue = getFieldValue(['colors', name, 'image']);
+                                    const isFile = imageValue instanceof File || (imageValue && imageValue.originFileObj);
+                                    const isUrl = typeof imageValue === 'string';
 
-            <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-slate-400 font-bold px-1 block mb-2">{t('colorFilterLabel', 'CSS Filter')}</label>
-                <Form.Item
-                    {...restField}
-                    name={[name, 'filterStyle']}
-                    className="mb-0 [&_.ant-form-item-explain-error]:text-right"
-                    required={false}
-                >
-                    <Input
-                        prefix={<Sliders size={18} className="text-slate-400 mr-2" />}
-                        className="w-full !h-[50px] !bg-slate-50 dark:!bg-[#222225] !border-none !rounded-xl !px-4 text-sm font-mono font-medium text-slate-900 dark:text-white focus:!ring-2 focus:!ring-yellow-500/50 transition-all hover:bg-slate-100 dark:hover:bg-[#2a2a2e]"
-                        placeholder={t('colorFilterPlaceholder', 'VD: hue-rotate(45deg)')}
-                    />
+                                    let displayName = t('uploadColorImage', 'Chọn hoặc tải ảnh lên...');
+                                    if (isFile) displayName = imageValue.name || imageValue.originFileObj.name;
+                                    else if (isUrl) displayName = imageValue.split('/').pop();
+
+                                    return (
+                                        <span className={`text-sm ${imageValue ? 'text-slate-900 dark:text-white font-medium' : 'text-slate-400'}`}>
+                                            {displayName}
+                                        </span>
+                                    );
+                                }}
+                            </Form.Item>
+                        </div>
+                    </Upload>
                 </Form.Item>
             </div>
         </div>

@@ -1,15 +1,19 @@
-import { Form, Input } from 'antd';
+import { Form, Input, Upload, message } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, FileText, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, FileText, Image as ImageIcon, Upload as UploadIcon, X } from 'lucide-react';
 import { getFeatureRules } from '../schemas/feature.schema';
 
 const FeatureInputFields = ({ name, restField }) => {
     const { t } = useTranslation('adminCarForm');
     const rules = getFeatureRules(t);
 
+    const normFile = (e) => {
+        if (Array.isArray(e)) return e;
+        return e?.fileList;
+    };
+
     return (
         <div className="space-y-6">
-            {/* Feature Title */}
             <div className="space-y-2">
                 <label className="block text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1 mb-2">
                     {t('featureGroupNameLabel', 'Tiêu đề Tính năng (H2)')}
@@ -28,27 +32,33 @@ const FeatureInputFields = ({ name, restField }) => {
                 </Form.Item>
             </div>
 
-            {/* Feature Image URL */}
             <div className="space-y-2">
                 <label className="block text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1 mb-2">
-                    {t('featureGroupImageLabel', 'Ảnh Đại Diện (URL)')}
+                    {t('featureGroupImageLabel', 'Ảnh Đại Diện (Upload)')}
                 </label>
                 <Form.Item
                     {...restField}
                     name={[name, 'image']}
-                    rules={rules.image}
-                    className="mb-0 [&_.ant-form-item-explain-error]:text-right"
-                    required={false}
+                    valuePropName="fileList"
+                    getValueFromEvent={normFile}
+                    className="mb-0"
                 >
-                    <Input
-                        prefix={<ImageIcon size={18} className="text-slate-400 mr-2" />}
-                        className="w-full !h-[50px] !bg-slate-50 dark:!bg-[#222225] !border-none !rounded-xl !px-4 text-xs font-mono font-medium text-slate-500 dark:text-slate-400 focus-within:!ring-2 focus-within:!ring-yellow-500/50 transition-all hover:bg-slate-100 dark:hover:bg-[#2a2a2e]"
-                        placeholder={t('featureGroupImagePlaceholder', 'VD: https://storage.com/cover.jpg')}
-                    />
+                    <Upload
+                        listType="picture-card"
+                        maxCount={1}
+                        beforeUpload={() => false}
+                        className="feature-image-upload [&_.ant-upload]:!w-full [&_.ant-upload]:!h-32 [&_.ant-upload]:!bg-slate-50 dark:[&_.ant-upload]:!bg-[#222225] [&_.ant-upload]:!border-dashed [&_.ant-upload]:!border-slate-200 dark:[&_.ant-upload]:!border-white/10 [&_.ant-upload]:!rounded-2xl [&_.ant-upload-list-item-container]:!w-full [&_.ant-upload-list-item-container]:!h-32"
+                    >
+                        <div className="flex flex-col items-center gap-2">
+                            <UploadIcon size={24} className="text-slate-400" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                {t('uploadFeatureImg', 'Click hoặc kéo thả ảnh')}
+                            </span>
+                        </div>
+                    </Upload>
                 </Form.Item>
             </div>
 
-            {/* Feature Description */}
             <div className="space-y-2 relative pt-2">
                 <label className="block text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1 mb-2">
                     {t('featureItemDescLabel', 'Nội dung mô tả (Paragraph)')}

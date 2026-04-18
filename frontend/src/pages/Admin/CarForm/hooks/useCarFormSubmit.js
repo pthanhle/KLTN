@@ -65,6 +65,21 @@ export const useCarFormSubmit = (form) => {
                 return;
             }
 
+            if (key === 'colors' && Array.isArray(value)) {
+                const colorsWithFiles = value.map((color, index) => {
+                    const colorImageFile = getRealFile(color.image);
+                    if (colorImageFile) {
+                        const fileName = colorImageFile.name || `color-${index}.png`;
+                        formData.append(`color_image_${index}`, colorImageFile, fileName);
+                        // Store a temporary marker to be replaced by backend
+                        return { ...color, image: `PENDING_UPLOAD_${index}` };
+                    }
+                    return color;
+                });
+                formData.append('colors', JSON.stringify(colorsWithFiles));
+                return;
+            }
+
             if (value !== null && typeof value === 'object' && !(value instanceof File) && !(value instanceof Blob)) {
                 formData.append(key, JSON.stringify(value));
             }
@@ -120,7 +135,6 @@ export const useCarFormSubmit = (form) => {
             await queryClient.invalidateQueries(['admin-products']);
             message.success('Xe mới đã được cập nhật lên Showroom!');
 
-            // Use replace to avoid sticky history entries that cause back-button loops
             window.location.replace('/admin/cars');
 
         } catch (error) {

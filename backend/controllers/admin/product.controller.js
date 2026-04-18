@@ -132,7 +132,16 @@ export const createProduct = asyncHandler(async (req, res) => {
   } = req.body
 
   const versions = safeParse(req.body.versions, []);
-  const colors = safeParse(req.body.colors, []);
+  let colors = safeParse(req.body.colors, []);
+  if (req.files) {
+    colors = colors.map((color, index) => {
+      const colorFile = req.files.find(f => f.fieldname === `color_image_${index}`);
+      // Remove filterStyle for consistency
+      const { filterStyle, ...rest } = color;
+      if (colorFile) return { ...rest, image: colorFile.path };
+      return rest;
+    });
+  }
   const gallery = safeParse(req.body.gallery, { photos: [], videos: [] });
   const features = safeParse(req.body.features, []);
   const specs = safeParse(req.body.specs, []);
@@ -225,7 +234,16 @@ export const updateProduct = asyncHandler(async (req, res) => {
     if (req.body[field] !== undefined) {
       if (field === 'product_name') car.name = req.body[field];
       else if (['versions', 'colors', 'features'].includes(field)) {
-        car[field] = safeParse(req.body[field], []);
+        let parsed = safeParse(req.body[field], []);
+        if (field === 'colors' && req.files) {
+          parsed = parsed.map((color, index) => {
+            const colorFile = req.files.find(f => f.fieldname === `color_image_${index}`);
+            const { filterStyle, ...rest } = color;
+            if (colorFile) return { ...rest, image: colorFile.path };
+            return rest;
+          });
+        }
+        car[field] = parsed;
       }
       else if (['gallery', 'threeSixty'].includes(field)) {
         car[field] = safeParse(req.body[field], field === 'gallery' ? { photos: [], videos: [] } : { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });

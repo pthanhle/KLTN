@@ -15,10 +15,7 @@ const router = express.Router()
 router.use(protect, admin)
 
 const uploadImageFields = (req, res, next) => {
-  upload.fields([
-    { name: 'image', maxCount: 1 },
-    { name: 'photos', maxCount: 10 }
-  ])(req, res, (err) => {
+  upload.any()(req, res, (err) => {
     if (err) {
       console.error('Multer Error:', err)
       return res.status(400).json({ message: err.message })

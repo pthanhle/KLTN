@@ -12,4 +12,3 @@ venv.bak/
 .gitignore
 Dockerfile
 docker-compose.yml
-requirements.txt

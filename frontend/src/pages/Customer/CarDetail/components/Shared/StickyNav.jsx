@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 const StickyNav = ({ t }) => {
     const navItems = [
         { id: 'price-color', label: t('products:detail.priceColor') },
+        { id: 'overview', label: t('products:detail.overview', 'Tổng quan') },
         { id: 'features', label: t('products:detail.features') },
         { id: 'design', label: t('products:detail.design') },
         { id: 'performance', label: t('products:detail.performance') },

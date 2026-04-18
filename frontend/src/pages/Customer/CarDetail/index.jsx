@@ -7,6 +7,7 @@ import { useScrollSpy } from './hooks/useScrollSpy';
 import HeroSection from './components/ProductInfo/HeroSection';
 import StickyNav from './components/Shared/StickyNav';
 import PriceAndColorSection from './components/ProductInfo/PriceAndColorSection';
+import DescriptionSection from './components/ProductInfo/DescriptionSection';
 import FeatureSection from './components/Features/FeatureSection';
 import SpecsSection from './components/Features/SpecsSection';
 import MediaGallerySection from './components/Gallery/MediaGallerySection';
@@ -36,15 +37,12 @@ const CarDetailPage = () => {
 
     return (
         <div className="bg-[#fcfcfc] dark:bg-[#0a0a0b] min-h-screen transition-colors duration-300">
-            {/* 1. Hero Animated Banner */}
             <div id="hero" className="w-full">
                 <HeroSection car={car} t={t} />
             </div>
 
-            {/* 2. Sticky Scroll Spy Nav */}
             <StickyNav t={t} />
 
-            {/* 3. Price & Color (360 Viewer) */}
             <PriceAndColorSection
                 car={car}
                 colors={car.colors || []}
@@ -53,7 +51,8 @@ const CarDetailPage = () => {
                 t={t}
             />
 
-            {/* 4. Features Zig-Zag Layout */}
+            <DescriptionSection description={car.description} />
+
             {car.features && car.features.length > 0 && (
                 <>
                     <FeatureSection
@@ -76,10 +75,8 @@ const CarDetailPage = () => {
                 </>
             )}
 
-            {/* 5. Specifications Table */}
             <SpecsSection specs={car.specs} t={t} />
 
-            {/* 6. Media Gallery */}
             {car.gallery && <MediaGallerySection gallery={car.gallery} t={t} />}
 
         </div>

@@ -1,7 +1,6 @@
 import Brand from '../../models/brandModel.js';
 import mongoose from 'mongoose';
 
-// Lấy danh sách thương hiệu
 export const getBrands = async (req, res) => {
     try {
         const { search, is_partner } = req.query;
@@ -22,7 +21,6 @@ export const getBrands = async (req, res) => {
     }
 };
 
-// Truy xuất 1 thương hiệu
 export const getBrandById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -34,7 +32,6 @@ export const getBrandById = async (req, res) => {
     }
 };
 
-// Tạo thương hiệu mới
 export const createBrand = async (req, res) => {
     try {
         const { name, image, is_partner, description } = req.body;
@@ -58,7 +55,6 @@ export const createBrand = async (req, res) => {
     }
 };
 
-// Cập nhật thương hiệu
 export const updateBrand = async (req, res) => {
     try {
         const { id } = req.params;
@@ -81,7 +77,6 @@ export const updateBrand = async (req, res) => {
     }
 };
 
-// Xóa thương hiệu
 export const deleteBrand = async (req, res) => {
     try {
         const { id } = req.params;

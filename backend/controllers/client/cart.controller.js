@@ -35,7 +35,6 @@ export const getCart = asyncHandler(async (req, res) => {
 
     let total = 0;
     const items = cart.items.map(item => {
-        // Exclude deleted or inactive parts
         if (!item.part || item.part.status !== 'active') {
             return null;
         }
@@ -91,7 +90,6 @@ export const addToCart = asyncHandler(async (req, res) => {
             items: [{ part: part_id, quantity, selected_options }]
         });
     } else {
-        // Find if this exact part with the EXACT same selected_options already exists
         const itemIndex = cart.items.findIndex(item =>
             item.part.toString() === part_id &&
             JSON.stringify(item.selected_options || {}) === JSON.stringify(selected_options)

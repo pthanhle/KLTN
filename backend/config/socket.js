@@ -52,7 +52,7 @@ export const initSocket = (server) => {
 
     socket.on('join_room', (roomName) => {
       socket.join(roomName);
-      console.log(`👉 ${socket.user.email} đã vào phòng [${roomName}]`);
+      console.log(`${socket.user.email} đã vào phòng [${roomName}]`);
     });
 
     socket.on('leave_room', (roomName) => {

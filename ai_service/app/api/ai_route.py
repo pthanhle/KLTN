@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from ..services.ai_engine import generate_response
+from app.services.ai_engine import generate_response
 
 router = APIRouter()
 

@@ -1,13 +1,14 @@
 import json
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
-from ..core.config import settings
-from ..core.database import db
+from app.core.config import settings
+from app.core.database import db
 
 llm = ChatGoogleGenerativeAI(
     model=settings.MODEL_NAME,
     google_api_key=settings.GEMINI_API_KEY,
-    temperature=0.7
+    temperature=0.7,
+    convert_system_message_to_human=True
 )
 
 async def get_chat_history(user_id: str, limit: int = 10):
@@ -30,7 +31,7 @@ async def classify_intent(message: str):
     
     Câu hỏi: "{message}"
     JSON:"""
-    res = await llm.ainvoke([SystemMessage(content=prompt)])
+    res = await llm.ainvoke([HumanMessage(content=prompt)])
     content = res.content.replace("```json", "").replace("```", "").strip()
     try:
         return json.loads(content)

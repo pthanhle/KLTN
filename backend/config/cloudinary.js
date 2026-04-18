@@ -7,11 +7,6 @@ let isConfigured = false
 
 const ensureConfigured = () => {
   if (isConfigured) return
-  
-  console.log('Configuring Cloudinary NOW:')
-  console.log('CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME)
-  console.log('API_KEY:', process.env.CLOUDINARY_API_KEY)
-  console.log('API_SECRET:', process.env.CLOUDINARY_API_SECRET ? '***' : 'NOT SET')
 
   if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
     throw new Error('Missing Cloudinary environment variables')
@@ -26,7 +21,7 @@ const ensureConfigured = () => {
   const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-      folder: 'carshop/products', 
+      folder: 'carshop/products',
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
       transformation: [{ width: 800, height: 600, crop: 'limit' }],
     },
@@ -61,6 +56,10 @@ export const upload = {
   fields(fieldsArray) {
     ensureConfigured()
     return multerInstance.fields(fieldsArray)
+  },
+  any() {
+    ensureConfigured()
+    return multerInstance.any()
   }
 }
 

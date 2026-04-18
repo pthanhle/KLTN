@@ -10,7 +10,6 @@ const ColorInputFields = ({ name, restField }) => {
     const form = Form.useFormInstance();
 
     const handleFileChange = (info, fieldIndex) => {
-        // We only care about the file binary, AntD Form.List handles the value update
         if (info.file.status === 'done') {
             message.success(`${info.file.name} uploaded successfully`);
         }
@@ -21,7 +20,6 @@ const ColorInputFields = ({ name, restField }) => {
         maxCount: 1,
         showUploadList: false,
         customRequest: ({ file, onSuccess }) => {
-            // No-op for actual upload, we handle it on form submit
             onSuccess("ok");
         },
     };
@@ -77,7 +75,7 @@ const ColorInputFields = ({ name, restField }) => {
                                     const imageValue = getFieldValue(['colors', name, 'image']);
                                     const isFile = imageValue instanceof File || (imageValue && imageValue.originFileObj);
                                     const isUrl = typeof imageValue === 'string';
-                                    
+
                                     let displayName = t('uploadColorImage', 'Chọn hoặc tải ảnh lên...');
                                     if (isFile) displayName = imageValue.name || imageValue.originFileObj.name;
                                     else if (isUrl) displayName = imageValue.split('/').pop();

@@ -136,7 +136,6 @@ export const createProduct = asyncHandler(async (req, res) => {
   if (req.files) {
     colors = colors.map((color, index) => {
       const colorFile = req.files.find(f => f.fieldname === `color_image_${index}`);
-      // Remove filterStyle for consistency
       const { filterStyle, ...rest } = color;
       if (colorFile) return { ...rest, image: colorFile.path };
       return rest;
@@ -158,11 +157,12 @@ export const createProduct = asyncHandler(async (req, res) => {
   let galleryPhotos = gallery.photos || [];
 
   if (req.files) {
-    if (req.files.image && req.files.image[0]) {
-      heroImage = req.files.image[0].path;
-    }
-    if (req.files.photos) {
-      const newPhotos = req.files.photos.map(file => file.path);
+    const singleFile = req.files.find(f => f.fieldname === 'image');
+    if (singleFile) heroImage = singleFile.path;
+    
+    const photoFiles = req.files.filter(f => f.fieldname === 'photos');
+    if (photoFiles.length > 0) {
+      const newPhotos = photoFiles.map(file => file.path);
       galleryPhotos = [...galleryPhotos, ...newPhotos];
     }
   }
@@ -235,7 +235,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
       if (field === 'product_name') car.name = req.body[field];
       else if (['versions', 'colors', 'features'].includes(field)) {
         let parsed = safeParse(req.body[field], []);
-        if (field === 'colors' && req.files) {
+        if (field === 'colors' && req.files && Array.isArray(req.files)) {
           parsed = parsed.map((color, index) => {
             const colorFile = req.files.find(f => f.fieldname === `color_image_${index}`);
             const { filterStyle, ...rest } = color;
@@ -267,9 +267,10 @@ export const updateProduct = asyncHandler(async (req, res) => {
     }
   })
 
-  if (req.files) {
-    if (req.files.image && req.files.image[0]) {
-      const newImagePath = req.files.image[0].path;
+  if (req.files && Array.isArray(req.files)) {
+    const singleFile = req.files.find(f => f.fieldname === 'image');
+    if (singleFile) {
+      const newImagePath = singleFile.path;
       car.image = newImagePath;
       
       if (!car.gallery) car.gallery = { photos: [], videos: [] };
@@ -279,8 +280,10 @@ export const updateProduct = asyncHandler(async (req, res) => {
         car.gallery.photos = [newImagePath, ...car.gallery.photos];
       }
     }
-    if (req.files.photos) {
-      const newPhotos = req.files.photos.map(file => file.path);
+    
+    const photoFiles = req.files.filter(f => f.fieldname === 'photos');
+    if (photoFiles.length > 0) {
+      const newPhotos = photoFiles.map(file => file.path);
       if (!car.gallery) car.gallery = { photos: [], videos: [] };
       if (!Array.isArray(car.gallery.photos)) car.gallery.photos = [];
       car.gallery.photos = [...car.gallery.photos, ...newPhotos];

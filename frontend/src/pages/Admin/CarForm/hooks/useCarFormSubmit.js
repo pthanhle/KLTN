@@ -71,7 +71,6 @@ export const useCarFormSubmit = (form) => {
                     if (colorImageFile) {
                         const fileName = colorImageFile.name || `color-${index}.png`;
                         formData.append(`color_image_${index}`, colorImageFile, fileName);
-                        // Store a temporary marker to be replaced by backend
                         return { ...color, image: `PENDING_UPLOAD_${index}` };
                     }
                     return color;

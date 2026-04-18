@@ -12,12 +12,27 @@ export const useCarFormSubmit = (form) => {
 
     const getRealFile = (val) => {
         if (!val) return null;
-        if (val instanceof File || val instanceof Blob) return val;
-        if (val.originFileObj instanceof File || val.originFileObj instanceof Blob) return val.originFileObj;
-        if (val.originFileObj && typeof val.originFileObj.size === 'number') return val.originFileObj;
-        if (val.file instanceof File || val.file instanceof Blob) return val.file;
-        if (val.file && typeof val.file.size === 'number') return val.file;
-        if (typeof val.size === 'number' && typeof val.type === 'string' && (val.name || val.lastModified)) return val;
+
+        const isBinary = (obj) => {
+            const s = Object.prototype.toString.call(obj);
+            return s === '[object File]' || s === '[object Blob]';
+        };
+
+        if (isBinary(val)) return val;
+
+        if (val.originFileObj) {
+            if (isBinary(val.originFileObj)) return val.originFileObj;
+            if (typeof val.originFileObj.size === 'number') return val.originFileObj;
+        }
+
+        if (val.file) {
+            if (isBinary(val.file)) return val.file;
+            if (typeof val.file.size === 'number') return val.file;
+        }
+
+        if (typeof val.size === 'number' && typeof val.type === 'string' && (val.name || val.lastModified)) {
+            return val;
+        }
 
         return null;
     };
@@ -31,7 +46,8 @@ export const useCarFormSubmit = (form) => {
             if (key === 'image') {
                 const heroFile = getRealFile(value);
                 if (heroFile) {
-                    formData.append('image', heroFile);
+                    const fileName = heroFile.name || 'hero-image.png';
+                    formData.append('image', heroFile, fileName);
                 } else if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('/') || value.startsWith('blob:'))) {
                     formData.append('image', value);
                 }
@@ -39,10 +55,11 @@ export const useCarFormSubmit = (form) => {
             }
 
             if (key === 'new_photos' && Array.isArray(value)) {
-                value.forEach(item => {
+                value.forEach((item, index) => {
                     const photoFile = getRealFile(item);
                     if (photoFile) {
-                        formData.append('photos', photoFile);
+                        const fileName = photoFile.name || `photo-${index}.png`;
+                        formData.append('photos', photoFile, fileName);
                     }
                 });
                 return;

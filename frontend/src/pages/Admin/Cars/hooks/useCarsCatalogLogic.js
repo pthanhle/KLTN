@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { message } from 'antd';
 import { useCarsFilter } from './useCarsFilter';
 import { useCarsSelection } from './useCarsSelection';
 import { useDynamicTaxonomies } from './useDynamicTaxonomies';
 import { getAdminProducts, updateAdminProduct } from '../../../../services/api/adminProduct.api';
+import { socket } from '../../../../services/socket';
 
 export const useCarsCatalogLogic = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -10,65 +12,76 @@ export const useCarsCatalogLogic = () => {
     const [totalCars, setTotalCars] = useState(0);
     const [globalStats, setGlobalStats] = useState(null);
 
-    // 1. Compose Micro-Hooks
     const filterState = useCarsFilter();
     const taxonomyState = useDynamicTaxonomies();
-    
-    // Compose Selection Hook with Dynamic Derived Data
     const selectionState = useCarsSelection(carsData);
 
-    // 2. Fetch from API
+    const fetchCars = async (silent = false) => {
+        if (!silent) setIsLoading(true);
+        try {
+            const params = {
+                current: 1,
+                pageSize: 1000,
+                search: filterState.searchTerm,
+                brand: filterState.filterBrand,
+                bodyStyle: filterState.filterBodyStyle,
+                status: filterState.filterStatus
+            };
+
+            const response = await getAdminProducts(params);
+            setCarsData(response.products);
+            setTotalCars(response.pagination?.total || 0);
+            setGlobalStats(response.stats || null);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            if (!silent) setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        let isMounted = true;
-        
-        setIsLoading(true);
-        const fetchCars = async () => {
-            try {
-                // Here we fetch all without pagination since admin table might handle it locally,
-                // or pass pagination info up to the table. We simulate the original UX where mapping handled all.
-                const params = {
-                    current: 1,
-                    pageSize: 1000, // fetch all for local table, or implement table pagination
-                    search: filterState.searchTerm,
-                    brand: filterState.filterBrand,
-                    bodyStyle: filterState.filterBodyStyle,
-                    status: filterState.filterStatus
-                };
-                
-                const response = await getAdminProducts(params);
-                if (isMounted) {
-                    setCarsData(response.products);
-                    setTotalCars(response.pagination?.total || 0);
-                    setGlobalStats(response.stats || null);
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                console.error("Failed to load admin cars:", error);
-                if (isMounted) setIsLoading(false);
-            }
+        const successMsg = sessionStorage.getItem('admin_car_success');
+        if (successMsg) {
+            message.success(successMsg);
+            sessionStorage.removeItem('admin_car_success');
+        }
+    }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => fetchCars(), 500);
+        return () => clearTimeout(timer);
+    }, [filterState.searchTerm, filterState.filterBrand, filterState.filterBodyStyle, filterState.filterStatus]);
+
+    useEffect(() => {
+        if (!socket.connected) {
+            socket.connect();
+        }
+
+        const handleUpdate = () => {
+            fetchCars(true);
         };
 
-        const timer = setTimeout(() => fetchCars(), 500);
+        socket.on('product_data_updated', handleUpdate);
+        socket.on('product_image_updated', handleUpdate);
+
         return () => {
-            isMounted = false;
-            clearTimeout(timer);
+            socket.off('product_data_updated', handleUpdate);
+            socket.off('product_image_updated', handleUpdate);
         };
     }, [filterState.searchTerm, filterState.filterBrand, filterState.filterBodyStyle, filterState.filterStatus]);
 
-    // 3. Actions
     const handleToggleDemo = async (id) => {
-        // Optimistic update UX
         const car = carsData.find(c => c.id === id || c._id === id);
         if (!car) return;
-        
+
         const newStatus = !car.isDemoAvailable;
         setCarsData(prev => prev.map(c => (c.id === id || c._id === id) ? { ...c, isDemoAvailable: newStatus } : c));
-        
+
         try {
             await updateAdminProduct(id, { isDemoAvailable: newStatus });
+            fetchCars(true);
         } catch (error) {
-            console.error("Failed to update demo status:", error);
-            // Revert optimistic update
+            console.error(error);
             setCarsData(prev => prev.map(c => (c.id === id || c._id === id) ? { ...c, isDemoAvailable: !newStatus } : c));
         }
     };

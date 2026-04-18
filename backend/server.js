@@ -19,6 +19,7 @@ import seedRoles from './seeders/roleSeed.js'
 import { ensureConfigured } from './config/cloudinary.js'
 import { initSocket } from './config/socket.js'
 import './workers/emailWorker.js'
+import './workers/imageWorker.js'
 
 import adminIndexRoutes from './routes/admin/index.route.js'
 import clientIndexRoutes from './routes/client/index.route.js'
@@ -54,14 +55,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 app.use(express.json())
 
-
 app.use('/api/admin', adminIndexRoutes)
 app.use('/api/client', clientIndexRoutes)
 app.use('/api/staff', staffIndexRoutes)
 app.use('/api/ai', AIroutes)
 app.use('/api/payments', paymentRoutes)
 app.use('/api/upload', uploadRoutes)
-
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 

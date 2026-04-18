@@ -1,6 +1,9 @@
 import asyncHandler from 'express-async-handler'
 import Car from '../../models/carModel.js'
 import mongoose from 'mongoose'
+import { addImageUploadJob } from '../../queues/imageQueue.js'
+import { getIO } from '../../config/socket.js'
+import path from 'path'
 
 const safeParse = (data, defaultValue = null) => {
   if (typeof data === 'string') {
@@ -71,7 +74,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
       $group: {
         _id: null,
         totalCars: { $sum: 1 },
-        outOfStock: { $sum: { $cond: [{ $lte: ["$stock", 0] }, 1, 0] } },
+        outOfStock: { $sum: { $cond: [{ $lte: ["$stock", 2] }, 1, 0] } },
         totalValue: { $sum: { $multiply: [{ $ifNull: ["$price", 0] }, { $ifNull: ["$stock", 0] }] } },
         activeTestDrives: { $sum: { $cond: [{ $eq: ["$isDemoAvailable", true] }, 1, 0] } }
       }
@@ -142,7 +145,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     if (isPending) {
       const fileKey = color.image.replace('PEND_COL_', 'color_file_');
       const colorFile = files.find(f => f.fieldname === fileKey);
-      if (colorFile) return { ...color, image: colorFile.path };
+      if (colorFile) return { ...color, image: `/uploads/temp/${colorFile.filename}` };
     }
     return color;
   });
@@ -152,7 +155,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     if (isPending) {
       const fileKey = feature.image.replace('PEND_FEAT_', 'feature_file_');
       const featureFile = files.find(f => f.fieldname === fileKey);
-      if (featureFile) return { ...feature, image: featureFile.path };
+      if (featureFile) return { ...feature, image: `/uploads/temp/${featureFile.filename}` };
     }
     return feature;
   });
@@ -172,11 +175,11 @@ export const createProduct = asyncHandler(async (req, res) => {
   let galleryPhotos = gallery.photos || [];
 
   const singleFile = files.find(f => f.fieldname === 'image');
-  if (singleFile) heroImage = singleFile.path;
+  if (singleFile) heroImage = `/uploads/temp/${singleFile.filename}`;
 
   const photoFiles = files.filter(f => f.fieldname === 'photos');
   if (photoFiles.length > 0) {
-    const newPhotos = photoFiles.map(file => file.path);
+    const newPhotos = photoFiles.map(file => `/uploads/temp/${file.filename}`);
     galleryPhotos = [...galleryPhotos, ...newPhotos];
   }
 
@@ -218,7 +221,15 @@ export const createProduct = asyncHandler(async (req, res) => {
   })
 
   const createdProduct = await car.save()
-  res.status(201).json({ success: true, data: createdProduct, message: 'Thêm xe mới thành công' })
+
+  if (files.length > 0) {
+    await addImageUploadJob(createdProduct._id, files, 'car');
+  }
+
+  const io = getIO();
+  if (io) io.emit('product_data_updated', { type: 'CREATE', productId: createdProduct._id });
+
+  res.status(201).json({ success: true, data: createdProduct, message: 'Thêm xe mới thành công (Đang xử lý ảnh trên Cloud...)' })
 })
 
 export const updateProduct = asyncHandler(async (req, res) => {
@@ -236,9 +247,6 @@ export const updateProduct = asyncHandler(async (req, res) => {
   }
 
   const files = req.files || [];
-
-  console.log(`[Diagnostic] Updating product: ${id}`);
-  console.log(`[Diagnostic] Files received: ${files.length}`);
 
   const allowedFields = [
     'name', 'product_name', 'sku', 'status', 'tagline', 'description',
@@ -261,10 +269,8 @@ export const updateProduct = asyncHandler(async (req, res) => {
               const fileKey = color.image.replace('PEND_COL_', 'color_file_');
               const colorFile = files.find(f => f.fieldname === fileKey);
               if (colorFile) {
-                console.log(`  - color match found for ${fileKey}`);
-                return { ...color, image: colorFile.path };
+                return { ...color, image: `/uploads/temp/${colorFile.filename}` };
               }
-              console.warn(`  - color match NOT found for ${fileKey}. Reverting...`);
               const oldItem = car.colors && car.colors[index];
               if (oldItem && oldItem.image) return { ...color, image: oldItem.image };
             }
@@ -279,10 +285,8 @@ export const updateProduct = asyncHandler(async (req, res) => {
               const fileKey = feature.image.replace('PEND_FEAT_', 'feature_file_');
               const featureFile = files.find(f => f.fieldname === fileKey);
               if (featureFile) {
-                console.log(`  - feature match found for ${fileKey}`);
-                return { ...feature, image: featureFile.path };
+                return { ...feature, image: `/uploads/temp/${featureFile.filename}` };
               }
-              console.warn(`  - feature match NOT found for ${fileKey}. Reverting...`);
               const oldItem = car.features && car.features[index];
               if (oldItem && oldItem.image) return { ...feature, image: oldItem.image };
             }
@@ -317,24 +321,33 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   const singleFile = files.find(f => f.fieldname === 'image');
   if (singleFile) {
-    car.image = singleFile.path;
+    const localUrl = `/uploads/temp/${singleFile.filename}`;
+    car.image = localUrl;
     if (!car.gallery) car.gallery = { photos: [], videos: [] };
-    if (!car.gallery.photos.includes(singleFile.path)) {
-      car.gallery.photos = [singleFile.path, ...car.gallery.photos];
+    if (!car.gallery.photos.includes(localUrl)) {
+      car.gallery.photos = [localUrl, ...car.gallery.photos];
       car.markModified('gallery.photos');
     }
   }
 
   const photoFiles = files.filter(f => f.fieldname === 'photos');
   if (photoFiles.length > 0) {
-    const newPhotos = photoFiles.map(file => file.path);
+    const newPhotos = photoFiles.map(file => `/uploads/temp/${file.filename}`);
     if (!car.gallery) car.gallery = { photos: [], videos: [] };
     car.gallery.photos = [...car.gallery.photos, ...newPhotos];
     car.markModified('gallery.photos');
   }
 
   const updatedProduct = await car.save()
-  res.json({ success: true, data: updatedProduct, message: 'Cập nhật xe thành công' })
+
+  if (files.length > 0) {
+    await addImageUploadJob(updatedProduct._id, files, 'car');
+  }
+
+  const io = getIO();
+  if (io) io.emit('product_data_updated', { type: 'UPDATE', productId: updatedProduct._id });
+
+  res.json({ success: true, data: updatedProduct, message: 'Cập nhật xe thành công (Đang xử lý ảnh trên Cloud...)' })
 })
 
 export const deleteProduct = asyncHandler(async (req, res) => {
@@ -352,5 +365,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   }
 
   await car.deleteOne()
+  const io = getIO();
+  if (io) io.emit('product_data_updated', { type: 'DELETE', productId: id });
   res.json({ success: true, message: 'Xe đã được xóa thành công' })
 })

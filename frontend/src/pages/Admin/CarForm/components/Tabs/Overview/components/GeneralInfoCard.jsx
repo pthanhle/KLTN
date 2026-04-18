@@ -1,6 +1,7 @@
+import { useRef } from 'react';
 import { Form, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { Bold, Italic, List, Link as LinkIcon, Image as ImageIcon, Code } from 'lucide-react';
+import { Bold, Italic, List } from 'lucide-react';
 import { getOverviewRules } from '../../../../schemas/carOverviewSchema';
 
 const { TextArea } = Input;
@@ -8,6 +9,40 @@ const { TextArea } = Input;
 const GeneralInfoCard = () => {
     const { t } = useTranslation('adminCarForm');
     const rules = getOverviewRules();
+    const form = Form.useFormInstance();
+    const textAreaRef = useRef(null);
+
+    const applyFormat = (prefix, suffix = '') => {
+        const textArea = textAreaRef.current?.resizableTextArea?.textArea;
+        if (!textArea) return;
+
+        const start = textArea.selectionStart;
+        const end = textArea.selectionEnd;
+        const text = textArea.value;
+        const selectedText = text.substring(start, end);
+        
+        let newText;
+        let newCursorPos;
+
+        if (prefix === 'list') {
+            const lines = selectedText.split('\n');
+            const formattedLines = lines.map(line => line.startsWith('- ') ? line : `- ${line}`);
+            const replacement = formattedLines.join('\n');
+            newText = text.substring(0, start) + replacement + text.substring(end);
+            newCursorPos = start + replacement.length;
+        } else {
+            const replacement = prefix + selectedText + suffix;
+            newText = text.substring(0, start) + replacement + text.substring(end);
+            newCursorPos = start + prefix.length + selectedText.length + suffix.length;
+        }
+
+        form.setFieldsValue({ description: newText });
+
+        setTimeout(() => {
+            textArea.focus();
+            textArea.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+    };
 
     return (
         <div className="bg-white dark:bg-[#141416] rounded-xl p-8 shadow-sm dark:shadow-[0_15px_30px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-white/5">
@@ -57,25 +92,31 @@ const GeneralInfoCard = () => {
                     <label className="block text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-black mb-3">{t('descLabel', 'Mô tả chi tiết')}</label>
                     <div className="rounded-2xl overflow-hidden border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-[#1a1a1c]/50 focus-within:ring-2 focus-within:ring-yellow-500/50 transition-all shadow-sm">
                         <div className="flex items-center gap-1 p-2 bg-white dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
-                            <button type="button" className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors border-none bg-transparent">
+                            <button 
+                                type="button" 
+                                onClick={() => applyFormat('**', '**')}
+                                className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors border-none bg-transparent"
+                            >
                                 <Bold size={18} />
                             </button>
-                            <button type="button" className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors border-none bg-transparent">
+                            <button 
+                                type="button" 
+                                onClick={() => applyFormat('*', '*')}
+                                className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors border-none bg-transparent"
+                            >
                                 <Italic size={18} />
                             </button>
-                            <button type="button" className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors border-none bg-transparent">
+                            <button 
+                                type="button" 
+                                onClick={() => applyFormat('list')}
+                                className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors border-none bg-transparent"
+                            >
                                 <List size={18} />
-                            </button>
-                            <div className="w-px h-5 bg-slate-200 dark:bg-white/10 mx-2"></div>
-                            <button type="button" className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors border-none bg-transparent">
-                                <LinkIcon size={18} />
-                            </button>
-                            <button type="button" className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors border-none bg-transparent">
-                                <ImageIcon size={18} />
                             </button>
                         </div>
                         <Form.Item name="description" rules={rules.description} className="mb-0">
                             <TextArea 
+                                ref={textAreaRef}
                                 className="w-full !bg-transparent !border-none !px-6 !py-5 !text-base text-slate-700 dark:text-slate-300 focus:!ring-0 leading-relaxed custom-scrollbar min-h-[300px]" 
                                 placeholder={t('descPlaceholder', 'Nhập nội dung mô tả chi tiết về khả năng vận hành, thiết kế ngoại thất và triết lý của xe...')} 
                                 autoSize={{ minRows: 10, maxRows: 20 }}

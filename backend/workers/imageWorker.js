@@ -10,7 +10,6 @@ const imageWorker = new Worker(
     'imageQueue',
     async (job) => {
         const { productId, files, type } = job.data;
-        console.log(`[Worker] Started processing images for ${type} ${productId}`);
 
         try {
             if (type === 'car') {
@@ -60,12 +59,11 @@ const imageWorker = new Worker(
                         }
 
                     } catch (uploadErr) {
-                        console.error(`  - Failed to upload ${file.fieldname}:`, uploadErr);
+                        console.error(uploadErr);
                     }
                 }
 
                 await car.save();
-                console.log(`[Worker] Finished updating ${productId} with CDN URLs`);
 
                 const io = getIO();
                 if (io) {
@@ -76,7 +74,7 @@ const imageWorker = new Worker(
                 }
             }
         } catch (error) {
-            console.error(`[Worker] Error processing job ${job.id}:`, error);
+            console.error(error);
             throw error;
         }
     },
@@ -85,13 +83,5 @@ const imageWorker = new Worker(
         concurrency: 5,
     }
 );
-
-imageWorker.on('completed', (job) => {
-    console.log(`[Worker] Job ${job.id} completed successfully`);
-});
-
-imageWorker.on('failed', (job, err) => {
-    console.error(`[Worker] Job ${job.id} failed:`, err);
-});
 
 export default imageWorker;

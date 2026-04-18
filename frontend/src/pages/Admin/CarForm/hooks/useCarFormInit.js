@@ -1,52 +1,46 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { getAdminProductById } from '../../../../services/api/adminProduct.api';
 
 export const useCarFormInit = (id, form) => {
-    const [isInitializing, setIsInitializing] = useState(true);
+    const [isInitializing, setIsInitializing] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
-        setIsInitializing(true);
-
-        const formatToPreview = (url) => {
-            if (!url || typeof url !== 'string') return url;
-            return [{
-                uid: `-1-${Math.random()}`,
-                name: 'image.png',
-                status: 'done',
-                url: url,
-                thumbUrl: url
-            }];
-        };
 
         const fetchCarData = async () => {
+            if (!id) {
+                form.resetFields();
+                return;
+            }
+
             try {
-                if (id) {
-                    const carDetail = await getAdminProductById(id);
-                    if (isMounted && carDetail) {
-                        const sanitizedData = { ...carDetail };
-
-                        if (sanitizedData.colors && Array.isArray(sanitizedData.colors)) {
-                            sanitizedData.colors = sanitizedData.colors.map(color => ({
-                                ...color,
-                                image: formatToPreview(color.image)
-                            }));
-                        }
-
-                        if (sanitizedData.features && Array.isArray(sanitizedData.features)) {
-                            sanitizedData.features = sanitizedData.features.map(feature => ({
-                                ...feature,
-                                image: formatToPreview(feature.image)
-                            }));
-                        }
-
-                        form.setFieldsValue(sanitizedData);
-                    }
-                } else {
-                    form.resetFields();
+                setIsInitializing(true);
+                const carDetail = await getAdminProductById(id);
+                
+                if (isMounted && carDetail) {
+                    const sanitizedData = {
+                        ...carDetail,
+                        brandId: carDetail.brandId?._id || carDetail.brandId,
+                        category: carDetail.category?._id || carDetail.category,
+                        versions: carDetail.versions || [],
+                        colors: carDetail.colors || [],
+                        features: (carDetail.features || []).map((f, idx) => ({
+                            ...f,
+                            image: f.image ? [{
+                                uid: `feat-${idx}`,
+                                name: 'image',
+                                status: 'done',
+                                url: f.image
+                            }] : []
+                        })),
+                        specs: carDetail.specs || [],
+                        gallery: carDetail.gallery || { photos: [], videos: [] },
+                        threeSixty: carDetail.threeSixty || { images: [], lighting: 'Studio', environment: 'Minimalist Studio' }
+                    };
+                    form.setFieldsValue(sanitizedData);
                 }
             } catch (error) {
-                console.error("Failed to fetch car data:", error);
+                console.error(error);
             } finally {
                 if (isMounted) {
                     setIsInitializing(false);

@@ -55,14 +55,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 app.use(express.json())
 
-
 app.use('/api/admin', adminIndexRoutes)
 app.use('/api/client', clientIndexRoutes)
 app.use('/api/staff', staffIndexRoutes)
 app.use('/api/ai', AIroutes)
 app.use('/api/payments', paymentRoutes)
 app.use('/api/upload', uploadRoutes)
-
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 

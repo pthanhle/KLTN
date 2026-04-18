@@ -15,11 +15,9 @@ export const useCarFormSubmit = (form) => {
     const getRealFile = (val) => {
         if (!val) return null;
         if (isBinary(val)) return val;
-        
         if (val.originFileObj && isBinary(val.originFileObj)) {
             return val.originFileObj;
         }
-
         if (Array.isArray(val) && val.length > 0) {
             const first = val[0];
             if (isBinary(first)) return first;
@@ -31,11 +29,9 @@ export const useCarFormSubmit = (form) => {
     const getStringUrl = (val) => {
         if (!val) return null;
         if (typeof val === 'string') return val;
-        
         if (val.url && typeof val.url === 'string') {
             return val.url;
         }
-
         if (Array.isArray(val) && val.length > 0) {
             const first = val[0];
             if (first.url && typeof first.url === 'string') return first.url;
@@ -96,7 +92,6 @@ export const useCarFormSubmit = (form) => {
                 formData.append(key, value);
             }
         }
-
         return formData;
     };
 
@@ -108,18 +103,17 @@ export const useCarFormSubmit = (form) => {
 
             if (id) {
                 await updateAdminProduct(id, formData);
-                message.success('Cập nhật xe thành công!');
+                sessionStorage.setItem('admin_car_success', 'Cập nhật xe thành công!');
             } else {
                 await createAdminProduct(formData);
-                message.success('Thêm xe mới thành công!');
+                sessionStorage.setItem('admin_car_success', 'Thêm xe mới thành công!');
             }
 
             queryClient.invalidateQueries(['adminProducts']);
-            navigate('/admin/cars');
+            window.location.href = '/admin/cars';
         } catch (error) {
-            console.error("Form submit error:", error);
+            console.error(error);
             message.error('Biểu mẫu còn thiếu thông tin hoặc có lỗi xảy ra!');
-        } finally {
             setIsSubmitting(false);
         }
     };
@@ -132,18 +126,17 @@ export const useCarFormSubmit = (form) => {
 
             if (id) {
                 await updateAdminProduct(id, formData);
-                message.success('Đã lưu nháp cập nhật!');
+                sessionStorage.setItem('admin_car_success', 'Đã lưu nháp cập nhật!');
             } else {
                 await createAdminProduct(formData);
-                message.success('Đã lưu bản nháp mới!');
+                sessionStorage.setItem('admin_car_success', 'Đã lưu bản nháp mới!');
             }
 
             queryClient.invalidateQueries(['adminProducts']);
-            navigate('/admin/cars');
+            window.location.href = '/admin/cars';
         } catch (error) {
-            console.error("Draft save error:", error);
+            console.error(error);
             message.error('Không thể lưu bản nháp!');
-        } finally {
             setIsSubmitting(false);
         }
     };

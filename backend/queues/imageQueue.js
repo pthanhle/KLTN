@@ -26,10 +26,8 @@ export const addImageUploadJob = async (productId, files, type = 'car') => {
             })),
             type
         });
-        console.log(`[Queue] Added upload job ${job.id} for product ${productId}`);
         return job;
     } catch (error) {
-        console.error(`[Queue] Failed to add job:`, error);
         throw error;
     }
 };

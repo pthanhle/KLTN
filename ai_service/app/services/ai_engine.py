@@ -26,17 +26,20 @@ async def save_chat_message(user_id: str, role: str, content: str):
 
 async def classify_intent(message: str):
     prompt = f"""
-    Bạn là chuyên gia phân loại ý định của khách hàng cho CarsShop.
-    Trả về JSON: {{ "intent": "product_search" | "service_search" | "category_check" | "order_tracking" | "booking_tracking" | "tradein_check" | "general", "keyword": string | null }}
+    Bạn là chuyên gia phân loại ý định của khách cho CarsShop.
+    Các intent: "car_search" (hỏi mua xe), "product_search" (phụ tùng), "service_search", "category_check", "general".
+    Trả về JSON: {{ "intent": string, "keyword": string | null, "max_price": number | null }}
+    Ví dụ: "Porsche tầm 2 tỷ" -> {{ "intent": "car_search", "keyword": "Porsche", "max_price": 2000000000 }}
     
     Câu hỏi: "{message}"
     JSON:"""
     res = await llm.ainvoke([HumanMessage(content=prompt)])
     content = res.content.replace("```json", "").replace("```", "").strip()
     try:
-        return json.loads(content)
+        data = json.loads(content)
+        return data
     except:
-        return {"intent": "general", "keyword": None}
+        return {"intent": "general", "keyword": None, "max_price": None}
 
 async def get_context(intent_data: dict, user_id: str):
     intent = intent_data.get("intent")

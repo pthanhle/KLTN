@@ -218,7 +218,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
     'price', 'salePrice', 'stock', 'isNew', 'brandId', 'brandName',
     'year', 'odo', 'engine', 'power', 'fuel', 'seats', 'bodyStyle',
     'isDemoAvailable', 'versions', 'colors', 'gallery', 'features', 'specs',
-    'threeSixty'
+    'threeSixty', 'image'
   ]
 
   allowedFields.forEach(field => {
@@ -240,24 +240,32 @@ export const updateProduct = asyncHandler(async (req, res) => {
         const numVal = Number(req.body[field]);
         if (!isNaN(numVal)) car[field] = numVal;
       }
+      else if (field === 'image') {
+        if (typeof req.body[field] === 'string' && (req.body[field].startsWith('http') || req.body[field].startsWith('/') || req.body[field].startsWith('blob:'))) {
+          car[field] = req.body[field];
+        }
+      }
       else car[field] = req.body[field]
     }
   })
 
   if (req.files) {
     if (req.files.image && req.files.image[0]) {
-      car.image = req.files.image[0].path;
-      if (car.gallery && car.gallery.photos) {
-        car.gallery.photos = [car.image, ...car.gallery.photos];
+      const newImagePath = req.files.image[0].path;
+      car.image = newImagePath;
+      
+      if (!car.gallery) car.gallery = { photos: [], videos: [] };
+      if (!Array.isArray(car.gallery.photos)) car.gallery.photos = [];
+      
+      if (!car.gallery.photos.includes(newImagePath)) {
+        car.gallery.photos = [newImagePath, ...car.gallery.photos];
       }
     }
     if (req.files.photos) {
       const newPhotos = req.files.photos.map(file => file.path);
-      if (car.gallery) {
-        car.gallery.photos = [...(car.gallery.photos || []), ...newPhotos];
-      } else {
-        car.gallery = { photos: newPhotos, videos: [] };
-      }
+      if (!car.gallery) car.gallery = { photos: [], videos: [] };
+      if (!Array.isArray(car.gallery.photos)) car.gallery.photos = [];
+      car.gallery.photos = [...car.gallery.photos, ...newPhotos];
     }
   }
 

@@ -10,14 +10,15 @@ export const useCarFormSubmit = (form) => {
     const { id } = useParams();
     const queryClient = useQueryClient();
 
-    // Helper to extract real File/Blob from various wrappers (AntD, raw browser, etc.)
-    // Tightened to ONLY return real binary data to ensure FormData works correctly.
     const getRealFile = (val) => {
         if (!val) return null;
         if (val instanceof File || val instanceof Blob) return val;
         if (val.originFileObj instanceof File || val.originFileObj instanceof Blob) return val.originFileObj;
+        if (val.originFileObj && typeof val.originFileObj.size === 'number') return val.originFileObj;
         if (val.file instanceof File || val.file instanceof Blob) return val.file;
-        // DO NOT return metadata objects {uid, name, etc} as they break FormData binary uploads
+        if (val.file && typeof val.file.size === 'number') return val.file;
+        if (typeof val.size === 'number' && typeof val.type === 'string' && (val.name || val.lastModified)) return val;
+
         return null;
     };
 

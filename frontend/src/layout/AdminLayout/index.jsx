@@ -19,7 +19,7 @@ const AdminLayout = () => {
     }, [location.pathname]);
 
     return (
-        <Layout key={location.key} style={{ minHeight: '100vh' }} hasSider={!isBuilderMode} className={isDarkMode ? 'dark' : ''}>
+        <Layout key={location.key} style={{ minHeight: '100vh' }} className={isDarkMode ? 'dark' : ''}>
             {!isBuilderMode && <Sider collapsed={collapsed} />}
             <Layout className={`transition-all w-full overflow-x-hidden duration-300 ${isDarkMode ? 'bg-[#0a0a0b]' : 'bg-[#f4f7fa]'}`}>
                 <Header collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} hideToggle={isBuilderMode} />

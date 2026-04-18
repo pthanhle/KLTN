@@ -49,6 +49,7 @@
     },
     "detail": {
         "priceColor": "Price & Colors",
+        "overview": "Overview",
         "features": "Highlights",
         "design": "Design",
         "performance": "Performance",

@@ -7,9 +7,9 @@ from app.core.database import db
 llm = ChatGoogleGenerativeAI(
     model=settings.MODEL_NAME,
     google_api_key=settings.GEMINI_API_KEY,
-    temperature=0.7
+    temperature=0.7,
+    convert_system_message_to_human=True
 )
-
 
 async def get_chat_history(user_id: str, limit: int = 10):
     cursor = db.chathistories.find({"user_id": user_id}).sort("timestamp", -1).limit(limit)
@@ -24,7 +24,6 @@ async def save_chat_message(user_id: str, role: str, content: str):
         "timestamp": __import__("datetime").datetime.utcnow()
     })
 
-
 async def classify_intent(message: str):
     prompt = f"""
     Bạn là chuyên gia phân loại ý định của khách hàng cho CarsShop.
@@ -32,13 +31,12 @@ async def classify_intent(message: str):
     
     Câu hỏi: "{message}"
     JSON:"""
-    res = await llm.ainvoke([SystemMessage(content=prompt)])
+    res = await llm.ainvoke([HumanMessage(content=prompt)])
     content = res.content.replace("```json", "").replace("```", "").strip()
     try:
         return json.loads(content)
     except:
         return {"intent": "general", "keyword": None}
-
 
 async def get_context(intent_data: dict, user_id: str):
     intent = intent_data.get("intent")
@@ -62,7 +60,6 @@ async def get_context(intent_data: dict, user_id: str):
         return "Dịch vụ: " + "\n".join([f"{s['service_name']}: {s['price']} VND" for s in services])
 
     return "Không tìm thấy dữ liệu phù hợp."
-
 
 async def generate_response(user_id: str, message: str):
     history = await get_chat_history(user_id)

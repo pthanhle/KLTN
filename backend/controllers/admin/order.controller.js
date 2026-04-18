@@ -75,7 +75,7 @@ export const createOrder = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error('Thiếu thông tin bắt buộc: user_id, items')
     }
-    
+
     if (!payment || !payment.method) {
         res.status(400)
         throw new Error('Vui lòng chọn phương thức thanh toán')
@@ -95,7 +95,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     const orderItems = items.map(item => {
         const p = partMap[item.part_id]
         if (!p) throw Object.assign(new Error(`Sản phẩm ${item.part_id} không tồn tại`), { statusCode: 404 })
-        
+
         const currentStock = p.inventory?.warehouse + p.inventory?.showroom || 0
         if (currentStock < item.quantity) throw Object.assign(new Error(`Sản phẩm "${p.name}" không đủ tồn kho`), { statusCode: 400 })
 
@@ -125,7 +125,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     }
 
     const final_total = financials?.grand_total && typeof financials.grand_total === 'number'
-        ? financials.grand_total 
+        ? financials.grand_total
         : computedSubtotal
 
     const order = await Order.create({
@@ -228,7 +228,7 @@ export const updateOrder = asyncHandler(async (req, res) => {
         if (tracking_info.provider) order.shipping.provider = tracking_info.provider
         if (tracking_info.tracking_code) order.shipping.tracking_code = tracking_info.tracking_code
     }
-    
+
     if (invoice_url) order.invoice_url = invoice_url
 
     const updated = await order.save()

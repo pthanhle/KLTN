@@ -36,6 +36,20 @@ services:
     networks:
       - app-network
 
+  ai-service:
+    build:
+      context: ./ai_service
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./ai_service/.env
+    depends_on:
+      - redis
+    volumes:
+      - ./ai_service:/app
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

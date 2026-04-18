@@ -1,13 +1,13 @@
 import { Image } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 
-export const GallerySlider = ({ 
-    activeTab, 
-    galleryItems, 
-    currentIndex, 
-    handlePrev, 
-    handleNext, 
+export const GallerySlider = ({
+    activeTab,
+    galleryItems,
+    currentIndex,
+    handlePrev,
+    handleNext,
     getSafeIndex,
     hasItems
 }) => {
@@ -19,10 +19,15 @@ export const GallerySlider = ({
         );
     }
 
+    const handleVideoClick = () => {
+        if (activeTab === 'videos' && galleryItems[currentIndex]?.url) {
+            window.open(galleryItems[currentIndex].url, '_blank', 'noopener,noreferrer');
+        }
+    };
+
     return (
         <div className="relative w-full overflow-hidden flex justify-center items-center py-4">
             <div className="flex items-center justify-center w-full gap-4 lg:gap-8">
-                {/* Previous Image (Side) */}
                 <div
                     className="hidden md:block w-[15%] lg:w-[25%] h-[200px] md:h-[30vh] lg:h-[45vh] max-h-[400px] opacity-40 hover:opacity-70 cursor-pointer rounded-r-[32px] lg:rounded-[32px] shrink-0 transition-opacity relative group"
                     onClick={handlePrev}
@@ -42,7 +47,6 @@ export const GallerySlider = ({
                     </div>
                 </div>
 
-                {/* Active Image (Center) */}
                 <div className="w-[95%] md:w-[65%] lg:w-[45%] h-[280px] md:h-[40vh] lg:h-[55vh] max-h-[500px] relative shrink-0 rounded-2xl lg:rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.08)] dark:shadow-2xl z-10 border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#141416] transition-colors">
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -51,7 +55,8 @@ export const GallerySlider = ({
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.98 }}
                             transition={{ duration: 0.3 }}
-                            className="w-full h-full relative rounded-2xl lg:rounded-[32px] overflow-hidden group"
+                            className={`w-full h-full relative rounded-2xl lg:rounded-[32px] overflow-hidden group ${activeTab === 'videos' ? 'cursor-pointer' : ''}`}
+                            onClick={handleVideoClick}
                         >
                             <Image
                                 src={galleryItems[currentIndex]?.thumbnail}
@@ -61,9 +66,9 @@ export const GallerySlider = ({
                                 preview={activeTab !== 'videos'}
                             />
                             {activeTab === 'videos' && (
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <div className="w-20 h-20 rounded-full bg-[#1db954] shadow-[0_0_30px_rgba(29,185,84,0.4)] flex items-center justify-center text-white">
-                                        <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[16px] border-l-white border-b-[10px] border-b-transparent ml-2"></div>
+                                <div className="absolute inset-0 flex items-center justify-center group-hover:bg-black/10 transition-colors">
+                                    <div className="w-20 h-20 rounded-full bg-[#ff0000] shadow-[0_10px_40px_rgba(255,0,0,0.4)] flex items-center justify-center text-white transform group-hover:scale-110 transition-transform duration-500">
+                                        <Play size={32} fill="white" className="ml-1" />
                                     </div>
                                 </div>
                             )}
@@ -71,7 +76,6 @@ export const GallerySlider = ({
                     </AnimatePresence>
                 </div>
 
-                {/* Next Image (Side) */}
                 <div
                     className="hidden md:block w-[15%] lg:w-[25%] h-[200px] md:h-[30vh] lg:h-[45vh] max-h-[400px] opacity-40 hover:opacity-70 cursor-pointer rounded-l-[32px] lg:rounded-[32px] shrink-0 transition-opacity relative group"
                     onClick={handleNext}
@@ -92,7 +96,6 @@ export const GallerySlider = ({
                 </div>
             </div>
 
-            {/* Mobile arrows */}
             <div className="md:hidden absolute inset-0 flex items-center justify-between px-6 z-20 pointer-events-none">
                 <button onClick={handlePrev} className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/40 flex items-center justify-center text-slate-900 dark:text-white backdrop-blur-md bg-white/50 dark:bg-black/40 pointer-events-auto shadow-[0_4px_20px_rgba(0,0,0,0.1)] dark:shadow-none">
                     <ChevronLeft size={20} />

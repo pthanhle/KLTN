@@ -1,10 +1,7 @@
 import { Link } from 'react-scroll';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const StickyNav = ({ t }) => {
-    const { scrollY } = useScroll();
-    const y = useTransform(scrollY, [0, 100], [0, -100]);
-
     const navItems = [
         { id: 'price-color', label: t('products:detail.priceColor') },
         { id: 'features', label: t('products:detail.features') },
@@ -19,8 +16,10 @@ const StickyNav = ({ t }) => {
         <>
             <motion.div
                 id="sticky-nav"
-                className="sticky top-[72px] h-[64px] flex items-center z-40 bg-white/90 dark:bg-[#0a0a0b]/90 backdrop-blur-xl border-b border-slate-200 dark:border-white/10 hidden lg:flex transition-all duration-300"
-                style={{ y }}
+                className="sticky top-[72px] h-[64px] flex items-center z-40 bg-white/95 dark:bg-[#0a0a0b]/95 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 hidden lg:flex transition-all duration-300 shadow-sm"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
             >
                 <style>{`
                     .car-nav-link { color: #64748b !important; border-bottom-color: transparent !important; }

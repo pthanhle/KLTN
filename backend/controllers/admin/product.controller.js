@@ -126,23 +126,30 @@ export const getProductById = asyncHandler(async (req, res) => {
 
 export const createProduct = asyncHandler(async (req, res) => {
   const {
-    name, product_name, type, sku, tagline, description,
+    name, product_name, sku, tagline, description,
     price, stock, isNew, brandId, brandName, year, odo, engine, power, fuel,
-    seats, bodyStyle, isDemoAvailable, status, images: bodyImages,
+    seats, bodyStyle, isDemoAvailable, status
   } = req.body
 
   const versions = safeParse(req.body.versions, []);
   let colors = safeParse(req.body.colors, []);
-  if (req.files) {
-    colors = colors.map((color, index) => {
-      const colorFile = req.files.find(f => f.fieldname === `color_image_${index}`);
-      const { filterStyle, ...rest } = color;
-      if (colorFile) return { ...rest, image: colorFile.path };
-      return rest;
-    });
-  }
+  let features = safeParse(req.body.features, []);
+  
+  const files = req.files || [];
+
+  colors = colors.map((color, index) => {
+    const colorFile = files.find(f => f.fieldname === `color_image_${index}`);
+    if (colorFile) return { ...color, image: colorFile.path };
+    return color;
+  });
+
+  features = features.map((feature, index) => {
+    const featureFile = files.find(f => f.fieldname === `feature_image_${index}`);
+    if (featureFile) return { ...feature, image: featureFile.path };
+    return feature;
+  });
+
   const gallery = safeParse(req.body.gallery, { photos: [], videos: [] });
-  const features = safeParse(req.body.features, []);
   const specs = safeParse(req.body.specs, []);
   const threeSixty = safeParse(req.body.threeSixty, { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
 
@@ -156,15 +163,13 @@ export const createProduct = asyncHandler(async (req, res) => {
   let heroImage = null;
   let galleryPhotos = gallery.photos || [];
 
-  if (req.files) {
-    const singleFile = req.files.find(f => f.fieldname === 'image');
-    if (singleFile) heroImage = singleFile.path;
-    
-    const photoFiles = req.files.filter(f => f.fieldname === 'photos');
-    if (photoFiles.length > 0) {
-      const newPhotos = photoFiles.map(file => file.path);
-      galleryPhotos = [...galleryPhotos, ...newPhotos];
-    }
+  const singleFile = files.find(f => f.fieldname === 'image');
+  if (singleFile) heroImage = singleFile.path;
+  
+  const photoFiles = files.filter(f => f.fieldname === 'photos');
+  if (photoFiles.length > 0) {
+    const newPhotos = photoFiles.map(file => file.path);
+    galleryPhotos = [...galleryPhotos, ...newPhotos];
   }
 
   let slug = finalName.toLowerCase()
@@ -222,6 +227,8 @@ export const updateProduct = asyncHandler(async (req, res) => {
     throw new Error('Xe không tồn tại')
   }
 
+  const files = req.files || [];
+
   const allowedFields = [
     'name', 'product_name', 'sku', 'status', 'tagline', 'description',
     'price', 'salePrice', 'stock', 'isNew', 'brandId', 'brandName',
@@ -233,23 +240,32 @@ export const updateProduct = asyncHandler(async (req, res) => {
   allowedFields.forEach(field => {
     if (req.body[field] !== undefined) {
       if (field === 'product_name') car.name = req.body[field];
-      else if (['versions', 'colors', 'features'].includes(field)) {
+      else if (['versions', 'colors', 'features', 'specs'].includes(field)) {
         let parsed = safeParse(req.body[field], []);
-        if (field === 'colors' && req.files && Array.isArray(req.files)) {
+        
+        if (field === 'colors') {
           parsed = parsed.map((color, index) => {
-            const colorFile = req.files.find(f => f.fieldname === `color_image_${index}`);
-            const { filterStyle, ...rest } = color;
-            if (colorFile) return { ...rest, image: colorFile.path };
-            return rest;
+            const colorFile = files.find(f => f.fieldname === `color_image_${index}`);
+            if (colorFile) return { ...color, image: colorFile.path };
+            return color;
           });
         }
-        car[field] = parsed;
+
+        if (field === 'features') {
+          parsed = parsed.map((feature, index) => {
+            const featureFile = files.find(f => f.fieldname === `feature_image_${index}`);
+            if (featureFile) return { ...feature, image: featureFile.path };
+            return feature;
+          });
+        }
+
+        car.set(field, parsed);
+        car.markModified(field);
       }
       else if (['gallery', 'threeSixty'].includes(field)) {
-        car[field] = safeParse(req.body[field], field === 'gallery' ? { photos: [], videos: [] } : { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
-      }
-      else if (field === 'specs') {
-        car[field] = safeParse(req.body[field], []);
+        const parsed = safeParse(req.body[field], field === 'gallery' ? { photos: [], videos: [] } : { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
+        car.set(field, parsed);
+        car.markModified(field);
       }
       else if (field === 'isDemoAvailable' || field === 'isNew') {
         car[field] = req.body[field] === 'true' || req.body[field] === true;
@@ -259,35 +275,31 @@ export const updateProduct = asyncHandler(async (req, res) => {
         if (!isNaN(numVal)) car[field] = numVal;
       }
       else if (field === 'image') {
-        if (typeof req.body[field] === 'string' && (req.body[field].startsWith('http') || req.body[field].startsWith('/') || req.body[field].startsWith('blob:'))) {
-          car[field] = req.body[field];
-        }
+          const val = req.body[field];
+          if (typeof val === 'string' && (val.startsWith('http') || val.startsWith('/') || val.startsWith('blob:'))) {
+              car.image = val;
+          }
       }
       else car[field] = req.body[field]
     }
   })
 
-  if (req.files && Array.isArray(req.files)) {
-    const singleFile = req.files.find(f => f.fieldname === 'image');
-    if (singleFile) {
-      const newImagePath = singleFile.path;
-      car.image = newImagePath;
-      
-      if (!car.gallery) car.gallery = { photos: [], videos: [] };
-      if (!Array.isArray(car.gallery.photos)) car.gallery.photos = [];
-      
-      if (!car.gallery.photos.includes(newImagePath)) {
-        car.gallery.photos = [newImagePath, ...car.gallery.photos];
-      }
+  const singleFile = files.find(f => f.fieldname === 'image');
+  if (singleFile) {
+    car.image = singleFile.path;
+    if (!car.gallery) car.gallery = { photos: [], videos: [] };
+    if (!car.gallery.photos.includes(singleFile.path)) {
+      car.gallery.photos = [singleFile.path, ...car.gallery.photos];
+      car.markModified('gallery.photos');
     }
-    
-    const photoFiles = req.files.filter(f => f.fieldname === 'photos');
-    if (photoFiles.length > 0) {
-      const newPhotos = photoFiles.map(file => file.path);
-      if (!car.gallery) car.gallery = { photos: [], videos: [] };
-      if (!Array.isArray(car.gallery.photos)) car.gallery.photos = [];
-      car.gallery.photos = [...car.gallery.photos, ...newPhotos];
-    }
+  }
+  
+  const photoFiles = files.filter(f => f.fieldname === 'photos');
+  if (photoFiles.length > 0) {
+    const newPhotos = photoFiles.map(file => file.path);
+    if (!car.gallery) car.gallery = { photos: [], videos: [] };
+    car.gallery.photos = [...car.gallery.photos, ...newPhotos];
+    car.markModified('gallery.photos');
   }
 
   const updatedProduct = await car.save()

@@ -1,12 +1,42 @@
 import React from 'react';
 import { Form, Input } from 'antd';
 import { GripVertical, Trash2 } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
-const SpecItemRow = ({ itemKey, itemName, restItemField, removeItem }) => {
+const SpecItemRow = ({ itemKey, itemName, restItemField, removeItem, index }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: itemKey });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 100 : 'auto',
+        position: 'relative',
+        opacity: isDragging ? 0.5 : 1,
+    };
+
     return (
-        <div key={itemKey} className="grid grid-cols-[40px_1fr_1fr_40px] gap-4 items-start px-4 py-3 border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
+        <div 
+            ref={setNodeRef} 
+            style={style}
+            className="grid grid-cols-[40px_1fr_1fr_40px] gap-4 items-start px-4 py-3 border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group"
+        >
             <div className="flex items-center justify-center h-10">
-                <GripVertical size={16} className="text-slate-300 dark:text-slate-600 cursor-grab active:cursor-grabbing hover:text-slate-500" />
+                <button
+                    type="button"
+                    {...attributes}
+                    {...listeners}
+                    className="p-2 cursor-grab active:cursor-grabbing text-slate-300 dark:text-slate-600 hover:text-slate-500 bg-transparent border-none transition-colors"
+                >
+                    <GripVertical size={16} />
+                </button>
             </div>
             <div>
                 <Form.Item

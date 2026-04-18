@@ -5,56 +5,49 @@ import { useQueryClient } from '@tanstack/react-query';
 import { createAdminProduct, updateAdminProduct } from '../../../../services/api/adminProduct.api';
 
 export const useCarFormSubmit = (form) => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const navigate = useNavigate();
     const { id } = useParams();
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const isBinary = (val) => val instanceof File || val instanceof Blob;
 
     const getRealFile = (val) => {
         if (!val) return null;
-
-        const isBinary = (obj) => {
-            const s = Object.prototype.toString.call(obj);
-            return s === '[object File]' || s === '[object Blob]';
-        };
-
         if (isBinary(val)) return val;
-
-        if (val.originFileObj) {
-            if (isBinary(val.originFileObj)) return val.originFileObj;
-            if (typeof val.originFileObj.size === 'number') return val.originFileObj;
+        if (Array.isArray(val) && val.length > 0) {
+            const first = val[0];
+            if (isBinary(first)) return first;
+            if (first.originFileObj && isBinary(first.originFileObj)) return first.originFileObj;
         }
+        return null;
+    };
 
-        if (val.file) {
-            if (isBinary(val.file)) return val.file;
-            if (typeof val.file.size === 'number') return val.file;
+    const getStringUrl = (val) => {
+        if (!val) return null;
+        if (typeof val === 'string') return val;
+        if (Array.isArray(val) && val.length > 0) {
+            const first = val[0];
+            if (first.url) return first.url;
+            if (typeof first === 'string') return first;
         }
-
-        if (typeof val.size === 'number' && typeof val.type === 'string' && (val.name || val.lastModified)) {
-            return val;
-        }
-
         return null;
     };
 
     const convertToFormData = (values) => {
         const formData = new FormData();
 
-        Object.keys(values).forEach(key => {
-            const value = values[key];
+        for (const [key, value] of Object.entries(values)) {
+            if (value === undefined || value === null) continue;
 
             if (key === 'image') {
-                const heroFile = getRealFile(value);
-                if (heroFile) {
-                    const fileName = heroFile.name || 'hero-image.png';
-                    formData.append('image', heroFile, fileName);
-                } else if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('/') || value.startsWith('blob:'))) {
-                    formData.append('image', value);
+                const file = getRealFile(value);
+                if (file) formData.append('image', file);
+                else {
+                    const url = getStringUrl(value);
+                    if (url) formData.append('image', url);
                 }
-                return;
-            }
-
-            if (key === 'new_photos' && Array.isArray(value)) {
+            } else if (key === 'new_photos' && Array.isArray(value)) {
                 value.forEach((item, index) => {
                     const photoFile = getRealFile(item);
                     if (photoFile) {
@@ -62,10 +55,7 @@ export const useCarFormSubmit = (form) => {
                         formData.append('photos', photoFile, fileName);
                     }
                 });
-                return;
-            }
-
-            if (key === 'colors' && Array.isArray(value)) {
+            } else if (key === 'colors' && Array.isArray(value)) {
                 const colorsWithFiles = value.map((color, index) => {
                     const colorImageFile = getRealFile(color.image);
                     if (colorImageFile) {
@@ -73,69 +63,46 @@ export const useCarFormSubmit = (form) => {
                         formData.append(`color_image_${index}`, colorImageFile, fileName);
                         return { ...color, image: `PENDING_UPLOAD_${index}` };
                     }
-                    return color;
+                    return { ...color, image: getStringUrl(color.image) };
                 });
                 formData.append('colors', JSON.stringify(colorsWithFiles));
-                return;
-            }
-
-            if (value !== null && typeof value === 'object' && !(value instanceof File) && !(value instanceof Blob)) {
+            } else if (key === 'features' && Array.isArray(value)) {
+                const featuresWithFiles = value.map((feature, index) => {
+                    const featureImageFile = getRealFile(feature.image);
+                    if (featureImageFile) {
+                        const fileName = featureImageFile.name || `feature-${index}.png`;
+                        formData.append(`feature_image_${index}`, featureImageFile, fileName);
+                        return { ...feature, image: `PENDING_UPLOAD_FEATURE_${index}` };
+                    }
+                    return { ...feature, image: getStringUrl(feature.image) };
+                });
+                formData.append('features', JSON.stringify(featuresWithFiles));
+            } else if (Array.isArray(value) || (typeof value === 'object' && !(value instanceof File) && !(value instanceof Blob))) {
                 formData.append(key, JSON.stringify(value));
-            }
-            else if (value !== undefined && value !== null) {
+            } else {
                 formData.append(key, value);
             }
-        });
+        }
 
         return formData;
-    };
-
-    const handleSaveDraft = async () => {
-        try {
-            setIsSubmitting(true);
-            const values = await form.validateFields();
-
-            const payload = convertToFormData({ ...values, status: 'Draft' });
-            let response;
-            if (id) {
-                response = await updateAdminProduct(id, payload);
-            } else {
-                response = await createAdminProduct(payload);
-            }
-
-            if (response && response.data) {
-                form.setFieldsValue({
-                    ...response.data,
-                    new_photos: []
-                });
-                await queryClient.invalidateQueries(['admin-products']);
-                message.success('Đã lưu nháp phân bổ xe thành công!');
-            }
-        } catch (error) {
-            console.error("Form submit error:", error);
-            message.error('Vui lòng kiểm tra lại các trường bắt buộc');
-        } finally {
-            setIsSubmitting(false);
-        }
     };
 
     const handlePublish = async () => {
         try {
             setIsSubmitting(true);
             const values = await form.validateFields();
+            const formData = convertToFormData({ ...values, status: 'Published' });
 
-            const payload = convertToFormData({ ...values, status: 'Published' });
             if (id) {
-                await updateAdminProduct(id, payload);
+                await updateAdminProduct(id, formData);
+                message.success('Cập nhật xe thành công!');
             } else {
-                await createAdminProduct(payload);
+                await createAdminProduct(formData);
+                message.success('Thêm xe mới thành công!');
             }
 
-            await queryClient.invalidateQueries(['admin-products']);
-            message.success('Xe mới đã được cập nhật lên Showroom!');
-
-            window.location.replace('/admin/cars');
-
+            queryClient.invalidateQueries(['adminProducts']);
+            navigate('/admin/cars');
         } catch (error) {
             console.error("Form submit error:", error);
             message.error('Biểu mẫu còn thiếu thông tin hoặc có lỗi xảy ra!');
@@ -144,9 +111,33 @@ export const useCarFormSubmit = (form) => {
         }
     };
 
+    const handleSaveDraft = async () => {
+        try {
+            setIsSubmitting(true);
+            const values = form.getFieldsValue();
+            const formData = convertToFormData({ ...values, status: 'Draft' });
+
+            if (id) {
+                await updateAdminProduct(id, formData);
+                message.success('Đã lưu nháp cập nhật!');
+            } else {
+                await createAdminProduct(formData);
+                message.success('Đã lưu bản nháp mới!');
+            }
+
+            queryClient.invalidateQueries(['adminProducts']);
+            navigate('/admin/cars');
+        } catch (error) {
+            console.error("Draft save error:", error);
+            message.error('Không thể lưu bản nháp!');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return {
         isSubmitting,
-        handleSaveDraft,
-        handlePublish
+        handlePublish,
+        handleSaveDraft
     };
 };

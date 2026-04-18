@@ -3,7 +3,7 @@ import axiosClient from '../../utils/axiosClient';
 export const adminPartApi = {
     getAllParts: async (params = {}) => {
         const response = await axiosClient.get('/admin/parts', { params });
-        return response; // response here IS already the backend payload
+        return response;
     },
 
     getPartById: async (id) => {
@@ -26,7 +26,6 @@ export const adminPartApi = {
         return response;
     },
 
-    // ---- BULK & TOGGLE ACTIONS ----
     updatePartStatus: async (id, status) => {
         const response = await axiosClient.patch(`/admin/parts/${id}/status`, { status });
         return response;
@@ -37,7 +36,6 @@ export const adminPartApi = {
         return response;
     },
 
-    // ---- META DATA ----
     getFiltersData: async () => {
         const [categoriesRes, brandsRes, conditionsRes] = await Promise.all([
             axiosClient.get('/admin/part-meta/categories'),

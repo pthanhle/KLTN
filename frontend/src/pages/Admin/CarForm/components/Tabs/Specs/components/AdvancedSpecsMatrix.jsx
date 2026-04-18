@@ -36,8 +36,8 @@ const AdvancedSpecsMatrix = () => {
                         <div className="space-y-10">
                             {categoryFields.map(({ key, name, ...restField }) => (
                                 <div key={key} className="bg-white dark:bg-[#1a1a1c] rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden">
-                                    <div className="px-6 py-5 bg-slate-50/50 dark:bg-black/20 border-b border-slate-100 dark:border-white/5 flex items-center justify-between gap-4">
-                                        <div className="flex-1">
+                                    <div className="px-4 py-5 bg-slate-50/50 dark:bg-black/20 border-b border-slate-100 dark:border-white/5 grid grid-cols-[1fr_40px] gap-4 items-center">
+                                        <div className="pl-10">
                                             <Form.Item
                                                 {...restField}
                                                 name={[name, 'category']}
@@ -51,14 +51,16 @@ const AdvancedSpecsMatrix = () => {
                                                 />
                                             </Form.Item>
                                         </div>
-                                        <Button
-                                            type="primary"
-                                            danger
-                                            icon={<Trash2 size={18} />}
-                                            onClick={() => removeCategory(name)}
-                                            className="w-12 h-12 flex items-center justify-center !rounded-xl transition-all cursor-pointer border-none shadow-lg shadow-red-500/20 hover:scale-110 active:scale-95 shrink-0"
-                                            title={t('removeCategoryBtn', 'Xóa Nhóm Thông Số')}
-                                        />
+                                        <div className="flex items-center justify-center">
+                                            <button
+                                                type="button"
+                                                onClick={() => removeCategory(name)}
+                                                className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 dark:text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all cursor-pointer border-none bg-transparent"
+                                                title={t('removeCategoryBtn', 'Xóa Nhóm Thông Số')}
+                                            >
+                                                <Trash2 size={20} />
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <Form.List name={[name, 'items']}>
@@ -73,9 +75,9 @@ const AdvancedSpecsMatrix = () => {
                                                     </div>
                                                 )}
 
-                                                <DndContext 
-                                                    sensors={sensors} 
-                                                    collisionDetection={closestCenter} 
+                                                <DndContext
+                                                    sensors={sensors}
+                                                    collisionDetection={closestCenter}
                                                     onDragEnd={(e) => handleDragEnd(e, itemFields, moveItem)}
                                                 >
                                                     <SortableContext items={itemFields.map(f => f.key)} strategy={verticalListSortingStrategy}>

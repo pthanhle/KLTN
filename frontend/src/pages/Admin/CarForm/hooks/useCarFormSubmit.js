@@ -15,6 +15,11 @@ export const useCarFormSubmit = (form) => {
     const getRealFile = (val) => {
         if (!val) return null;
         if (isBinary(val)) return val;
+        
+        if (val.originFileObj && isBinary(val.originFileObj)) {
+            return val.originFileObj;
+        }
+
         if (Array.isArray(val) && val.length > 0) {
             const first = val[0];
             if (isBinary(first)) return first;
@@ -26,9 +31,14 @@ export const useCarFormSubmit = (form) => {
     const getStringUrl = (val) => {
         if (!val) return null;
         if (typeof val === 'string') return val;
+        
+        if (val.url && typeof val.url === 'string') {
+            return val.url;
+        }
+
         if (Array.isArray(val) && val.length > 0) {
             const first = val[0];
-            if (first.url) return first.url;
+            if (first.url && typeof first.url === 'string') return first.url;
             if (typeof first === 'string') return first;
         }
         return null;
@@ -36,6 +46,7 @@ export const useCarFormSubmit = (form) => {
 
     const convertToFormData = (values) => {
         const formData = new FormData();
+        const timestamp = Date.now();
 
         for (const [key, value] of Object.entries(values)) {
             if (value === undefined || value === null) continue;
@@ -51,7 +62,7 @@ export const useCarFormSubmit = (form) => {
                 value.forEach((item, index) => {
                     const photoFile = getRealFile(item);
                     if (photoFile) {
-                        const fileName = photoFile.name || `photo-${index}.png`;
+                        const fileName = photoFile.name || `photo-${index}-${timestamp}.png`;
                         formData.append('photos', photoFile, fileName);
                     }
                 });
@@ -59,9 +70,10 @@ export const useCarFormSubmit = (form) => {
                 const colorsWithFiles = value.map((color, index) => {
                     const colorImageFile = getRealFile(color.image);
                     if (colorImageFile) {
-                        const fileName = colorImageFile.name || `color-${index}.png`;
-                        formData.append(`color_image_${index}`, colorImageFile, fileName);
-                        return { ...color, image: `PENDING_UPLOAD_${index}` };
+                        const fieldName = `color_file_${index}_${timestamp}`;
+                        const fileName = colorImageFile.name || `color-${index}-${timestamp}.png`;
+                        formData.append(fieldName, colorImageFile, fileName);
+                        return { ...color, image: `PEND_COL_${index}_${timestamp}` };
                     }
                     return { ...color, image: getStringUrl(color.image) };
                 });
@@ -70,9 +82,10 @@ export const useCarFormSubmit = (form) => {
                 const featuresWithFiles = value.map((feature, index) => {
                     const featureImageFile = getRealFile(feature.image);
                     if (featureImageFile) {
-                        const fileName = featureImageFile.name || `feature-${index}.png`;
-                        formData.append(`feature_image_${index}`, featureImageFile, fileName);
-                        return { ...feature, image: `PENDING_UPLOAD_FEATURE_${index}` };
+                        const fieldName = `feature_file_${index}_${timestamp}`;
+                        const fileName = featureImageFile.name || `feat-${index}-${timestamp}.png`;
+                        formData.append(fieldName, featureImageFile, fileName);
+                        return { ...feature, image: `PEND_FEAT_${index}_${timestamp}` };
                     }
                     return { ...feature, image: getStringUrl(feature.image) };
                 });

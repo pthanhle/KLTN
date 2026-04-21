@@ -162,7 +162,7 @@ async def _fetch_context(message: str) -> str:
     clean_msg = re.sub(r"tầm giá|khoảng|dưới|trên|giá|hơn|thấp hơn|cao hơn", "", clean_msg).strip()
     if clean_msg in ["xe", "ô tô", "oto", "chiếc", "option", "lựa chọn", "mẫu"]:
         clean_msg = ""
-        
+
     phrase_regex = {"$regex": clean_msg, "$options": "i"} if clean_msg else None
     cars, parts, services = await _query_all(phrase_regex, price_filter)
 
@@ -195,7 +195,7 @@ async def _query_all(keyword_regex: dict | None, price_filter: dict | None = Non
     car_query = {}
     if keyword_regex:
         car_query = {"$or": [{"name": keyword_regex}, {"brandName": keyword_regex}, {"bodyStyle": keyword_regex}]}
-    
+
     if price_filter:
         if car_query:
             car_query = {"$and": [car_query, price_filter]}

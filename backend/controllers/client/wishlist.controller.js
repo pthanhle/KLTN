@@ -3,9 +3,7 @@ import Wishlist from '../../models/wishlistModel.js';
 import Part from '../../models/partModel.js';
 import mongoose from 'mongoose';
 
-// @desc    Get user wishlist
-// @route   GET /api/client/wishlist
-// @access  Private
+
 export const getWishlist = asyncHandler(async (req, res) => {
     let wishlist = await Wishlist.findOne({ user: req.user._id }).populate({
         path: 'parts',
@@ -58,15 +56,12 @@ export const getWishlist = asyncHandler(async (req, res) => {
 
     res.json({
         data: {
-            items: [...activeParts, ...mockCarItems] 
+            items: [...activeParts, ...mockCarItems]
         }
     });
 });
 
-// @desc    Add or remove a part from wishlist
-// @route   POST /api/client/wishlist/toggle
-// @access  Private
-// @body    part_id
+
 export const toggleWishlistStatus = asyncHandler(async (req, res) => {
     const { part_id } = req.body;
 
@@ -119,9 +114,7 @@ export const toggleWishlistStatus = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Clear user wishlist
-// @route   DELETE /api/client/wishlist
-// @access  Private
+
 export const clearWishlist = asyncHandler(async (req, res) => {
     await Wishlist.findOneAndUpdate(
         { user: req.user._id },
@@ -129,3 +122,4 @@ export const clearWishlist = asyncHandler(async (req, res) => {
     );
     res.json({ message: 'Danh sách yêu thích đã được dọn sạch.' });
 });
+

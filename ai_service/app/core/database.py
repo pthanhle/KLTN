@@ -6,3 +6,10 @@ db = client[settings.DATABASE_NAME]
 
 async def get_database():
     return db
+
+async def init_db():
+    try:
+        await db.chathistories.create_index("timestamp", expireAfterSeconds=604800)
+    except:
+        await db.chathistories.drop_index("timestamp_1")
+        await db.chathistories.create_index("timestamp", expireAfterSeconds=604800)

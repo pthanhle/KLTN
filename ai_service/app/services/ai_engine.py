@@ -53,11 +53,13 @@ QUOTA_EXCEEDED_MSG = (
     "Bạn có thể để lại thông tin liên hệ để chúng tôi hỗ trợ trực tiếp."
 )
 
+
 PERSONAL_KEYWORDS = {
     "tôi", "của tôi", "mình", "của mình", "đơn hàng", "order", "tài khoản", 
     "account", "mật khẩu", "password", "tên", "name", "địa chỉ", "address", 
     "phone", "sdt", "số điện thoại", "giỏ hàng", "cart", "thanh toán", "payment"
 }
+
 
 def _is_greeting(message: str) -> bool:
     msg = message.lower().strip()

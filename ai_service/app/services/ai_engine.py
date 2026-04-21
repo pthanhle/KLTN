@@ -53,6 +53,11 @@ QUOTA_EXCEEDED_MSG = (
     "Bạn có thể để lại thông tin liên hệ để chúng tôi hỗ trợ trực tiếp."
 )
 
+PERSONAL_KEYWORDS = {
+    "tôi", "của tôi", "mình", "của mình", "đơn hàng", "order", "tài khoản", 
+    "account", "mật khẩu", "password", "tên", "name", "địa chỉ", "address", 
+    "phone", "sdt", "số điện thoại", "giỏ hàng", "cart", "thanh toán", "payment"
+}
 
 def _is_greeting(message: str) -> bool:
     msg = message.lower().strip()
@@ -61,6 +66,7 @@ def _is_greeting(message: str) -> bool:
             if kw in msg:
                 return True
     return False
+
 
 def _extract_price(message: str) -> dict | None:
     import re
@@ -86,9 +92,16 @@ def _extract_price(message: str) -> dict | None:
     return {"price": {"$gte": asked_price * 0.8, "$lte": asked_price * 1.2}}
 
 
-def _normalize_key(user_id: str, message: str) -> str:
+def _is_personal_query(message: str) -> bool:
+    msg = message.lower()
+    return any(kw in msg for kw in PERSONAL_KEYWORDS)
+
+
+def _normalize_key(message: str, user_id: str = None) -> str:
     normalized = " ".join(message.lower().split())
-    return f"{user_id}:{normalized}"
+    if user_id:
+        return f"private:{user_id}:{normalized}"
+    return f"public:{normalized}"
 
 
 async def _wait_for_rate_limit() -> None:
@@ -121,6 +134,21 @@ async def _invoke_with_backoff(messages: list) -> str:
                     raise RuntimeError("quota_exceeded")
             else:
                 raise
+
+
+async def _rephrase_answer(raw_answer: str, user_query: str) -> str:
+    prompt = (
+        f"Hãy diễn đạt lại câu trả lời sau đây một cách tự nhiên và mới mẻ hơn để phản hồi cho câu hỏi: '{user_query}'.\n"
+        "YÊU CẦU:\n"
+        "1. Giữ nguyên toàn bộ thông tin quan trọng (giá, tên xe, thông số).\n"
+        "2. Ngắn gọn, thân thiện, không dùng Markdown.\n"
+        f"CÂU TRẢ LỜI GỐC: {raw_answer}"
+    )
+    try:
+        result = await llm.ainvoke([HumanMessage(content=prompt)])
+        return result.content.replace("**", "").replace("*", "-").strip()
+    except:
+        return raw_answer
 
 
 async def _fetch_context(message: str) -> str:
@@ -234,11 +262,12 @@ def _build_messages(system: str, history: list, user_message: str) -> list:
 
 
 async def generate_response(user_id: str, message: str) -> str:
-    cache_key = _normalize_key(user_id, message)
+    is_private = _is_personal_query(message)
+    cache_key = _normalize_key(message, user_id if is_private else None)
     
     cached = await redis_client.get(cache_key)
     if cached:
-        return cached
+        return await _rephrase_answer(cached, message)
 
     await _wait_for_rate_limit()
 

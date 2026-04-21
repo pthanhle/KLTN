@@ -3,6 +3,8 @@ import time
 import redis.asyncio as redis
 from collections import deque
 from datetime import datetime
+from bson import ObjectId
+
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, AIMessage
@@ -153,11 +155,24 @@ async def _rephrase_answer(raw_answer: str, user_query: str) -> str:
         return raw_answer
 
 
+async def _generate_ai_title(first_msg: str) -> str:
+    prompt = (
+        "Dựa trên tin nhắn đầu tiên của khách hàng sau đây, hãy đặt một tiêu đề cực kỳ ngắn gọn (dưới 5 từ) "
+        "để đặt tên cho cuộc hội thoại này. Chỉ trả về tiêu đề, không thêm gì khác.\n"
+        f"TIN NHẮN: {first_msg}"
+    )
+    try:
+        result = await llm.ainvoke([HumanMessage(content=prompt)])
+        return result.content.replace('"', '').replace('.', '').strip()
+    except:
+        return first_msg[:30] + "..."
+
+
 async def _fetch_context(message: str) -> str:
     import re
     msg_low = message.lower()
     price_filter = _extract_price(message)
-    
+
     clean_msg = re.sub(r"(\d+[\.,]?\d*)\s*(tỷ|triệu|tr)", "", msg_low)
     clean_msg = re.sub(r"tầm giá|khoảng|dưới|trên|giá|hơn|thấp hơn|cao hơn", "", clean_msg).strip()
     if clean_msg in ["xe", "ô tô", "oto", "chiếc", "option", "lựa chọn", "mẫu"]:
@@ -213,19 +228,76 @@ async def _query_all(keyword_regex: dict | None, price_filter: dict | None = Non
     return cars, parts, services
 
 
-async def _get_history(user_id: str, limit: int = 5) -> list:
-    cursor = db.chathistories.find({"user_id": user_id}).sort("timestamp", -1).limit(limit)
+async def get_user_conversations(user_id: str) -> list:
+    cursor = db.conversations.find({"user_id": ObjectId(user_id)}).sort("updated_at", -1)
+    docs = await cursor.to_list(length=20)
+    for d in docs:
+        d["id"] = str(d["_id"])
+        del d["_id"]
+    return docs
+
+
+async def _get_or_create_conversation(user_id: str, conversation_id: str = None, first_msg: str = "") -> tuple[str, str]:
+    if conversation_id:
+        try:
+            conv = await db.conversations.find_one({"_id": ObjectId(conversation_id), "user_id": ObjectId(user_id)})
+            if conv:
+                return str(conv["_id"]), conv["title"]
+        except:
+            pass
+    
+    title = await _generate_ai_title(first_msg) if first_msg else "Cuộc trò chuyện mới"
+    new_conv = {
+        "user_id": ObjectId(user_id),
+        "title": title,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+    }
+    result = await db.conversations.insert_one(new_conv)
+    return str(result.inserted_id), title
+
+
+async def _get_history(conversation_id: str, limit: int = 5) -> list:
+    cursor = db.chathistories.find({"conversation_id": ObjectId(conversation_id)}).sort("timestamp", -1).limit(limit)
     docs = await cursor.to_list(length=limit)
     return docs[::-1]
 
 
-async def _save_message(user_id: str, role: str, content: str) -> None:
+async def get_conversation_messages(user_id: str, conversation_id: str) -> list:
+    obj_id = ObjectId(conversation_id)
+    conv = await db.conversations.find_one({"_id": obj_id, "user_id": ObjectId(user_id)})
+    if not conv:
+        return []
+    
+    cursor = db.chathistories.find({"conversation_id": obj_id}).sort("timestamp", 1)
+    docs = await cursor.to_list(length=100)
+    for d in docs:
+        d["id"] = str(d["_id"])
+        del d["_id"]
+        d["conversation_id"] = str(d["conversation_id"])
+    return docs
+
+
+async def delete_conversation(user_id: str, conversation_id: str) -> bool:
+    obj_id = ObjectId(conversation_id)
+    res_conv = await db.conversations.delete_one({"_id": obj_id, "user_id": ObjectId(user_id)})
+    if res_conv.deleted_count > 0:
+        await db.chathistories.delete_many({"conversation_id": obj_id})
+        return True
+    return False
+
+
+async def _save_message(user_id: str, conversation_id: str, role: str, content: str) -> None:
     await db.chathistories.insert_one({
-        "user_id": user_id,
+        "conversation_id": ObjectId(conversation_id),
         "role": role,
         "content": content,
         "timestamp": datetime.utcnow(),
     })
+    await db.conversations.update_one(
+        {"_id": ObjectId(conversation_id)},
+        {"$set": {"updated_at": datetime.utcnow()}}
+    )
 
 
 def _build_messages(system: str, history: list, user_message: str) -> list:
@@ -263,17 +335,22 @@ def _build_messages(system: str, history: list, user_message: str) -> list:
     return messages
 
 
-async def generate_response(user_id: str, message: str) -> str:
+async def generate_response(user_id: str, message: str, conversation_id: str = None) -> dict:
+    conv_id, title = await _get_or_create_conversation(user_id, conversation_id, message)
+
     is_private = _is_personal_query(message)
     cache_key = _normalize_key(message, user_id if is_private else None)
     
     cached = await redis_client.get(cache_key)
     if cached:
-        return await _rephrase_answer(cached, message)
+        answer = await _rephrase_answer(cached, message)
+        await _save_message(user_id, conv_id, "user", message)
+        await _save_message(user_id, conv_id, "assistant", answer)
+        return {"answer": answer, "conversation_id": conv_id, "title": title}
 
     await _wait_for_rate_limit()
 
-    history = await _get_history(user_id)
+    history = await _get_history(conv_id)
 
     if _is_greeting(message):
         system_prompt = SYSTEM_GREETING
@@ -287,12 +364,12 @@ async def generate_response(user_id: str, message: str) -> str:
         answer = await _invoke_with_backoff(messages)
     except RuntimeError as e:
         if str(e) == "quota_exceeded":
-            return QUOTA_EXCEEDED_MSG
+            return {"answer": QUOTA_EXCEEDED_MSG, "conversation_id": conv_id, "title": title}
         raise
 
-    await _save_message(user_id, "user", message)
-    await _save_message(user_id, "assistant", answer)
-    
+    await _save_message(user_id, conv_id, "user", message)
+    await _save_message(user_id, conv_id, "assistant", answer)
+
     await redis_client.setex(cache_key, 3600, answer)
 
-    return answer
+    return {"answer": answer, "conversation_id": conv_id, "title": title}

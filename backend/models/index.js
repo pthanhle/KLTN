@@ -1,4 +1,3 @@
-// backend/models/index.js
 import './userModel.js'
 import './roleModel.js'
 import './categoryModel.js'
@@ -9,3 +8,5 @@ import './serviceBayModel.js'
 import './partModel.js'
 import './partCategoryModel.js'
 import './partBrandModel.js'
+import './conversationModel.js'
+import './chathistoryModel.js'

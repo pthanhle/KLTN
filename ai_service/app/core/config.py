@@ -8,5 +8,6 @@ class Settings:
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
     DATABASE_NAME = "carShop"
     MODEL_NAME = "gemini-2.5-flash-lite"
+    REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 
 settings = Settings()

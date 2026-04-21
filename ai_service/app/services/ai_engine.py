@@ -1,5 +1,6 @@
 import asyncio
 import time
+import redis.asyncio as redis
 from collections import deque
 from datetime import datetime
 
@@ -16,7 +17,7 @@ llm = ChatGoogleGenerativeAI(
     convert_system_message_to_human=True,
 )
 
-_cache: dict[str, str] = {}
+redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
 _request_times: deque = deque()
 _RATE_LIMIT = 12
@@ -211,8 +212,10 @@ def _build_messages(system: str, history: list, user_message: str) -> list:
 
 async def generate_response(user_id: str, message: str) -> str:
     cache_key = _normalize_key(user_id, message)
-    if cache_key in _cache:
-        return _cache[cache_key]
+    
+    cached = await redis_client.get(cache_key)
+    if cached:
+        return cached
 
     await _wait_for_rate_limit()
 
@@ -229,6 +232,7 @@ async def generate_response(user_id: str, message: str) -> str:
 
     await _save_message(user_id, "user", message)
     await _save_message(user_id, "assistant", answer)
-    _cache[cache_key] = answer
+    
+    await redis_client.setex(cache_key, 3600, answer)
 
     return answer

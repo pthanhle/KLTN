@@ -178,7 +178,7 @@ async def _fetch_context(message: str) -> str:
     if clean_msg in ["xe", "ô tô", "oto", "chiếc", "option", "lựa chọn", "mẫu"]:
         clean_msg = ""
 
-    phrase_regex = {"$regex": clean_msg, "$options": "i"} if clean_msg else None
+    phrase_regex = {"$regex": re.escape(clean_msg), "$options": "i"} if clean_msg else None
     cars, parts, services = await _query_all(phrase_regex, price_filter)
 
     if not cars and price_filter:
@@ -192,7 +192,7 @@ async def _fetch_context(message: str) -> str:
     if not any([cars, parts, services]) and clean_msg:
         words = [w for w in clean_msg.split() if len(w) > 2]
         if words:
-            word_regex = {"$regex": "|".join(words), "$options": "i"}
+            word_regex = {"$regex": "|".join(re.escape(w) for w in words), "$options": "i"}
             cars, parts, services = await _query_all(word_regex, price_filter)
 
     segments = []

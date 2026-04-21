@@ -42,7 +42,7 @@ async def _fetch_context(message: str) -> str:
     if services:
         segments.append("Dịch vụ: " + " | ".join(f"{s['service_name']} - {s.get('price', 'Liên hệ')} VND" for s in services))
 
-    return "\n".join(segments) if segments else "Không tìm thấy dữ liệu phù hợp trong hệ thống."
+    return "\n".join(segments)[:600] if segments else "Không tìm thấy dữ liệu phù hợp."
 
 
 async def _query_all(regex: dict) -> tuple:
@@ -61,7 +61,7 @@ async def _query_all(regex: dict) -> tuple:
     return cars, parts, services
 
 
-async def _get_history(user_id: str, limit: int = 8) -> list:
+async def _get_history(user_id: str, limit: int = 5) -> list:
     cursor = db.chathistories.find({"user_id": user_id}).sort("timestamp", -1).limit(limit)
     docs = await cursor.to_list(length=limit)
     return docs[::-1]

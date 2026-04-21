@@ -7,6 +7,6 @@ class Settings:
     MONGO_URI = os.getenv("MONGO_URI")
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
     DATABASE_NAME = "carShop"
-    MODEL_NAME = "gemini-2.0-flash"
+    MODEL_NAME = "gemini-2.0-flash-lite"
 
 settings = Settings()

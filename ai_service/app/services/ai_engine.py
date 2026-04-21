@@ -23,21 +23,44 @@ _request_times: deque = deque()
 _RATE_LIMIT = 12
 _RATE_WINDOW = 60.0
 
+
+GREETING_KEYWORDS = {
+    "xin chào", "xin chao", "chào", "chao", "hello", "hi", "hey",
+    "helo", "alo", "ơi", "bạn ơi", "cho hỏi", "giúp mình", "giúp tôi",
+}
+
+
+SYSTEM_GREETING = (
+    "Bạn là trợ lý ảo thân thiện của CarsShop. "
+    "Hãy chào hỏi lịch sự và hỏi bạn cần hỗ trợ gì về xe hơi hoặc dịch vụ tại shop. "
+    "Trả lời ngắn gọn, tự nhiên, không dùng ký hiệu Markdown."
+)
+
+
 SYSTEM_TEMPLATE = (
-    "Bạn là trợ lý ảo chuyên nghiệp của CarsShop. NGUYÊN TẮC: CHỈ trả lời dựa trên dữ liệu thật sau đây:\n"
+    "Bạn là trợ lý ảo chuyên nghiệp của CarsShop. CHỈ trả lời dựa trên dữ liệu thật sau đây:\n"
     "{context}\n\n"
-    "QUY TẮC NGHIÊM NGẶT:\n"
-    "1. KHÔNG ĐƯỢC NHẮC ĐẾN bất kỳ mẫu xe, đời xe nào KHÔNG CÓ trong danh sách trên.\n"
-    "2. Nếu danh sách trên trống hoặc không có xe nào đúng yêu cầu, hãy trả lời: 'Hiện tại hệ thống chưa tìm thấy xe nào phù hợp với yêu cầu này tại shop. Bạn vui lòng để lại thông tin hoặc yêu cầu khác để em tìm kiếm thêm nhé!'\n"
-    "3. Tuyệt đối không sử dụng kiến thức bên ngoài về các dòng xe khác không có trong dữ liệu.\n"
+    "QUY TẮC:\n"
+    "1. KHÔNG ĐƯỢC nhắc đến bất kỳ mẫu xe nào KHÔNG CÓ trong danh sách trên.\n"
+    "2. Nếu danh sách trống hoặc không có xe đúng yêu cầu, trả lời: 'Hiện tại hệ thống chưa tìm thấy xe nào phù hợp với yêu cầu này tại shop. Bạn vui lòng để lại thông tin hoặc yêu cầu khác để em tìm kiếm thêm nhé!'\n"
+    "3. Tuyệt đối không dùng kiến thức bên ngoài về các dòng xe không có trong dữ liệu.\n"
     "4. Trả lời ngắn gọn, thân thiện, không dùng ký hiệu Markdown."
 )
+
 
 QUOTA_EXCEEDED_MSG = (
     "Hiện tại hệ thống AI đang bận, vui lòng thử lại sau ít phút. "
     "Bạn có thể để lại thông tin liên hệ để chúng tôi hỗ trợ trực tiếp."
 )
 
+
+def _is_greeting(message: str) -> bool:
+    msg = message.lower().strip()
+    if len(msg.split()) <= 4:
+        for kw in GREETING_KEYWORDS:
+            if kw in msg:
+                return True
+    return False
 
 def _extract_price(message: str) -> dict | None:
     import re
@@ -135,7 +158,7 @@ async def _fetch_context(message: str) -> str:
     if services:
         segments.append("Dịch vụ tại shop: " + " | ".join(f"{s['service_name']} - {s.get('price', 0):,.0f} VND" for s in services))
 
-    return "\n".join(segments)[:1200] if segments else "Hiện tại shop không có sản phẩm nào phù hợp yêu cầu này."
+    return "\n".join(segments)[:1200] if segments else ""
 
 
 async def _query_all(keyword_regex: dict | None, price_filter: dict | None = None) -> tuple:
@@ -219,8 +242,14 @@ async def generate_response(user_id: str, message: str) -> str:
 
     await _wait_for_rate_limit()
 
-    history, context = await _get_history(user_id), await _fetch_context(message)
-    system_prompt = SYSTEM_TEMPLATE.format(context=context)
+    history = await _get_history(user_id)
+
+    if _is_greeting(message):
+        system_prompt = SYSTEM_GREETING
+    else:
+        context = await _fetch_context(message)
+        system_prompt = SYSTEM_TEMPLATE.format(context=context)
+
     messages = _build_messages(system_prompt, history, message)
 
     try:

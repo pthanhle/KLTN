@@ -57,8 +57,8 @@ QUOTA_EXCEEDED_MSG = (
 
 
 PERSONAL_KEYWORDS = {
-    "tôi", "của tôi", "mình", "của mình", "đơn hàng", "order", "tài khoản", 
-    "account", "mật khẩu", "password", "tên", "name", "địa chỉ", "address", 
+    "tôi", "của tôi", "mình", "của mình", "đơn hàng", "order", "tài khoản",
+    "account", "mật khẩu", "password", "tên", "name", "địa chỉ", "address",
     "phone", "sdt", "số điện thoại", "giỏ hàng", "cart", "thanh toán", "payment"
 }
 
@@ -75,10 +75,10 @@ def _is_greeting(message: str) -> bool:
 def _extract_price(message: str) -> dict | None:
     import re
     msg = message.lower()
-    
+
     match_billion = re.search(r"(\d+[\.,]?\d*)\s*tỷ", msg)
     match_million = re.search(r"(\d+[\.,]?\d*)\s*(triệu|tr)", msg)
-    
+
     asked_price = None
     if match_billion:
         asked_price = float(match_billion.group(1).replace(",", ".")) * 1_000_000_000
@@ -245,7 +245,7 @@ async def _get_or_create_conversation(user_id: str, conversation_id: str = None,
                 return str(conv["_id"]), conv["title"]
         except:
             pass
-    
+
     title = await _generate_ai_title(first_msg) if first_msg else "Cuộc trò chuyện mới"
     new_conv = {
         "user_id": ObjectId(user_id),
@@ -268,7 +268,7 @@ async def get_conversation_messages(user_id: str, conversation_id: str) -> list:
     conv = await db.conversations.find_one({"_id": obj_id, "user_id": ObjectId(user_id)})
     if not conv:
         return []
-    
+
     cursor = db.chathistories.find({"conversation_id": obj_id}).sort("timestamp", 1)
     docs = await cursor.to_list(length=100)
     for d in docs:
@@ -340,7 +340,7 @@ async def generate_response(user_id: str, message: str, conversation_id: str = N
 
     is_private = _is_personal_query(message)
     cache_key = _normalize_key(message, user_id if is_private else None)
-    
+
     cached = await redis_client.get(cache_key)
     if cached:
         answer = await _rephrase_answer(cached, message)

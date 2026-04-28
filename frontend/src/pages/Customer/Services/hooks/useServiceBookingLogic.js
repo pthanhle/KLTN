@@ -64,7 +64,7 @@ export const useServiceBookingLogic = () => {
         if (isExists) {
             newServices = currentServices.filter(s => s._id !== srv._id);
         } else {
-            newServices = [...currentServices, { _id: srv._id, service_name: srv.service_name, price: srv.price }];
+            newServices = [...currentServices, { _id: srv._id, serviceName: srv.serviceName, basePrice: srv.basePrice, priceType: srv.priceType }];
         }
         methods.setValue('selected_services', newServices, { shouldValidate: true });
     };

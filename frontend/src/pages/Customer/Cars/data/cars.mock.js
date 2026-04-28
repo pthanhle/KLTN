@@ -98,10 +98,4 @@ export const DUMMY_CARS = [
     };
 });
 
-export const BODY_STYLES = [
-    { label: 'Tất cả', value: 'Tất cả' },
-    { label: 'Sedan', value: 'Sedan' },
-    { label: 'SUV', value: 'SUV' },
-    { label: 'Coupe', value: 'Coupe' },
-    { label: 'Cabriolet', value: 'Cabriolet' },
-];
+

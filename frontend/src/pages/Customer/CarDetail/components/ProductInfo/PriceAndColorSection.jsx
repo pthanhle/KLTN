@@ -12,7 +12,7 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
     const frames = Array.from({ length: 36 }).map((_, i) => i % 2 === 0 ? img1 : img2);
 
     return (
-        <section id="price-color" className="pt-24 lg:pt-32 pb-24 bg-white dark:bg-[#0a0a0b] overflow-hidden">
+        <section id="price-color" className="min-h-[calc(100vh-136px)] flex items-center py-10 lg:py-0 bg-white dark:bg-[#0a0a0b] overflow-hidden">
             <style>
                 {`
                     @keyframes float {
@@ -43,19 +43,15 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
             </style>
 
             <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1440px]">
-                <div className="flex flex-col-reverse lg:flex-row gap-16 xl:gap-24 items-center">
+                <div className="flex flex-col-reverse lg:flex-row gap-10 xl:gap-16 items-center">
 
-                    <div className="w-full lg:w-[400px] flex-shrink-0 flex flex-col gap-10">
+                    <div className="w-full lg:w-[400px] flex-shrink-0 flex flex-col gap-6 lg:gap-8">
                         <div className="animate-in fade-in slide-in-from-left-4 duration-700">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-[2px] bg-yellow-500"></div>
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-yellow-600 dark:text-yellow-500">{t('products:detail.configurator', 'Configurator')}</span>
-                            </div>
-                            <h2 className="text-[32px] lg:text-[40px] font-black uppercase text-slate-900 dark:text-white leading-[0.9] tracking-tighter mb-4">
-                                {t('products:detail.priceColor')}
+                            <h2 className="text-[28px] lg:text-[36px] font-black uppercase text-slate-900 dark:text-white leading-[0.9] tracking-tighter mb-3">
+                                {t('priceColor', 'GIÁ BÁN & MÀU SẮC')}
                             </h2>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed max-w-sm">
-                                {t('products:detail.customizationDesc', 'Cá nhân hóa chiếc xe của bạn với những tùy chọn màu sắc và cấu hình cao cấp nhất.')}
+                            <p className="text-slate-500 dark:text-slate-400 text-[13px] font-medium leading-relaxed max-w-sm">
+                                {t('customizationDesc', 'Cá nhân hóa chiếc xe của bạn với những tùy chọn màu sắc và cấu hình cao cấp nhất.')}
                             </p>
                         </div>
 
@@ -67,11 +63,11 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
                                         <button
                                             key={color.id}
                                             onClick={() => setSelectedColor(color)}
-                                            className="relative flex flex-col items-center gap-3 group"
+                                            className="relative flex flex-col items-center gap-2 group"
                                         >
                                             <div className={`
-                                                relative w-14 h-14 rounded-full flex items-center justify-center p-[2px] transition-all duration-500
-                                                ${isActive ? 'bg-yellow-500 shadow-[0_10px_25px_rgba(234,179,8,0.4)] scale-110' : 'bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20'}
+                                                relative w-12 h-12 rounded-full flex items-center justify-center p-[2px] transition-all duration-500
+                                                ${isActive ? 'bg-yellow-500 shadow-[0_5px_15px_rgba(234,179,8,0.4)] scale-110' : 'bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20'}
                                             `}>
                                                 <div
                                                     className="w-full h-full rounded-full border-2 border-white dark:border-[#0a0a0b] shadow-inner"
@@ -81,7 +77,7 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
                                                     }}
                                                 ></div>
                                             </div>
-                                            <span className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? 'text-slate-900 dark:text-white translate-y-0 opacity-100' : 'text-slate-400 opacity-0 -translate-y-2'}`}>
+                                            <span className={`text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? 'text-slate-900 dark:text-white translate-y-0 opacity-100' : 'text-slate-400 opacity-0 -translate-y-2'}`}>
                                                 {color.name}
                                             </span>
                                         </button>
@@ -90,34 +86,34 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
                             </div>
                         </div>
 
-                        <div className="p-8 rounded-[32px] bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 animate-in fade-in slide-in-from-left-4 duration-700 delay-200">
-                            <div className="space-y-6">
+                        <div className="p-6 lg:p-8 rounded-[24px] bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 animate-in fade-in slide-in-from-left-4 duration-700 delay-200">
+                            <div className="space-y-5">
                                 <div>
-                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-3">{t('products:detail.retailPrice')}</p>
+                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2">{t('retailPrice', 'GIÁ BÁN LẺ ĐỀ XUẤT')}</p>
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">
+                                        <span className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
                                             {(car.price).toLocaleString()}
                                         </span>
-                                        <span className="text-[14px] font-black text-yellow-600 dark:text-yellow-500">VNĐ</span>
+                                        <span className="text-[12px] font-black text-yellow-600 dark:text-yellow-500">VNĐ</span>
                                     </div>
                                 </div>
                                 <div className="h-px bg-slate-200 dark:bg-white/10 w-full"></div>
-                                <div className="flex flex-col gap-4">
-                                    <button className="w-full py-5 bg-slate-900 dark:bg-yellow-500 text-white dark:text-slate-900 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-yellow-600 dark:hover:bg-yellow-400 transition-all rounded-2xl shadow-xl shadow-slate-900/10 dark:shadow-yellow-500/10 active:scale-95">
-                                        {t('products:detail.estimateBtn')}
+                                <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
+                                    <button className="w-full py-4 bg-slate-900 dark:bg-yellow-500 text-white dark:text-slate-900 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-yellow-600 dark:hover:bg-yellow-400 transition-all rounded-xl shadow-lg shadow-slate-900/10 dark:shadow-yellow-500/10 active:scale-95">
+                                        {t('estimateBtn', 'DỰ TOÁN CHI PHÍ')}
                                     </button>
                                     <button
                                         onClick={() => navigate(`/test-drive/${car.id || car._id || '1'}`)}
-                                        className="w-full py-5 bg-white dark:bg-transparent border-2 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-[11px] font-black uppercase tracking-[0.2em] hover:border-slate-900 dark:hover:border-white transition-all rounded-2xl active:scale-95"
+                                        className="w-full py-4 bg-white dark:bg-transparent border-2 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-[11px] font-black uppercase tracking-[0.2em] hover:border-slate-900 dark:hover:border-white transition-all rounded-xl active:scale-95"
                                     >
-                                        {t('products:detail.testDriveBtn')}
+                                        {t('testDriveBtn', 'ĐĂNG KÝ LÁI THỬ')}
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex-1 w-full min-h-[500px] lg:min-h-[700px] flex items-center justify-center relative">
+                    <div className="flex-1 w-full min-h-[350px] lg:min-h-[500px] flex items-center justify-center relative">
                         <div className="absolute inset-0 studio-light pointer-events-none transition-opacity duration-1000"></div>
 
                         <div className="absolute bottom-[25%] left-0 right-0 h-[1px] stage-line z-0"></div>

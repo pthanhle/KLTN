@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BODY_STYLES } from '../../../Customer/Cars/data/cars.mock';
+import { BODY_STYLES } from '../../../Customer/Cars/constants/cars.constants';
 
 export const useDynamicTaxonomies = () => {
     const [brands, setBrands] = useState([]);

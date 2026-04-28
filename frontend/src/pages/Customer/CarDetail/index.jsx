@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageLoader } from '@/components/ui/page-loader';
+import { Skeleton } from 'antd';
 import { useCarDetailLogic } from './hooks/useCarDetailLogic';
 import { useScrollSpy } from './hooks/useScrollSpy';
 
@@ -12,8 +12,21 @@ import FeatureSection from './components/Features/FeatureSection';
 import SpecsSection from './components/Features/SpecsSection';
 import MediaGallerySection from './components/Gallery/MediaGallerySection';
 
+const CarDetailSkeleton = () => (
+    <div className="w-full bg-[#fcfcfc] dark:bg-[#0a0a0b] min-h-screen pt-20 pb-20">
+        <div className="container mx-auto px-6 max-w-[1440px]">
+            <Skeleton active paragraph={{ rows: 2 }} className="mb-10 max-w-lg" />
+            <Skeleton.Image active className="!w-full !h-[400px] lg:!h-[600px] !rounded-[40px] mb-12" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <Skeleton active paragraph={{ rows: 4 }} />
+                <Skeleton active paragraph={{ rows: 4 }} />
+            </div>
+        </div>
+    </div>
+);
+
 const CarDetailPage = () => {
-    const { t } = useTranslation(['products', 'layout']);
+    const { t } = useTranslation(['carDetail']);
     const {
         isLoading,
         car,
@@ -24,13 +37,13 @@ const CarDetailPage = () => {
     useScrollSpy();
 
     if (isLoading) {
-        return <PageLoader />;
+        return <CarDetailSkeleton />;
     }
 
     if (!car) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0a0a0b] text-slate-900 dark:text-white text-lg font-bold">
-                {t('products:detail.carNotFound', 'Không tìm thấy dữ liệu xe.')}
+                {t('carNotFound', 'Không tìm thấy dữ liệu xe.')}
             </div>
         );
     }
@@ -60,7 +73,7 @@ const CarDetailPage = () => {
                         title={car.features[0].title}
                         features={[{ title: '', desc: car.features[0].desc, image: car.features[0].image }]}
                         align="right"
-                        subtitle={t('products:detail.design')}
+                        subtitle={t('design')}
                     />
 
                     {car.features[1] && (
@@ -69,7 +82,7 @@ const CarDetailPage = () => {
                             title={car.features[1].title}
                             features={[{ title: '', desc: car.features[1].desc, image: car.features[1].image }]}
                             align="left"
-                            subtitle={t('products:detail.technology')}
+                            subtitle={t('technology')}
                         />
                     )}
                 </>

@@ -3,7 +3,7 @@ const SpecsSection = ({ specs, t }) => {
         <section id="specs" className="py-24 bg-white dark:bg-[#0a0a0b] relative">
             <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1000px]">
                 <h2 className="text-[28px] lg:text-[40px] font-black uppercase text-center text-slate-900 dark:text-white mb-16 tracking-tight">
-                    {t('products:detail.specs')}
+                    {t('specs', 'THÔNG SỐ KỸ THUẬT')}
                 </h2>
                 
                 <div className="relative bg-slate-50 dark:bg-[#141416] rounded-[48px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.02)] dark:shadow-none border border-slate-100 dark:border-white/5">

@@ -9,8 +9,8 @@ export const getStep1Schema = (t) => {
         selected_services: z.array(
             z.object({
                 _id: z.string(),
-                service_name: z.string(),
-                price: z.number()
+                serviceName: z.string(),
+                basePrice: z.number().optional(),
             })
         ).min(1, t?.('services:error_service_required') || 'Vui lòng chọn ít nhất một dịch vụ')
     });

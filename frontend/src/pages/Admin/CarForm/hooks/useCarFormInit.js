@@ -1,59 +1,38 @@
-import { useEffect, useState } from 'react';
-import { getAdminProductById } from '../../../../services/api/adminProduct.api';
+import { useEffect } from 'react';
+import { useAdminProductDetailQuery } from '../../../../services/queries/adminProduct.queries';
 
 export const useCarFormInit = (id, form) => {
-    const [isInitializing, setIsInitializing] = useState(false);
+    const { data: carDetail, isLoading: isInitializing } = useAdminProductDetailQuery(id);
 
     useEffect(() => {
-        let isMounted = true;
+        if (!id) {
+            form.resetFields();
+            return;
+        }
 
-        const fetchCarData = async () => {
-            if (!id) {
-                form.resetFields();
-                return;
-            }
-
-            try {
-                setIsInitializing(true);
-                const carDetail = await getAdminProductById(id);
-                
-                if (isMounted && carDetail) {
-                    const sanitizedData = {
-                        ...carDetail,
-                        brandId: carDetail.brandId?._id || carDetail.brandId,
-                        category: carDetail.category?._id || carDetail.category,
-                        versions: carDetail.versions || [],
-                        colors: carDetail.colors || [],
-                        features: (carDetail.features || []).map((f, idx) => ({
-                            ...f,
-                            image: f.image ? [{
-                                uid: `feat-${idx}`,
-                                name: 'image',
-                                status: 'done',
-                                url: f.image
-                            }] : []
-                        })),
-                        specs: carDetail.specs || [],
-                        gallery: carDetail.gallery || { photos: [], videos: [] },
-                        threeSixty: carDetail.threeSixty || { images: [], lighting: 'Studio', environment: 'Minimalist Studio' }
-                    };
-                    form.setFieldsValue(sanitizedData);
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                if (isMounted) {
-                    setIsInitializing(false);
-                }
-            }
-        };
-
-        fetchCarData();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [id, form]);
+        if (carDetail) {
+            const sanitizedData = {
+                ...carDetail,
+                brandId: carDetail.brandId?._id || carDetail.brandId,
+                category: carDetail.category?._id || carDetail.category,
+                versions: carDetail.versions || [],
+                colors: carDetail.colors || [],
+                features: (carDetail.features || []).map((f, idx) => ({
+                    ...f,
+                    image: f.image ? [{
+                        uid: `feat-${idx}`,
+                        name: 'image',
+                        status: 'done',
+                        url: f.image
+                    }] : []
+                })),
+                specs: carDetail.specs || [],
+                gallery: carDetail.gallery || { photos: [], videos: [] },
+                threeSixty: carDetail.threeSixty || { images: [], lighting: 'Studio', environment: 'Minimalist Studio' }
+            };
+            form.setFieldsValue(sanitizedData);
+        }
+    }, [id, carDetail, form]);
 
     return { isInitializing };
 };

@@ -1,43 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { message } from 'antd';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCarsFilter } from './useCarsFilter';
 import { useCarsSelection } from './useCarsSelection';
 import { useDynamicTaxonomies } from './useDynamicTaxonomies';
-import { getAdminProducts, updateAdminProduct } from '../../../../services/api/adminProduct.api';
-import { socket } from '../../../../services/socket';
+import { useAdminProductsQuery, useUpdateAdminProductMutation, adminProductKeys } from '../../../../services/queries/adminProduct.queries';
+import { useCarSocket } from './useCarSocket';
 
 export const useCarsCatalogLogic = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [carsData, setCarsData] = useState([]);
-    const [totalCars, setTotalCars] = useState(0);
-    const [globalStats, setGlobalStats] = useState(null);
-
     const filterState = useCarsFilter();
     const taxonomyState = useDynamicTaxonomies();
+    
+    const queryClient = useQueryClient();
+
+    const queryParams = useMemo(() => ({
+        current: 1,
+        pageSize: 1000,
+        search: filterState.searchTerm,
+        brand: filterState.filterBrand,
+        bodyStyle: filterState.filterBodyStyle,
+        status: filterState.filterStatus
+    }), [filterState.searchTerm, filterState.filterBrand, filterState.filterBodyStyle, filterState.filterStatus]);
+
+    const { data: response, isLoading: isQueryLoading, isFetching } = useAdminProductsQuery(queryParams);
+    const { mutateAsync: updateProduct } = useUpdateAdminProductMutation();
+
+    const carsData = response?.products || [];
+    const totalCars = response?.pagination?.total || 0;
+    const globalStats = response?.stats || null;
+
     const selectionState = useCarsSelection(carsData);
 
-    const fetchCars = async (silent = false) => {
-        if (!silent) setIsLoading(true);
-        try {
-            const params = {
-                current: 1,
-                pageSize: 1000,
-                search: filterState.searchTerm,
-                brand: filterState.filterBrand,
-                bodyStyle: filterState.filterBodyStyle,
-                status: filterState.filterStatus
-            };
+    const handleSocketUpdate = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
+    }, [queryClient]);
 
-            const response = await getAdminProducts(params);
-            setCarsData(response.products);
-            setTotalCars(response.pagination?.total || 0);
-            setGlobalStats(response.stats || null);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            if (!silent) setIsLoading(false);
-        }
-    };
+    useCarSocket(handleSocketUpdate);
 
     useEffect(() => {
         const successMsg = sessionStorage.getItem('admin_car_success');
@@ -47,42 +45,18 @@ export const useCarsCatalogLogic = () => {
         }
     }, []);
 
-    useEffect(() => {
-        const timer = setTimeout(() => fetchCars(), 500);
-        return () => clearTimeout(timer);
-    }, [filterState.searchTerm, filterState.filterBrand, filterState.filterBodyStyle, filterState.filterStatus]);
-
-    useEffect(() => {
-        if (!socket.connected) {
-            socket.connect();
-        }
-
-        const handleUpdate = () => {
-            fetchCars(true);
-        };
-
-        socket.on('product_data_updated', handleUpdate);
-        socket.on('product_image_updated', handleUpdate);
-
-        return () => {
-            socket.off('product_data_updated', handleUpdate);
-            socket.off('product_image_updated', handleUpdate);
-        };
-    }, [filterState.searchTerm, filterState.filterBrand, filterState.filterBodyStyle, filterState.filterStatus]);
-
     const handleToggleDemo = async (id) => {
         const car = carsData.find(c => c.id === id || c._id === id);
         if (!car) return;
 
         const newStatus = !car.isDemoAvailable;
-        setCarsData(prev => prev.map(c => (c.id === id || c._id === id) ? { ...c, isDemoAvailable: newStatus } : c));
 
+        // Optimistic UI could be handled via React Query 'onMutate', but for simplicity, we let the refetch handle it
         try {
-            await updateAdminProduct(id, { isDemoAvailable: newStatus });
-            fetchCars(true);
+            await updateProduct({ id, data: { isDemoAvailable: newStatus } });
         } catch (error) {
+            message.error("Failed to update demo status");
             console.error(error);
-            setCarsData(prev => prev.map(c => (c.id === id || c._id === id) ? { ...c, isDemoAvailable: !newStatus } : c));
         }
     };
 
@@ -90,7 +64,7 @@ export const useCarsCatalogLogic = () => {
         cars: carsData,
         totalCars,
         globalStats,
-        isLoading,
+        isLoading: isQueryLoading || isFetching,
         ...filterState,
         ...selectionState,
         ...taxonomyState,

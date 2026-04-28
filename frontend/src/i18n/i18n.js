@@ -44,6 +44,8 @@ import enTracking from '../locales/en/tracking.json';
 import viTracking from '../locales/vi/tracking.json';
 import enPartDetail from '../locales/en/partDetail.json';
 import viPartDetail from '../locales/vi/partDetail.json';
+import enAdminServiceItems from '../locales/en/adminServiceItems.json';
+import viAdminServiceItems from '../locales/vi/adminServiceItems.json';
 
 i18n
     .use(initReactI18next)
@@ -72,6 +74,7 @@ i18n
                 contact: enContact,
                 tracking: enTracking,
                 partDetail: enPartDetail,
+                adminServiceItems: enAdminServiceItems,
             },
             vi: {
                 translation: viTranslation,
@@ -96,6 +99,7 @@ i18n
                 contact: viContact,
                 tracking: viTracking,
                 partDetail: viPartDetail,
+                adminServiceItems: viAdminServiceItems,
             },
         },
         lng: 'vi',

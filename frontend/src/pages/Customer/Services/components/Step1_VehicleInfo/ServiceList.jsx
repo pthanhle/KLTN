@@ -10,6 +10,15 @@ const ServiceList = ({ filteredServices, bookingData, handleServiceToggle, t }) 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                 {filteredServices.map(srv => {
                     const isSelected = bookingData.selected_services?.some(s => s._id === srv._id) || false;
+                    
+                    // Render price logic
+                    let priceDisplay = t('services:price_contact', 'LIÊN HỆ');
+                    if (srv.priceType === 'FIXED') {
+                        priceDisplay = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(srv.basePrice);
+                    } else if (srv.priceType === 'STARTING_AT') {
+                        priceDisplay = `TỪ ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(srv.basePrice)}`;
+                    }
+
                     return (
                         <div 
                             key={srv._id}
@@ -21,13 +30,13 @@ const ServiceList = ({ filteredServices, bookingData, handleServiceToggle, t }) 
                             </div>
                             <div className="flex-1">
                                 <h4 className={`font-bold text-[15px] leading-tight mb-2 ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200'}`}>
-                                    {srv.service_name}
+                                    {srv.serviceName}
                                 </h4>
                                 <p className="text-[13px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-4">
                                     {srv.description}
                                 </p>
                                 <p className="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 uppercase tracking-widest">
-                                    {t('services:price_contact', 'GIÁ DỰ KIẾN: LIÊN HỆ')}
+                                    GIÁ DỰ KIẾN: {priceDisplay}
                                 </p>
                             </div>
                             <div className={`w-6 h-6 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'bg-yellow-500 border-yellow-500' : 'border-slate-300 dark:border-white/20'}`}>

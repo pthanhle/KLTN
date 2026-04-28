@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { createAdminProduct, updateAdminProduct } from '../../../../services/api/adminProduct.api';
+import { useCreateAdminProductMutation, useUpdateAdminProductMutation } from '../../../../services/queries/adminProduct.queries';
 
 export const useCarFormSubmit = (form) => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const createMutation = useCreateAdminProductMutation();
+    const updateMutation = useUpdateAdminProductMutation();
 
     const isBinary = (val) => val instanceof File || val instanceof Blob;
 
@@ -102,15 +103,14 @@ export const useCarFormSubmit = (form) => {
             const formData = convertToFormData({ ...values, status: 'Published' });
 
             if (id) {
-                await updateAdminProduct(id, formData);
+                await updateMutation.mutateAsync({ id, data: formData });
                 sessionStorage.setItem('admin_car_success', 'Cập nhật xe thành công!');
             } else {
-                await createAdminProduct(formData);
+                await createMutation.mutateAsync(formData);
                 sessionStorage.setItem('admin_car_success', 'Thêm xe mới thành công!');
             }
 
-            queryClient.invalidateQueries(['adminProducts']);
-            window.location.href = '/admin/cars';
+            navigate('/admin/cars');
         } catch (error) {
             console.error(error);
             message.error('Biểu mẫu còn thiếu thông tin hoặc có lỗi xảy ra!');
@@ -125,15 +125,14 @@ export const useCarFormSubmit = (form) => {
             const formData = convertToFormData({ ...values, status: 'Draft' });
 
             if (id) {
-                await updateAdminProduct(id, formData);
+                await updateMutation.mutateAsync({ id, data: formData });
                 sessionStorage.setItem('admin_car_success', 'Đã lưu nháp cập nhật!');
             } else {
-                await createAdminProduct(formData);
+                await createMutation.mutateAsync(formData);
                 sessionStorage.setItem('admin_car_success', 'Đã lưu bản nháp mới!');
             }
 
-            queryClient.invalidateQueries(['adminProducts']);
-            window.location.href = '/admin/cars';
+            navigate('/admin/cars');
         } catch (error) {
             console.error(error);
             message.error('Không thể lưu bản nháp!');

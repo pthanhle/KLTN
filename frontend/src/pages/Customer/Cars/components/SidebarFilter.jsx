@@ -15,7 +15,7 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400" />
                 <input 
                     type="text" 
-                    placeholder={t('cars.filters.searchPlaceholder')}
+                    placeholder={t('filters_searchPlaceholder', 'Tìm kiếm mẫu xe...')}
                     value={filters.keyword}
                     onChange={(e) => handleFilterChange('keyword', e.target.value)}
                     className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/10 rounded-2xl text-[14px] font-medium text-slate-800 dark:text-white outline-none focus:border-yellow-500/50 shadow-sm transition-all"
@@ -24,7 +24,7 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
 
             {/* Brands Filter */}
             <div>
-                <h3 className="text-[15px] font-bold text-slate-900 dark:text-white mb-4">{t('cars.filters.brandsTitle')}</h3>
+                <h3 className="text-[15px] font-bold text-slate-900 dark:text-white mb-4">{t('filters_brandsTitle', 'Thương Hiệu')}</h3>
                 
                 {/* Checkbox "Tất cả" */}
                 <label className="flex items-center gap-3 cursor-pointer group mb-4">
@@ -32,7 +32,7 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                         {filters.brandSlugs.length === 0 && <Check size={14} className="text-white dark:text-slate-900" strokeWidth={3} />}
                     </div>
                     <span className={`text-[14px] font-medium transition-colors ${filters.brandSlugs.length === 0 ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white'}`}>
-                        {t('cars.filters.allBrands')}
+                        {t('filters_allBrands', 'Tất cả thương hiệu')}
                     </span>
                     <input 
                         type="checkbox" 
@@ -48,7 +48,7 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-300" />
                         <input 
                             type="text" 
-                            placeholder={t('cars.filters.searchBrandPlaceholder')}
+                            placeholder={t('filters_searchBrandPlaceholder', 'Tìm thương hiệu...')}
                             value={brandSearch}
                             onChange={e => setBrandSearch(e.target.value)}
                             className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-white/5 rounded-xl text-[13px] font-medium text-slate-700 dark:text-white outline-none focus:border-yellow-500/30 transition-all placeholder:text-slate-400"
@@ -88,14 +88,14 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
             {/* Price Filter */}
             <div>
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-[15px] font-bold text-slate-900 dark:text-white">{t('cars.filters.priceTitle')}</h3>
+                    <h3 className="text-[15px] font-bold text-slate-900 dark:text-white">{t('filters_priceTitle', 'Khoảng Giá (VND)')}</h3>
                 </div>
                 
                 <div className="flex items-center gap-3 mb-2">
                     <div className="flex-1">
                         <input 
                             type="number" 
-                            placeholder={t('cars.filters.from')}
+                            placeholder={t('filters_from', 'Từ')}
                             value={filters.minPrice}
                             onChange={(e) => handleFilterChange('minPrice', e.target.value)}
                             className="w-full px-4 py-2.5 bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-medium text-slate-800 dark:text-white outline-none focus:border-yellow-500/50 transition-all placeholder:text-slate-400"
@@ -105,21 +105,21 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                     <div className="flex-1">
                         <input 
                             type="number" 
-                            placeholder={t('cars.filters.to')}
+                            placeholder={t('filters_to', 'Đến')}
                             value={filters.maxPrice}
                             onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
                             className="w-full px-4 py-2.5 bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-medium text-slate-800 dark:text-white outline-none focus:border-yellow-500/50 transition-all placeholder:text-slate-400"
                         />
                     </div>
                 </div>
-                <p className="text-[11px] font-bold text-slate-400 italic text-right">{t('cars.filters.unit')}</p>
+                <p className="text-[11px] font-bold text-slate-400 italic text-right">{t('filters_unit', 'Đơn vị: VNĐ')}</p>
             </div>
 
             <div className="w-full h-[1px] bg-slate-100 dark:bg-white/5"></div>
 
             {/* Body Styles (Pills) */}
             <div>
-                <h3 className="text-[15px] font-bold text-slate-900 dark:text-white mb-4">{t('cars.filters.bodyStylesTitle')}</h3>
+                <h3 className="text-[15px] font-bold text-slate-900 dark:text-white mb-4">{t('filters_bodyStylesTitle', 'Kiểu Dáng')}</h3>
                 <div className="flex flex-wrap gap-2.5">
                     {bodyStylesData.map(style => {
                         const isActive = filters.bodyStyle === style.value;
@@ -151,7 +151,7 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                 }}
                 className="mt-6 w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[14px] font-bold rounded-2xl hover:bg-yellow-500 dark:hover:bg-yellow-500 hover:text-white dark:hover:text-slate-900 transition-colors shadow-[0_8px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_20px_rgba(255,255,255,0.05)]"
             >
-                {t('cars.filters.resetFilter')}
+                {t('filters_resetFilter', 'Bỏ lọc')}
             </button>
 
         </div>

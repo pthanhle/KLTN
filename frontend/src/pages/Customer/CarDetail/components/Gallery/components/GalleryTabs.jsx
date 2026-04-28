@@ -7,13 +7,13 @@ export const GalleryTabs = ({ activeTab, onTabChange, t }) => {
                 onClick={() => onTabChange('photos')}
                 className={`relative px-6 py-2 rounded-full text-[12px] font-bold uppercase tracking-widest transition-all z-10 ${activeTab === 'photos' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-300'}`}
             >
-                {t('products:detail.photos')}
+                {t('photos', 'HÌNH ẢNH')}
             </button>
             <button
                 onClick={() => onTabChange('videos')}
                 className={`relative px-6 py-2 rounded-full text-[12px] font-bold uppercase tracking-widest transition-all z-10 ${activeTab === 'videos' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-300'}`}
             >
-                {t('products:detail.videos')}
+                {t('videos', 'VIDEO')}
             </button>
 
             <motion.div

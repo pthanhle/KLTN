@@ -80,21 +80,21 @@ const CarCard = ({ car, t }) => {
                     {car.name}
                 </h3>
                 <p className="text-[13px] text-slate-500 font-medium mb-6">
-                    {car.isNew ? t('cars.card.newCar') : `${t('cars.card.year')} ${car.year} • ${t('cars.card.odo')} ${car.odo.toLocaleString()} km`}
+                    {car.isNew ? t('card_newCar', 'Xe mới') : `${t('card_year', 'Sản xuất')} ${car.year} • ${t('card_odo', 'Odo')} ${car.odo.toLocaleString()} km`}
                 </p>
 
                 {/* Specs Grid */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
                     <div className="flex flex-col items-center justify-center p-2.5 bg-slate-50 dark:bg-[#0a0a0b] border border-slate-100 dark:border-white/5 rounded-2xl text-center">
-                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 mb-0.5">{t('cars.card.engine')}</span>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 mb-0.5">{t('card_engine', 'ĐỘNG CƠ')}</span>
                         <span className="text-[12px] sm:text-[13px] font-bold text-slate-700 dark:text-slate-300">{car.engine}</span>
                     </div>
                     <div className="flex flex-col items-center justify-center p-2.5 bg-slate-50 dark:bg-[#0a0a0b] border border-slate-100 dark:border-white/5 rounded-2xl text-center">
-                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 mb-0.5">{t('cars.card.fuel')}</span>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 mb-0.5">{t('card_fuel', 'NHIÊN LIỆU')}</span>
                         <span className="text-[12px] sm:text-[13px] font-bold text-slate-700 dark:text-slate-300">{car.fuel}</span>
                     </div>
                     <div className="flex flex-col items-center justify-center p-2.5 bg-slate-50 dark:bg-[#0a0a0b] border border-slate-100 dark:border-white/5 rounded-2xl text-center">
-                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 mb-0.5">{t('cars.card.seats')}</span>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 mb-0.5">{t('card_seats', 'CHỖ NGỒI')}</span>
                         <span className="text-[12px] sm:text-[13px] font-bold text-slate-700 dark:text-slate-300">{car.seats} Chỗ</span>
                     </div>
                 </div>
@@ -102,14 +102,14 @@ const CarCard = ({ car, t }) => {
                 {/* Footer: Price & Button */}
                 <div className="flex items-end justify-between mt-auto pt-4 border-t border-slate-100 dark:border-white/5">
                     <div>
-                        <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t('cars.card.priceLabel')}</p>
+                        <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t('card_priceLabel', 'GIÁ NIÊM YẾT')}</p>
                         <p className="text-xl font-black text-yellow-500">{formatVND(car.price)}</p>
                     </div>
                     <Link
                         to={`/cars/${car.id}`}
                         className="!px-5 !py-2.5 !bg-slate-100 hover:!bg-yellow-500 !text-slate-700 hover:!text-white dark:!bg-[#0b0f19] dark:hover:!bg-yellow-500 dark:!text-slate-300 !text-[13px] !font-bold !rounded-full transition-all duration-300"
                     >
-                        {t('cars.card.detailBtn')}
+                        {t('card_detailBtn', 'Xem chi tiết')}
                     </Link>
                 </div>
             </div>

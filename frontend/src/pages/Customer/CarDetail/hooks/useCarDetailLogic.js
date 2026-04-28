@@ -1,43 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getClientProductById } from '../../../../services/api/clientProduct.api';
+import { useClientProductDetailQuery } from '../../../../services/queries/clientProduct.queries';
 
 export const useCarDetailLogic = () => {
     const { id } = useParams();
-    const [isLoading, setIsLoading] = useState(true);
-    const [car, setCar] = useState(null);
     const [selectedColor, setSelectedColor] = useState(null);
 
+    const { data: car, isLoading } = useClientProductDetailQuery(id);
+
+    // Initialize selected color once car data is loaded
     useEffect(() => {
-        let isMounted = true;
-        setIsLoading(true);
-
-        const fetchCarDetail = async () => {
-            try {
-                // If it's a slug or ID, the backend supports both
-                const fetchedCar = await getClientProductById(id);
-                if (isMounted) {
-                    setCar(fetchedCar);
-                    if (fetchedCar.colors && fetchedCar.colors.length > 0) {
-                        setSelectedColor(fetchedCar.colors[0]);
-                    }
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                console.error("Failed to fetch car detail:", error);
-                if (isMounted) setIsLoading(false);
-            }
-        };
-
-        const timer = setTimeout(() => {
-            fetchCarDetail();
-        }, 500);
-
-        return () => {
-            isMounted = false;
-            clearTimeout(timer);
-        };
-    }, [id]);
+        if (car && car.colors && car.colors.length > 0 && !selectedColor) {
+            setSelectedColor(car.colors[0]);
+        }
+    }, [car, selectedColor]);
 
     return {
         isLoading,

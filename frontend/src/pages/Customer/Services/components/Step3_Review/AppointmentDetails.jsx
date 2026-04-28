@@ -53,7 +53,7 @@ const AppointmentDetails = ({ bookingData, handlePrevStep, t }) => {
                         <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase mb-1.5">{t('services:service_category', 'SERVICE CATEGORY')}</p>
                         <p className="text-[15px] font-bold text-slate-900 dark:text-white leading-tight mb-2">
                             {bookingData.selected_services?.length > 0 
-                                ? bookingData.selected_services.map(s => s.service_name).join(', ') 
+                                ? bookingData.selected_services.map(s => s.serviceName).join(', ') 
                                 : t('services:pending_details', 'Pending Details')}
                         </p>
                         <p className="text-[12px] text-slate-500 leading-relaxed line-clamp-1">

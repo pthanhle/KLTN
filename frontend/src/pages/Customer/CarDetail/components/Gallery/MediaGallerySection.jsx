@@ -21,7 +21,7 @@ const MediaGallerySection = ({ gallery, t }) => {
             <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1440px]">
                 <div className="flex flex-col items-center mb-6 lg:mb-8 mt-4 lg:mt-0">
                     <h2 className="text-[24px] lg:text-[36px] font-black uppercase text-center text-slate-900 dark:text-white mb-4 transition-colors">
-                        {t('products:detail.gallery')}
+                        {t('gallery', 'THƯ VIỆN ẢNH & VIDEO')}
                     </h2>
 
                     <GalleryTabs 

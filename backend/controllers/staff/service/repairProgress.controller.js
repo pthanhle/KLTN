@@ -2,7 +2,7 @@ import RepairProgress from '../../../models/repairprogressModel.js'
 import Booking from '../../../models/bookingModel.js'
 import ServiceBay from '../../../models/serviceBayModel.js'
 import User from '../../../models/userModel.js'
-import ServicePackage from '../../../models/servicepackageModel.js'
+import ServiceItem from '../../../models/serviceItemModel.js'
 import Notification from '../../../models/notificationModel.js'
 import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
@@ -20,7 +20,7 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
         const bookings = await Booking.find({
             $or: [
                 { user_id: { $in: await User.find({ full_name: { $regex: search, $options: 'i' } }).select('_id') } },
-                { service_id: { $in: await ServicePackage.find({ service_name: { $regex: search, $options: 'i' } }).select('_id') } },
+                { service_id: { $in: await ServiceItem.find({ serviceName: { $regex: search, $options: 'i' } }).select('_id') } },
             ],
             status: { $ne: 'cancelled' },
         }).select('_id')

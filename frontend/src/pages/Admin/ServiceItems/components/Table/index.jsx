@@ -2,8 +2,8 @@ import React from 'react';
 import { Table } from 'antd';
 import { getColumns } from './Columns';
 
-const ServiceItemsTable = ({ items, isLoading, currentPage, setCurrentPage, pageSize, totalItems, t }) => {
-    const columns = getColumns(t);
+const ServiceItemsTable = ({ items, isLoading, currentPage, setCurrentPage, pageSize, totalItems, onEdit, onDelete, onToggleStatus, t }) => {
+    const columns = getColumns(t, onEdit, onDelete, onToggleStatus);
 
     return (
         <div className="bg-white dark:bg-[#141416] rounded-2xl border border-slate-200 dark:border-white/5 relative overflow-hidden shadow-sm">

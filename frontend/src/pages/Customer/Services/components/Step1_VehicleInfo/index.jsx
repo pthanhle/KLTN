@@ -20,6 +20,7 @@ const Step1_VehicleInfo = ({
     filteredServices,
     handleServiceToggle,
     isStep1Valid,
+    isServicesLoading,
     t 
 }) => {
     const { control, formState: { errors } } = useFormContext();
@@ -52,6 +53,7 @@ const Step1_VehicleInfo = ({
                 categories={categories}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                isServicesLoading={isServicesLoading}
                 t={t}
             />
 
@@ -60,6 +62,7 @@ const Step1_VehicleInfo = ({
                 filteredServices={filteredServices}
                 bookingData={bookingData}
                 handleServiceToggle={handleServiceToggle}
+                isServicesLoading={isServicesLoading}
                 t={t}
             />
 

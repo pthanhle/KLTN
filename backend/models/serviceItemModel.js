@@ -5,9 +5,9 @@ const serviceItemSchema = new mongoose.Schema({
   serviceName: { type: String, required: true },
   priceType: { type: String, enum: ['FIXED', 'STARTING_AT', 'CONTACT'], required: true, default: 'CONTACT' },
   basePrice: { type: Number, default: 0 },
-  estimatedDuration: { type: Number, required: true },
+  estimatedDuration: { type: Number, default: null },
   isPackage: { type: Boolean, default: false },
-  category: { type: String },
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'ServiceCategory' },
   description: { type: String },
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });

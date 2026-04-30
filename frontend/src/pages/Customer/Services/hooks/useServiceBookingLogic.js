@@ -1,25 +1,23 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { App } from 'antd';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getServiceBookingSchema } from '../schemas/servicesSchema';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-
-// Import Constants & Mocks đã được xé lẻ ra
 import { VEHICLE_BRANDS, SERVICE_CATEGORIES, TIME_SLOTS } from '../constants/bookingConstants';
 import { MOCK_SERVICES_DATA } from '../data/services.mock';
+import { useClientServiceItemsQuery } from '../../../../services/queries/serviceItemQueries';
+import { useClientServiceCategoriesQuery } from '../../../../services/queries/serviceCategoryQueries';
 
 export const useServiceBookingLogic = () => {
     const { message } = App.useApp();
     const { t } = useTranslation(['services']);
     const location = useLocation();
 
-    // 1. Quản lý Step và State vòng chờ API
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 2. Tái cấu trúc Zod Schema & React Hook Form
     const schema = useMemo(() => getServiceBookingSchema(t), [t]);
     const methods = useForm({
         resolver: zodResolver(schema),
@@ -36,13 +34,42 @@ export const useServiceBookingLogic = () => {
     });
 
     const bookingData = methods.watch();
-    
-    // 3. Logic chọn Dịch vụ
-    const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'Bảo dưỡng');
-    // Phép lọc dữ liệu với Data Tĩnh được nhét vào Hook
-    const filteredServices = MOCK_SERVICES_DATA.filter(s => s.category === selectedCategory || s.category === 'Kiểm tra đo đạc');
 
-    // 4. Các Hàm Handler Điều hướng & Chọn lựa
+    const [selectedCategory, setSelectedCategory] = useState(location.state?.category || '');
+
+    const { data: serviceItemsData, isLoading: isServicesLoading } = useClientServiceItemsQuery();
+    const { data: categoriesData } = useClientServiceCategoriesQuery();
+
+    const servicesFromApi = serviceItemsData?.services || [];
+
+    const dynamicCategories = useMemo(() => {
+        if (!categoriesData || categoriesData.length === 0) return SERVICE_CATEGORIES;
+
+        return categoriesData.map(cat => {
+            return {
+                id: cat._id,
+                labelKey: cat.name,
+                iconName: cat.icon || 'Wrench'
+            };
+        });
+    }, [categoriesData]);
+
+    useEffect(() => {
+        if (!selectedCategory && dynamicCategories.length > 0) {
+            setSelectedCategory(dynamicCategories[0].id);
+        } else if (selectedCategory && categoriesData && categoriesData.length > 0) {
+            const isObjectId = selectedCategory.length === 24;
+            if (!isObjectId) {
+                const match = categoriesData.find(c => c.name === selectedCategory);
+                if (match) {
+                    setSelectedCategory(match._id);
+                }
+            }
+        }
+    }, [dynamicCategories, categoriesData, selectedCategory]);
+
+    const filteredServices = servicesFromApi.filter(s => s.category?._id === selectedCategory);
+
     const handleNextStep = () => {
         if (currentStep < 3) setCurrentStep(prev => prev + 1);
     };
@@ -83,7 +110,7 @@ export const useServiceBookingLogic = () => {
         try {
             await new Promise(resolve => setTimeout(resolve, 1500));
             console.log("Dữ liệu gửi lên BE: ", bookingData);
-            
+
             message.success({
                 content: t ? t('services:booking_success', 'Booking successful! We will contact you soon.') : 'Booking successful!',
                 style: { marginTop: '10vh' },
@@ -99,13 +126,10 @@ export const useServiceBookingLogic = () => {
     return {
         methods,
         currentStep,
-        
-        // Trả ra các Constants & Mock Data cho View sử dụng
-        services: MOCK_SERVICES_DATA,
-        categories: SERVICE_CATEGORIES,
+        services: servicesFromApi,
+        categories: dynamicCategories,
         vehicleBrands: VEHICLE_BRANDS,
         timeSlots: TIME_SLOTS,
-        
         filteredServices,
         selectedCategory,
         setSelectedCategory,
@@ -113,6 +137,7 @@ export const useServiceBookingLogic = () => {
         isSubmitting,
         isStep1Valid,
         isStep2Valid,
+        isServicesLoading,
         updateBookingData,
         handleServiceToggle,
         handleNextStep,

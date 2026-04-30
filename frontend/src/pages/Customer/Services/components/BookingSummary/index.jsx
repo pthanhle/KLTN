@@ -82,7 +82,7 @@ const BookingSummary = ({ bookingData, currentStep, t }) => {
                     <div className="flex flex-col gap-5 mb-8">
                         <div className="flex justify-between items-center text-[15px] font-medium border-b border-white/5 pb-4">
                             <span className="text-slate-400">{t('services:base_service_fee')}</span>
-                            <span className="text-white font-bold">{t('services:price_contact')}</span>
+                            <span className="text-white font-bold">{t('services:contact')}</span>
                         </div>
                         <div className="flex justify-between items-center text-[15px] font-medium border-b border-white/5 pb-4">
                             <span className="text-slate-400">{t('services:parts_and_materials')}</span>
@@ -97,9 +97,9 @@ const BookingSummary = ({ bookingData, currentStep, t }) => {
                     <div className="mb-8">
                         <p className="text-[12px] font-bold text-slate-400 tracking-widest uppercase mb-2">{t('services:estimated_total')}</p>
                         <p className="text-[32px] font-black tracking-tighter text-yellow-500">
-                            {t('services:price_contact')}
+                            {t('services:contact')}
                         </p>
-                        <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mt-1">TAXES INCLUDED</p>
+                        <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mt-1">{t('services:taxes_included')}</p>
                     </div>
 
                     <div className="bg-white/5 rounded-2xl p-5 border border-white/5">

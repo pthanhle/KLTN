@@ -18,7 +18,7 @@ const MediaGalleryCard = ({ control, name, t }) => {
     } = useMediaGallery(control, name, t);
 
     return (
-        <section className="bg-white dark:bg-[#191f31] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
+        <section className="bg-white dark:bg-[#141416] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
             <div className="flex items-center gap-3 mb-8">
                 <ImageIcon className="text-yellow-500" size={24} />
                 <h3 className="text-lg font-bold uppercase tracking-wider text-slate-800 dark:text-white">
@@ -33,7 +33,7 @@ const MediaGalleryCard = ({ control, name, t }) => {
                     setTimeout(() => onSuccess("ok"), 0);
                 }}
                 onChange={handleUpload}
-                className="[&_.ant-upload-drag]:!bg-slate-50 dark:[&_.ant-upload-drag]:!bg-[#151b2d] [&_.ant-upload-drag]:!border-2 [&_.ant-upload-drag]:!border-dashed [&_.ant-upload-drag]:!border-slate-300 dark:[&_.ant-upload-drag]:!border-white/20 [&_.ant-upload-drag]:hover:!border-yellow-500"
+                className="[&_.ant-upload-drag]:!bg-slate-50 dark:[&_.ant-upload-drag]:!bg-[#1c1c1e] [&_.ant-upload-drag]:!border-2 [&_.ant-upload-drag]:!border-dashed [&_.ant-upload-drag]:!border-slate-300 dark:[&_.ant-upload-drag]:!border-white/20 [&_.ant-upload-drag]:hover:!border-yellow-500"
             >
                 <div className="py-8 flex flex-col items-center justify-center gap-4">
                     <div className="w-16 h-16 rounded-full bg-yellow-50 dark:bg-yellow-500/10 flex items-center justify-center">

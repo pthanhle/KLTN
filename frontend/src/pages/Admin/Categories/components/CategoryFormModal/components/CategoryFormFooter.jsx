@@ -1,6 +1,6 @@
 export const CategoryFormFooter = ({ onClose, isEditing, t }) => {
     return (
-        <footer className="p-8 pt-4 pb-6 mt-4 flex items-center gap-4 bg-slate-50/50 dark:bg-slate-900/40 rounded-b-[32px]">
+        <footer className="p-8 pt-4 pb-6 mt-4 flex items-center gap-4 bg-slate-50/50 dark:bg-[#141416] rounded-b-[32px]">
             <button 
                 type="button" 
                 onClick={onClose}

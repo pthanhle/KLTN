@@ -26,8 +26,8 @@ export const CategoryFormModal = ({ isOpen, onClose, onSave, editingData, t }) =
             focusable={{ focusTriggerAfterClose: false }}
             destroyOnHidden
             classNames={{
-                mask: "backdrop-blur-md bg-slate-950/40 dark:bg-[#070d1f]/80",
-                content: "!p-0 bg-white dark:bg-[#151b2d] rounded-[32px] shadow-2xl overflow-hidden dark:border dark:border-white/5 animate-in fade-in zoom-in duration-300",
+                mask: "backdrop-blur-md bg-slate-950/40 dark:bg-[#000000]/80",
+                content: "!p-0 bg-white dark:bg-[#141416] rounded-[32px] shadow-2xl overflow-hidden dark:border dark:border-white/5 animate-in fade-in zoom-in duration-300",
                 body: "bg-transparent",
             }}
         >

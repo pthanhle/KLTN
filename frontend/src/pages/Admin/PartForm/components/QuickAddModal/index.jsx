@@ -38,7 +38,7 @@ const QuickAddModal = ({ title, placeholder, visible, onCancel, onAdd, t }) => {
             open={visible}
             onCancel={handleCancel}
             footer={modalFooter}
-            className="[&_.ant-modal-content]:bg-white dark:[&_.ant-modal-content]:bg-[#191f31] [&_.ant-modal-content]:rounded-3xl [&_.ant-modal-content]:p-8 [&_.ant-modal-header]:bg-transparent [&_.ant-modal-title]:bg-transparent [&_.ant-modal-footer]:mt-8 [&_.ant-modal-footer]:border-none"
+            className="[&_.ant-modal-content]:bg-white dark:[&_.ant-modal-content]:bg-[#141416] [&_.ant-modal-content]:rounded-3xl [&_.ant-modal-content]:p-8 [&_.ant-modal-header]:bg-transparent [&_.ant-modal-title]:bg-transparent [&_.ant-modal-footer]:mt-8 [&_.ant-modal-footer]:border-none"
             centered
         >
             <div className="py-6">
@@ -49,7 +49,7 @@ const QuickAddModal = ({ title, placeholder, visible, onCancel, onAdd, t }) => {
                     value={value} 
                     onChange={handleChange} 
                     placeholder={placeholder}
-                    className="w-full h-14 bg-slate-50 dark:bg-[#151b2d] border-2 border-transparent hover:border-yellow-500/30 focus:border-yellow-500/50 focus:bg-white dark:focus:bg-[#1a2235] rounded-[1.25rem] px-6 text-slate-800 dark:text-white transition-all text-base font-bold shadow-sm"
+                    className="w-full h-14 bg-slate-50 dark:bg-[#1c1c1e] border-2 border-transparent hover:border-yellow-500/30 focus:border-yellow-500/50 focus:bg-white dark:focus:bg-[#27272a] rounded-[1.25rem] px-6 text-slate-800 dark:text-white transition-all text-base font-bold shadow-sm"
                     onPressEnter={handleOk}
                 />
             </div>

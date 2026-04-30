@@ -21,8 +21,8 @@ const VideoBlockEditor = ({ control, index, t }) => {
             </div>
 
             {/* Right: Live Preview Panel */}
-            <div className="col-span-1 xl:col-span-8 bg-slate-900 rounded-2xl overflow-hidden relative border-4 border-slate-800 shadow-2xl flex items-center justify-center min-h-[400px]">
-                <div className="relative z-10 w-full h-full p-8 flex flex-col justify-center items-center bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-2xl">
+            <div className="col-span-1 xl:col-span-8 bg-slate-900 rounded-2xl overflow-hidden relative border-4 dark:border-white/10 shadow-2xl flex items-center justify-center min-h-[400px]">
+                <div className="relative z-10 w-full h-full p-8 flex flex-col justify-center items-center bg-white dark:bg-[#141416] text-slate-900 dark:text-white rounded-2xl">
                     {blockData.title && <h3 className="text-3xl font-black uppercase text-center mb-8">{blockData.title}</h3>}
                     <div className="w-full max-w-3xl aspect-video rounded-3xl overflow-hidden shadow-xl relative bg-black group flex items-center justify-center border-4 border-slate-100 dark:border-white/5">
                         {blockData.cover_image ? (

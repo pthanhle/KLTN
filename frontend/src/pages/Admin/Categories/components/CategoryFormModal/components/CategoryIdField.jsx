@@ -20,7 +20,7 @@ export const CategoryIdField = ({ t, isEditing }) => {
             <Input 
                 disabled={isEditing}
                 placeholder={t('adminCategories:phId')} 
-                className="w-full !h-14 !text-base !bg-slate-50 dark:!bg-[#0c1324] disabled:!bg-slate-100 disabled:dark:!bg-white/5 !border-slate-200 dark:!border-white/10 !rounded-2xl px-6 text-slate-800 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-600 hover:!border-yellow-500 focus:!border-yellow-500 focus:!shadow-[0_0_0_4px_rgba(234,179,8,0.1)] transition-all outline-none disabled:opacity-60 disabled:cursor-not-allowed" 
+                className="w-full !h-14 !text-base !bg-slate-50 dark:!bg-[#1c1c1e] disabled:!bg-slate-100 disabled:dark:!bg-white/5 !border-slate-200 dark:!border-white/10 !rounded-2xl px-6 text-slate-800 dark:text-white font-mono placeholder:text-slate-400 dark:placeholder:text-slate-600 hover:!border-yellow-500 focus:!border-yellow-500 focus:!shadow-[0_0_0_4px_rgba(234,179,8,0.1)] transition-all outline-none disabled:opacity-60 disabled:cursor-not-allowed" 
             />
         </Form.Item>
     );

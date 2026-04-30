@@ -11,7 +11,7 @@ const ActionButtons = ({ sequenceCount, onClear, onProcessAI }) => {
                 <button 
                     type="button"
                     onClick={onClear}
-                    className="w-full py-4 rounded-full bg-slate-100 dark:bg-[#2e3447] text-slate-700 dark:text-white text-[10px] uppercase tracking-[0.15em] font-black border border-transparent dark:border-[#4f4633]/20 hover:bg-slate-200 dark:hover:bg-[#2e3447]/80 hover:text-red-500 dark:hover:text-red-400 transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-full bg-slate-100 dark:bg-[#1c1c1e] text-slate-700 dark:text-white text-[10px] uppercase tracking-[0.15em] font-black border border-transparent dark:border-[#4f4633]/20 hover:bg-slate-200 dark:hover:bg-[#27272a]/80 hover:text-red-500 dark:hover:text-red-400 transition-colors flex items-center justify-center gap-2"
                 >
                     <Trash2 className="w-4 h-4" />
                     {t('uploaderBtnClear', 'Xóa Chuỗi Hiện Tại')}

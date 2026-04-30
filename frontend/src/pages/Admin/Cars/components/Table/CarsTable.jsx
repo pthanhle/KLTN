@@ -40,7 +40,29 @@ const CarsTable = ({ cars, loading, selectedKeys, toggleSelection, toggleAllSele
                     className: '!mt-2 !mb-0 !pt-4 !pb-4 !px-6 !text-xs !font-bold !uppercase !tracking-widest !text-slate-500 custom-pagination border-t border-slate-100 dark:border-white/5'
                 }}
                 rowClassName={() => "group hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"}
-                className="custom-dark-table w-full whitespace-nowrap [&_.ant-table-thead_th]:!bg-[#f8fafc] dark:[&_.ant-table-thead_th]:!bg-[#191f31] [&_.ant-table-thead_th]:!text-slate-500 [&_.ant-table-thead_th]:!font-bold [&_.ant-table-thead_th]:!uppercase [&_.ant-table-thead_th]:!text-[10px] [&_.ant-table-thead_th]:!tracking-wider [&_.ant-table-thead_th]:!px-4"
+                className="
+                    custom-dark-table w-full whitespace-nowrap 
+                    [&_.ant-table]:!bg-transparent 
+
+                    /* Header Base */
+                    [&_.ant-table-thead_th]:!bg-[#f8fafc] 
+                    dark:[&_.ant-table-thead_th]:!bg-[#141416] 
+                    [&_.ant-table-thead_th]:!text-slate-500 
+                    [&_.ant-table-thead_th]:!font-bold 
+                    [&_.ant-table-thead_th]:!uppercase 
+                    [&_.ant-table-thead_th]:!text-[10px] 
+                    [&_.ant-table-thead_th]:!tracking-wider 
+                    [&_.ant-table-thead_th]:!px-4
+                    
+                    /* Header Hover & Sorter */
+                    [&_.ant-table-thead>tr>th:hover]:!bg-slate-100 
+                    dark:[&_.ant-table-thead>tr>th:hover]:!bg-white/[0.04]
+                    [&_.ant-table-column-sort]:!bg-slate-100
+                    dark:[&_.ant-table-column-sort]:!bg-white/[0.04]
+                    dark:[&_.ant-table-column-sorter-inner]:text-slate-500
+                    dark:[&_.ant-table-column-sorter-up.active]:text-yellow-500
+                    dark:[&_.ant-table-column-sorter-down.active]:text-yellow-500
+                "
             />
         </div>
     );

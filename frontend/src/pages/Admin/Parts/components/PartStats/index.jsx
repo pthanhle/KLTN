@@ -15,7 +15,7 @@ const PartStats = ({ stats, t, loading }) => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-12">
-            <div className="bg-white dark:bg-[#191f31] rounded-2xl p-8 border border-slate-200 dark:border-white/5 transition-all group hover:bg-slate-50 dark:hover:bg-[#23293c]">
+            <div className="bg-white dark:bg-[#141416] rounded-2xl p-8 border border-slate-200 dark:border-white/5 transition-all group hover:bg-slate-50 dark:hover:bg-white/[0.02]">
                 <div className="flex justify-between items-start mb-4">
                     <div className="p-3 bg-yellow-50 dark:bg-yellow-500/10 rounded-xl">
                         <Package className="text-yellow-500" size={24} strokeWidth={2.5} />
@@ -25,7 +25,7 @@ const PartStats = ({ stats, t, loading }) => {
                 {renderValue(stats?.totalParts || 0)}
             </div>
 
-            <div className="bg-white dark:bg-[#191f31] rounded-2xl p-8 border border-slate-200 dark:border-white/5 transition-all group hover:bg-slate-50 dark:hover:bg-[#23293c]">
+            <div className="bg-white dark:bg-[#141416] rounded-2xl p-8 border border-slate-200 dark:border-white/5 transition-all group hover:bg-slate-50 dark:hover:bg-white/[0.02]">
                 <div className="flex justify-between items-start mb-4">
                     <div className="p-3 bg-red-50 dark:bg-red-500/10 rounded-xl">
                         <AlertTriangle className="text-red-500" size={24} strokeWidth={2.5} />
@@ -35,7 +35,7 @@ const PartStats = ({ stats, t, loading }) => {
                 {renderValue(stats?.outOfStock || 0)}
             </div>
 
-            <div className="bg-white dark:bg-[#191f31] rounded-2xl p-8 border border-slate-200 dark:border-white/5 transition-all group hover:bg-slate-50 dark:hover:bg-[#23293c]">
+            <div className="bg-white dark:bg-[#141416] rounded-2xl p-8 border border-slate-200 dark:border-white/5 transition-all group hover:bg-slate-50 dark:hover:bg-white/[0.02]">
                 <div className="flex justify-between items-start mb-4">
                     <div className="p-3 bg-green-50 dark:bg-green-500/10 rounded-xl">
                         <CircleDollarSign className="text-green-500" size={24} strokeWidth={2.5} />
@@ -51,7 +51,7 @@ const PartStats = ({ stats, t, loading }) => {
                 )}
             </div>
 
-            <div className="bg-white dark:bg-[#191f31] rounded-2xl p-8 border border-slate-200 dark:border-white/5 transition-all group hover:bg-slate-50 dark:hover:bg-[#23293c]">
+            <div className="bg-white dark:bg-[#141416] rounded-2xl p-8 border border-slate-200 dark:border-white/5 transition-all group hover:bg-slate-50 dark:hover:bg-white/[0.02]">
                 <div className="flex justify-between items-start mb-4">
                     <div className="p-3 bg-blue-50 dark:bg-blue-500/10 rounded-xl">
                         <Layers className="text-blue-500" size={24} strokeWidth={2.5} />

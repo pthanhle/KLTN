@@ -24,7 +24,7 @@ const FeatureGridBlockEditor = ({ control, index, t }) => {
                 <div className="space-y-4">
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{t('adminPartForm:lblFeatures')}</p>
                     {fields.map((field, fIndex) => (
-                        <div key={field.id} className="relative p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 space-y-3 group">
+                        <div key={field.id} className="relative p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-[#1c1c1e] space-y-3 group">
                             <button type="button" onClick={() => remove(fIndex)} className="absolute -top-2 -right-2 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all z-10"><Trash2 size={12} /></button>
                             <FormInput name={`landing_blocks.${index}.features.${fIndex}.title`} control={control} placeholder={t('adminPartForm:phFeatureTitle')} extraClassName="!mb-0" />
                             <FormInput name={`landing_blocks.${index}.features.${fIndex}.description`} control={control} type="textarea" rows={2} placeholder={t('adminPartForm:phFeatureDesc')} extraClassName="!mb-0" />
@@ -38,9 +38,9 @@ const FeatureGridBlockEditor = ({ control, index, t }) => {
             </div>
 
             {/* Right: Live Preview Panel */}
-            <div className="col-span-1 xl:col-span-7 bg-slate-900 rounded-2xl overflow-hidden relative border-4 border-slate-800 shadow-2xl flex items-center justify-center min-h-[400px]">
+            <div className="col-span-1 xl:col-span-7 bg-slate-900 rounded-2xl overflow-hidden relative border-4 dark:border-white/10 shadow-2xl flex items-center justify-center min-h-[400px]">
                 <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
-                <div className="relative z-10 w-full h-full p-8 flex items-center bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-2xl">
+                <div className="relative z-10 w-full h-full p-8 flex items-center bg-white dark:bg-[#141416] text-slate-900 dark:text-white rounded-2xl">
                     <div className="w-full max-w-4xl mx-auto space-y-12">
                         <div className="text-center space-y-4">
                             <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight">{blockData.title || t('adminPartForm:blockFeatureGrid')}</h3>
@@ -48,8 +48,8 @@ const FeatureGridBlockEditor = ({ control, index, t }) => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {(blockData.features || []).map((feat, idx) => (
-                                <div key={idx} className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 text-center space-y-4">
-                                    <div className="w-14 h-14 mx-auto rounded-xl flex items-center justify-center bg-slate-200 dark:bg-slate-700">
+                                <div key={idx} className="p-6 rounded-2xl bg-slate-50 dark:bg-[#1c1c1e] border border-slate-200 dark:border-white/5 text-center space-y-4">
+                                    <div className="w-14 h-14 mx-auto rounded-xl flex items-center justify-center bg-slate-200 dark:bg-white/5">
                                         {feat.icon ? <Image src={feat.icon} alt="" className="w-8 h-8 object-contain" preview={false} /> : <LayoutGrid size={24} className="opacity-50" />}
                                     </div>
                                     <h4 className="font-bold text-lg">{feat.title || t('adminPartForm:defFeatureTitle')}</h4>

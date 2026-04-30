@@ -23,7 +23,7 @@ const TextBlockEditor = ({ control, index, t }) => {
             </div>
 
             {/* Live Visual Preview */}
-            <div className="xl:col-span-5 relative w-full h-[220px] rounded-2xl bg-slate-50 dark:bg-slate-800/50 text-slate-900 border border-slate-200 dark:border-white/5 overflow-hidden p-8 shadow-sm flex items-center justify-center">
+            <div className="xl:col-span-5 relative w-full h-[220px] rounded-2xl bg-slate-50 dark:bg-[#1c1c1e] text-slate-900 border border-slate-200 dark:border-white/5 overflow-hidden p-8 shadow-sm flex items-center justify-center">
                 <div className="h-full flex flex-col items-center justify-center text-center">
                     {blockData.title && (
                         <h4 className="text-xl font-bold mb-4 dark:text-white">

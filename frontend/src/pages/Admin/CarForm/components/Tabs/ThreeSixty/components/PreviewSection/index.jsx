@@ -25,7 +25,7 @@ const ThreeSixtyPreview = ({ manager }) => {
 
     return (
         <section className="h-full">
-            <div className="bg-white dark:bg-[#191f31] p-4 rounded-3xl shadow-2xl relative flex flex-col h-full border border-slate-100 dark:border-white/5">
+            <div className="bg-white dark:bg-[#141416] p-4 rounded-3xl shadow-2xl relative flex flex-col h-full border border-slate-100 dark:border-white/5">
                 <div className="flex justify-between items-center mb-4 px-4 pt-2">
                     <div className="flex gap-2">
                         <div className="w-3 h-3 rounded-full bg-red-400"></div>

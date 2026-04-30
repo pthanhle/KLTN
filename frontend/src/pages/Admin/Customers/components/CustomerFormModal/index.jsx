@@ -28,7 +28,7 @@ export const CustomerFormModal = ({ isOpen, onClose, customer, t }) => {
             destroyOnHidden
             classNames={{
                 wrapper: 'fixed inset-0 z-50 flex items-center justify-center pointer-events-none custom-modal-wrapper',
-                mask: 'backdrop-blur-sm bg-slate-900/40 dark:bg-[#0c1324]/60 pointer-events-auto',
+                mask: 'backdrop-blur-sm bg-slate-900/40 dark:bg-[#1c1c1e]/60 pointer-events-auto',
                 content: '!bg-transparent !shadow-none !p-0 overflow-hidden pointer-events-auto h-auto max-h-[90vh] ring-1 ring-slate-900/5 dark:ring-white/10 mx-auto transition-colors !rounded-2xl md:!rounded-[2rem] w-[95vw] !max-w-[1000px] flex flex-col',
                 body: 'flex-1 h-full w-full'
             }}
@@ -37,9 +37,9 @@ export const CustomerFormModal = ({ isOpen, onClose, customer, t }) => {
             }}
         >
             {contextHolder}
-            <div className="bg-white dark:bg-[#0c1324] h-full flex flex-col relative w-full overflow-hidden transition-colors">
+            <div className="bg-white dark:bg-[#1c1c1e] h-full flex flex-col relative w-full overflow-hidden transition-colors">
 
-                <div className="px-8 md:px-10 py-6 md:py-8 border-b border-slate-200 dark:border-white/10 shrink-0 transition-colors z-20 shadow-sm relative bg-white dark:bg-[#0c1324]">
+                <div className="px-8 md:px-10 py-6 md:py-8 border-b border-slate-200 dark:border-white/10 shrink-0 transition-colors z-20 shadow-sm relative bg-white dark:bg-[#1c1c1e]">
                     <div className="flex justify-between items-start">
                         <div>
                             <h1 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-2 uppercase">
@@ -78,7 +78,7 @@ export const CustomerFormModal = ({ isOpen, onClose, customer, t }) => {
                     </Form>
                 </div>
 
-                <div className="px-8 md:px-10 py-5 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#151b2d] flex justify-end gap-3 items-center shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0 transition-colors z-20">
+                <div className="px-8 md:px-10 py-5 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#141416] flex justify-end gap-3 items-center shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0 transition-colors z-20">
                     <button
                         type="button"
                         onClick={onClose}

@@ -15,7 +15,7 @@ const DragDropZone = ({ onUpload }) => {
 
     return (
         <Dragger 
-            className="!bg-slate-50 !border-2 !border-dashed !border-slate-300 dark:!bg-[#151b2d]/50 hover:dark:!bg-[#23293c]/80 dark:!border-[#4f4633]/30 !rounded-xl !p-0 transition-all cursor-pointer group/dropzone w-full"
+            className="!bg-slate-50 !border-2 !border-dashed !border-slate-300 dark:!bg-[#1c1c1e]/50 hover:dark:!bg-[#1c1c1e]/80 dark:!border-[#4f4633]/30 !rounded-xl !p-0 transition-all cursor-pointer group/dropzone w-full"
             multiple={true}
             showUploadList={false}
             customRequest={handleCustomRequest}

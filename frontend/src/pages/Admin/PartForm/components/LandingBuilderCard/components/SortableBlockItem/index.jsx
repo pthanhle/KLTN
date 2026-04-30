@@ -38,7 +38,7 @@ const SortableBlockItem = ({ id, field, index, control, removeBlock, handleImage
         <div 
             ref={setNodeRef} 
             style={style}
-            className={`relative bg-slate-50 dark:bg-[#151b2d] rounded-2xl border-2 ${isDragging ? 'border-indigo-500' : 'border-slate-200/50 dark:border-white/5'} overflow-hidden group transition-colors hover:border-indigo-500/30 touch-none`}
+            className={`relative bg-slate-50 dark:bg-[#1c1c1e] rounded-2xl border-2 ${isDragging ? 'border-indigo-500' : 'border-slate-200/50 dark:border-white/5'} overflow-hidden group transition-colors hover:border-indigo-500/30 touch-none`}
         >
             <div className={`flex items-center justify-between px-4 py-3 bg-white/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`} {...attributes} {...listeners}>
                 <div className="flex items-center gap-2">

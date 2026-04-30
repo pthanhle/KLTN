@@ -3,7 +3,7 @@ import { formatDate } from '../../../../../Customers/utils/format';
 
 export const LoyaltyHistoryList = ({ history, t }) => {
     return (
-        <div className="bg-slate-50 dark:bg-[#151b2d] rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden">
+        <div className="bg-slate-50 dark:bg-[#141416] rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden">
             <div className="divide-y divide-slate-200 dark:divide-white/5 max-h-[320px] overflow-y-auto custom-scrollbar">
                 {history.map(item => {
                     const isEarn = item.action === 'EARN';

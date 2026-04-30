@@ -12,7 +12,7 @@ const PricingCard = ({ watch, t }) => {
     const discountPercent = calculateDiscountPercent(originalPrice, price);
 
     return (
-        <section className="bg-white dark:bg-[#191f31] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
+        <section className="bg-white dark:bg-[#141416] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
             <div className="flex items-center gap-3 mb-8">
                 <CircleDollarSign className="text-emerald-500" size={24} />
                 <h3 className="text-lg font-bold uppercase tracking-wider text-slate-800 dark:text-white">

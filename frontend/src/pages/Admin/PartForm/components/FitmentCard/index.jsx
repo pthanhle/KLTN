@@ -19,7 +19,7 @@ const FitmentCard = ({ brands, t }) => {
 
 
     return (
-        <section className="bg-white dark:bg-[#191f31] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
+        <section className="bg-white dark:bg-[#141416] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
             <div className="flex items-center gap-3 mb-8">
                 <CarFront className="text-yellow-500" size={24} />
                 <h3 className="text-lg font-bold uppercase tracking-wider text-slate-800 dark:text-white">
@@ -59,7 +59,7 @@ const FitmentCard = ({ brands, t }) => {
                     </div>
                     <div className="space-y-4">
                         {fields.map((field, index) => (
-                            <div key={field.id} className="p-4 bg-slate-50 dark:bg-[#151b2d] rounded-3xl flex gap-4 items-center border-2 border-transparent hover:border-yellow-500/20 transition-all group">
+                            <div key={field.id} className="p-4 bg-slate-50 dark:bg-[#1c1c1e] rounded-3xl flex gap-4 items-center border-2 border-transparent hover:border-yellow-500/20 transition-all group">
                                 <div className="w-36">
                                     <FormSelect
                                         name={`fitment_data.${index}.brand`}

@@ -11,8 +11,8 @@ const PriceInputBox = ({ name, label, isHighlight, badge }) => {
     return (
         <div className={`p-6 sm:p-8 rounded-[2rem] transition-all duration-300 ${
             isHighlight 
-            ? 'bg-yellow-50/50 dark:bg-[#151b2d]/80 border-2 border-yellow-400/30' 
-            : 'bg-slate-50 dark:bg-[#151b2d] border-2 border-transparent'
+            ? 'bg-yellow-50/50 dark:bg-[#1c1c1e]/80 border-2 border-yellow-400/30' 
+            : 'bg-slate-50 dark:bg-[#1c1c1e] border-2 border-transparent'
         }`}>
             <label className={`flex items-center justify-between text-[11px] uppercase tracking-widest mb-4 font-bold ${
                 isHighlight ? 'text-yellow-600 dark:text-yellow-500' : 'text-slate-500 dark:text-slate-400'
@@ -34,7 +34,7 @@ const PriceInputBox = ({ name, label, isHighlight, badge }) => {
                             >
                                 <InputNumber 
                                     {...field}
-                                    className={`!w-full !rounded-2xl !border-transparent !bg-white dark:!bg-[#111727] shadow-sm hover:shadow-md focus-within:!ring-2 focus-within:!ring-yellow-500/50 transition-all duration-300 [&_.ant-input-number-handler-wrap]:hidden
+                                    className={`!w-full !rounded-2xl !border-transparent !bg-white dark:!bg-[#141416] shadow-sm hover:shadow-md focus-within:!ring-2 focus-within:!ring-yellow-500/50 transition-all duration-300 [&_.ant-input-number-handler-wrap]:hidden
                                         [&_.ant-input-number-input]:text-3xl sm:[&_.ant-input-number-input]:text-4xl [&_.ant-input-number-input]:h-16 [&_.ant-input-number-input]:!px-6 [&_.ant-input-number-input]:font-black [&_.ant-input-number-input]:text-left
                                         ${isHighlight 
                                             ? '[&_.ant-input-number-input]:text-yellow-600 dark:[&_.ant-input-number-input]:text-yellow-500' 

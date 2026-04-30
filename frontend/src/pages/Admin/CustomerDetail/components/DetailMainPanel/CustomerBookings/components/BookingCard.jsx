@@ -18,7 +18,7 @@ export const BookingCard = ({ booking, t }) => {
     } = mapBookingData(booking, t);
 
     return (
-        <div className="bg-white dark:bg-[#151b2d] rounded-2xl p-6 border border-slate-200 dark:border-white/5 hover:border-yellow-500/30 dark:hover:border-premium-gold/30 transition-all group shadow-sm hover:shadow-xl hover:shadow-yellow-500/5 dark:hover:shadow-black/20 relative overflow-hidden">
+        <div className="bg-white dark:bg-[#141416] rounded-2xl p-6 border border-slate-200 dark:border-white/5 hover:border-yellow-500/30 dark:hover:border-premium-gold/30 transition-all group shadow-sm hover:shadow-xl hover:shadow-yellow-500/5 dark:hover:shadow-black/20 relative overflow-hidden">
             <div className={`absolute inset-y-0 left-0 w-1 ${statusConfig.color}`}></div>
             
             <div className="flex justify-between items-start mb-6 pl-2">

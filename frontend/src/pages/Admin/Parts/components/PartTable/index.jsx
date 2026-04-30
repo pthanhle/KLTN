@@ -6,7 +6,7 @@ const PartTable = ({ parts, loading, paginationInfo, onChange, onEdit, onDelete,
     const columns = getPartColumns(t, onEdit, onDelete);
 
     return (
-        <div className="bg-white dark:bg-[#191f31] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/5 shadow-xl shadow-slate-200/20 dark:shadow-none">
+        <div className="bg-white dark:bg-[#141416] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/5 shadow-xl shadow-slate-200/20 dark:shadow-none">
             <div className="overflow-x-auto">
                 <Table 
                     columns={columns} 
@@ -29,11 +29,24 @@ const PartTable = ({ parts, loading, paginationInfo, onChange, onEdit, onDelete,
                     className="
                         custom-dark-table w-full 
                         [&_.ant-table]:!bg-transparent 
+
+                        /* Header Base */
                         [&_.ant-table-thead>tr>th]:!bg-slate-50 
-                        dark:[&_.ant-table-thead>tr>th]:!bg-[#151b2d]/50 
+                        dark:[&_.ant-table-thead>tr>th]:!bg-[#141416]
                         [&_.ant-table-thead>tr>th]:!border-b 
                         [&_.ant-table-thead>tr>th]:!border-slate-200 
                         dark:[&_.ant-table-thead>tr>th]:!border-white/5 
+
+                        /* Header Hover & Sorter */
+                        [&_.ant-table-thead>tr>th:hover]:!bg-slate-100 
+                        dark:[&_.ant-table-thead>tr>th:hover]:!bg-white/[0.04]
+                        [&_.ant-table-column-sort]:!bg-slate-100
+                        dark:[&_.ant-table-column-sort]:!bg-white/[0.04]
+                        dark:[&_.ant-table-column-sorter-inner]:text-slate-500
+                        dark:[&_.ant-table-column-sorter-up.active]:text-yellow-500
+                        dark:[&_.ant-table-column-sorter-down.active]:text-yellow-500
+
+                        /* Body Rows */
                         [&_.ant-table-tbody>tr>td]:!border-b 
                         [&_.ant-table-tbody>tr>td]:!border-slate-100 
                         dark:[&_.ant-table-tbody>tr>td]:!border-white/5 

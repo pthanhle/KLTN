@@ -24,7 +24,7 @@ export const CustomerServiceHistory = ({ serviceHistory, isLoading, t }) => {
                 </h3>
             </div>
             
-            <div className="bg-slate-50 dark:bg-[#151b2d] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/5">
+            <div className="bg-slate-50 dark:bg-[#141416] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/5">
                 <div className="grid grid-cols-12 gap-x-4 px-8 py-4 bg-slate-100 dark:bg-[#0c1324]/50 text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-slate-400">
                     <div className="col-span-2">{t('adminCustomers:colId', 'Mã HD')}</div>
                     <div className="col-span-4">{t('adminCustomers:colVehicleService', 'Xe / Dịch vụ')}</div>

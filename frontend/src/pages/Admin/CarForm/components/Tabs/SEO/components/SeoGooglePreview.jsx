@@ -27,7 +27,7 @@ const SeoGooglePreview = () => {
                 <div className="bg-white dark:bg-[#222225] rounded-2xl p-6 md:px-9 md:py-6 shadow-sm border border-slate-200 dark:border-white/10 transition-all z-10 relative">
                     <div className="space-y-1">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
+                            <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-[#1c1c1e] flex items-center justify-center overflow-hidden shrink-0">
                                 <span className="text-[10px] font-black text-slate-800 dark:text-white border border-slate-300 dark:border-slate-600 rounded-full w-full h-full flex items-center justify-center">
                                     {SEO_CONSTANTS.SITE_FAVICON_TEXT}
                                 </span>

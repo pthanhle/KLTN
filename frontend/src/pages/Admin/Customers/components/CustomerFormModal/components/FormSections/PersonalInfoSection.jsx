@@ -12,11 +12,11 @@ export const PersonalInfoSection = ({ t, schemas }) => {
                 <div className="w-full md:w-auto flex justify-center">
                     <div className="relative group cursor-pointer w-24 h-24">
                         <Upload name="avatar" showUploadList={false} beforeUpload={() => false}>
-                            <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-[#191f31] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-600 overflow-hidden hover:border-yellow-500 transition-colors">
+                            <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-[#141416] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-600 overflow-hidden hover:border-yellow-500 transition-colors">
                                 <Camera size={28} strokeWidth={1.5} className="text-slate-400 group-hover:text-yellow-500 transition-colors" />
                             </div>
                         </Upload>
-                        <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-[#151b2d] pointer-events-none">
+                        <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-[#141416] pointer-events-none">
                             <PenSquare size={14} strokeWidth={3} />
                         </div>
                     </div>
@@ -31,7 +31,7 @@ export const PersonalInfoSection = ({ t, schemas }) => {
                         className="mb-0 col-span-1 sm:col-span-2"
                     >
                         <Input 
-                            className="w-full h-[54px] bg-slate-50 dark:bg-white/5 border-transparent rounded-xl px-5 text-[14px] focus:bg-white dark:focus:bg-[#191f31] focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-white/10" 
+                            className="w-full h-[54px] bg-slate-50 dark:bg-white/5 border-transparent rounded-xl px-5 text-[14px] focus:bg-white dark:focus:bg-[#141416] focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-white/10" 
                             placeholder={t('adminCustomers:labelFullName', 'Nhập tên khách hàng...')} 
                         />
                     </Form.Item>
@@ -43,7 +43,7 @@ export const PersonalInfoSection = ({ t, schemas }) => {
                         className="mb-0"
                     >
                         <Input 
-                            className="w-full h-[54px] bg-slate-50 dark:bg-white/5 border-transparent rounded-xl px-5 text-[14px] focus:bg-white dark:focus:bg-[#191f31] focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-white/10" 
+                            className="w-full h-[54px] bg-slate-50 dark:bg-white/5 border-transparent rounded-xl px-5 text-[14px] focus:bg-white dark:focus:bg-[#141416] focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-white/10" 
                             placeholder="+84 ..." 
                         />
                     </Form.Item>
@@ -55,7 +55,7 @@ export const PersonalInfoSection = ({ t, schemas }) => {
                         className="mb-0"
                     >
                         <Input 
-                            className="w-full h-[54px] bg-slate-50 dark:bg-white/5 border-transparent rounded-xl px-5 text-[14px] focus:bg-white dark:focus:bg-[#191f31] focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-white/10" 
+                            className="w-full h-[54px] bg-slate-50 dark:bg-white/5 border-transparent rounded-xl px-5 text-[14px] focus:bg-white dark:focus:bg-[#141416] focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-white/10" 
                             placeholder="example@email.com" 
                         />
                     </Form.Item>
@@ -66,7 +66,7 @@ export const PersonalInfoSection = ({ t, schemas }) => {
                         className="mb-0 col-span-1 sm:col-span-2"
                     >
                         <Input 
-                            className="w-full h-[54px] bg-slate-50 dark:bg-white/5 border-transparent rounded-xl px-5 text-[14px] focus:bg-white dark:focus:bg-[#191f31] focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-white/10" 
+                            className="w-full h-[54px] bg-slate-50 dark:bg-white/5 border-transparent rounded-xl px-5 text-[14px] focus:bg-white dark:focus:bg-[#141416] focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-white/10" 
                             placeholder={t('adminCustomers:placeholderAddress', 'Thành phố, Quận/Huyện...')} 
                         />
                     </Form.Item>

@@ -12,24 +12,24 @@ const FormSelect = ({ name, control, placeholder, options, mode, allowClear, ext
                     <ConfigProvider
                         theme={{
                             token: {
-                                controlHeight: 56, // This guarantees EXACTLY 56px height while keeping everything perfectly aligned natively
-                                borderRadius: 20, // 1.25rem
+                                controlHeight: 56,
+                                borderRadius: 20,
                                 colorBgContainer: 'transparent',
                                 colorBorder: 'transparent',
                                 colorTextPlaceholder: '#94a3b8',
                             },
                             components: {
                                 Select: {
-                                    multipleItemBg: '#eab308', // yellow-500
-                                    multipleItemColor: '#0f172a', // slate-900
-                                    multipleItemHeight: 32, // larger tag height
+                                    multipleItemBg: '#eab308',
+                                    multipleItemColor: '#0f172a',
+                                    multipleItemHeight: 32,
                                     multipleItemBorderColor: 'transparent',
                                     selectorBg: 'transparent',
                                 }
                             }
                         }}
                     >
-                        <div className={`relative group w-full bg-slate-50 dark:bg-[#151b2d] border-2 border-transparent hover:border-yellow-500/30 focus-within:border-yellow-500/50 rounded-[1.25rem] transition-all shadow-sm ${extraClassName}`}>
+                        <div className={`relative group w-full bg-slate-50 dark:bg-[#1c1c1e] border-2 border-transparent dark:border-white/5 hover:border-yellow-500/30 focus-within:border-yellow-500/50 rounded-[1.25rem] transition-all shadow-sm ${extraClassName}`}>
                             <Select
                                 {...field}
                                 mode={mode}

@@ -60,7 +60,7 @@ const HeroBlockEditor = ({ control, index, handleImageUpload, t }) => {
             </div>
 
             {/* Live Visual Preview */}
-            <div className="xl:col-span-5 relative w-full h-[220px] rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 overflow-hidden group shadow-sm flex">
+            <div className="xl:col-span-5 relative w-full h-[220px] rounded-2xl bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/5 overflow-hidden group shadow-sm flex">
                 <div className={`w-full h-full flex flex-col justify-center px-8 relative z-10 text-slate-900 dark:text-white ${blockData.align === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
                     <h4 className="font-bold text-xl leading-tight mb-2">
                         {blockData.title || t('adminPartForm:phH2Title')}

@@ -17,7 +17,7 @@ export const CategorizationSection = ({ t, tiersList, schemas }) => {
                     <Select 
                         className="w-full h-[54px] bg-slate-50 dark:bg-white/5 rounded-xl border border-transparent hover:bg-slate-100 dark:hover:bg-white/10 transition-colors" 
                         variant="borderless"
-                        classNames={{ popup: '!dark:bg-[#151b2d] !bg-white' }}
+                        classNames={{ popup: '!dark:bg-[#141416] !bg-white' }}
                         options={SOURCE_OPTIONS.map(opt => ({
                             value: opt.value,
                             label: <span className="font-bold text-slate-900 dark:text-white text-[14px] leading-[36px] px-2">{t(opt.labelKey, opt.fallbackLabel)}</span>

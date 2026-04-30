@@ -29,7 +29,7 @@ const FormHeader = ({ isEditMode, onSubmit, onApply, onDraft, onDuplicate, isSav
                     type="button"
                     disabled={isSaving}
                     onClick={onDraft}
-                    className="px-6 py-2.5 flex items-center justify-center rounded-xl bg-slate-200 dark:bg-[#23293c] text-slate-700 dark:text-white font-bold shadow-sm hover:scale-105 transition-transform active:scale-95 disabled:opacity-50 text-[13px]"
+                    className="px-6 py-2.5 flex items-center justify-center rounded-xl bg-slate-200 dark:bg-[#141416] text-slate-700 dark:text-white font-bold shadow-sm hover:scale-105 transition-transform active:scale-95 disabled:opacity-50 text-[13px]"
                 >
                     {t('adminPartForm:btnDraft', 'Lưu Bản Nháp')}
                 </button>
@@ -66,7 +66,7 @@ const FormHeader = ({ isEditMode, onSubmit, onApply, onDraft, onDuplicate, isSav
                 <button
                     type="button"
                     onClick={() => navigate('/admin/parts')}
-                    className="px-6 py-2.5 flex items-center justify-center rounded-xl bg-white dark:bg-[#23293c] border border-slate-200 dark:border-white/20 text-slate-700 dark:text-white font-semibold hover:bg-slate-50 dark:hover:bg-[#2e3447] transition-colors text-[13px]"
+                    className="px-6 py-2.5 flex items-center justify-center rounded-xl bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/20 text-slate-700 dark:text-white font-semibold hover:bg-slate-50 dark:hover:bg-[#1c1c1e] transition-colors text-[13px]"
                 >
                     {t('adminPartForm:btnCancel', 'Trở Về')}
                 </button>

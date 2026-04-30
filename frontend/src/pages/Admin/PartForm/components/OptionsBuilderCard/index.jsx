@@ -8,7 +8,7 @@ const OptionsBuilderCard = ({ t }) => {
     const { control, fields, remove, handleAddOption } = useOptionsBuilder();
 
     return (
-        <section className="bg-white dark:bg-[#191f31] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
+        <section className="bg-white dark:bg-[#141416] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
             <div className="flex items-center gap-3 mb-8">
                 <Settings2 className="text-yellow-500" size={24} />
                 <h3 className="text-lg font-bold uppercase tracking-wider text-slate-800 dark:text-white">
@@ -18,7 +18,7 @@ const OptionsBuilderCard = ({ t }) => {
 
             <div className="space-y-4">
                 {fields.map((field, index) => (
-                    <div key={field.id} className="relative p-6 pt-10 bg-slate-50 dark:bg-[#151b2d] rounded-3xl border-2 border-transparent hover:border-yellow-500/20 transition-all group">
+                    <div key={field.id} className="relative p-6 pt-10 bg-slate-50 dark:bg-[#1c1c1e] rounded-3xl border-2 border-transparent hover:border-yellow-500/20 transition-all group">
                         <button
                             type="button"
                             onClick={() => remove(index)}
@@ -58,7 +58,7 @@ const OptionsBuilderCard = ({ t }) => {
                 <button
                     type="button"
                     onClick={handleAddOption}
-                    className="w-full py-4 rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-yellow-500/50 hover:bg-yellow-500/5 text-slate-500 dark:text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-3xl border-2 border-dashed border-slate-300 dark:border-white/10 hover:border-yellow-500/50 hover:bg-yellow-500/5 text-slate-500 dark:text-slate-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2"
                 >
                     <Plus size={18} strokeWidth={3} />
                     {t('adminPartForm:setupOption')}

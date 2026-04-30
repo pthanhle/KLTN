@@ -8,7 +8,7 @@ const SeoBuilderCard = ({ t }) => {
 
 
     return (
-        <section className="bg-white dark:bg-[#191f31] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
+        <section className="bg-white dark:bg-[#141416] rounded-2xl p-8 shadow-xl shadow-slate-200/20 dark:shadow-none border border-slate-200 dark:border-white/5">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                     <Globe className="text-blue-500" size={24} />

@@ -10,7 +10,7 @@ const BuilderHeader = ({ handleSaveDraft, handlePublish, isSubmitting }) => {
         <header className="w-full bg-transparent flex-shrink-0 z-10 relative pt-8 pb-4">
             <div className="w-full max-w-[1600px] mx-auto px-6 md:px-10 xl:px-12 flex justify-between items-center">
                 <div className="flex items-center gap-5">
-                    <button onClick={() => window.location.replace('/admin/cars')} className="hidden md:flex p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors hover:bg-slate-200/50 dark:hover:bg-[#191f31] rounded-lg cursor-pointer border border-transparent">
+                    <button onClick={() => window.location.replace('/admin/cars')} className="hidden md:flex p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors hover:bg-slate-200/50 dark:hover:bg-[#1c1c1e] rounded-lg cursor-pointer border border-transparent">
                         <ArrowLeft size={20} />
                     </button>
                     <div className="flex flex-col">
@@ -26,7 +26,7 @@ const BuilderHeader = ({ handleSaveDraft, handlePublish, isSubmitting }) => {
                         type="button"
                         onClick={handleSaveDraft}
                         disabled={isSubmitting}
-                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 dark:bg-[#191f31] text-slate-600 dark:text-slate-300 text-[13px] font-bold hover:bg-slate-200 dark:hover:bg-[#2e3447] transition-all border border-transparent cursor-pointer shadow-sm disabled:opacity-50"
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 dark:bg-[#141416] text-slate-600 dark:text-slate-300 text-[13px] font-bold hover:bg-slate-200 dark:hover:bg-[#27272a] transition-all border border-transparent cursor-pointer shadow-sm disabled:opacity-50"
                     >
                         {isSubmitting && <Loader2 size={14} className="animate-spin" />}
                         {t('saveDraftBtn', 'Lưu Nháp')}

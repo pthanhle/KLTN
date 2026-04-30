@@ -16,7 +16,7 @@ const VideoGridItem = ({ video, index, onRemove }) => {
         <div className="group relative flex items-center gap-6 p-5 bg-white dark:bg-[#1a1a1c]/40 border border-slate-100 dark:border-white/5 rounded-[32px] hover:border-yellow-500/50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] transition-all duration-500">
             <div 
                 onClick={handleOpenVideo}
-                className="relative w-48 aspect-video rounded-2xl overflow-hidden shadow-lg flex-shrink-0 bg-slate-200 dark:bg-slate-800 cursor-pointer group/thumb"
+                className="relative w-48 aspect-video rounded-2xl overflow-hidden shadow-lg flex-shrink-0 bg-slate-200 dark:bg-[#1c1c1e] cursor-pointer group/thumb"
             >
                 {video.thumbnail ? (
                     <Image 

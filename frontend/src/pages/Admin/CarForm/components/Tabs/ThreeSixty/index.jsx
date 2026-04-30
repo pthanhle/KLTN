@@ -22,7 +22,7 @@ const ThreeSixtyTab = ({ form }) => {
                 </div>
                 
                 <div className="flex items-center gap-4 pb-1">
-                    <div className="px-4 py-2 bg-slate-100 dark:bg-[#23293c] rounded-full flex items-center gap-2 border border-slate-200 dark:border-white/10">
+                    <div className="px-4 py-2 bg-slate-100 dark:bg-[#1c1c1e] rounded-full flex items-center gap-2 border border-slate-200 dark:border-white/10">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
                         <span className="text-[10px] uppercase tracking-widest font-bold text-slate-600 dark:text-emerald-400">
                             {t('tab360StatusReady', 'System Ready')}

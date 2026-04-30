@@ -20,7 +20,7 @@ const StatusCard = () => {
                     getValueFromEvent={(checked) => !checked}
                     className="mb-0"
                 >
-                    <Switch className="bg-slate-300 dark:bg-[#2e3447] scale-110" />
+                    <Switch className="bg-slate-300 dark:bg-[#1c1c1e] scale-110" />
                 </Form.Item>
             </div>
             
@@ -32,7 +32,7 @@ const StatusCard = () => {
                     <span className="text-[12px] font-medium text-slate-500 dark:text-slate-400 mt-1">{t('isDemoDesc', 'Kích hoạt đăng ký Test Drive trực tuyến')}</span>
                 </div>
                 <Form.Item name="isDemoAvailable" valuePropName="checked" className="mb-0">
-                    <Switch className="bg-slate-300 dark:bg-[#2e3447] scale-110" />
+                    <Switch className="bg-slate-300 dark:bg-[#1c1c1e] scale-110" />
                 </Form.Item>
             </div>
         </div>

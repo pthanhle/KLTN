@@ -11,7 +11,7 @@ import { FormProvider } from 'react-hook-form';
 
 const ServicesPage = () => {
     const { t } = useTranslation(['services']);
-    
+
     const {
         methods,
         currentStep,
@@ -26,6 +26,7 @@ const ServicesPage = () => {
         isSubmitting,
         isStep1Valid,
         isStep2Valid,
+        isServicesLoading,
         updateBookingData,
         handleServiceToggle,
         handleNextStep,
@@ -41,60 +42,58 @@ const ServicesPage = () => {
 
             <FormProvider {...methods}>
                 <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1440px]">
-                    {/* Stepper Logic */}
                     <BookingStepper currentStep={currentStep} t={t} />
 
-                {/* Main Content Layout */}
-                <div className="flex flex-col-reverse lg:flex-row gap-12 lg:gap-16 items-start justify-between w-full mt-4 md:mt-12 xl:px-8">
-                    
-                    {/* Left Column Wrapper (Steps) */}
-                    <div className="flex-1 w-full max-w-4xl mx-auto lg:mx-0">
-                        {currentStep === 1 && (
-                            <Step1_VehicleInfo 
-                                bookingData={bookingData} 
-                                updateBookingData={updateBookingData}
-                                handleNextStep={handleNextStep}
-                                categories={categories}
-                                vehicleBrands={vehicleBrands}
-                                selectedCategory={selectedCategory}
-                                setSelectedCategory={setSelectedCategory}
-                                filteredServices={filteredServices}
-                                handleServiceToggle={handleServiceToggle}
-                                isStep1Valid={isStep1Valid}
-                                t={t}
-                            />
-                        )}
+                    <div className="flex flex-col-reverse lg:flex-row gap-12 lg:gap-16 items-start justify-between w-full mt-4 md:mt-12 xl:px-8">
 
-                        {currentStep === 2 && (
-                            <Step2_Schedule 
-                                bookingData={bookingData}
-                                updateBookingData={updateBookingData}
-                                handleNextStep={handleNextStep}
-                                handlePrevStep={handlePrevStep}
-                                timeSlots={timeSlots}
-                                t={t}
-                            />
-                        )}
-                        {currentStep === 3 && (
-                            <Step3_Review 
-                                bookingData={bookingData}
-                                handlePrevStep={handlePrevStep}
-                                handleSubmitBooking={handleSubmitBooking}
-                                isSubmitting={isSubmitting}
-                                t={t}
-                            />
-                        )}
+                        <div className="flex-1 w-full max-w-4xl mx-auto lg:mx-0">
+                            {currentStep === 1 && (
+                                <Step1_VehicleInfo
+                                    bookingData={bookingData}
+                                    updateBookingData={updateBookingData}
+                                    handleNextStep={handleNextStep}
+                                    categories={categories}
+                                    vehicleBrands={vehicleBrands}
+                                    selectedCategory={selectedCategory}
+                                    setSelectedCategory={setSelectedCategory}
+                                    filteredServices={filteredServices}
+                                    handleServiceToggle={handleServiceToggle}
+                                    isStep1Valid={isStep1Valid}
+                                    isServicesLoading={isServicesLoading}
+                                    t={t}
+                                />
+                            )}
+
+                            {currentStep === 2 && (
+                                <Step2_Schedule
+                                    bookingData={bookingData}
+                                    updateBookingData={updateBookingData}
+                                    handleNextStep={handleNextStep}
+                                    handlePrevStep={handlePrevStep}
+                                    timeSlots={timeSlots}
+                                    t={t}
+                                />
+                            )}
+                            {currentStep === 3 && (
+                                <Step3_Review
+                                    bookingData={bookingData}
+                                    handlePrevStep={handlePrevStep}
+                                    handleSubmitBooking={handleSubmitBooking}
+                                    isSubmitting={isSubmitting}
+                                    t={t}
+                                />
+                            )}
+                        </div>
+
+                        {/* Right Column Summary Sidebar */}
+                        <BookingSummary
+                            bookingData={bookingData}
+                            currentStep={currentStep}
+                            t={t}
+                        />
+
                     </div>
-
-                    {/* Right Column Summary Sidebar */}
-                    <BookingSummary 
-                        bookingData={bookingData} 
-                        currentStep={currentStep} 
-                        t={t} 
-                    />
-
                 </div>
-            </div>
             </FormProvider>
         </div>
     );

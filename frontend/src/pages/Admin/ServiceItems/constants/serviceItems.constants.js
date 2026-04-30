@@ -6,7 +6,7 @@ export const CATEGORY_OPTIONS = [
 ];
 
 export const PRICE_TYPE_OPTIONS = [
-    { value: 'FIXED', label: 'FIXED' },
-    { value: 'STARTING_AT', label: 'STARTING_AT' },
-    { value: 'CONTACT', label: 'CONTACT' },
+    { value: 'FIXED', label: 'Cố Định', tKey: 'form_price_fixed' },
+    { value: 'STARTING_AT', label: 'Từ Giá', tKey: 'form_price_starting' },
+    { value: 'CONTACT', label: 'Liên Hệ', tKey: 'form_price_contact' },
 ];

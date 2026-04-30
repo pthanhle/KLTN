@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-    LayoutDashboard, 
-    Box, 
-    Layers, 
-    Users, 
-    ShoppingCart, 
-    Wrench, 
-    UserCog, 
-    TicketPercent, 
-    CarFront, 
+import {
+    LayoutDashboard,
+    Box,
+    Layers,
+    Users,
+    ShoppingCart,
+    Wrench,
+    UserCog,
+    TicketPercent,
+    CarFront,
     TrendingUp,
     Tag,
     Settings,

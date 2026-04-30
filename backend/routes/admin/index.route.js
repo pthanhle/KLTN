@@ -8,7 +8,8 @@ import customerRoutes from './customer.route.js'
 import orderRoutes from './order.route.js'
 import dashboardRoutes from './dashboard.route.js'
 import staffRoutes from './staff.route.js'
-import servicePackageRoutes from './servicePackage.route.js'
+import serviceItemRoutes from './serviceItem.route.js'
+import serviceCategoryRoutes from './serviceCategory.route.js'
 import promotionRoutes from './promotion.route.js'
 import tradeinVehicleRoutes from './tradeinVehicle.route.js'
 import revenueReportRoutes from './revenuereport.route.js'
@@ -26,7 +27,8 @@ router.use('/customers', customerRoutes)
 router.use('/orders', orderRoutes)
 router.use('/dashboard', dashboardRoutes)
 router.use('/staff', staffRoutes)
-router.use('/service-packages', servicePackageRoutes)
+router.use('/service-items', serviceItemRoutes)
+router.use('/service-categories', serviceCategoryRoutes)
 router.use('/promotions', promotionRoutes)
 router.use('/tradein-vehicles', tradeinVehicleRoutes)
 router.use('/revenue-reports', revenueReportRoutes)

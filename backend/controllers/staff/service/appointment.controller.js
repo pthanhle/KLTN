@@ -1,5 +1,5 @@
 import Booking from '../../../models/bookingModel.js'
-import ServicePackage from '../../../models/servicepackageModel.js'
+import ServiceItem from '../../../models/serviceItemModel.js'
 import User from '../../../models/userModel.js'
 import Notification from '../../../models/notificationModel.js'
 import asyncHandler from 'express-async-handler'

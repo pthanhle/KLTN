@@ -1,0 +1,21 @@
+{
+  "title": "Attendance Details",
+  "subtitle": "Employee Attendance Tracking & Performance Metrics",
+  "stat_work_days": "Actual Work Days",
+  "stat_late_days": "Late Days",
+  "stat_overtime": "Overtime",
+  "stat_score": "Attendance Score",
+  "table_title": "Attendance Log",
+  "btn_export": "Export",
+  "col_date": "Date",
+  "col_shift": "Shift",
+  "col_clock_in": "Clock In",
+  "col_clock_out": "Clock Out",
+  "col_status": "Status",
+  "col_method": "Method",
+  "col_notes": "Notes",
+  "status_on_time": "ON TIME",
+  "status_late": "LATE",
+  "status_absent": "ABSENT",
+  "status_day_off": "DAY OFF"
+}

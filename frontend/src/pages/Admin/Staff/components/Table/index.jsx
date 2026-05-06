@@ -54,6 +54,14 @@ export const StaffTable = ({ data, isLoading, t, navigate, paginationInfo, onCha
                         hover:[&_.ant-table-tbody>tr]:!bg-slate-50 
                         dark:hover:[&_.ant-table-tbody>tr]:!bg-white/[0.02]
 
+                        /* Fixed Columns Background Fix */
+                        [&_.ant-table-thead>tr>th:last-child]:!bg-slate-50
+                        dark:[&_.ant-table-thead>tr>th:last-child]:!bg-[#141416]
+                        [&_.ant-table-tbody>tr>td:last-child]:!bg-white
+                        dark:[&_.ant-table-tbody>tr>td:last-child]:!bg-[#141416]
+                        [&_.ant-table-tbody>tr:hover>td:last-child]:!bg-slate-50
+                        dark:[&_.ant-table-tbody>tr:hover>td:last-child]:!bg-[#1c1c1e]
+
                         /* Padding Adjustments */
                         [&_.ant-table-thead>tr>th:first-child]:!pl-8
                         [&_.ant-table-tbody>tr>td:first-child]:!pl-8

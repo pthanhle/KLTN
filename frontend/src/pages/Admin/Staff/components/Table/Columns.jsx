@@ -25,10 +25,15 @@ export const getColumns = (t, navigate) => [
         key: 'employee',
         width: 300,
         render: (text, record) => (
-            <div className="flex items-center gap-5 whitespace-nowrap">
+            <div 
+                className="flex items-center gap-5 whitespace-nowrap cursor-pointer group/name"
+                onClick={() => navigate(`/admin/staff/${record._id}`)}
+            >
                 <AvatarRenderer url={record.avatarUrl} name={text} />
                 <div className="min-w-0">
-                    <div className="font-semibold text-slate-900 dark:text-white text-base truncate">{text}</div>
+                    <div className="font-semibold text-slate-900 dark:text-white text-base truncate group-hover/name:text-yellow-600 dark:group-hover/name:text-yellow-500 transition-colors">
+                        {text}
+                    </div>
                     <div className="text-slate-500 dark:text-[#d3c5ac] text-xs mt-0.5 truncate">ID: {record.employeeId}</div>
                 </div>
             </div>

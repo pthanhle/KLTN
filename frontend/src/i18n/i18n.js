@@ -48,6 +48,14 @@ import enAdminServiceItems from '../locales/en/adminServiceItems.json';
 import viAdminServiceItems from '../locales/vi/adminServiceItems.json';
 import enAdminStaff from '../locales/en/adminStaff.json';
 import viAdminStaff from '../locales/vi/adminStaff.json';
+import enAdminStaffDetail from '../locales/en/adminStaffDetail.json';
+import viAdminStaffDetail from '../locales/vi/adminStaffDetail.json';
+import enAdminStaffAttendance from '../locales/en/adminStaffAttendance.json';
+import viAdminStaffAttendance from '../locales/vi/adminStaffAttendance.json';
+import enAdminStaffCompliance from '../locales/en/adminStaffCompliance.json';
+import viAdminStaffCompliance from '../locales/vi/adminStaffCompliance.json';
+import enAdminStaffCreate from '../locales/en/adminStaffCreate.json';
+import viAdminStaffCreate from '../locales/vi/adminStaffCreate.json';
 
 i18n
     .use(initReactI18next)
@@ -78,6 +86,10 @@ i18n
                 partDetail: enPartDetail,
                 adminServiceItems: enAdminServiceItems,
                 adminStaff: enAdminStaff,
+                adminStaffDetail: enAdminStaffDetail,
+                adminStaffAttendance: enAdminStaffAttendance,
+                adminStaffCompliance: enAdminStaffCompliance,
+                adminStaffCreate: enAdminStaffCreate,
             },
             vi: {
                 translation: viTranslation,
@@ -104,6 +116,10 @@ i18n
                 partDetail: viPartDetail,
                 adminServiceItems: viAdminServiceItems,
                 adminStaff: viAdminStaff,
+                adminStaffDetail: viAdminStaffDetail,
+                adminStaffAttendance: viAdminStaffAttendance,
+                adminStaffCompliance: viAdminStaffCompliance,
+                adminStaffCreate: viAdminStaffCreate,
             },
         },
         lng: 'vi',

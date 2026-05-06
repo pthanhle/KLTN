@@ -61,5 +61,11 @@
     "perk_2": "Hỗ trợ xe đi lại tạm thời (Đủ điều kiện)",
     "perk_3": "Rửa xe VIP chi tiết khi xuất xưởng",
     "processing": "Đang xử lý...",
-    "booking_success": "Đặt lịch thành công! Nhân viên sẽ sớm liên hệ lại với bạn."
+    "booking_success": "Đặt lịch thành công! Nhân viên sẽ sớm liên hệ lại với bạn.",
+    "error_brand_required": "Vui lòng chọn hãng xe",
+    "error_model_required": "Vui lòng nhập dòng xe",
+    "error_license_required": "Vui lòng nhập biển số xe",
+    "error_service_required": "Vui lòng chọn ít nhất một dịch vụ",
+    "error_date_required": "Vui lòng chọn ngày",
+    "error_time_required": "Vui lòng chọn khung giờ"
 }

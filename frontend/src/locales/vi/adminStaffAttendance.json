@@ -1,0 +1,21 @@
+{
+  "title": "Chi tiết Chấm công",
+  "subtitle": "Theo dõi lịch trình đi làm & Mức độ chuyên cần",
+  "stat_work_days": "Ngày công thực tế",
+  "stat_late_days": "Số ngày đi trễ",
+  "stat_overtime": "Giờ tăng ca",
+  "stat_score": "Điểm chuyên cần",
+  "table_title": "Nhật ký chấm công",
+  "btn_export": "Xuất dữ liệu",
+  "col_date": "Ngày",
+  "col_shift": "Ca làm",
+  "col_clock_in": "Giờ vào",
+  "col_clock_out": "Giờ ra",
+  "col_status": "Trạng thái",
+  "col_method": "Phương thức",
+  "col_notes": "Ghi chú",
+  "status_on_time": "ĐÚNG GIỜ",
+  "status_late": "ĐI TRỄ",
+  "status_absent": "VẮNG MẶT",
+  "status_day_off": "NGHỈ PHÉP"
+}

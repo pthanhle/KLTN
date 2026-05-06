@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { StaffHeader } from './components/StaffHeader';
 import { StaffToolbar } from './components/StaffToolbar';
 import { StaffTable } from './components/Table';
 import { useStaffTableLogic } from './hooks/useStaffTableLogic';
+import { CreateStaffDrawer } from './components/CreateStaffDrawer';
 
 const StaffManagement = () => {
     const { t } = useTranslation(['adminStaff', 'common']);
     const navigate = useNavigate();
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const {
         data,
@@ -31,7 +33,7 @@ const StaffManagement = () => {
                 <StaffHeader
                     t={t}
                     breadcrumbItems={breadcrumbItems}
-                    onAddStaff={() => console.log('Open Add Staff Modal/Drawer')}
+                    onAddStaff={() => setIsDrawerOpen(true)}
                 />
 
                 <StaffToolbar
@@ -53,6 +55,10 @@ const StaffManagement = () => {
                     onChange={handleTableChange}
                 />
 
+                <CreateStaffDrawer 
+                    isOpen={isDrawerOpen} 
+                    onClose={() => setIsDrawerOpen(false)} 
+                />
             </div>
         </div>
     );

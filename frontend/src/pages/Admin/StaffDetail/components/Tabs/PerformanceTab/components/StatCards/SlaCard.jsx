@@ -1,0 +1,28 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Clock } from 'lucide-react';
+
+export const SlaCard = ({ avgTime, unit }) => {
+    const { t } = useTranslation();
+
+    return (
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-6 border border-slate-200 dark:border-white/5 relative overflow-hidden group hover:border-indigo-500/30 transition-colors shadow-sm dark:shadow-none">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+            <div className="relative z-10">
+                <p className="font-medium uppercase tracking-widest text-xs text-slate-500 dark:text-gray-400 mb-4 flex items-center gap-2">
+                    <Clock size={14} />
+                    {t('adminStaffDetail:perf_avg_sla', 'SLA Xử lý trung bình')}
+                </p>
+                <div className="flex items-baseline gap-2 mb-2">
+                    <h2 className="text-4xl font-bold text-slate-800 dark:text-white tracking-tight">
+                        {avgTime}
+                    </h2>
+                    <span className="text-sm font-medium text-slate-500 dark:text-gray-400">{unit}</span>
+                </div>
+                <p className="text-[10px] font-medium uppercase tracking-widest text-indigo-500 mt-4">
+                    {t('adminStaffDetail:perf_sla_desc')}
+                </p>
+            </div>
+        </div>
+    );
+};

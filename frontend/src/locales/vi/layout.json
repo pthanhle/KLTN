@@ -92,10 +92,13 @@
   "admin": {
     "sider": {
       "dashboard": "Tổng quan",
-      "products": "Sản phẩm",
+      "cars": "Kho xe",
       "categories": "Danh mục",
+      "brands": "Thương hiệu",
+      "parts": "Phụ tùng",
       "customers": "Khách hàng",
       "orders": "Đơn hàng",
+      "test-drive-bookings": "Lái thử",
       "service-packages": "Gói dịch vụ",
       "staff": "Nhân viên",
       "promotions": "Khuyến mãi",

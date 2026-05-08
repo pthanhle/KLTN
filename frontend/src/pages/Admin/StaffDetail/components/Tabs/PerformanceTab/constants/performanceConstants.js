@@ -5,6 +5,7 @@ export const KANBAN_STATUS = {
 };
 
 export const TASK_PRIORITY = {
+    URGENT: 'URGENT',
     HIGH: 'HIGH',
     MEDIUM: 'MEDIUM',
     LOW: 'LOW'

@@ -7,26 +7,26 @@ import { SHOWROOM_BRANCHES } from '../../../../../Customer/TestDriveBooking/data
 export const filterTestDrivesByStatus = (drives, filterType) => {
     if (!drives || drives.length === 0) return [];
     
-    // 'upcoming': Trạng thái 1 (Chờ xác nhận), 2 (Chốt lịch), 3 (Đang diễn ra)
-    // 'history': Trạng thái 4 (Hoàn thành), 5 (Đã hủy)
+    // 'upcoming': Pending, Confirmed, InProgress
+    // 'history': Completed, Cancelled
     if (filterType === 'upcoming') {
-        return drives.filter(d => [1, 2, 3].includes(d.booking_status));
+        return drives.filter(d => ['Pending', 'Confirmed', 'InProgress'].includes(d.status));
     }
     
-    return drives.filter(d => [4, 5].includes(d.booking_status));
+    return drives.filter(d => ['Completed', 'Cancelled'].includes(d.status));
 };
 
 export const formatDriveLocation = (drive, t) => {
-    if (drive.test_drive_type === 'showroom') {
-        const branch = SHOWROOM_BRANCHES.find(b => b.id === drive.showroom_branch);
-        return branch ? branch.name : (drive.delivery_address || t('showroom_tt_auto', 'Showroom TT AUTO'));
+    if (drive.bookingType === 'showroom') {
+        const branch = SHOWROOM_BRANCHES.find(b => b.id === drive.showroomBranch);
+        return branch ? branch.name : (drive.addressDetail || t('showroom_tt_auto', 'Showroom TT AUTO'));
     }
     
-    if (typeof drive.delivery_address === 'object' && drive.delivery_address !== null) {
-        return `${drive.delivery_address.street}, ${drive.delivery_address.ward}, ${drive.delivery_address.district}, ${drive.delivery_address.city}`;
+    if (drive.bookingType === 'home' && drive.city) {
+        return `${drive.addressDetail}, ${drive.ward}, ${drive.district}, ${drive.city}`;
     }
     
-    return drive.delivery_address || t('updating', 'Đang cập nhật');
+    return drive.addressDetail || t('updating', 'Đang cập nhật');
 };
 
 export const formatDriveDate = (dateString) => {

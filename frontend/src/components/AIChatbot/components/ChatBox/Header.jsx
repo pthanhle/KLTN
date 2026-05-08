@@ -5,7 +5,7 @@ import IconButton from '../common/IconButton';
 
 const Header = ({ onClose, t }) => {
     return (
-        <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#1a1c23] border-b border-gray-100 dark:border-white/5 rounded-t-2xl shadow-sm z-20 relative">
+        <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#1c1c1e] border-b border-gray-100 dark:border-white/5 rounded-t-2xl shadow-sm z-20 relative">
             <div className="flex items-center gap-2">
                 <IconButton icon={Menu} className="md:hidden" />
                 <div className="w-8 h-8 flex items-center justify-center shrink-0">

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Drawer, Button } from 'antd';
+import { Modal, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { UserPlus, X } from 'lucide-react';
 import { StaffFormFields } from './components/FormFields';
 import { useCreateStaff } from '../../hooks/useCreateStaff';
 
-export const CreateStaffDrawer = ({ isOpen, onClose }) => {
+export const CreateStaffModal = ({ isOpen, onClose }) => {
     const { t } = useTranslation(['adminStaffCreate', 'common']);
 
     const { methods, isSubmitting, handleCreateSubmit, resetForm } = useCreateStaff(onClose, t);
@@ -17,7 +17,7 @@ export const CreateStaffDrawer = ({ isOpen, onClose }) => {
     };
 
     return (
-        <Drawer
+        <Modal
             title={
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-yellow-500/10 text-yellow-500 rounded-lg">
@@ -33,38 +33,39 @@ export const CreateStaffDrawer = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             }
-            placement="right"
-            size="large"
-            onClose={handleClose}
+            centered
+            width={700}
+            onCancel={handleClose}
             open={isOpen}
             closeIcon={<X size={20} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors" />}
-            className="dark:bg-[#1c1c1e] [&_.ant-drawer-header]:dark:border-white/5 [&_.ant-drawer-header]:dark:bg-[#1c1c1e] [&_.ant-drawer-body]:dark:bg-[#1c1c1e] [&_.ant-drawer-footer]:dark:border-white/5 [&_.ant-drawer-footer]:dark:bg-[#1c1c1e]"
+            className="dark:bg-[#1c1c1e] [&_.ant-modal-content]:dark:bg-[#1c1c1e] [&_.ant-modal-header]:dark:bg-[#1c1c1e] [&_.ant-modal-header]:dark:border-white/5 [&_.ant-modal-footer]:dark:border-white/5 [&_.ant-modal-content]:dark:border [&_.ant-modal-content]:dark:border-white/10"
             footer={
-                <div className="flex justify-end gap-3 py-2">
-                    <Button
+                <div className="flex justify-end gap-3 pt-4 mt-6 border-t border-slate-100 dark:border-white/5">
+                    <button
+                        type="button"
                         onClick={handleClose}
-                        className="h-10 px-6 rounded-lg font-medium border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:!text-slate-800 dark:hover:!text-white hover:!border-slate-300 dark:hover:!border-white/20"
                         disabled={isSubmitting}
+                        className="group flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-[#1c1c1e] hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white rounded-full font-black text-[11px] tracking-widest uppercase active:scale-95 transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                     >
                         {t('adminStaffCreate:btn_cancel', 'Hủy bỏ')}
-                    </Button>
-                    <Button
+                    </button>
+                    <button
+                        type="button"
                         onClick={handleCreateSubmit}
-                        type="primary"
-                        className="h-10 px-6 rounded-lg font-bold bg-yellow-500 hover:!bg-yellow-400 text-slate-900 border-none flex items-center gap-2"
-                        loading={isSubmitting}
+                        disabled={isSubmitting}
+                        className="group flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-yellow-500 dark:hover:bg-yellow-400 text-white dark:text-slate-900 rounded-full font-black text-[11px] tracking-widest uppercase shadow-xl shadow-slate-900/20 dark:shadow-yellow-500/20 active:scale-95 transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting
                             ? t('adminStaffCreate:btn_submitting', 'Đang xử lý...')
                             : t('adminStaffCreate:btn_submit', 'Tạo tài khoản')
                         }
-                    </Button>
+                    </button>
                 </div>
             }
         >
-            <form onSubmit={handleCreateSubmit} className="flex flex-col">
+            <form onSubmit={handleCreateSubmit} className="flex flex-col mt-6">
                 <StaffFormFields t={t} control={control} errors={errors} />
             </form>
-        </Drawer>
+        </Modal>
     );
 };

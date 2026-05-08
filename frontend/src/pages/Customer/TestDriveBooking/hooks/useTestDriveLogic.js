@@ -4,10 +4,10 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-import { getMockCarDetail } from '../../CarDetail/data/carDetail.mock';
 import { TIME_SLOTS, SHOWROOM_BRANCHES } from '../data/testDrive.mock';
 import { getBookingSchema } from '../schemas/bookingSchema';
 import { mapRescheduleDataToForm, mapFormToBookingPayload } from '../utils/bookingFormMapper';
+import { useClientProductDetailQuery } from '../../../../services/queries/clientProduct.queries';
 import { useGetTestDriveById, useSubmitTestDrive } from '../../../../services/queries/bookingQueries';
 import { useGetCheckoutProfile } from '../../../../services/queries/checkoutQueries';
 import { useLocationCascade } from './useLocationCascade';
@@ -33,6 +33,7 @@ export const useTestDriveLogic = () => {
     }, [fetchError, t, navigate]);
 
     const submitMutation = useSubmitTestDrive();
+    const { data: realCar, isLoading: isCarLoading } = useClientProductDetailQuery(id);
     const [car, setCar] = useState(null);
 
     const timeSlots = TIME_SLOTS;
@@ -52,12 +53,13 @@ export const useTestDriveLogic = () => {
     }, [defaultVals, methods]);
 
     useEffect(() => {
-        const mockCar = getMockCarDetail(id);
-        setCar(mockCar);
-        if (mockCar && !mockCar.isDemoAvailable) {
-            methods.setValue('bookingType', 'waitlist');
+        if (realCar) {
+            setCar(realCar);
+            if (!realCar.isDemoAvailable) {
+                methods.setValue('bookingType', 'waitlist');
+            }
         }
-    }, [id, methods]);
+    }, [realCar, methods]);
 
     // Phân tách Logic Đổ dữ liệu cấp tỉnh huyện ra một Custom Hook độc lập
     const locationData = useLocationCascade(methods);
@@ -83,7 +85,7 @@ export const useTestDriveLogic = () => {
 
     return {
         car,
-        isLoading: submitMutation.isPending,
+        isLoading: submitMutation.isPending || isCarLoading,
         isReschedule,
         handleCancel,
         methods,

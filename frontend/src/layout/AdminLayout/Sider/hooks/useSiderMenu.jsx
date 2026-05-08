@@ -13,7 +13,8 @@ import {
     TrendingUp,
     Tag,
     Settings,
-    Car
+    Car,
+    CalendarCheck
 } from 'lucide-react';
 
 export const useSiderMenu = (collapsed) => {
@@ -21,8 +22,7 @@ export const useSiderMenu = (collapsed) => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Responsive icon sizes
-    const iconSize = 24; // Cố định kích thước to
+    const iconSize = 24;
 
     const menuItems = [
         {
@@ -59,6 +59,11 @@ export const useSiderMenu = (collapsed) => {
             key: '/admin/orders',
             icon: <ShoppingCart size={iconSize} />,
             label: t('admin.sider.orders'),
+        },
+        {
+            key: '/admin/test-drive-bookings',
+            icon: <CalendarCheck size={iconSize} />,
+            label: t('admin.sider.test-drive-bookings', 'Lái Thử'),
         },
         {
             key: '/admin/service-packages',

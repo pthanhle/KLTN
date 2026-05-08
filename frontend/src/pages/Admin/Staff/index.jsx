@@ -5,7 +5,7 @@ import { StaffHeader } from './components/StaffHeader';
 import { StaffToolbar } from './components/StaffToolbar';
 import { StaffTable } from './components/Table';
 import { useStaffTableLogic } from './hooks/useStaffTableLogic';
-import { CreateStaffDrawer } from './components/CreateStaffDrawer';
+import { CreateStaffModal } from './components/CreateStaffModal';
 
 const StaffManagement = () => {
     const { t } = useTranslation(['adminStaff', 'common']);
@@ -55,7 +55,7 @@ const StaffManagement = () => {
                     onChange={handleTableChange}
                 />
 
-                <CreateStaffDrawer 
+                <CreateStaffModal 
                     isOpen={isDrawerOpen} 
                     onClose={() => setIsDrawerOpen(false)} 
                 />

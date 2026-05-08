@@ -1,4 +1,4 @@
-import { mockTestDrives } from '../../pages/Shared/Profile/pages/TestDriveHistory/data/testDriveHistory.mock';
+import { GLOBAL_TEST_DRIVES } from '../mock/globalTestDrive.mock';
 
 /**
  * Thư mục API Tập trung (Centralized Services Architect)
@@ -8,13 +8,12 @@ export const BookingAPI = {
     // API GET - Lấy danh sách lịch hẹn của User hiện tại (Mock)
     getTestDriveList: async () => {
         await new Promise((resolve) => setTimeout(resolve, 800));
-        return mockTestDrives;
+        return GLOBAL_TEST_DRIVES;
     },
 
-    // API GET - Lấy thông tin lịch sử từ ID URL
     getTestDriveById: async (id) => {
-        await new Promise((resolve) => setTimeout(resolve, 800)); // Giả lập ping mạng
-        const drive = mockTestDrives.find(d => d.booking_code === id);
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        const drive = GLOBAL_TEST_DRIVES.find(d => d._id === id);
         if (!drive) throw new Error('Booking not found');
         return drive;
     },
@@ -23,7 +22,7 @@ export const BookingAPI = {
     submitTestDrive: async (payload) => {
         await new Promise((resolve) => setTimeout(resolve, 1500));
         console.log('[API Global Service] => Đã gửi Request:', payload);
-        
+
         return {
             status: 200,
             success: true,

@@ -10,7 +10,7 @@ const TicketDetails = ({ drive, t }) => {
                         {t('booking_id', 'Mã Đặt Lịch')}
                     </div>
                     <div className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter transition-colors duration-300">
-                        #{drive.booking_code}
+                        #{drive._id}
                     </div>
                 </div>
             </div>
@@ -23,7 +23,7 @@ const TicketDetails = ({ drive, t }) => {
                     <div>
                         <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">{t('date', 'Ngày hẹn')}</div>
                         <div className="text-sm font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300 whitespace-nowrap">
-                            {formatDriveDate(drive.booking_date)}
+                            {formatDriveDate(drive.selectedDate)}
                         </div>
                     </div>
                 </div>
@@ -34,7 +34,7 @@ const TicketDetails = ({ drive, t }) => {
                     </div>
                     <div>
                         <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">{t('time', 'Giờ hẹn')}</div>
-                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300 whitespace-nowrap">{drive.time_slot}</div>
+                        <div className="text-sm font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300 whitespace-nowrap">{drive.selectedTimeSlot}</div>
                     </div>
                 </div>
 
@@ -51,13 +51,13 @@ const TicketDetails = ({ drive, t }) => {
                 </div>
             </div>
 
-            {drive.customer_note && (
+            {drive.note && (
                 <div className="mt-8 bg-slate-50 dark:bg-[#0a0a0b] p-4 rounded-2xl border-l-[3px] border-yellow-500 border-t border-b border-r border-t-slate-100 border-b-slate-100 border-r-slate-100 dark:border-t-white/5 dark:border-b-white/5 dark:border-r-white/5 transition-colors duration-300">
                     <div className="flex items-center gap-2 mb-2">
                         <MessageSquareText size={14} className="text-slate-400" />
                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('customer_note', 'Ghi chú khách hàng')}</span>
                     </div>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 italic font-medium leading-relaxed transition-colors duration-300">"{drive.customer_note}"</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 italic font-medium leading-relaxed transition-colors duration-300">"{drive.note}"</p>
                 </div>
             )}
         </div>

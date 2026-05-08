@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KanbanColumn } from './components/KanbanColumn';
-import { TaskDetailModal } from './components/TaskDetailModal';
+import { TaskDetailModal } from '../../../../../../Shared/components/TaskDetailModal';
 import { ChatAuditModal } from './components/ChatAuditModal';
 import { KANBAN_STATUS, getKanbanColumnKeys } from '../../constants/performanceConstants';
 

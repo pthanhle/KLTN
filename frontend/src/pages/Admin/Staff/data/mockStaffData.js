@@ -26,14 +26,14 @@ export const mockStaffData = [
             },
             kanban: {
                 todo: [
-                    { id: 'RO-300', title: 'Khám xe: Động cơ kêu lạ (CR-V)', priority: 'HIGH', sla: '1h', customerName: 'Nguyễn Văn A', licensePlate: '51G-123.45', customerPhone: '0977088308', vehicleModel: 'Toyota Camry', appointmentTime: '12:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' } ,
+                    { id: 'RO-300', title: 'Khám xe: Động cơ kêu lạ (CR-V)', priority: 'URGENT', sla: '1h', customerName: 'Nguyễn Văn A', licensePlate: '51G-123.45', customerPhone: '0977088308', vehicleModel: 'Honda CR-V', appointmentTime: '12:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' } ,
                     { id: 'RO-304', title: 'Kiểm tra hồ sơ bảo hành thước lái', priority: 'MEDIUM', sla: '2h', customerName: 'Hoàng Minh Bình', licensePlate: '43G-803.92', customerPhone: '0869574013', vehicleModel: 'Kia Sorento', appointmentTime: '15:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ],
                 inProgress: [
-                    { id: 'RO-301', title: 'Giám sát đại tu gầm Porsche Macan', priority: 'HIGH', sla: 'Ongoing', progress: 50, customerName: 'Bùi Hữu Đạt', licensePlate: '65G-601.24', customerPhone: '0985844302', vehicleModel: 'Kia Sorento', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
+                    { id: 'RO-301', title: 'Giám sát đại tu gầm Porsche Macan', priority: 'HIGH', sla: 'Ongoing', progress: 50, customerName: 'Bùi Hữu Đạt', licensePlate: '65G-601.24', customerPhone: '0985844302', vehicleModel: 'Porsche Macan', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ],
                 done: [
-                    { id: 'RO-299', title: 'QA xe xuất xưởng BMW 320i', priority: 'HIGH', billed: '0.5h', customerName: 'Lý Xuân Dũng', licensePlate: '30H-391.93', customerPhone: '0934692512', vehicleModel: 'Ford Everest', appointmentTime: '11:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
+                    { id: 'RO-299', title: 'QA xe xuất xưởng BMW 320i', priority: 'HIGH', billed: '0.5h', customerName: 'Lý Xuân Dũng', licensePlate: '30H-391.93', customerPhone: '0934692512', vehicleModel: 'BMW 320i', appointmentTime: '11:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
                     { id: 'RO-298', title: 'Test drive sau đại tu hộp số', priority: 'MEDIUM', billed: '1.0h', customerName: 'Đặng Thu Tùng', licensePlate: '60G-964.76', customerPhone: '0897376291', vehicleModel: 'Mazda 3', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ]
             }
@@ -67,14 +67,14 @@ export const mockStaffData = [
             kanban: {
                 todo: [
                     { id: 'RO-101', title: 'Booking: Khách VIP mang xe tới bảo dưỡng 5000km', priority: 'HIGH', sla: '2h', customerName: 'Lê Trần B', licensePlate: '51H-999.99', customerPhone: '0981400819', vehicleModel: 'BMW 320i', appointmentTime: '11:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' } ,
-                    { id: 'RO-108', title: 'Tiếp nhận xe Mazda 3 bị tai nạn nhẹ', priority: 'MEDIUM', sla: '4h', customerName: 'Bùi Thu Đạt', licensePlate: '60H-787.62', customerPhone: '0987108871', vehicleModel: 'Toyota Camry', appointmentTime: '12:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
+                    { id: 'RO-108', title: 'Tiếp nhận xe Mazda 3 bị tai nạn nhẹ', priority: 'MEDIUM', sla: '4h', customerName: 'Bùi Thu Đạt', licensePlate: '60H-787.62', customerPhone: '0987108871', vehicleModel: 'Mazda 3', appointmentTime: '12:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ],
                 inProgress: [
-                    { id: 'RO-105', title: 'Báo giá đại tu gầm Honda City chờ khách duyệt', priority: 'HIGH', sla: '45m Remaining', progress: 65, customerName: 'Nguyễn Quang Dũng', licensePlate: '51F-674.65', customerPhone: '0978507283', vehicleModel: 'Honda CR-V', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
+                    { id: 'RO-105', title: 'Báo giá đại tu gầm Honda City chờ khách duyệt', priority: 'HIGH', sla: '45m Remaining', progress: 65, customerName: 'Nguyễn Quang Dũng', licensePlate: '51F-674.65', customerPhone: '0978507283', vehicleModel: 'Honda City', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
                     { id: 'RO-106', title: 'Thương lượng bảo hiểm thân vỏ xe tai nạn', priority: 'HIGH', sla: '1h', progress: 40, customerName: 'Huỳnh Hữu Sơn', licensePlate: '29D-515.50', customerPhone: '0897484063', vehicleModel: 'Mazda 3', appointmentTime: '15:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ],
                 done: [
-                    { id: 'RO-099', title: 'Đã thanh toán - Chờ giao xe SantaFe', priority: 'LOW', billed: 'N/A', customerName: 'Phạm Văn Hương', licensePlate: '61A-623.92', customerPhone: '0931077343', vehicleModel: 'Toyota Camry', appointmentTime: '09:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
+                    { id: 'RO-099', title: 'Đã thanh toán - Chờ giao xe SantaFe', priority: 'LOW', billed: 'N/A', customerName: 'Phạm Văn Hương', licensePlate: '61A-623.92', customerPhone: '0931077343', vehicleModel: 'Hyundai SantaFe', appointmentTime: '09:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
                     { id: 'RO-097', title: 'Giải quyết khiếu nại xong - Gọi khách tới lấy xe', priority: 'HIGH', billed: 'N/A', customerName: 'Dương Thu Tùng', licensePlate: '51F-856.64', customerPhone: '0906127705', vehicleModel: 'Toyota Camry', appointmentTime: '16:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ]
             }
@@ -114,7 +114,7 @@ export const mockStaffData = [
                     { id: 'RO-110', title: 'Gửi báo giá gói phủ Ceramic - Chờ khách rep', priority: 'MEDIUM', sla: '2h', progress: 30, customerName: 'Hồ Ngọc Dũng', licensePlate: '51H-770.80', customerPhone: '0866015877', vehicleModel: 'Ford Everest', appointmentTime: '11:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ],
                 done: [
-                    { id: 'RO-102', title: 'Giao xe khách VIP (Porsche 911)', priority: 'HIGH', billed: 'N/A', customerName: 'Nguyễn Anh Dũng', licensePlate: '60D-133.55', customerPhone: '0906249396', vehicleModel: 'Mercedes C200', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
+                    { id: 'RO-102', title: 'Giao xe khách VIP (Porsche 911)', priority: 'HIGH', billed: 'N/A', customerName: 'Nguyễn Anh Dũng', licensePlate: '60D-133.55', customerPhone: '0906249396', vehicleModel: 'Porsche 911', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ]
             }
         }
@@ -146,17 +146,17 @@ export const mockStaffData = [
             },
             kanban: {
                 todo: [
-                    { id: 'LD-881', title: 'Lịch lái thử xe CR-V (Anh Tuấn)', priority: 'HIGH', sla: '2h', customerName: 'Phạm Anh Tuấn', customerPhone: '0897779937', vehicleModel: 'Honda CR-V 2024', licensePlate: '51LD-123.45 (Demo)', appointmentTime: '14:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.', locationType: 'HOME', address: 'Khu biệt thự Chateau, Quận 7, TP.HCM' } ,
-                    { id: 'LD-883', title: 'Setup lịch lái thử GLC 300 cuối tuần', priority: 'MEDIUM', sla: '24h', customerName: 'Hoàng Thu Hoa', licensePlate: '43C-131.56', customerPhone: '0867538723', vehicleModel: 'Mercedes C200', appointmentTime: '11:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
+                    { id: 'LD-881', title: 'Lịch lái thử xe CR-V (Anh Tuấn)', priority: 'URGENT', sla: '2h', customerName: 'Phạm Anh Tuấn', customerPhone: '0897779937', vehicleModel: 'Honda CR-V', licensePlate: '51LD-123.45 (Demo)', appointmentTime: '14:00', description: 'Khách VIP. Vui lòng chuẩn bị sẵn sàng.', locationType: 'HOME', address: 'Khu biệt thự Chateau, Quận 7, TP.HCM' } ,
+                    { id: 'LD-883', title: 'Setup lịch lái thử GLC 300 cuối tuần', priority: 'MEDIUM', sla: '24h', customerName: 'Hoàng Thu Hoa', licensePlate: '43C-131.56', customerPhone: '0867538723', vehicleModel: 'Mercedes GLC 300', appointmentTime: '11:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ],
                 inProgress: [
-                    { id: 'CS-102', taskType: 'CHAT', title: 'Tư vấn giá lăn bánh Honda CR-V', priority: 'HIGH', sla: '12:05', progress: 50, customerName: 'Hoàng Minh', customerPhone: '0909123456', vehicleModel: 'Honda CR-V L', isBlinking: true, description: 'Khách hàng quan tâm giá lăn bánh tại HN.', chatLogs: [ { sender: 'customer', time: '10:00', text: 'Chào bạn, mình đang quan tâm dòng CR-V bản L, nhờ bạn tư vấn.' }, { sender: 'staff', time: '10:01', text: 'Dạ em chào anh Minh. Cảm ơn anh đã quan tâm đến dòng xe CR-V ạ.' }, { sender: 'customer', time: '10:02', text: 'Bản L hiện tại lăn bánh ở HN là bao nhiêu? Có chương trình khuyến mãi gì không bạn?' }, { sender: 'staff', time: '10:03', text: 'Dạ hiện tại CR-V bản L đang được hỗ trợ 100% lệ phí trước bạ. Em gửi anh bảng chiết tính chi tiết nhé.' } ] },
-                    { id: 'LD-870', title: 'Gửi báo giá lăn bánh Ford Everest', priority: 'HIGH', sla: '1d', progress: 90, customerName: 'Bùi Minh Sơn', licensePlate: '65H-278.50', customerPhone: '0988409915', vehicleModel: 'Kia Sorento', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
-                    { id: 'LD-871', title: 'Thương lượng chốt giá bán Tucson', priority: 'HIGH', sla: '4h', progress: 60, customerName: 'Ngô Văn Nam', licensePlate: '30F-929.52', customerPhone: '0988552732', vehicleModel: 'Porsche Macan', appointmentTime: '09:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
+                    { id: 'CS-102', taskType: 'CHAT', title: 'Tư vấn giá lăn bánh Honda CR-V', priority: 'HIGH', sla: '12:05', progress: 50, customerName: 'Hoàng Minh', customerPhone: '0909123456', vehicleModel: 'Honda CR-V', isBlinking: true, description: 'Khách hàng quan tâm giá lăn bánh tại HN.', chatLogs: [ { sender: 'customer', time: '10:00', text: 'Chào bạn, mình đang quan tâm dòng CR-V bản L, nhờ bạn tư vấn.' }, { sender: 'staff', time: '10:01', text: 'Dạ em chào anh Minh. Cảm ơn anh đã quan tâm đến dòng xe CR-V ạ.' }, { sender: 'customer', time: '10:02', text: 'Bản L hiện tại lăn bánh ở HN là bao nhiêu? Có chương trình khuyến mãi gì không bạn?' }, { sender: 'staff', time: '10:03', text: 'Dạ hiện tại CR-V bản L đang được hỗ trợ 100% lệ phí trước bạ. Em gửi anh bảng chiết tính chi tiết nhé.' } ] },
+                    { id: 'LD-870', title: 'Gửi báo giá lăn bánh Ford Everest', priority: 'HIGH', sla: '1d', progress: 90, customerName: 'Bùi Minh Sơn', licensePlate: '65H-278.50', customerPhone: '0988409915', vehicleModel: 'Ford Everest', appointmentTime: '10:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
+                    { id: 'LD-871', title: 'Thương lượng chốt giá bán Tucson', priority: 'HIGH', sla: '4h', progress: 60, customerName: 'Ngô Văn Nam', licensePlate: '30F-929.52', customerPhone: '0988552732', vehicleModel: 'Hyundai Tucson', appointmentTime: '09:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ],
                 done: [
-                    { id: 'LD-865', title: 'Đã thu cọc - Chờ giao xe Civic RS', priority: 'LOW', billed: 'N/A', customerName: 'Vũ Thanh Bình', licensePlate: '30D-690.74', customerPhone: '0894317041', vehicleModel: 'Porsche Macan', appointmentTime: '16:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
-                    { id: 'LD-864', title: 'Ký hợp đồng Peugeot 3008 thành công', priority: 'MEDIUM', billed: 'N/A', customerName: 'Phan Thanh Hương', licensePlate: '30A-308.23', customerPhone: '0899777036', vehicleModel: 'BMW 320i', appointmentTime: '15:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
+                    { id: 'LD-865', title: 'Đã thu cọc - Chờ giao xe Civic RS', priority: 'LOW', billed: 'N/A', customerName: 'Vũ Thanh Bình', licensePlate: '30D-690.74', customerPhone: '0894317041', vehicleModel: 'Honda Civic', appointmentTime: '16:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  ,
+                    { id: 'LD-864', title: 'Ký hợp đồng Peugeot 3008 thành công', priority: 'MEDIUM', billed: 'N/A', customerName: 'Phan Thanh Hương', licensePlate: '30A-308.23', customerPhone: '0899777036', vehicleModel: 'Peugeot 3008', appointmentTime: '15:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ]
             }
         }
@@ -172,7 +172,7 @@ export const mockStaffData = [
         avatarUrl: 'https://randomuser.me/api/portraits/men/22.jpg',
         role: 'SALES_EXECUTIVE',
         department: 'Showroom Floor',
-        status: 'ON_LEAVE',
+        status: 'ACTIVE',
         baseSalary: 8000000,
         kpiType: 'COMMISSION',
         kpiValue: 2.5,
@@ -190,7 +190,7 @@ export const mockStaffData = [
                 todo: [], 
                 inProgress: [], 
                 done: [
-                    { id: 'LD-700', title: 'Ký hợp đồng Vios G trước khi nghỉ phép', priority: 'HIGH', billed: 'N/A', customerName: 'Lý Văn Nhung', licensePlate: '61G-997.69', customerPhone: '0868462307', vehicleModel: 'Toyota Camry', appointmentTime: '15:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
+                    { id: 'LD-700', title: 'Ký hợp đồng Vios G trước khi nghỉ phép', priority: 'HIGH', billed: 'N/A', customerName: 'Lý Văn Nhung', licensePlate: '61G-997.69', customerPhone: '0868462307', vehicleModel: 'Toyota Vios', appointmentTime: '15:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ] 
             }
         }
@@ -222,8 +222,8 @@ export const mockStaffData = [
             },
             kanban: {
                 todo: [
-                    { id: 'RO-201', title: 'Khám xe & Lên Checklist lỗi hộp số C200', priority: 'HIGH', sla: '24h', customerName: 'Đỗ C', licensePlate: '30A-555.55', customerPhone: '0898659819', vehicleModel: 'Mazda 3', appointmentTime: '08:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' } ,
-                    { id: 'RO-205', title: 'Đọc lỗi chuyên sâu hệ thống điện Camry', priority: 'HIGH', sla: '4h', customerName: 'Hồ Minh Linh', licensePlate: '60H-476.15', customerPhone: '0934538387', vehicleModel: 'Porsche Macan', appointmentTime: '09:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
+                    { id: 'RO-201', title: 'Khám xe & Lên Checklist lỗi hộp số C200', priority: 'HIGH', sla: '24h', customerName: 'Đỗ C', licensePlate: '30A-555.55', customerPhone: '0898659819', vehicleModel: 'Mercedes C200', appointmentTime: '08:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' } ,
+                    { id: 'RO-205', title: 'Đọc lỗi chuyên sâu hệ thống điện Camry', priority: 'HIGH', sla: '4h', customerName: 'Hồ Minh Linh', licensePlate: '60H-476.15', customerPhone: '0934538387', vehicleModel: 'Toyota Camry', appointmentTime: '09:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  
                 ],
                 inProgress: [
                     { id: 'RO-195', title: 'Đang tháo cụm lốc điều hoà \u0026 nạp gas', priority: 'MEDIUM', sla: '2h Remaining', progress: 80, customerName: 'Vũ Tuấn Bình', licensePlate: '29F-541.27', customerPhone: '0902346889', vehicleModel: 'Mazda 3', appointmentTime: '11:00', description: 'Khách hàng hẹn đến đúng giờ. Vui lòng chuẩn bị sẵn sàng.' }  

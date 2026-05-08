@@ -28,7 +28,7 @@ const NotificationHeader = ({ unreadCount, onMarkAllRead }) => {
                 <Button 
                     onClick={onMarkAllRead}
                     icon={<CheckCheck className="w-4 h-4" />}
-                    className="group shadow-sm flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-500 font-medium text-sm px-5 !h-10 bg-white dark:bg-[#151b2d] rounded-full border border-slate-200 dark:border-white/10 hover:!bg-yellow-500 hover:!text-slate-900 transition-all duration-300"
+                    className="group shadow-sm flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-500 font-medium text-sm px-5 !h-10 bg-white dark:bg-[#141416] rounded-full border border-slate-200 dark:border-white/10 hover:!bg-yellow-500 hover:!text-slate-900 transition-all duration-300"
                 >
                     {t('notif_btn_mark_all', 'Đánh dấu tất cả là đã đọc')}
                 </Button>

@@ -73,8 +73,7 @@ export const toggleWishlistStatus = asyncHandler(async (req, res) => {
     } else {
         part = await Part.findOne({ _id: part_id, status: 'active' });
         if (!part) {
-            res.status(404);
-            throw new Error('Sản phẩm này không tồn tại hoặc đã ngừng kinh doanh.');
+            isMockCar = true;
         }
     }
 

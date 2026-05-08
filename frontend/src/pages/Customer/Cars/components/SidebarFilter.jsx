@@ -51,7 +51,7 @@ const SidebarFilter = ({ filters, handleFilterChange, handleBrandToggle, handleS
                             placeholder={t('filters_searchBrandPlaceholder', 'Tìm thương hiệu...')}
                             value={brandSearch}
                             onChange={e => setBrandSearch(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-white/5 rounded-xl text-[13px] font-medium text-slate-700 dark:text-white outline-none focus:border-yellow-500/30 transition-all placeholder:text-slate-400"
+                            className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#141416] border border-slate-200 dark:border-white/5 rounded-xl text-[13px] font-medium text-slate-700 dark:text-white outline-none focus:border-yellow-500/30 transition-all placeholder:text-slate-400"
                         />
                     </div>
                 )}

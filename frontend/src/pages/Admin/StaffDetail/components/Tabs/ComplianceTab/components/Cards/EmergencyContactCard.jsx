@@ -3,30 +3,16 @@ import { Phone, Edit2, Check, X } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 import { Button, Input, Form } from 'antd';
 import { useEmergencyForm } from '../../hooks/useEmergencyForm';
-
-const InfoRow = ({ label, children }) => (
-    <div className="flex flex-col mb-4 last:mb-0">
-        <span className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mb-1">{label}</span>
-        <div className="text-sm text-slate-800 dark:text-slate-200">{children}</div>
-    </div>
-);
-
-const FieldWrapper = ({ label, error, children }) => (
-    <div className="flex flex-col mb-4 last:mb-0">
-        <label className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mb-1">{label}</label>
-        {children}
-        {error && <span className="text-red-500 text-xs mt-0.5">{error.message}</span>}
-    </div>
-);
+import { InfoRow, FieldWrapper } from '../Shared/FormHelpers';
 
 const EmergencyContactCard = ({ staffId, data, t, onUpdateSuccess }) => {
-    const { 
+    const {
         methods: { control, formState: { errors } },
-        isEditing, 
-        isSubmitting, 
-        handleEditClick, 
-        handleCancel, 
-        handleEditSubmit 
+        isEditing,
+        isSubmitting,
+        handleEditClick,
+        handleCancel,
+        handleEditSubmit
     } = useEmergencyForm(staffId, data, t, onUpdateSuccess);
 
     return (
@@ -41,8 +27,8 @@ const EmergencyContactCard = ({ staffId, data, t, onUpdateSuccess }) => {
                     </h3>
                 </div>
                 {!isEditing && (
-                    <Button 
-                        type="text" 
+                    <Button
+                        type="text"
                         onClick={handleEditClick}
                         className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center justify-center p-2 rounded-lg transition-colors"
                         title={t('adminStaffCompliance:btn_edit_profile', 'Cập nhật hồ sơ')}
@@ -64,9 +50,16 @@ const EmergencyContactCard = ({ staffId, data, t, onUpdateSuccess }) => {
                             <Input {...field} className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white" />
                         </FieldWrapper>
                     )} />
-                    <Controller name="phone" control={control} render={({ field }) => (
+                    <Controller name="phone" control={control} render={({ field: { onChange, ...field } }) => (
                         <FieldWrapper label={t('adminStaffCompliance:label_contact_phone', 'Số điện thoại')} error={errors.phone}>
-                            <Input {...field} className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white" />
+                            <Input
+                                {...field}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, '');
+                                    onChange(value);
+                                }}
+                                className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white"
+                            />
                         </FieldWrapper>
                     )} />
                     <div className="mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
@@ -78,17 +71,17 @@ const EmergencyContactCard = ({ staffId, data, t, onUpdateSuccess }) => {
                     </div>
 
                     <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-slate-100 dark:border-white/5">
-                        <button 
+                        <button
                             type="button"
-                            onClick={handleCancel} 
-                            disabled={isSubmitting} 
+                            onClick={handleCancel}
+                            disabled={isSubmitting}
                             className="h-10 px-5 rounded-lg font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {t('adminStaffCompliance:btn_cancel', 'Hủy bỏ')}
                         </button>
-                        <button 
-                            type="submit" 
-                            disabled={isSubmitting} 
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
                             className="h-10 px-6 rounded-lg font-bold bg-yellow-500 hover:bg-yellow-400 text-slate-900 shadow-md shadow-yellow-500/20 flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {!isSubmitting && <Check size={16} />}

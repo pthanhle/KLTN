@@ -19,15 +19,19 @@ export const CategoryTable = ({ categories, isLoading, handleEdit, handleDelete,
                 <Table
                     columns={columns}
                     dataSource={categories}
-                rowKey="id"
-                pagination={{
-                    pageSize: 8,
-                    showSizeChanger: true,
-                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
-                    className: '!px-6 py-4 !text-xs !font-bold !uppercase !tracking-widest !text-slate-500 custom-pagination border-t border-slate-100 dark:border-white/5'
-                }}
-                rowClassName={() => "group hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"}
-                className="
+                    rowKey="id"
+                    pagination={{
+                        defaultPageSize: 10,
+                        showSizeChanger: true,
+                        showTotal: (total, range) => (
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+                                {t('showing', 'Hiển thị')} <strong className="text-slate-800 dark:text-white mx-1">{range[0]}-{range[1]}</strong> / <strong className="text-slate-800 dark:text-white mx-1">{total}</strong>
+                            </span>
+                        ),
+                        className: '!px-6 py-4 !text-xs !font-bold !uppercase !tracking-widest !text-slate-500 custom-pagination border-t border-slate-100 dark:border-white/5'
+                    }}
+                    rowClassName={() => "group hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"}
+                    className="
                     custom-dark-table w-full 
                     [&_.ant-table]:!bg-transparent 
 
@@ -49,10 +53,10 @@ export const CategoryTable = ({ categories, isLoading, handleEdit, handleDelete,
                     dark:[&_.ant-table-column-sorter-up.active]:text-yellow-500
                     dark:[&_.ant-table-column-sorter-down.active]:text-yellow-500
                 "
-                locale={{
-                    emptyText: <Empty description={false} className="py-20" />
-                }}
-            />
+                    locale={{
+                        emptyText: <Empty description={false} className="py-20" />
+                    }}
+                />
             </div>
         </section>
     );

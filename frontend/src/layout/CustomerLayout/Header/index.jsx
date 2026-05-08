@@ -5,7 +5,7 @@ import UserActions from './components/UserActions';
 
 const Header = () => {
     return (
-        <header className="sticky top-0 z-50 w-full bg-white dark:bg-[#0b0f19] border-b border-gray-200 dark:border-slate-800/80 shadow-sm transition-colors duration-300">
+        <header className="sticky top-0 z-50 w-full bg-white dark:bg-[#0a0a0b] border-b border-gray-200 dark:border-slate-800/80 shadow-sm transition-colors duration-300">
             <div className="w-full px-4 md:px-6 lg:px-10 xl:px-16 2xl:px-24">
                 <div className="flex h-[72px] items-center justify-between">
                     

@@ -8,7 +8,7 @@ export const getBookingSchema = (t, rescheduleData, isDemoAvailable = true) => {
     return z.object({
         fullName: z.string().min(2, t('booking_errorName', 'Vui lòng nhập họ và tên')),
         phoneNumber: z.string()
-            .transform((val) => val.replace(/\s+/g, '')) // Remove spaces automatically
+            .transform((val) => val.replace(/\s+/g, ''))
             .pipe(z.string().regex(/^(0|\+84)[0-9]{8,9}$/, t('booking_errorPhone', 'Vui lòng nhập số điện thoại hợp lệ'))),
         bookingType: z.enum(['showroom', 'home', 'waitlist']),
         showroomBranch: z.string().optional(),
@@ -28,7 +28,6 @@ export const getBookingSchema = (t, rescheduleData, isDemoAvailable = true) => {
             ? z.string().min(5, t('booking_errorReason', 'Vui lòng cung cấp lý do dời lịch (ít nhất 5 ký tự)'))
             : z.string().optional()
     }).superRefine((data, ctx) => {
-        // Only require branch for waitlists or showroom visits
         if ((data.bookingType === 'showroom' || data.bookingType === 'waitlist') && !data.showroomBranch) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,

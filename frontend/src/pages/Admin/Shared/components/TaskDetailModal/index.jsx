@@ -1,26 +1,23 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { X, Clock, User, Phone, Car, FileText, CheckCircle2, AlertCircle, MapPin, Building } from 'lucide-react';
-import { TASK_PRIORITY } from '../../../constants/performanceConstants';
-import { getPriorityStyles } from '../../../utils/performanceUtils';
-import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll';
+import React from 'react';
+import { X, Clock, User, Car, FileText, AlertCircle, MapPin, Building } from 'lucide-react';
+import { useTaskDetailModalLogic } from './hooks/useTaskDetailModalLogic';
+import { useLockBodyScroll } from '../../../../Admin/StaffDetail/components/Tabs/PerformanceTab/hooks/useLockBodyScroll';
 
 export const TaskDetailModal = ({ task, onClose }) => {
-    const { t } = useTranslation();
-    const [isClosing, setIsClosing] = useState(false);
-
     // Prevent body scroll when modal is open
     useLockBodyScroll(true);
 
-    const handleClose = () => {
-        setIsClosing(true);
-        setTimeout(onClose, 200); // Wait for animation
-    };
+    const {
+        isReady,
+        isClosing,
+        handleClose,
+        pStyles,
+        translatedPriority,
+        t,
+        isHighPriority
+    } = useTaskDetailModalLogic(task, onClose);
 
-    if (!task) return null;
-
-    const pStyles = getPriorityStyles(task.priority);
-    const translatedPriority = task.priority ? t(`adminStaffDetail:perf_kanban_priority_${task.priority.toLowerCase()}`) : task.priority;
+    if (!isReady) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -40,10 +37,12 @@ export const TaskDetailModal = ({ task, onClose }) => {
                             <span className="bg-slate-200 dark:bg-[#2e3447] text-slate-700 dark:text-gray-300 font-mono text-xs font-bold px-2.5 py-1 rounded-md tracking-widest uppercase">
                                 {task.id}
                             </span>
-                            <span className={`${pStyles.split(' ').slice(0, 2).join(' ')} font-medium uppercase tracking-widest text-[10px] px-2 py-1 rounded flex items-center gap-1 border`}>
-                                {task.priority === TASK_PRIORITY.HIGH && <AlertCircle size={10} />}
-                                {translatedPriority} - {t('adminStaffDetail:perf_kanban_priority')}
-                            </span>
+                            {task.priority && (
+                                <span className={`${pStyles.split(' ').slice(0, 2).join(' ')} font-medium uppercase tracking-widest text-[10px] px-2 py-1 rounded flex items-center gap-1 border`}>
+                                    {isHighPriority && <AlertCircle size={10} />}
+                                    {translatedPriority} - {t('adminStaffDetail:perf_kanban_priority')}
+                                </span>
+                            )}
                         </div>
                         <h3 className="text-xl font-bold text-slate-800 dark:text-white leading-tight">
                             {task.title}
@@ -135,6 +134,10 @@ export const TaskDetailModal = ({ task, onClose }) => {
                                     {t('adminStaffDetail:modal_timing', 'Thời gian & Tiến độ')}
                                 </h4>
                                 <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-500 dark:text-gray-400">{t('adminStaffDetail:modal_appointment_date', 'Ngày hẹn')}:</span>
+                                        <span className="text-sm font-semibold text-slate-800 dark:text-white">{task.appointmentDate || t('adminStaffDetail:date_today', 'Hôm nay')}</span>
+                                    </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-slate-500 dark:text-gray-400">{t('adminStaffDetail:modal_appointment', 'Giờ hẹn')}:</span>
                                         <span className="text-sm font-semibold text-slate-800 dark:text-white">{task.appointmentTime || t('adminStaffDetail:modal_not_available')}</span>

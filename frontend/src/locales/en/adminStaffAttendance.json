@@ -17,5 +17,8 @@
   "status_on_time": "ON TIME",
   "status_late": "LATE",
   "status_absent": "ABSENT",
-  "status_day_off": "DAY OFF"
+  "status_day_off": "DAY OFF",
+  "notice_system_title": "System Notice",
+  "notice_sync_active": "Attendance Sync Active",
+  "notice_sync_desc": "Biometric terminals at Service Bay 1 & 2 are currently online and syncing."
 }

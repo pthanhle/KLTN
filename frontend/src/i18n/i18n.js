@@ -56,6 +56,8 @@ import enAdminStaffCompliance from '../locales/en/adminStaffCompliance.json';
 import viAdminStaffCompliance from '../locales/vi/adminStaffCompliance.json';
 import enAdminStaffCreate from '../locales/en/adminStaffCreate.json';
 import viAdminStaffCreate from '../locales/vi/adminStaffCreate.json';
+import enAdminTestDriveBookings from '../locales/en/adminTestDriveBookings.json';
+import viAdminTestDriveBookings from '../locales/vi/adminTestDriveBookings.json';
 
 i18n
     .use(initReactI18next)
@@ -90,6 +92,7 @@ i18n
                 adminStaffAttendance: enAdminStaffAttendance,
                 adminStaffCompliance: enAdminStaffCompliance,
                 adminStaffCreate: enAdminStaffCreate,
+                adminTestDriveBookings: enAdminTestDriveBookings,
             },
             vi: {
                 translation: viTranslation,
@@ -120,6 +123,7 @@ i18n
                 adminStaffAttendance: viAdminStaffAttendance,
                 adminStaffCompliance: viAdminStaffCompliance,
                 adminStaffCreate: viAdminStaffCreate,
+                adminTestDriveBookings: viAdminTestDriveBookings,
             },
         },
         lng: 'vi',

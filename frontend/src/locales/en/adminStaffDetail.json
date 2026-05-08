@@ -63,6 +63,7 @@
     "perf_kanban_todo": "Pending Intake",
     "perf_kanban_in_progress": "Active Bay",
     "perf_kanban_done": "QA / Ready",
+    "perf_kanban_priority_urgent": "Urgent",
     "perf_kanban_priority_high": "High",
     "perf_kanban_priority_medium": "Medium",
     "perf_kanban_priority_low": "Low",
@@ -124,5 +125,7 @@
     "chat_whisper_placeholder": "Internal whisper to staff (Customer cannot see)...",
     "chat_send": "Send",
     "chat_admin_mode": "Admin Audit Mode - Anonymous to Customer",
-    "chat_takeover": "Take Over Chat"
+    "chat_takeover": "Take Over Chat",
+    "date_today": "Today",
+    "modal_appointment_date": "Appointment Date"
 }

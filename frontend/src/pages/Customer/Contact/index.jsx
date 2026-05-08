@@ -9,7 +9,7 @@ const ContactPage = () => {
     const { control, errors, isSubmitting, handleSubmit } = form;
 
     return (
-        <main className="relative min-h-screen bg-[#f8fafc] dark:bg-[#0c1324] font-sans selection:bg-yellow-500 selection:text-slate-900 transition-colors duration-300">
+        <main className="relative min-h-screen bg-[#f8fafc] dark:bg-[#0a0a0b] font-sans selection:bg-yellow-500 selection:text-slate-900 transition-colors duration-300">
             {/* Background elements */}
             <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
                 <div className="absolute top-[-10%] right-[-5%] w-[50vw] h-[50vw] bg-yellow-500/5 dark:bg-yellow-500/10 rounded-full blur-[120px]"></div>

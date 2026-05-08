@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { TaskCard } from './TaskCard';
+import TaskCard from '../../../../../../../Shared/components/TaskCard';
 import { KANBAN_STATUS } from '../../../constants/performanceConstants';
 
 export const KanbanColumn = ({ title, count, tasks, status, isPulse }) => {

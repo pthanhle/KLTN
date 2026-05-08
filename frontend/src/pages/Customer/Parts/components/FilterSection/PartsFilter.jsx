@@ -50,7 +50,7 @@ const PartsFilter = ({
                                 placeholder={t('filter_brand_search', 'Tìm thương hiệu...')}
                                 value={brandSearch || ''}
                                 onChange={e => onBrandSearchChange(e.target.value)}
-                                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-white/5 rounded-xl text-[13px] font-medium text-slate-700 dark:text-white outline-none focus:border-yellow-500/30 transition-all placeholder:text-slate-400"
+                                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#141416] border border-slate-200 dark:border-white/5 rounded-xl text-[13px] font-medium text-slate-700 dark:text-white outline-none focus:border-yellow-500/30 transition-all placeholder:text-slate-400"
                             />
                         </div>
                     )}
@@ -144,7 +144,7 @@ const PartsFilter = ({
                                 className={`px-4 py-1.5 rounded-full text-[12px] font-bold transition-all border ${
                                     isActive 
                                         ? 'bg-yellow-500 text-white border-yellow-500 shadow-[0_2px_10px_rgba(234,179,8,0.3)]' 
-                                        : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white'
+                                        : 'bg-white dark:bg-[#141416] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-white/30'
                                 }`}
                             >
                                 {cat.name}

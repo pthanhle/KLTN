@@ -63,6 +63,7 @@
     "perf_kanban_todo": "Chờ tiếp nhận",
     "perf_kanban_in_progress": "Đang sửa chữa",
     "perf_kanban_done": "Hoàn thành / QA",
+    "perf_kanban_priority_urgent": "Khẩn cấp",
     "perf_kanban_priority_high": "Cao",
     "perf_kanban_priority_medium": "Trung bình",
     "perf_kanban_priority_low": "Thấp",
@@ -124,5 +125,7 @@
     "chat_whisper_placeholder": "Nhập tin nhắn trao đổi nội bộ...",
     "chat_send": "Gửi",
     "chat_admin_mode": "Chế độ giám sát (Chỉ nội bộ)",
-    "chat_takeover": "Tiếp quản hỗ trợ"
+    "chat_takeover": "Tiếp quản hỗ trợ",
+    "date_today": "Hôm nay",
+    "modal_appointment_date": "Ngày hẹn"
 }

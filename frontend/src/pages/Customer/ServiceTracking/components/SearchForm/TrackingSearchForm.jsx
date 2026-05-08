@@ -9,7 +9,7 @@ const TrackingSearchForm = ({ hookState }) => {
 
     return (
         <div className="flex-1 w-full max-w-md z-10 animate-in fade-in slide-in-from-right-8 duration-1000 delay-150">
-            <div className="bg-white/90 dark:bg-[#151b2d]/80 backdrop-blur-2xl p-8 md:p-10 rounded-[32px] shadow-[0_30px_60px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 relative overflow-hidden">
+            <div className="bg-white/90 dark:bg-[#141416]/95 backdrop-blur-2xl p-8 md:p-10 rounded-[32px] shadow-[0_30px_60px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-white/10 relative overflow-hidden">
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/20 dark:bg-yellow-500/10 blur-[80px] rounded-full pointer-events-none"></div>
 
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">

@@ -9,7 +9,7 @@ const Footer = () => {
     const { t } = useTranslation('layout');
 
     return (
-        <footer className="bg-white dark:bg-[#0b0f19] border-t border-slate-200 dark:border-white/5 pt-16 pb-8 transition-colors duration-300">
+        <footer className="bg-white dark:bg-[#0a0a0b] border-t border-slate-200 dark:border-white/5 pt-16 pb-8 transition-colors duration-300">
             <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1280px]">
                 {/* Top Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-12">

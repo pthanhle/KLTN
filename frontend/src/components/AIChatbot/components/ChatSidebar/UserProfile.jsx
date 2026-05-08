@@ -5,7 +5,7 @@ import IconButton from '../common/IconButton';
 
 const UserProfile = ({ isLoading = false, t }) => {
     return (
-        <div className="p-4 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-white/5">
+        <div className="p-4 bg-slate-50 dark:bg-[#1c1c1e] border-t border-slate-200 dark:border-white/5">
             <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 ring-1 ring-slate-300 dark:ring-white/10 overflow-hidden flex items-center justify-center shrink-0">
                     {isLoading ? (

@@ -23,7 +23,7 @@ const InfoCardItem = ({ itemKey, data, isLoading, t }) => {
     }
 
     return (
-        <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-xl p-10 rounded-[32px] group hover:-translate-y-2 transition-all duration-500 border border-slate-200/50 dark:border-white/10 shadow-2xl shadow-slate-200/50 dark:shadow-none">
+        <div className="bg-white/90 dark:bg-[#141416]/95 backdrop-blur-xl p-10 rounded-[32px] group hover:-translate-y-2 transition-all duration-500 border border-slate-200/50 dark:border-white/10 shadow-2xl shadow-slate-200/50 dark:shadow-none">
             <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-8 group-hover:bg-yellow-500 transition-colors duration-500">
                 <Icon className="text-yellow-600 dark:text-yellow-500 group-hover:text-slate-900 transition-colors duration-500 w-8 h-8" strokeWidth={1.5} />
             </div>

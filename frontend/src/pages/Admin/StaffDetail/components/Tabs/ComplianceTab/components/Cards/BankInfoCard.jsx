@@ -5,21 +5,7 @@ import BankSelect from '../Shared/BankSelect';
 import { Controller } from 'react-hook-form';
 import { Button, Input, Form } from 'antd';
 import { useFinancialForm } from '../../hooks/useFinancialForm';
-
-const InfoRow = ({ label, children }) => (
-    <div className="flex flex-col mb-4 last:mb-0">
-        <span className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mb-1">{label}</span>
-        <div className="text-sm text-slate-800 dark:text-slate-200">{children}</div>
-    </div>
-);
-
-const FieldWrapper = ({ label, error, children }) => (
-    <div className="flex flex-col mb-4 last:mb-0">
-        <label className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mb-1">{label}</label>
-        {children}
-        {error && <span className="text-red-500 text-xs mt-0.5">{error.message}</span>}
-    </div>
-);
+import { InfoRow, FieldWrapper } from '../Shared/FormHelpers';
 
 const BankInfoCard = ({ staffId, data, t, onUnmask, onUpdateSuccess }) => {
     const {
@@ -56,9 +42,16 @@ const BankInfoCard = ({ staffId, data, t, onUnmask, onUpdateSuccess }) => {
 
             {isEditing ? (
                 <Form component="form" onSubmit={handleEditSubmit} className="animate-fade-in flex flex-col">
-                    <Controller name="bankAccount" control={control} render={({ field }) => (
+                    <Controller name="bankAccount" control={control} render={({ field: { onChange, ...field } }) => (
                         <FieldWrapper label={t('adminStaffCompliance:label_bank_account', 'Số tài khoản')} error={errors.bankAccount}>
-                            <Input {...field} className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white" />
+                            <Input
+                                {...field}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, '');
+                                    onChange(value);
+                                }}
+                                className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white"
+                            />
                         </FieldWrapper>
                     )} />
                     <Controller name="bankName" control={control} render={({ field }) => (
@@ -73,30 +66,44 @@ const BankInfoCard = ({ staffId, data, t, onUnmask, onUpdateSuccess }) => {
                     )} />
 
                     <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/5">
-                        <Controller name="taxCode" control={control} render={({ field }) => (
+                        <Controller name="taxCode" control={control} render={({ field: { onChange, ...field } }) => (
                             <FieldWrapper label={t('adminStaffCompliance:label_tax_code', 'Mã số thuế (PIT)')} error={errors.taxCode}>
-                                <Input {...field} className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white" />
+                                <Input
+                                    {...field}
+                                    onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, '');
+                                        onChange(value);
+                                    }}
+                                    className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white"
+                                />
                             </FieldWrapper>
                         )} />
-                        <Controller name="insuranceCode" control={control} render={({ field }) => (
+                        <Controller name="insuranceCode" control={control} render={({ field: { onChange, ...field } }) => (
                             <FieldWrapper label={t('adminStaffCompliance:label_insurance_code', 'Mã số BHXH')} error={errors.insuranceCode}>
-                                <Input {...field} className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white" />
+                                <Input
+                                    {...field}
+                                    onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, '');
+                                        onChange(value);
+                                    }}
+                                    className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white"
+                                />
                             </FieldWrapper>
                         )} />
                     </div>
 
                     <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-slate-100 dark:border-white/5">
-                        <button 
+                        <button
                             type="button"
-                            onClick={handleCancel} 
-                            disabled={isSubmitting} 
+                            onClick={handleCancel}
+                            disabled={isSubmitting}
                             className="h-10 px-5 rounded-lg font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {t('adminStaffCompliance:btn_cancel', 'Hủy bỏ')}
                         </button>
-                        <button 
-                            type="submit" 
-                            disabled={isSubmitting} 
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
                             className="h-10 px-6 rounded-lg font-bold bg-yellow-500 hover:bg-yellow-400 text-slate-900 shadow-md shadow-yellow-500/20 flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {!isSubmitting && <Check size={16} />}

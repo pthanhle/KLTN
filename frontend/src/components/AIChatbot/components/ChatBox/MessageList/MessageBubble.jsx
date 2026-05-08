@@ -26,7 +26,7 @@ const MessageBubble = ({ msg, isWelcome, t }) => {
                 <img src={BrandLogo} alt="AI" className="w-full h-full object-contain transition-all duration-300 [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.08))] dark:[filter:drop-shadow(0_0_2px_rgba(255,255,255,0.6))_drop-shadow(0_0_12px_rgba(255,255,255,0.15))]" />
             </div>
             <div className="space-y-1.5 max-w-[85%]">
-                <div className="bg-slate-50 dark:bg-[#1a2030] p-4 py-3.5 rounded-2xl rounded-tl-sm text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed border border-slate-200 dark:border-white/5 shadow-sm space-y-2 whitespace-pre-wrap">
+                <div className="bg-slate-50 dark:bg-[#1c1c1e] p-4 py-3.5 rounded-2xl rounded-tl-sm text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed border border-slate-200 dark:border-white/5 shadow-sm space-y-2 whitespace-pre-wrap">
                     {msg.text}
                 </div>
                 <span className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold px-1 inline-block">

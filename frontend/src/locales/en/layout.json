@@ -90,10 +90,13 @@
   "admin": {
     "sider": {
       "dashboard": "Dashboard",
-      "products": "Products",
+      "cars": "Cars Inventory",
       "categories": "Categories",
+      "brands": "Brands",
+      "parts": "Parts",
       "customers": "Customers",
       "orders": "Orders",
+      "test-drive-bookings": "Test Drives",
       "service-packages": "Service Packages",
       "staff": "Staff",
       "promotions": "Promotions",

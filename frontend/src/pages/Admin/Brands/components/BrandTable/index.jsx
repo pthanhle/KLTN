@@ -14,13 +14,17 @@ export const BrandTable = ({ data, isLoading, onEdit, onDelete, t }) => {
                     rowKey="id"
                     loading={isLoading}
                     pagination={{
-                        pageSize: 5,
+                        defaultPageSize: 10,
                         showSizeChanger: true,
-                        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} brands`,
+                        showTotal: (total, range) => (
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+                                {t('showing', 'Hiển thị')} <strong className="text-slate-800 dark:text-white mx-1">{range[0]}-{range[1]}</strong> / <strong className="text-slate-800 dark:text-white mx-1">{total}</strong>
+                            </span>
+                        ),
                         className: '!px-6 py-4 !text-xs !font-bold !uppercase !tracking-widest !text-slate-500 custom-pagination border-t border-slate-100 dark:border-white/5'
                     }}
                     rowClassName={() => "group hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"}
-                className="
+                    className="
                     custom-dark-table w-full 
                     [&_.ant-table]:!bg-transparent 
 

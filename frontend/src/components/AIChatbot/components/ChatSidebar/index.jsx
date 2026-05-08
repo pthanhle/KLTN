@@ -4,7 +4,7 @@ import UserProfile from './UserProfile';
 
 const ChatSidebar = ({ sessions, currentSessionId, setCurrentSessionId, handleCreateNewSession, handleDeleteSession, t }) => {
     return (
-        <aside className="hidden md:flex flex-col w-56 lg:w-60 bg-white/95 dark:bg-[#0c1324]/80 backdrop-blur-2xl rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1),0_15px_30px_rgba(0,0,0,0.2)]">
+        <aside className="hidden md:flex flex-col w-56 lg:w-60 bg-white/95 dark:bg-[#141416]/95 backdrop-blur-2xl rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1),0_15px_30px_rgba(0,0,0,0.2)]">
             <div className="p-4 border-b border-slate-200 dark:border-white/5">
                 <button 
                     onClick={handleCreateNewSession}

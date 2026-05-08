@@ -7,7 +7,7 @@ const LocationMap = ({ contactData, isLoading, t }) => {
     const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(addressString)}&t=m&z=16&output=embed&iwloc=near`;
 
     return (
-        <section className="w-full h-[350px] md:h-[600px] relative mt-20 animate-in fade-in duration-1000 delay-700 bg-slate-100 dark:bg-[#060608]">
+        <section className="w-full h-[350px] md:h-[600px] relative mt-20 animate-in fade-in duration-1000 delay-700 bg-slate-100 dark:bg-[#0a0a0b]">
             {isLoading ? (
                 <div className="w-full h-full bg-slate-200 dark:bg-slate-800 animate-pulse flex items-center justify-center">
                     <Skeleton.Image className="!w-32 !h-32 opacity-20" />

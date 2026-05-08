@@ -95,8 +95,6 @@
   }
 }
 
-/* Ngăn chặn Chrome/Edge tự động fill nền và đổi màu chữ (Autofill Hack) */
-/* Transition delay 5000s sẽ khóa chết sự kiện đổi màu nền của Chrome, giữ lại màu trong suốt của Input */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -105,14 +103,12 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: currentColor !important;
 }
 
-/* Override đặc biệt cho trang Auth (Vì AuthLayout luôn mang nền tối kể cả khi đang ở light mode) */
 .bg-slate-800\/50:-webkit-autofill,
 .bg-slate-800\/50:-webkit-autofill:hover,
 .bg-slate-800\/50:-webkit-autofill:focus {
   -webkit-text-fill-color: white !important;
 }
 
-/* --- OVERRIDE ANT DESIGN MESSAGE --- */
 .ant-message .ant-message-notice-content {
   background-color: var(--color-background) !important;
   color: var(--color-foreground) !important;
@@ -198,7 +194,7 @@ input:-webkit-autofill:active {
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: #0b0f19;
+  background: #0a0a0b;
   /* dark mode background */
 }
 

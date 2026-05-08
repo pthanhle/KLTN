@@ -21,8 +21,8 @@ const NotificationSkeleton = () => {
             </div>
 
             {/* Card skeletons */}
-            {[1, 2, 3].map((item) => (
-                <div key={item} className="p-6 border-l-4 border-slate-200 dark:border-white/5 rounded-r-2xl bg-white/50 dark:bg-[#151b2d]/50 flex gap-6">
+            {skelItems.map((item) => (
+                <div key={item} className="p-6 border-l-4 border-slate-200 dark:border-white/5 rounded-r-2xl bg-white/50 dark:bg-[#141416]/50 flex gap-6">
                     <Skeleton.Avatar active shape="square" size={48} className="!rounded-2xl" />
                     <div className="flex-1 space-y-3">
                         <Skeleton active title={{ width: '40%' }} paragraph={{ rows: 2, width: ['100%', '80%'] }} />

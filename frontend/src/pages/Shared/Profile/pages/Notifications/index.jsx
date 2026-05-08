@@ -100,7 +100,7 @@ const ProfileNotifications = () => {
                 {notifications.length > 0 && (
                     <footer className="mt-16 flex justify-center pb-20">
                         <Button 
-                            className="group flex flex-row-reverse items-center justify-center gap-2 px-8 md:px-10 !h-12 bg-white dark:bg-[#151b2d] rounded-full border border-slate-200 dark:border-white/10 hover:!border-yellow-500/50 dark:hover:!border-yellow-500/50 transition-all duration-500 shadow-sm"
+                            className="group flex flex-row-reverse items-center justify-center gap-2 px-8 md:px-10 !h-12 bg-white dark:bg-[#141416] rounded-full border border-slate-200 dark:border-white/10 hover:!border-yellow-500/50 dark:hover:!border-yellow-500/50 transition-all duration-500 shadow-sm"
                             icon={<ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-yellow-500 group-hover:translate-y-1 transition-transform" />}
                         >
                             <span className="text-sm font-semibold text-slate-600 dark:text-slate-300 group-hover:text-yellow-600 dark:group-hover:text-yellow-500 transition-colors">

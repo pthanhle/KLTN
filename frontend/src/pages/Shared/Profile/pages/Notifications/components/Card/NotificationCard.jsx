@@ -41,7 +41,7 @@ const NotificationCard = ({ notification, onMarkRead, onMarkUnread, onDelete }) 
         <div className={`relative group border-l-4 backdrop-blur-[20px] rounded-r-2xl p-6 transition-all duration-300 hover:translate-x-1 flex gap-4 md:gap-6 items-start shadow-sm hover:shadow-md ${
             isUnread 
                 ? 'bg-yellow-50/50 dark:bg-yellow-500/5 border-yellow-500 dark:border-yellow-500' 
-                : 'bg-white/80 dark:bg-[#151b2d]/80 border-slate-200 dark:border-white/5 opacity-80 hover:opacity-100'
+                : 'bg-white/80 dark:bg-[#141416]/80 border-slate-200 dark:border-white/5 opacity-80 hover:opacity-100'
         }`}>
             {/* Visual Icon Box */}
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${

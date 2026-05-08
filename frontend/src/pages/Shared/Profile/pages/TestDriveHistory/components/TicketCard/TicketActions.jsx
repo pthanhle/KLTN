@@ -1,7 +1,7 @@
 import { CalendarClock, XCircle, Star } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 
-const TicketActions = ({ status, statusText, id, handleReschedule, handleCancel, t }) => {
+const TicketActions = ({ status, id, handleReschedule, handleCancel, t }) => {
     // Cutout Styles that support Dark mode borders dynamically
     const cutoutStyles = `
         relative bg-slate-50/50 dark:bg-white/[0.02] 
@@ -15,8 +15,7 @@ const TicketActions = ({ status, statusText, id, handleReschedule, handleCancel,
     `;
 
     const renderButtons = () => {
-        // 1: Pending, 2: Confirmed
-        if (status === 1 || status === 2) {
+        if (status === 'Pending' || status === 'Confirmed') {
             return (
                 <div className="w-full flex flex-col gap-3">
                     <button 
@@ -38,8 +37,7 @@ const TicketActions = ({ status, statusText, id, handleReschedule, handleCancel,
             );
         }
 
-        // 4: Completed
-        if (status === 4) {
+        if (status === 'Completed') {
             return (
                 <div className="w-full flex flex-col gap-3">
                     <button className="w-full py-3.5 bg-yellow-500 border border-yellow-500 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-[0_4px_12px_rgba(234,179,8,0.2)] hover:bg-yellow-400 hover:border-yellow-400 hover:-translate-y-0.5 transition-all duration-300 flex flex-col items-center gap-1.5 group">
@@ -58,7 +56,7 @@ const TicketActions = ({ status, statusText, id, handleReschedule, handleCancel,
     return (
         <div className={cutoutStyles}>
             <div className="mb-6 w-full flex justify-center">
-                <StatusBadge status={status} text={statusText} />
+                <StatusBadge status={status} t={t} />
             </div>
 
             {renderButtons()}

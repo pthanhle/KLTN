@@ -17,5 +17,8 @@
   "status_on_time": "ĐÚNG GIỜ",
   "status_late": "ĐI TRỄ",
   "status_absent": "VẮNG MẶT",
-  "status_day_off": "NGHỈ PHÉP"
+  "status_day_off": "NGHỈ PHÉP",
+  "notice_system_title": "THÔNG BÁO HỆ THỐNG",
+  "notice_sync_active": "Đồng bộ Chấm công Đang Hoạt động",
+  "notice_sync_desc": "Thiết bị sinh trắc học tại Khoang Dịch vụ 1 & 2 hiện đang trực tuyến và đang đồng bộ dữ liệu."
 }

@@ -40,7 +40,7 @@ const CarsPage = () => {
                 <div className="container mx-auto px-4 md:px-6 lg:px-10 max-w-[1440px]">
                     <div className="flex flex-col lg:flex-row gap-10 xl:gap-14">
                         <aside className="w-full lg:w-[320px] xl:w-[360px] flex-shrink-0">
-                            <div className="sticky top-28 bg-white dark:bg-[#0b0f19] p-6 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+                            <div className="sticky top-28 bg-white dark:bg-[#141416] p-6 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
                                 <div className="flex items-center gap-3 mb-8">
                                     <SlidersHorizontal size={20} className="text-yellow-500" strokeWidth={2.5} />
                                     <h2 className="text-lg font-black text-slate-900 dark:text-white">{t('filters.title', 'Bộ lọc tìm kiếm')}</h2>

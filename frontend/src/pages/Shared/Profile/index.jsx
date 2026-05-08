@@ -40,7 +40,7 @@ const ProfilePage = () => {
                 ) : (
                     <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-12">
                         <aside className="w-full lg:w-[320px] xl:w-[340px] flex-shrink-0">
-                            <div className="sticky top-28 bg-white dark:bg-[#0b0f19] p-8 md:p-10 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+                            <div className="sticky top-28 bg-white dark:bg-[#141416] p-8 md:p-10 rounded-[32px] border border-slate-100 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
                                 <ProfileSidebar
                                     profile={profile}
                                     t={t}

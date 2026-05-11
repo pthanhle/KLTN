@@ -31,26 +31,6 @@ export const useSiderMenu = (collapsed) => {
             label: t('admin.sider.dashboard'),
         },
         {
-            key: '/admin/cars',
-            icon: <Car size={iconSize} />,
-            label: t('admin.sider.cars', 'Kho Xe'),
-        },
-        {
-            key: '/admin/categories',
-            icon: <Layers size={iconSize} />,
-            label: t('admin.sider.categories'),
-        },
-        {
-            key: '/admin/brands',
-            icon: <Tag size={iconSize} />,
-            label: t('admin.sider.brands', 'Thương Hiệu'),
-        },
-        {
-            key: '/admin/parts',
-            icon: <Settings size={iconSize} />,
-            label: t('admin.sider.parts', 'Phụ Tùng'),
-        },
-        {
             key: '/admin/customers',
             icon: <Users size={iconSize} />,
             label: t('admin.sider.customers'),
@@ -66,19 +46,34 @@ export const useSiderMenu = (collapsed) => {
             label: t('admin.sider.test-drive-bookings', 'Lái Thử'),
         },
         {
+            key: '/admin/services/reception',
+            icon: <Box size={iconSize} />,
+            label: t('admin.sider.service-reception', 'Lịch Dịch Vụ'),
+        },
+        {
             key: '/admin/service-packages',
             icon: <Wrench size={iconSize} />,
             label: t('admin.sider.service-packages'),
         },
         {
-            key: '/admin/staff',
-            icon: <UserCog size={iconSize} />,
-            label: t('admin.sider.staff'),
+            key: '/admin/parts',
+            icon: <Settings size={iconSize} />,
+            label: t('admin.sider.parts', 'Phụ Tùng'),
         },
         {
-            key: '/admin/promotions',
-            icon: <TicketPercent size={iconSize} />,
-            label: t('admin.sider.promotions'),
+            key: '/admin/cars',
+            icon: <Car size={iconSize} />,
+            label: t('admin.sider.cars', 'Kho Xe'),
+        },
+        {
+            key: '/admin/brands',
+            icon: <Tag size={iconSize} />,
+            label: t('admin.sider.brands', 'Thương Hiệu'),
+        },
+        {
+            key: '/admin/categories',
+            icon: <Layers size={iconSize} />,
+            label: t('admin.sider.categories'),
         },
         {
             key: '/admin/tradein-vehicles',
@@ -86,10 +81,20 @@ export const useSiderMenu = (collapsed) => {
             label: t('admin.sider.tradein-vehicles'),
         },
         {
+            key: '/admin/promotions',
+            icon: <TicketPercent size={iconSize} />,
+            label: t('admin.sider.promotions'),
+        },
+        {
+            key: '/admin/staff',
+            icon: <UserCog size={iconSize} />,
+            label: t('admin.sider.staff'),
+        },
+        {
             key: '/admin/revenue-reports',
             icon: <TrendingUp size={iconSize} />,
             label: t('admin.sider.revenue-reports'),
-        },
+        }
     ];
 
     const handleMenuClick = ({ key }) => {

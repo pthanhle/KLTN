@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { useAdminBookings, useAdminSalesStaff, useAssignBookingMutation } from '../../../../services/queries/testDriveBookingAdmin.queries';
+import { useDispatchSocket } from './useDispatchSocket';
 import { message } from 'antd';
 
 export const useDispatchLogic = (t) => {
@@ -9,6 +10,8 @@ export const useDispatchLogic = (t) => {
     const [activeBooking, setActiveBooking] = useState(null);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [pendingAssignmentData, setPendingAssignmentData] = useState(null);
+
+    useDispatchSocket();
 
     const { data: bookingsResponse, isLoading: isLoadingBookings } = useAdminBookings({
         status: 'Pending',
@@ -48,7 +51,7 @@ export const useDispatchLogic = (t) => {
             const booking = active.data.current.booking;
             const staffId = over.id;
             const staff = staffList.find(s => s._id === staffId);
-            
+
             if (booking && staff) {
                 setPendingAssignmentData({ booking, staff });
                 setIsAssignModalOpen(true);
@@ -59,8 +62,8 @@ export const useDispatchLogic = (t) => {
     const confirmAssignment = (values) => {
         if (!pendingAssignmentData) return;
 
-        assignBooking({ 
-            bookingId: pendingAssignmentData.booking._id, 
+        assignBooking({
+            bookingId: pendingAssignmentData.booking._id,
             staffId: pendingAssignmentData.staff._id,
             priority: values.priority,
             note: values.note

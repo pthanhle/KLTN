@@ -19,3 +19,17 @@ export const getSharedPriorityStyles = (priority) => {
             return 'bg-slate-50 text-slate-500 dark:bg-slate-500/10 dark:text-slate-400 border-slate-200 dark:border-slate-500/20';
     }
 };
+
+/**
+ * Format SLA string with translations
+ * @param {string} sla 
+ * @param {function} t 
+ * @returns {string} Formatted SLA
+ */
+export const formatTaskSla = (sla, t) => {
+    if (!sla) return '';
+    if (sla === 'Ongoing') return t('adminStaffDetail:sla_ongoing', 'Đang xử lý');
+    if (sla === 'Overdue') return t('adminStaffDetail:sla_overdue', 'Quá hạn');
+    if (sla.includes('Remaining')) return sla.replace('Remaining', t('adminStaffDetail:sla_remaining', 'còn lại'));
+    return sla;
+};

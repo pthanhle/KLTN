@@ -25,6 +25,7 @@ const AdminServiceItemsPage = lazy(() => import('../pages/Admin/ServiceItems'));
 const AdminStaffPage = lazy(() => import('../pages/Admin/Staff'));
 const AdminStaffDetailPage = lazy(() => import('../pages/Admin/StaffDetail'));
 const AdminTestDriveBookingsPage = lazy(() => import('../pages/Admin/TestDriveBookings'));
+const AdminServiceReceptionPage = lazy(() => import('../pages/Admin/ServiceReception'));
 
 const Home = lazy(() => import('../pages/Customer/Home'));
 
@@ -121,6 +122,7 @@ const AppRoutes = () => {
                         <Route path="/admin/staff" element={<AdminStaffPage />} />
                         <Route path="/admin/staff/:id" element={<AdminStaffDetailPage />} />
                         <Route path="/admin/test-drive-bookings" element={<AdminTestDriveBookingsPage />} />
+                        <Route path="/admin/services/reception" element={<AdminServiceReceptionPage />} />
                         <Route path="/admin/orders" element={<div>Quản Lý Đơn Hàng</div>} />
                     </Route>
                 </Route>

@@ -1,9 +1,11 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+
 import { X, MessageCircle } from 'lucide-react';
 
+import { useChatAuditHeaderLogic } from './hooks/useChatAuditHeaderLogic';
+
 export const ChatAuditHeader = ({ task, onClose }) => {
-    const { t } = useTranslation();
+    const { t, displaySla } = useChatAuditHeaderLogic(task);
 
     return (
         <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between bg-slate-50/50 dark:bg-white/5 shrink-0">
@@ -31,7 +33,7 @@ export const ChatAuditHeader = ({ task, onClose }) => {
                     <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">
                         {t('adminStaffDetail:chat_sla_limit')}
                     </div>
-                    <div className="text-sm font-bold text-yellow-600 dark:text-yellow-500">{task.sla}</div>
+                    <div className="text-sm font-bold text-yellow-600 dark:text-yellow-500">{displaySla}</div>
                 </div>
                 <button 
                     onClick={onClose}

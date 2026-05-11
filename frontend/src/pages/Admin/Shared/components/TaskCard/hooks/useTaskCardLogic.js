@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { getSharedPriorityStyles } from '../../../../Shared/utils/task.utils';
+import { getSharedPriorityStyles, formatTaskSla } from '../../../../Shared/utils/task.utils';
 
 export const useTaskCardLogic = (task, status) => {
     const { t } = useTranslation(['adminStaffDetail', 'adminTestDriveBookings']);
@@ -23,6 +23,8 @@ export const useTaskCardLogic = (task, status) => {
     const displayTime = task.appointmentTime || t('adminStaffDetail:modal_not_available', 'N/A');
     const displayCustomerName = task.customerName || t('adminStaffDetail:modal_not_available', 'N/A');
 
+    const displaySla = formatTaskSla(task.sla, t);
+
     const slaStyle = isOverdue ? 'text-rose-500 dark:text-rose-500' : 'text-slate-700 dark:text-slate-300';
 
     return {
@@ -34,6 +36,7 @@ export const useTaskCardLogic = (task, status) => {
         displayDate,
         displayTime,
         displayCustomerName,
+        displaySla,
         slaStyle,
         t
     };

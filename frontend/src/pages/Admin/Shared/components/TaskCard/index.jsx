@@ -12,6 +12,7 @@ const TaskCard = ({ task, status, onClick }) => {
         displayDate,
         displayTime,
         displayCustomerName,
+        displaySla,
         slaStyle,
         t
     } = useTaskCardLogic(task, status);
@@ -99,7 +100,7 @@ const TaskCard = ({ task, status, onClick }) => {
                 ) : task.sla && (
                     <div className="flex items-center gap-1.5 shrink-0">
                         <span className={`text-[10px] font-bold uppercase tracking-widest bg-white dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200 dark:border-white/5 ${slaStyle}`}>
-                            SLA: {task.sla}
+                            SLA: {displaySla}
                         </span>
                     </div>
                 )}

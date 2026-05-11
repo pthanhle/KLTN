@@ -207,3 +207,15 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   background-color: #475569;
   /* slate-600 */
 }
+/* Custom Admin Tabs for Control Tower */
+.custom-admin-tabs .ant-tabs-content-holder {
+  height: 100%;
+  overflow: hidden;
+}
+.custom-admin-tabs .ant-tabs-content {
+  height: 100%;
+}
+.custom-admin-tabs .ant-tabs-tabpane {
+  height: 100%;
+}
+

@@ -6,6 +6,9 @@ export const useReceptionLogic = (selectedDate) => {
     const [advisors, setAdvisors] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeId, setActiveId] = useState(null);
+    const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+    const [selectedBookingForReschedule, setSelectedBookingForReschedule] = useState(null);
+    const [bookingToMarkNoShow, setBookingToMarkNoShow] = useState(null);
 
     const dateStr = selectedDate ? selectedDate.format('YYYY-MM-DD') : null;
 
@@ -36,7 +39,7 @@ export const useReceptionLogic = (selectedDate) => {
         if (!over) return;
 
         const bookingId = active.id;
-        const targetId = over.id; // Có thể là 'unassigned' hoặc advisor_id
+        const targetId = over.id;
 
         setBookings((prevBookings) => {
             return prevBookings.map((booking) => {
@@ -55,6 +58,68 @@ export const useReceptionLogic = (selectedDate) => {
     const unassignedBookings = bookings.filter(b => b.status === 'CONFIRMED');
     const activeBooking = activeId ? bookings.find(b => b._id === activeId) : null;
 
+    const confirmNoShow = (bookingId) => {
+        setBookingToMarkNoShow(bookingId);
+    };
+
+    const handleNoShowConfirm = async () => {
+        if (!bookingToMarkNoShow) return;
+
+        try {
+            // TODO: API Integration Point for No-Show
+            // await axios.patch(`/api/v1/bookings/${bookingToMarkNoShow}/status`, {
+            //     status: 'NO_SHOW',
+            //     updated_at: new Date().toISOString()
+            // });
+            
+            setBookings(prev => prev.map(b => b._id === bookingToMarkNoShow ? { ...b, status: 'NO_SHOW' } : b).filter(b => b.status !== 'NO_SHOW'));
+            setBookingToMarkNoShow(null);
+        } catch (error) {
+            console.error('Failed to mark booking as no-show:', error);
+            // message.error(t('error_update_failed'));
+        }
+    };
+
+    const handleNoShowCancel = () => {
+        setBookingToMarkNoShow(null);
+    };
+
+    const handleRescheduleClick = (booking) => {
+        setSelectedBookingForReschedule(booking);
+        setIsRescheduleModalOpen(true);
+    };
+
+    const rescheduleBooking = async (bookingId, newTime, newDate) => {
+        try {
+            const [hours, minutes] = newTime.split(':');
+            const endHours = parseInt(hours, 10) + 2; // Assuming default service duration is 2 hours
+            const endTime = `${endHours.toString().padStart(2, '0')}:${minutes}`;
+            const newTimeSlot = `${newTime} - ${endTime}`;
+
+            // TODO: API Integration Point for Reschedule
+            // await axios.patch(`/api/v1/bookings/${bookingId}/reschedule`, {
+            //     booking_date: newDate,
+            //     time_slot: newTimeSlot,
+            //     // status: 'PENDING' // Optional: reset status if business rules require re-confirmation
+            // });
+
+            setBookings(prev => prev.map(b => {
+                if (b._id === bookingId) {
+                    if (newDate && newDate !== dateStr) {
+                        return { ...b, time_slot: newTimeSlot, booking_date: newDate, is_hidden: true };
+                    }
+                    return { ...b, time_slot: newTimeSlot };
+                }
+                return b;
+            }).filter(b => !b.is_hidden));
+            
+            setIsRescheduleModalOpen(false);
+            setSelectedBookingForReschedule(null);
+        } catch (error) {
+            console.error('Failed to reschedule booking:', error);
+        }
+    };
+
     return {
         bookings,
         advisors,
@@ -62,6 +127,15 @@ export const useReceptionLogic = (selectedDate) => {
         handleDragStart,
         handleDragEnd,
         unassignedBookings,
-        activeBooking
+        activeBooking,
+        confirmNoShow,
+        handleNoShowConfirm,
+        handleNoShowCancel,
+        bookingToMarkNoShow,
+        rescheduleBooking,
+        handleRescheduleClick,
+        isRescheduleModalOpen,
+        setIsRescheduleModalOpen,
+        selectedBookingForReschedule
     };
 };

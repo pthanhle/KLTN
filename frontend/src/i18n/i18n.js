@@ -60,6 +60,8 @@ import enAdminTestDriveBookings from '../locales/en/adminTestDriveBookings.json'
 import viAdminTestDriveBookings from '../locales/vi/adminTestDriveBookings.json';
 import enAdminServiceReception from '../locales/en/adminServiceReception.json';
 import viAdminServiceReception from '../locales/vi/adminServiceReception.json';
+import enAdminRODetail from '../locales/en/adminRODetail.json';
+import viAdminRODetail from '../locales/vi/adminRODetail.json';
 
 i18n
     .use(initReactI18next)
@@ -96,6 +98,7 @@ i18n
                 adminStaffCreate: enAdminStaffCreate,
                 adminTestDriveBookings: enAdminTestDriveBookings,
                 adminServiceReception: enAdminServiceReception,
+                adminRODetail: enAdminRODetail,
             },
             vi: {
                 translation: viTranslation,
@@ -128,6 +131,7 @@ i18n
                 adminStaffCreate: viAdminStaffCreate,
                 adminTestDriveBookings: viAdminTestDriveBookings,
                 adminServiceReception: viAdminServiceReception,
+                adminRODetail: viAdminRODetail,
             },
         },
         lng: 'vi',

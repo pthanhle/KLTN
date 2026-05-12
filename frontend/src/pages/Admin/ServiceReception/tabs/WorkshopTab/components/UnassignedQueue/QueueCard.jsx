@@ -1,10 +1,12 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Car, Wrench, MoreVertical } from 'lucide-react';
-import { Tooltip } from 'antd';
+import { Car, Wrench, MoreVertical, User } from 'lucide-react';
+import { Popover } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const QueueCard = ({ booking }) => {
+    const { t } = useTranslation('adminServiceReception');
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: booking._id,
         data: {
@@ -21,22 +23,24 @@ const QueueCard = ({ booking }) => {
     };
 
     const tooltipContent = (
-        <div className="flex flex-col gap-2 p-2 min-w-[200px]">
-            <div className="flex justify-between items-center border-b border-white/10 pb-2 mb-1">
-                <span className="font-bold text-yellow-500">{booking._id}</span>
-                <span className="bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-bold">{booking.status}</span>
+        <div className="flex flex-col gap-2 p-1 min-w-[200px] text-slate-800 dark:text-slate-200">
+            <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-1">
+                <span className="font-bold text-yellow-600 dark:text-yellow-500">{booking._id}</span>
+                <span className="bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300">
+                    {t(`status_${booking.status}`, booking.status)}
+                </span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-                <Car className="w-3.5 h-3.5 text-slate-400" />
+                <Car className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{booking.license_plate} - {booking.vehicle_model}</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <User className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{booking.customer_name}</span>
             </div>
-            <div className="flex items-start gap-2 text-xs mt-1 bg-white/5 p-2 rounded">
-                <Wrench className="w-3.5 h-3.5 text-yellow-500 shrink-0 mt-0.5" />
-                <span className="text-slate-300">{booking.vehicle_condition || 'Không có ghi chú'}</span>
+            <div className="flex items-start gap-2 text-xs mt-1 bg-slate-50 dark:bg-white/5 p-2 rounded">
+                <Wrench className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
+                <span className="text-slate-700 dark:text-slate-300">{booking.vehicle_condition || t('bookingCard_noSymptoms')}</span>
             </div>
         </div>
     );
@@ -66,9 +70,9 @@ const QueueCard = ({ booking }) => {
     if (isDragging) return cardContent;
 
     return (
-        <Tooltip title={tooltipContent} placement="left">
+        <Popover content={tooltipContent} placement="left" trigger="hover">
             {cardContent}
-        </Tooltip>
+        </Popover>
     );
 };
 

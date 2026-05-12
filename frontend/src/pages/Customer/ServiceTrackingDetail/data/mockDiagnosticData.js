@@ -25,8 +25,8 @@ export const mockDiagnosticData = {
             },
             {
                 id: 'engine', title: 'Động Cơ & Hộp Số', icon: 'Cpu', totalCount: 10, technician_note: null,
-                items: [ 
-                    { name: 'Dầu hộp số', status: 'warning', action_required: 'Đã đến hạn thay theo chu kỳ' }, 
+                items: [
+                    { name: 'Dầu hộp số', status: 'warning', action_required: 'Đã đến hạn thay theo chu kỳ' },
                     { name: 'Dầu bôi trơn động cơ', status: 'normal' },
                     { name: 'Lọc dầu (lọc nhớt)', status: 'normal' },
                     { name: 'Bugie & Đánh lưả', status: 'normal' },
@@ -40,7 +40,7 @@ export const mockDiagnosticData = {
             },
             {
                 id: 'electrical', title: 'Hệ Thống Điện & Cảm Biến', icon: 'Zap', totalCount: 9, technician_note: null,
-                items: [ 
+                items: [
                     { name: 'Ắc quy (Điện áp/Dòng)', status: 'normal' },
                     { name: 'Hệ thống chiếu sáng', status: 'normal' },
                     { name: 'Màn hình hiển thị Taplo', status: 'normal' },
@@ -54,7 +54,7 @@ export const mockDiagnosticData = {
             },
             {
                 id: 'body', title: 'Nội Ngoại Thất & Khung Vỏ', icon: 'Car', totalCount: 9, technician_note: null,
-                items: [ 
+                items: [
                     { name: 'Bề mặt sơn ngoại thất', status: 'normal' },
                     { name: 'Gương chiếu hậu', status: 'normal' },
                     { name: 'Cơ cấu điện ghế lái', status: 'normal' },
@@ -72,7 +72,11 @@ export const mockDiagnosticData = {
 };
 
 export const getDiagnosticData = (code) => {
+    if (['SRV-2026-X11A', 'SRV-2026-Y22B', 'SRV-2026-Z33C', 'SRV-2026-R11', 'SRV-2026-R22'].includes(code)) {
+        return null;
+    }
+
     const diagnostic = mockDiagnosticData['SRV-2026-B77P'];
-    const serviceSession = getMasterServiceSession(diagnostic.booking_code);
-    return { ...diagnostic, last_maintenance_date: '10/05/2025', technician: { name: serviceSession?.mechanic_info?.name, role: serviceSession?.mechanic_info?.level, avatar: serviceSession?.mechanic_info?.avatar, signature: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Steve_Jobs_signature.svg/512px-Steve_Jobs_signature.svg.png' } };
+    const serviceSession = getMasterServiceSession(code);
+    return { ...diagnostic, booking_code: code, last_maintenance_date: '10/05/2025', technician: { name: serviceSession?.mechanic_info?.name || 'Nguyễn Văn A', role: serviceSession?.mechanic_info?.level || 'Kỹ thuật viên', avatar: serviceSession?.mechanic_info?.avatar || 'https://i.pravatar.cc/150', signature: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Steve_Jobs_signature.svg/512px-Steve_Jobs_signature.svg.png' } };
 };

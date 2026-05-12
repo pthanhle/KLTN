@@ -5,7 +5,7 @@ import { Inbox } from 'lucide-react';
 import { useDroppable } from '@dnd-kit/core';
 import { Skeleton } from 'antd';
 
-const IncomingBookingsPane = ({ bookings, isLoading }) => {
+const IncomingBookingsPane = ({ bookings, isLoading, onReschedule, onNoShow }) => {
     const { t } = useTranslation('adminServiceReception');
     const { setNodeRef, isOver } = useDroppable({
         id: 'unassigned',
@@ -42,7 +42,7 @@ const IncomingBookingsPane = ({ bookings, isLoading }) => {
                     </div>
                 ) : (
                     bookings.map(booking => (
-                        <BookingCard key={booking._id} booking={booking} />
+                        <BookingCard key={booking._id} booking={booking} onReschedule={onReschedule} onNoShow={onNoShow} />
                     ))
                 )}
             </div>

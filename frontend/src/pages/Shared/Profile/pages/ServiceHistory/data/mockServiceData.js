@@ -72,5 +72,77 @@ export const mockServices = [
             { step: 'QC_TESTING', key: 'step_qc', status: 'COMPLETED', time: '2026-06-15T17:00:00Z', note: 'Test bề mặt bằng công nghệ hồng ngoại. Đạt chuẩn 9H.', images: [] },
             { step: 'COMPLETED', key: 'step_completed', status: 'COMPLETED', time: '2026-06-15T17:30:00Z', note: 'Rửa vệ sinh khoang máy và Bàn giao khách.', images: [] }
         ]
+    },
+    {
+        booking_code: 'SRV-2026-W33', // Đã duyệt, Đang thi công
+        user_id: 'USR-08913',
+        service_type: 'REPAIR',
+        advisor_info: { id: 'ADV-001', name: 'Đỗ Tiến Đạt', phone: '0988.111.222', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026024d' },
+        mechanic_info: { id: 'MEC-005', name: 'Lê Văn Nam', level: 'Master Technician', avatar: 'https://i.pravatar.cc/150?u=a04258a2462d826712d' },
+        vehicle_info: { brand: 'Hyundai', model: 'Santafe', license_plate: '61A-123.45', current_odometer: 60000 },
+        booking_status: 'IN_PROGRESS'
+    },
+    {
+        booking_code: 'SRV-2026-W11', // Chờ khách duyệt
+        user_id: 'USR-08914',
+        service_type: 'REPAIR',
+        advisor_info: { id: 'ADV-002', name: 'Nguyễn Thị Bích', phone: '0912.333.444', avatar: 'https://i.pravatar.cc/150?u=a04258114e29026702d' },
+        mechanic_info: { id: 'MEC-012', name: 'Trần Mạnh Hùng', level: 'Senior Detailer', avatar: 'https://i.pravatar.cc/150?u=a048581f4e29026701d' },
+        vehicle_info: { brand: 'Mercedes-Benz', model: 'GLC 300', license_plate: '51F-888.88', current_odometer: 32000 },
+        booking_status: 'QUOTING'
+    },
+    {
+        booking_code: 'SRV-2026-R22', // Cố vấn đang kiểm tra
+        user_id: 'USR-08915',
+        service_type: 'MAINTENANCE',
+        advisor_info: { id: 'ADV-003', name: 'Trần Văn C', phone: '0912.444.555', avatar: 'https://i.pravatar.cc/150?u=a04258114e29026703d' },
+        mechanic_info: { id: 'MEC-013', name: 'Võ Minh D', level: 'Technician', avatar: 'https://i.pravatar.cc/150?u=a048581f4e29026702d' },
+        vehicle_info: { brand: 'Ford', model: 'Everest', license_plate: '60C-555.55', current_odometer: 15000 },
+        booking_status: 'DIAGNOSING'
+    },
+    {
+        booking_code: 'SRV-2026-X11A',
+        user_id: 'USR-08916',
+        service_type: 'REPAIR',
+        advisor_info: null,
+        mechanic_info: null,
+        vehicle_info: { brand: 'Mazda', model: 'CX-5', license_plate: '30H-123.45', current_odometer: 45000 },
+        booking_status: 'PENDING'
+    },
+    {
+        booking_code: 'SRV-2026-Y22B',
+        user_id: 'USR-08917',
+        service_type: 'MAINTENANCE',
+        advisor_info: null,
+        mechanic_info: null,
+        vehicle_info: { brand: 'Toyota', model: 'Camry', license_plate: '51K-999.99', current_odometer: 20000 },
+        booking_status: 'PENDING'
+    },
+    {
+        booking_code: 'SRV-2026-Z33C',
+        user_id: 'USR-08918',
+        service_type: 'REPAIR',
+        advisor_info: null,
+        mechanic_info: null,
+        vehicle_info: { brand: 'Ford', model: 'Ranger', license_plate: '60A-456.78', current_odometer: 85000 },
+        booking_status: 'PENDING'
+    },
+    {
+        booking_code: 'SRV-2026-R11',
+        user_id: 'USR-08919',
+        service_type: 'REPAIR',
+        advisor_info: null,
+        mechanic_info: null,
+        vehicle_info: { brand: 'Honda', model: 'CR-V', license_plate: '51G-123.99', current_odometer: 120000 },
+        booking_status: 'PENDING'
+    },
+    {
+        booking_code: 'SRV-2026-W22',
+        user_id: 'USR-08920',
+        service_type: 'REPAIR',
+        advisor_info: { id: 'ADV-001', name: 'Đỗ Tiến Đạt', phone: '0988.111.222', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026024d' },
+        mechanic_info: null,
+        vehicle_info: { brand: 'BMW', model: 'X5', license_plate: '30A-999.99', current_odometer: 70000 },
+        booking_status: 'RO_CREATED'
     }
 ];

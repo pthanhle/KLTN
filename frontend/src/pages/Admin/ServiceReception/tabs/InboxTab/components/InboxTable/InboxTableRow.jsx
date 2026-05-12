@@ -4,7 +4,7 @@ import { Clock, CalendarDays, CheckCircle2, MessageSquare, AlertCircle, Phone, C
 import { calculateAging } from '../../utils/timeUtils';
 import dayjs from 'dayjs';
 
-const InboxTableRow = ({ booking, onConfirm }) => {
+const InboxTableRow = ({ booking, onConfirm, onReject }) => {
     const { t } = useTranslation('adminServiceReception');
     const aging = calculateAging(booking.created_at);
 
@@ -43,7 +43,7 @@ const InboxTableRow = ({ booking, onConfirm }) => {
                 </div>
             </div>
 
-            <div className="w-full md:w-[25%] flex flex-col gap-1 pr-4 mb-3 md:mb-0">
+            <div className="w-full md:w-[20%] flex flex-col gap-1 pr-4 mb-3 md:mb-0">
                 <div className="font-bold text-slate-800 dark:text-white">
                     {booking.vehicle_brand} {booking.vehicle_model}
                 </div>
@@ -53,7 +53,7 @@ const InboxTableRow = ({ booking, onConfirm }) => {
             </div>
 
             {/* Request Details Column */}
-            <div className="w-full md:w-[35%] flex flex-col gap-2 pr-4 mb-3 md:mb-0">
+            <div className="w-full md:w-[30%] flex flex-col gap-2 pr-4 mb-3 md:mb-0">
                 <div className="font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                     <CalendarDays size={16} className="text-blue-500" />
                     {formattedDate}, {booking.time_slot}
@@ -73,7 +73,13 @@ const InboxTableRow = ({ booking, onConfirm }) => {
             </div>
 
             {/* Actions Column */}
-            <div className="w-full md:w-[10%] flex md:justify-end items-start mt-2 md:mt-0">
+            <div className="w-full md:w-[20%] flex flex-col md:flex-row md:justify-end gap-2 items-start mt-2 md:mt-0">
+                <button
+                    onClick={() => onReject(booking._id)}
+                    className="w-full md:w-auto bg-transparent hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 uppercase text-[11px] font-bold tracking-widest px-4 py-3 rounded-full transition-all"
+                >
+                    {t('action_reject', 'Reject')}
+                </button>
                 <button
                     onClick={() => onConfirm(booking._id)}
                     className="w-full md:w-auto bg-amber-400 hover:bg-amber-500 dark:bg-amber-500 dark:hover:bg-amber-400 text-slate-900 uppercase text-[11px] font-black tracking-widest px-6 py-3 rounded-full shadow-lg shadow-amber-500/20 active:scale-95 transition-all"

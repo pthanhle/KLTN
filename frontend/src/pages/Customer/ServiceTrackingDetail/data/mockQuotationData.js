@@ -19,8 +19,19 @@ const quotationDatabase = {
 };
 
 export const getQuotationData = (code) => {
+    if (['SRV-2026-R22', 'SRV-2026-X11A', 'SRV-2026-Y22B', 'SRV-2026-Z33C', 'SRV-2026-R11'].includes(code)) {
+        return null;
+    }
+
     const data = quotationDatabase['SRV-2026-B77P'];
-    const serviceSession = getMasterServiceSession(data.booking_code);
-    const isAlreadyApproved = false; // Set về false để cho phép Demo màn hình Ký duyệt và Thanh toán
-    return { ...data, status: 'WAITING_FOR_APPROVAL', creation_date: serviceSession?.booking_date, advisor_name: serviceSession?.advisor_info?.name || 'Trần Hoàng', customer_info: { full_name: 'Nguyễn Văn Khách', phone: '0901.234.567', address: 'Số 12, Phạm Văn Đồng, Hà Nội' }, vehicle_info: { ...serviceSession?.vehicle_info }, payment_terms: { ...data.payment_terms, deposit_status: 'PENDING' }, customer_signature: null };
+    const serviceSession = getMasterServiceSession(code);
+
+    let status = 'WAITING_FOR_APPROVAL';
+    if (['SRV-2026-B77P'].includes(code)) {
+        status = 'PENDING';
+    } else if (['SRV-2026-W11', 'SRV-2026-W22', 'SRV-2026-W33', 'SRV-2026-W44', 'SRV-2026-X99R'].includes(code)) {
+        status = 'APPROVED';
+    }
+
+    return { ...data, booking_code: code, status, creation_date: serviceSession?.booking_date, advisor_name: serviceSession?.advisor_info?.name || 'Trần Hoàng', customer_info: { full_name: 'Nguyễn Văn Khách', phone: '0901.234.567', address: 'Số 12, Phạm Văn Đồng, Hà Nội' }, vehicle_info: { ...serviceSession?.vehicle_info }, payment_terms: { ...data.payment_terms, deposit_status: 'PENDING' }, customer_signature: null };
 };

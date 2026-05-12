@@ -1,7 +1,38 @@
 import User from '../../models/userModel.js'
 import Order from '../../models/orderModel.js'
 import Booking from '../../models/bookingModel.js'
+import Role from '../../models/roleModel.js'
+import mongoose from 'mongoose'
 import asyncHandler from 'express-async-handler'
+
+
+export const getCustomerStats = asyncHandler(async (req, res) => {
+    const customerRoleIds = await getCustomerRoleIds()
+    const query = { role_id: { $in: customerRoleIds } }
+
+    const totalCustomers = await User.countDocuments(query)
+    
+    const vipCustomers = await User.countDocuments({
+        role_id: { $in: customerRoleIds },
+        'loyalty.tier': { $in: ['GOLD', 'PLATINUM', 'DIAMOND', 'TITANIUM'] }
+    })
+
+    const startOfWeek = new Date()
+    startOfWeek.setHours(0, 0, 0, 0)
+    startOfWeek.setDate(startOfWeek.getDate() - (startOfWeek.getDay() || 7))
+    
+    const newThisWeek = await User.countDocuments({
+        role_id: { $in: customerRoleIds },
+        createdAt: { $gte: startOfWeek }
+    })
+
+    res.json({
+        totalCustomers,
+        vipCustomers,
+        retentionRate: 85,
+        newThisWeek
+    })
+})
 
 
 export const getCustomers = asyncHandler(async (req, res) => {
@@ -49,9 +80,12 @@ export const getCustomerById = asyncHandler(async (req, res) => {
     }
 
     const customerRoleIds = await getCustomerRoleIds()
-    if (!customerRoleIds.includes(customer.role_id._id.toString())) {
+
+    const roleIdStr = customer.role_id?._id?.toString() || customer.role_id?.toString();
+
+    if (!roleIdStr || !customerRoleIds.includes(roleIdStr)) {
         res.status(400)
-        throw new Error('Người dùng này không phải là khách hàng')
+        throw new Error('Người dùng này không phải là khách hàng hoặc không có vai trò hợp lệ')
     }
 
     const orderCount = await Order.countDocuments({ user_id: customer._id })
@@ -66,7 +100,7 @@ export const getCustomerById = asyncHandler(async (req, res) => {
 
 
 export const updateCustomer = asyncHandler(async (req, res) => {
-    const { 
+    const {
         full_name, email, phone, address, status,
         addresses, garage, customer_type, tax_info,
         loyalty, debt, source, admin_notes, last_visit_date
@@ -94,7 +128,7 @@ export const updateCustomer = asyncHandler(async (req, res) => {
     if (garage !== undefined) customer.garage = garage
     if (customer_type !== undefined) customer.customer_type = customer_type
     if (tax_info !== undefined) customer.tax_info = tax_info
-    
+
     if (loyalty !== undefined) {
         if (loyalty.points !== undefined) customer.loyalty.points = loyalty.points
         if (loyalty.tier !== undefined) customer.loyalty.tier = loyalty.tier
@@ -231,7 +265,6 @@ export const getBookingsByCustomer = asyncHandler(async (req, res) => {
 })
 
 const getCustomerRoleIds = async () => {
-    const Role = (await import('../../models/roleModel.js')).default
     const customerRoles = await Role.find({ role_name: { $in: ['customer', 'Customer'] } })
     return customerRoles.map(r => r._id.toString())
 }

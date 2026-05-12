@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { adminCustomerApi } from '../../../../../services/api/adminCustomer.api';
+import { adminCustomerApi } from '@/services/api/adminCustomer.api';
 import { normalizeFormForApi } from '../utils/customerFormUtils';
 
 export const useCustomerFormSubmit = (onClose, messageApi, onSuccess) => {

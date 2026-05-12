@@ -62,18 +62,21 @@ export const getCustomerColumns = (t, onViewDetails, onEditDetails) => [
         dataIndex: 'tier',
         key: 'tier',
         width: 120,
-        render: (tier) => {
+        render: (tier, record) => {
+            const displayTier = (tier || record.loyalty?.tier || 'BRONZE').toLowerCase();
             const getTierStyle = () => {
-                switch(tier) {
+                switch(displayTier) {
                     case 'platinum': return 'bg-yellow-500/10 text-yellow-600 dark:text-premium-gold border-yellow-500/20 shadow-[0_0_15px_rgba(247,190,29,0.2)]';
+                    case 'titanium': return 'bg-slate-800 text-white dark:bg-slate-500/10 dark:text-slate-200 border-slate-700 dark:border-slate-500/20';
                     case 'gold': return 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-500/20';
                     case 'silver': return 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600';
+                    case 'bronze': return 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border-orange-200 dark:border-orange-500/20';
                     default: return 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400 border-slate-200 dark:border-white/10';
                 }
             };
             return (
                 <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${getTierStyle()}`}>
-                    {tier}
+                    {displayTier}
                 </span>
             );
         }

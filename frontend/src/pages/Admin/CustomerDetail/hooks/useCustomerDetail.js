@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { message } from 'antd';
-import { adminCustomerApi } from '../../../../services/api/adminCustomer.api';
+import { adminCustomerApi } from '@/services/api/adminCustomer.api';
 import { MOCK_TIER_CONFIG } from '../../Customers/data/tierConfig.mock';
 
 export const useCustomerDetail = () => {
@@ -21,14 +21,21 @@ export const useCustomerDetail = () => {
     const [bookingsPagination, setBookingsPagination] = useState({ page: 1, limit: 5, total: 0 });
 
     useEffect(() => {
-        if (!id) return;
+        if (!id || id === 'undefined') {
+            console.warn('Customer ID is missing or undefined');
+            setIsLoading(false);
+            return;
+        }
+
         const fetchCustomer = async () => {
             setIsLoading(true);
             try {
+                console.log('Fetching customer detail for ID:', id);
                 const data = await adminCustomerApi.getCustomerById(id);
                 setCustomer(data);
             } catch (err) {
-                message.error('Không thể tải thông tin khách hàng');
+                const errorMsg = err?.response?.data?.message || err.message || 'Không thể tải thông tin khách hàng';
+                message.error(errorMsg);
                 console.error('Fetch customer detail error:', err);
             } finally {
                 setIsLoading(false);

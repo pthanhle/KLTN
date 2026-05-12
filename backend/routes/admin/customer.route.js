@@ -1,6 +1,7 @@
 import express from 'express'
 import {
     getCustomers,
+    getCustomerStats,
     getCustomerById,
     updateCustomer,
     deleteCustomer,
@@ -12,6 +13,9 @@ import { protect, admin } from '../../middleware/authMiddleware.js'
 const router = express.Router()
 
 router.use(protect, admin)
+
+router.route('/stats')
+    .get(getCustomerStats)
 
 router.route('/')
     .get(getCustomers)

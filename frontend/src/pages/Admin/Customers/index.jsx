@@ -44,10 +44,10 @@ const CustomersPage = () => {
                     <Table
                         loading={false}
                         dataSource={isLoading ? generateSkeletonData(10) : data}
-                        rowKey="id"
+                        rowKey={(record) => record.id || record._id}
                         columns={withSkeletonColumns(getCustomerColumns(
                             t, 
-                            (record) => navigate(`/admin/customers/${record.id}`),
+                            (record) => navigate(`/admin/customers/${record.id || record._id}`),
                             (record) => { setEditingCustomer(record); setIsFormOpen(true); }
                         ))}
                         pagination={false}

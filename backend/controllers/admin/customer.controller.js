@@ -90,13 +90,11 @@ export const updateCustomer = asyncHandler(async (req, res) => {
     if (address !== undefined) customer.address = address
     if (status !== undefined) customer.status = status
 
-    // Enterprise Fields (Admins can update everything, including Loyalty & Debt)
     if (addresses !== undefined) customer.addresses = addresses
     if (garage !== undefined) customer.garage = garage
     if (customer_type !== undefined) customer.customer_type = customer_type
     if (tax_info !== undefined) customer.tax_info = tax_info
     
-    // Loyalty might be sent as an entire object from Admin UI
     if (loyalty !== undefined) {
         if (loyalty.points !== undefined) customer.loyalty.points = loyalty.points
         if (loyalty.tier !== undefined) customer.loyalty.tier = loyalty.tier

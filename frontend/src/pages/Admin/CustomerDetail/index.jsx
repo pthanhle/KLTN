@@ -16,7 +16,16 @@ const CustomerDetailPage = () => {
         setActiveTab, 
         isEditorOpen, 
         setIsEditorOpen,
-        tiersList
+        tiersList,
+        orders,
+        ordersLoading,
+        ordersPagination,
+        fetchOrders,
+        bookings,
+        bookingsLoading,
+        bookingsPagination,
+        fetchBookings,
+        handleCustomerUpdate,
     } = useCustomerDetail();
     const navigate = useNavigate();
 
@@ -52,6 +61,14 @@ const CustomerDetailPage = () => {
                     setActiveTab={setActiveTab}
                     isLoading={isLoading}
                     t={t}
+                    orders={orders}
+                    ordersLoading={ordersLoading}
+                    ordersPagination={ordersPagination}
+                    onOrdersPageChange={(page) => fetchOrders(page, ordersPagination.limit)}
+                    bookings={bookings}
+                    bookingsLoading={bookingsLoading}
+                    bookingsPagination={bookingsPagination}
+                    onBookingsPageChange={(page) => fetchBookings(page, bookingsPagination.limit)}
                 />
             </div>
             
@@ -60,7 +77,8 @@ const CustomerDetailPage = () => {
                 onClose={() => setIsEditorOpen(false)} 
                 customer={customer} 
                 tiersList={tiersList}
-                t={t} 
+                t={t}
+                onSave={handleCustomerUpdate}
             />
         </main>
     );

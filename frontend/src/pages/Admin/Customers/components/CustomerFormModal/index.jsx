@@ -6,15 +6,15 @@ import { getCustomerFormSchemas } from './schemas/customerSchemas';
 import { useCustomerFormLoader } from './hooks/useCustomerFormLoader';
 import { useCustomerFormSubmit } from './hooks/useCustomerFormSubmit';
 
-export const CustomerFormModal = ({ isOpen, onClose, customer, t }) => {
+export const CustomerFormModal = ({ isOpen, onClose, customer, t, onSuccess }) => {
     const [messageApi, contextHolder] = message.useMessage();
     const { form, isEditMode, isLoading, tiersList } = useCustomerFormLoader(customer, isOpen);
-    const { isSubmitting, handleSave } = useCustomerFormSubmit(onClose, messageApi);
+    const { isSubmitting, handleSave } = useCustomerFormSubmit(onClose, messageApi, onSuccess);
 
     const schemas = getCustomerFormSchemas(t);
 
     const onSubmitWrapper = (values) => {
-        handleSave(values, isEditMode);
+        handleSave(values, isEditMode, customer?._id || customer?.id);
     };
 
     return (

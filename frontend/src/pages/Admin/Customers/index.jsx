@@ -17,7 +17,9 @@ const CustomersPage = () => {
 
     const { 
         t, breadcrumbItems, data, stats, pagination, isLoading, handlePaginationChange,
-        selectedRowKeys, handleSelectChange, handleClearSelection, handleBulkAction
+        filters, handleFilterChange,
+        selectedRowKeys, handleSelectChange, handleClearSelection, handleBulkAction,
+        refetch,
     } = useCustomers();
 
     const startRecord = (pagination.currentPage - 1) * pagination.pageSize + 1;
@@ -37,7 +39,7 @@ const CustomersPage = () => {
 
                 <div className="bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm overflow-hidden relative">
 
-                    <CustomerToolbar t={t} />
+                    <CustomerToolbar t={t} filters={filters} onFilterChange={handleFilterChange} />
 
                     <Table
                         loading={false}
@@ -88,6 +90,7 @@ const CustomersPage = () => {
                     isOpen={isFormOpen}
                     onClose={() => setIsFormOpen(false)}
                     customer={editingCustomer}
+                    onSuccess={refetch}
                 />
             </div>
         </div>

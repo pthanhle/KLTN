@@ -7,6 +7,8 @@ import {
     deleteCustomer,
     getOrdersByCustomer,
     getBookingsByCustomer,
+    createCustomer,
+    verifyCustomerOTP,
 } from '../../controllers/admin/customer.controller.js'
 import { protect, admin } from '../../middleware/authMiddleware.js'
 
@@ -19,6 +21,9 @@ router.route('/stats')
 
 router.route('/')
     .get(getCustomers)
+    .post(createCustomer)
+
+router.post('/verify-otp', verifyCustomerOTP)
 
 router.route('/:id')
     .get(getCustomerById)

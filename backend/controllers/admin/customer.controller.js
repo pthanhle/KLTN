@@ -4,6 +4,9 @@ import Booking from '../../models/bookingModel.js'
 import Role from '../../models/roleModel.js'
 import mongoose from 'mongoose'
 import asyncHandler from 'express-async-handler'
+import crypto from 'crypto'
+import emailQueue from '../../queues/emailQueue.js'
+import { customerOtpCreationEmail, customerOtpResendEmail } from '../../utils/emailTemplates.js'
 
 
 export const getCustomerStats = asyncHandler(async (req, res) => {
@@ -261,6 +264,125 @@ export const getBookingsByCustomer = asyncHandler(async (req, res) => {
             total,
             pages: Math.ceil(total / limit),
         },
+    })
+})
+
+
+export const createCustomer = asyncHandler(async (req, res) => {
+    const { full_name, email, phone, username, address, avatar } = req.body
+
+    if (!email || !full_name || !phone) {
+        res.status(400)
+        throw new Error('Vui lòng điền đầy đủ thông tin (Họ tên, Email, Số điện thoại)')
+    }
+
+    const emailExists = await User.findOne({ email })
+    if (emailExists) {
+        if (emailExists.status === 'inactive' && !emailExists.isEmailVerified) {
+            const otp = Math.floor(100000 + Math.random() * 900000).toString()
+            const otpHash = crypto.createHash('sha256').update(otp).digest('hex')
+            
+            emailExists.emailOTP = otpHash
+            emailExists.emailOTPExpire = Date.now() + 10 * 60 * 1000
+            await emailExists.save()
+
+            const resendTemplate = customerOtpResendEmail(otp)
+            await emailQueue.add('sendEmail', {
+                to: emailExists.email,
+                ...resendTemplate,
+            })
+
+            return res.status(200).json({
+                message: 'Mã OTP mới đã được gửi đến email.',
+                email: emailExists.email,
+            })
+        }
+        res.status(400)
+        throw new Error('Email đã tồn tại và đã được kích hoạt')
+    }
+
+    const finalUsername = username || email.split('@')[0] + Math.floor(Math.random() * 1000)
+    const usernameExists = await User.findOne({ username: finalUsername })
+    if (usernameExists) {
+        res.status(400)
+        throw new Error('Username đã tồn tại, vui lòng chọn username khác')
+    }
+
+    let customerRole = await Role.findOne({ role_name: { $in: ['Customer', 'customer'] } })
+    if (!customerRole) {
+        customerRole = await Role.create({ role_name: 'Customer' })
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex')
+    const tempPassword = crypto.randomBytes(8).toString('hex')
+
+    const customer = await User.create({
+        full_name,
+        email,
+        phone,
+        username: finalUsername,
+        password: tempPassword,
+        address,
+        avatar,
+        role_id: customerRole._id,
+        status: 'inactive',
+        isEmailVerified: false,
+        emailOTP: otpHash,
+        emailOTPExpire: Date.now() + 10 * 60 * 1000,
+    })
+
+    try {
+        const creationTemplate = customerOtpCreationEmail(customer.full_name, otp)
+        await emailQueue.add('sendEmail', {
+            to: customer.email,
+            ...creationTemplate,
+        })
+    } catch (error) {
+        console.error('Error queuing customer welcome email:', error.message)
+    }
+
+    res.status(201).json({
+        message: 'Đã tạo hồ sơ khách hàng. Vui lòng xác thực OTP gửi đến email.',
+        email: customer.email,
+    })
+})
+
+export const verifyCustomerOTP = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body
+
+    if (!email || !otp) {
+        res.status(400)
+        throw new Error('Thiếu email hoặc OTP')
+    }
+
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex')
+
+    const customer = await User.findOne({
+        email,
+        emailOTP: otpHash,
+        emailOTPExpire: { $gt: Date.now() },
+    })
+
+    if (!customer) {
+        res.status(400)
+        throw new Error('OTP không hợp lệ hoặc đã hết hạn')
+    }
+
+    customer.isEmailVerified = true
+    customer.status = 'active'
+    customer.emailOTP = undefined
+    customer.emailOTPExpire = undefined
+    await customer.save()
+
+    res.json({
+        message: 'Xác thực khách hàng thành công',
+        customer: {
+            _id: customer._id,
+            full_name: customer.full_name,
+            email: customer.email,
+            status: customer.status
+        }
     })
 })
 

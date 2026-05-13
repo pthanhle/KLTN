@@ -1,28 +1,81 @@
-import { Form, Input, Upload } from 'antd';
-import { User, Camera, PenSquare } from 'lucide-react';
+import { useState } from 'react';
+import { Form, Input, Upload, message } from 'antd';
+import { User, Camera, PenSquare, Loader2 } from 'lucide-react';
 import { SectionHeader } from '../UI/SectionHeader';
+import axiosClient from '@/utils/axiosClient';
 
 export const PersonalInfoSection = ({ t, schemas }) => {
+    const [isUploading, setIsUploading] = useState(false);
+    const form = Form.useFormInstance();
+    const avatarUrl = Form.useWatch('avatar', form);
+
+    const handleUpload = async (file) => {
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await axiosClient.post('/common/upload/image', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            const url = response.data?.url || response.url;
+            form.setFieldsValue({ avatar: url });
+            message.success(t('adminCustomers:uploadSuccess', 'Tải ảnh lên thành công'));
+        } catch (error) {
+            message.error(t('adminCustomers:uploadError', 'Tải ảnh lên thất bại'));
+            console.error('Upload error:', error);
+        } finally {
+            setIsUploading(false);
+        }
+        return false; 
+    };
+
     return (
         <section className="py-8 border-b border-slate-100 dark:border-white/5">
             <SectionHeader icon={User} title={t('adminCustomers:sectionPersonalInfo', 'Thông Tin Cá Nhân')} />
 
             <div className="flex flex-col md:flex-row gap-8">
-                {/* Avatar Upload (Mock bằng Antd Upload, tuân thủ không dùng img thuần) */}
                 <div className="w-full md:w-auto flex justify-center">
                     <div className="relative group cursor-pointer w-24 h-24">
-                        <Upload name="avatar" showUploadList={false} beforeUpload={() => false}>
-                            <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-[#141416] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-600 overflow-hidden hover:border-yellow-500 transition-colors">
-                                <Camera size={28} strokeWidth={1.5} className="text-slate-400 group-hover:text-yellow-500 transition-colors" />
+                        <Upload 
+                            name="avatar" 
+                            showUploadList={false} 
+                            beforeUpload={handleUpload}
+                            accept="image/*"
+                            disabled={isUploading}
+                        >
+                            <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-[#141416] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-600 overflow-hidden hover:border-yellow-500 transition-all relative">
+                                {avatarUrl ? (
+                                    <img 
+                                        src={avatarUrl} 
+                                        alt="Avatar" 
+                                        className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75" 
+                                    />
+                                ) : (
+                                    <Camera size={28} strokeWidth={1.5} className="text-slate-400 group-hover:text-yellow-500 transition-colors" />
+                                )}
+                                
+                                {isUploading && (
+                                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center rounded-full backdrop-blur-[2px]">
+                                        <Loader2 size={24} className="text-white animate-spin" />
+                                    </div>
+                                )}
+                                
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-full">
+                                    <Camera size={20} className="text-white" />
+                                </div>
                             </div>
                         </Upload>
-                        <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-[#141416] pointer-events-none">
+                        <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-[#141416] pointer-events-none z-10">
                             <PenSquare size={14} strokeWidth={3} />
                         </div>
                     </div>
                 </div>
 
-                {/* Data Fields */}
+                <Form.Item name="avatar" hidden>
+                    <Input />
+                </Form.Item>
+
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                     <Form.Item 
                         name="full_name" 

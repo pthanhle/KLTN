@@ -2,6 +2,7 @@ import { Modal, Form, Skeleton, message } from 'antd';
 import { X, Loader2 } from 'lucide-react';
 import { PersonalInfoSection } from './components/FormSections/PersonalInfoSection';
 import { CategorizationSection } from './components/FormSections/CategorizationSection';
+import { OtpVerificationStep } from './components/OtpVerificationStep';
 import { getCustomerFormSchemas } from './schemas/customerSchemas';
 import { useCustomerFormLoader } from './hooks/useCustomerFormLoader';
 import { useCustomerFormSubmit } from './hooks/useCustomerFormSubmit';
@@ -9,7 +10,15 @@ import { useCustomerFormSubmit } from './hooks/useCustomerFormSubmit';
 export const CustomerFormModal = ({ isOpen, onClose, customer, t, onSuccess }) => {
     const [messageApi, contextHolder] = message.useMessage();
     const { form, isEditMode, isLoading, tiersList } = useCustomerFormLoader(customer, isOpen);
-    const { isSubmitting, handleSave } = useCustomerFormSubmit(onClose, messageApi, onSuccess);
+    const { 
+        isSubmitting, 
+        isOtpSent, 
+        pendingEmail, 
+        handleSave, 
+        handleVerifyOtp, 
+        handleResendOtp,
+        resetOtpState 
+    } = useCustomerFormSubmit(onClose, messageApi, onSuccess);
 
     const schemas = getCustomerFormSchemas(t);
 
@@ -17,10 +26,15 @@ export const CustomerFormModal = ({ isOpen, onClose, customer, t, onSuccess }) =
         handleSave(values, isEditMode, customer?._id || customer?.id);
     };
 
+    const handleClose = () => {
+        resetOtpState();
+        onClose();
+    };
+
     return (
         <Modal
             open={isOpen}
-            onCancel={onClose}
+            onCancel={handleClose}
             footer={null}
             closable={false}
             centered
@@ -43,15 +57,19 @@ export const CustomerFormModal = ({ isOpen, onClose, customer, t, onSuccess }) =
                     <div className="flex justify-between items-start">
                         <div>
                             <h1 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-2 uppercase">
-                                {isEditMode ? t('adminCustomers:editTitle', 'THÊM MỚI / CHỈNH SỬA KHÁCH HÀNG') : t('adminCustomers:createTitle', 'THÊM MỚI KHÁCH HÀNG')}
+                                {isOtpSent 
+                                    ? t('adminCustomers:verifyTitle', 'XÁC THỰC TÀI KHOẢN')
+                                    : (isEditMode ? t('adminCustomers:editTitle', 'CHỈNH SỬA KHÁCH HÀNG') : t('adminCustomers:createTitle', 'THÊM MỚI KHÁCH HÀNG'))}
                             </h1>
                             <p className="text-slate-500 dark:text-slate-400 font-medium text-xs md:text-sm">
-                                {isEditMode ? t('adminCustomers:editSubtitle', 'Cập nhật hồ sơ 360 độ') : t('adminCustomers:createSubtitle', 'Tạo dữ liệu khách hàng theo quy trình chuẩn')}
+                                {isOtpSent
+                                    ? t('adminCustomers:verifySubtitle', 'Xác thực email để kích hoạt hồ sơ')
+                                    : (isEditMode ? t('adminCustomers:editSubtitle', 'Cập nhật hồ sơ 360 độ') : t('adminCustomers:createSubtitle', 'Tạo dữ liệu khách hàng theo quy trình chuẩn'))}
                             </p>
                         </div>
                         <button
                             type="button"
-                            onClick={onClose}
+                            onClick={handleClose}
                             className="p-2 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-500 dark:text-red-400 rounded-full transition-all active:scale-95 outline-none"
                         >
                             <X size={24} />
@@ -67,35 +85,47 @@ export const CustomerFormModal = ({ isOpen, onClose, customer, t, onSuccess }) =
                         </div>
                     )}
                     
-                    <Form
-                        form={form}
-                        layout="vertical"
-                        onFinish={onSubmitWrapper}
-                        className={`flex flex-col animate-fade-in pb-4 ${isLoading ? 'hidden' : 'block'}`}
-                    >
-                        <PersonalInfoSection t={t} schemas={schemas} />
-                        <CategorizationSection t={t} tiersList={tiersList} schemas={schemas} />
-                    </Form>
+                    {isOtpSent ? (
+                        <OtpVerificationStep 
+                            email={pendingEmail}
+                            onVerify={handleVerifyOtp}
+                            onResend={handleResendOtp}
+                            isSubmitting={isSubmitting}
+                            t={t}
+                        />
+                    ) : (
+                        <Form
+                            form={form}
+                            layout="vertical"
+                            onFinish={onSubmitWrapper}
+                            className={`flex flex-col animate-fade-in pb-4 ${isLoading ? 'hidden' : 'block'}`}
+                        >
+                            <PersonalInfoSection t={t} schemas={schemas} />
+                            <CategorizationSection t={t} tiersList={tiersList} schemas={schemas} />
+                        </Form>
+                    )}
                 </div>
 
-                <div className="px-8 md:px-10 py-5 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#141416] flex justify-end gap-3 items-center shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0 transition-colors z-20">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="px-6 md:px-8 py-3 md:py-3.5 rounded-xl text-red-600 dark:text-red-400 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 font-bold text-[10px] md:text-xs tracking-widest uppercase transition-all outline-none active:scale-95"
-                    >
-                        {t('adminCustomers:btnCancel', 'Hủy')}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => form.submit()}
-                        disabled={isSubmitting || isLoading}
-                        className="flex items-center gap-3 px-8 md:px-10 py-3 md:py-3.5 bg-yellow-500 hover:bg-yellow-600 outline-none text-slate-900 font-black text-[10px] md:text-xs tracking-widest uppercase rounded-xl shadow-xl shadow-yellow-500/20 active:scale-95 disabled:opacity-70 disabled:active:scale-100 transition-all cursor-pointer"
-                    >
-                        {isSubmitting && <Loader2 size={16} className="animate-spin" />}
-                        {isEditMode ? t('adminCustomers:btnSave', 'LƯU HỒ SƠ') : t('adminCustomers:btnCreate', 'TẠO MỚI')}
-                    </button>
-                </div>
+                {!isOtpSent && (
+                    <div className="px-8 md:px-10 py-5 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#141416] flex justify-end gap-3 items-center shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0 transition-colors z-20">
+                        <button
+                            type="button"
+                            onClick={handleClose}
+                            className="px-6 md:px-8 py-3 md:py-3.5 rounded-xl text-red-600 dark:text-red-400 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 font-bold text-[10px] md:text-xs tracking-widest uppercase transition-all outline-none active:scale-95"
+                        >
+                            {t('adminCustomers:btnCancel', 'Hủy')}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => form.submit()}
+                            disabled={isSubmitting || isLoading}
+                            className="flex items-center gap-3 px-8 md:px-10 py-3 md:py-3.5 bg-yellow-500 hover:bg-yellow-600 outline-none text-slate-900 font-black text-[10px] md:text-xs tracking-widest uppercase rounded-xl shadow-xl shadow-yellow-500/20 active:scale-95 disabled:opacity-70 disabled:active:scale-100 transition-all cursor-pointer"
+                        >
+                            {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+                            {isEditMode ? t('adminCustomers:btnSave', 'LƯU HỒ SƠ') : t('adminCustomers:btnCreate', 'TẠO MỚI')}
+                        </button>
+                    </div>
+                )}
             </div>
 
             <style>{`

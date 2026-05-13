@@ -37,4 +37,14 @@ export const adminCustomerApi = {
         const response = await axiosClient.get(`/admin/customers/${id}/bookings`, { params });
         return response;
     },
+
+    createCustomer: async (data) => {
+        const response = await axiosClient.post('/admin/customers', data);
+        return response;
+    },
+
+    verifyCustomerOTP: async (email, otp) => {
+        const response = await axiosClient.post('/admin/customers/verify-otp', { email, otp });
+        return response;
+    },
 };

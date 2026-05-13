@@ -144,6 +144,10 @@ export const updateCustomer = asyncHandler(async (req, res) => {
     if (admin_notes !== undefined) customer.admin_notes = admin_notes
     if (last_visit_date !== undefined) customer.last_visit_date = last_visit_date
 
+    if (req.file) {
+        customer.avatar = req.file.path
+    }
+
     const updated = await customer.save()
     res.json({
         message: 'Cập nhật khách hàng thành công',
@@ -269,7 +273,12 @@ export const getBookingsByCustomer = asyncHandler(async (req, res) => {
 
 
 export const createCustomer = asyncHandler(async (req, res) => {
-    const { full_name, email, phone, username, address, avatar } = req.body
+    const { full_name, email, phone, username, address } = req.body
+    let avatar = req.body.avatar
+
+    if (req.file) {
+        avatar = req.file.path
+    }
 
     if (!email || !full_name || !phone) {
         res.status(400)

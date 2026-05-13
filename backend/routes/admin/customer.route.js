@@ -11,6 +11,7 @@ import {
     verifyCustomerOTP,
 } from '../../controllers/admin/customer.controller.js'
 import { protect, admin } from '../../middleware/authMiddleware.js'
+import { upload } from '../../config/cloudinary.js'
 
 const router = express.Router()
 
@@ -21,13 +22,13 @@ router.route('/stats')
 
 router.route('/')
     .get(getCustomers)
-    .post(createCustomer)
+    .post(upload.single('avatar'), createCustomer)
 
 router.post('/verify-otp', verifyCustomerOTP)
 
 router.route('/:id')
     .get(getCustomerById)
-    .put(updateCustomer)
+    .put(upload.single('avatar'), updateCustomer)
     .delete(deleteCustomer)
 
 router.route('/:id/orders')

@@ -9,25 +9,27 @@ export const PersonalInfoSection = ({ t, schemas }) => {
     const form = Form.useFormInstance();
     const avatarUrl = Form.useWatch('avatar', form);
 
-    const handleUpload = async (file) => {
-        setIsUploading(true);
-        const formData = new FormData();
-        formData.append('image', file);
+    const handleUpload = (file) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            // We set the file object itself to the form value
+            form.setFieldsValue({ avatar: file });
+        };
+        reader.readAsDataURL(file);
+        return false; // Prevent auto-upload
+    };
 
-        try {
-            const response = await axiosClient.post('/common/upload/image', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            const url = response.data?.url || response.url;
-            form.setFieldsValue({ avatar: url });
-            message.success(t('adminCustomers:uploadSuccess', 'Tải ảnh lên thành công'));
-        } catch (error) {
-            message.error(t('adminCustomers:uploadError', 'Tải ảnh lên thất bại'));
-            console.error('Upload error:', error);
-        } finally {
-            setIsUploading(false);
+    // Helper to get preview URL
+    const getAvatarPreview = () => {
+        if (!avatarUrl) return null;
+        if (typeof avatarUrl === 'string') return avatarUrl;
+        if (avatarUrl instanceof File || avatarUrl instanceof Blob) {
+            return URL.createObjectURL(avatarUrl);
         }
-        return false; 
+        if (avatarUrl.originFileObj) {
+            return URL.createObjectURL(avatarUrl.originFileObj);
+        }
+        return null;
     };
 
     return (
@@ -45,9 +47,9 @@ export const PersonalInfoSection = ({ t, schemas }) => {
                             disabled={isUploading}
                         >
                             <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-[#141416] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-600 overflow-hidden hover:border-yellow-500 transition-all relative">
-                                {avatarUrl ? (
+                                {getAvatarPreview() ? (
                                     <img 
-                                        src={avatarUrl} 
+                                        src={getAvatarPreview()} 
                                         alt="Avatar" 
                                         className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75" 
                                     />

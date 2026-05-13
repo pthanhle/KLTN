@@ -10,16 +10,34 @@ export const useCustomerFormSubmit = (onClose, messageApi, onSuccess) => {
     const handleSave = async (values, isEditMode, customerId) => {
         setIsSubmitting(true);
         try {
-            const payload = normalizeFormForApi(values);
+            // Convert values to FormData for file upload support
+            const formData = new FormData();
+            
+            // Append all values to FormData
+            Object.entries(values).forEach(([key, value]) => {
+                if (value === undefined || value === null) return;
+                
+                if (key === 'avatar') {
+                    if (value instanceof File || value instanceof Blob) {
+                        formData.append('avatar', value);
+                    } else if (typeof value === 'string') {
+                        formData.append('avatar', value);
+                    }
+                } else if (typeof value === 'object') {
+                    formData.append(key, JSON.stringify(value));
+                } else {
+                    formData.append(key, value);
+                }
+            });
 
             if (isEditMode && customerId) {
-                await adminCustomerApi.updateCustomer(customerId, payload);
+                await adminCustomerApi.updateCustomer(customerId, formData);
                 if (messageApi) messageApi.success('Cập nhật hồ sơ khách hàng thành công');
                 if (onSuccess) onSuccess();
                 if (onClose) onClose();
             } else {
-                const response = await adminCustomerApi.createCustomer(payload);
-                setPendingEmail(payload.email);
+                const response = await adminCustomerApi.createCustomer(formData);
+                setPendingEmail(values.email);
                 setIsOtpSent(true);
                 if (messageApi) messageApi.success(response?.message || 'Đã gửi mã OTP đến email khách hàng');
             }

@@ -10,25 +10,24 @@ export const PersonalInfoSection = ({ t, schemas }) => {
     const avatarUrl = Form.useWatch('avatar', form);
 
     const handleUpload = (file) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            // We set the file object itself to the form value
-            form.setFieldsValue({ avatar: file });
-        };
-        reader.readAsDataURL(file);
-        return false; // Prevent auto-upload
+       
+        form.setFieldsValue({ avatar: file });
+        return false;
     };
 
-    // Helper to get preview URL
     const getAvatarPreview = () => {
         if (!avatarUrl) return null;
+        
         if (typeof avatarUrl === 'string') return avatarUrl;
+        
         if (avatarUrl instanceof File || avatarUrl instanceof Blob) {
             return URL.createObjectURL(avatarUrl);
         }
+        
         if (avatarUrl.originFileObj) {
             return URL.createObjectURL(avatarUrl.originFileObj);
         }
+        
         return null;
     };
 

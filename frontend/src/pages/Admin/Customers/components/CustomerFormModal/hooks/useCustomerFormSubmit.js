@@ -10,20 +10,35 @@ export const useCustomerFormSubmit = (onClose, messageApi, onSuccess) => {
     const handleSave = async (values, isEditMode, customerId) => {
         setIsSubmitting(true);
         try {
-            // Convert values to FormData for file upload support
+            const getRealFile = (val) => {
+                if (!val) return null;
+
+                if (val instanceof File || val instanceof Blob) return val;
+
+                if (val.originFileObj instanceof File || val.originFileObj instanceof Blob) {
+                    return val.originFileObj;
+                }
+
+                if (typeof val === 'object' && val.size && val.type && (val.uid || val.name)) {
+                    return val;
+                }
+
+                return null;
+            };
+
             const formData = new FormData();
-            
-            // Append all values to FormData
+
             Object.entries(values).forEach(([key, value]) => {
                 if (value === undefined || value === null) return;
-                
+
                 if (key === 'avatar') {
-                    if (value instanceof File || value instanceof Blob) {
-                        formData.append('avatar', value);
+                    const file = getRealFile(value);
+                    if (file) {
+                        formData.append('avatar', file);
                     } else if (typeof value === 'string') {
                         formData.append('avatar', value);
                     }
-                } else if (typeof value === 'object') {
+                } else if (typeof value === 'object' && !(value instanceof File) && !(value instanceof Blob)) {
                     formData.append(key, JSON.stringify(value));
                 } else {
                     formData.append(key, value);
@@ -79,8 +94,8 @@ export const useCustomerFormSubmit = (onClose, messageApi, onSuccess) => {
         setPendingEmail('');
     };
 
-    return { 
-        isSubmitting, 
+    return {
+        isSubmitting,
         isOtpSent,
         pendingEmail,
         handleSave,

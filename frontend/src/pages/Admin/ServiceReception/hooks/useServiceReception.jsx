@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GitMerge, LayoutGrid, Inbox } from 'lucide-react';
+import { GitMerge, LayoutGrid, Inbox, Activity } from 'lucide-react';
 import dayjs from 'dayjs';
 import ReceptionTab from '../tabs/ReceptionTab';
 import WorkshopTab from '../tabs/WorkshopTab';
 import InboxTab from '../tabs/InboxTab';
+import TrackingTab from '../tabs/TrackingTab';
 
 export const useServiceReception = () => {
     const { t } = useTranslation('adminServiceReception');
@@ -45,6 +46,16 @@ export const useServiceReception = () => {
                 </div>
             ),
             children: <WorkshopTab selectedDate={selectedDate} />,
+        },
+        {
+            key: 'tracking',
+            label: (
+                <div className="flex items-center gap-2 px-2">
+                    <Activity size={16} />
+                    <span>{t('tab_tracking', 'Giám Sát RO Tổng')}</span>
+                </div>
+            ),
+            children: <TrackingTab />,
         }
     ];
 

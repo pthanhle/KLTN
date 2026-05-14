@@ -1,18 +1,23 @@
 import React from 'react';
-import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Calendar, Clock } from 'lucide-react';
+import { GripVertical, Calendar, Clock, MoreVertical, XCircle, CalendarClock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useBookingCard } from './hooks/useBookingCard';
 
-const BookingCard = ({ booking }) => {
+const BookingCard = ({ booking, onReschedule, onNoShow }) => {
     const { t } = useTranslation('adminServiceReception');
-    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-        id: booking._id,
-        data: {
-            type: 'booking',
-            booking,
-        },
-    });
+    const {
+        isMenuOpen,
+        handleMenuClick,
+        closeMenu,
+        handleReschedule,
+        handleNoShow,
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        isDragging
+    } = useBookingCard(booking, onReschedule, onNoShow);
 
     const style = {
         transform: CSS.Translate.toString(transform),
@@ -43,7 +48,42 @@ const BookingCard = ({ booking }) => {
                         {booking.time_slot}
                     </div>
                 </div>
-                <GripVertical className="text-slate-400 dark:text-slate-500 w-4 h-4 shrink-0 mt-1 cursor-grab" />
+                <div className="flex items-center gap-1">
+                    <GripVertical className="text-slate-400 dark:text-slate-500 w-4 h-4 shrink-0 cursor-grab" />
+                    <div className="relative" onPointerDown={(e) => e.stopPropagation()}>
+                        <button 
+                            onClick={handleMenuClick}
+                            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors rounded-md hover:bg-slate-100 dark:hover:bg-white/10"
+                        >
+                            <MoreVertical className="w-4 h-4" />
+                        </button>
+                        
+                        {isMenuOpen && (
+                            <>
+                                <div 
+                                    className="fixed inset-0 z-[1000]" 
+                                    onClick={closeMenu}
+                                ></div>
+                                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-[#2e3447] rounded-lg shadow-xl border border-slate-100 dark:border-white/10 z-[1001] py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                    <button 
+                                        onClick={handleReschedule}
+                                        className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 flex items-center gap-2"
+                                    >
+                                        <CalendarClock size={16} className="text-yellow-600 dark:text-premium-gold" />
+                                        {t('action_reschedule', 'Reschedule')}
+                                    </button>
+                                    <button 
+                                        onClick={handleNoShow}
+                                        className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                                    >
+                                        <XCircle size={16} />
+                                        {t('action_no_show', 'No-show')}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
             </div>
 
             <div className="mb-4">

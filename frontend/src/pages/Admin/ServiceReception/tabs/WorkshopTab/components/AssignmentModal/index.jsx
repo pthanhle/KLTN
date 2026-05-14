@@ -26,7 +26,7 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
             }
             open={visible}
             onCancel={onCancel}
-            destroyOnClose
+            destroyOnHidden
             closable={false}
             width={600}
             className="dark-modal"

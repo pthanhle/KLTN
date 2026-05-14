@@ -3,7 +3,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { Car, MoreVertical, AlertTriangle, Clock, User, Wrench } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, Image } from 'antd';
+import { Popover, Image } from 'antd';
 import { calculateLeftPercentage, calculateWidthPercentage } from '../../utils/ganttUtils';
 
 const ROBlock = ({ booking, isConflict, technicians, adjustDuration }) => {
@@ -35,38 +35,40 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration }) => {
     };
 
     const tooltipContent = (
-        <div className="flex flex-col gap-2 p-1 min-w-[200px]">
-            <div className="flex justify-between items-center border-b border-white/10 pb-2 mb-1">
-                <span className="font-bold text-yellow-500">{booking._id}</span>
-                <span className="bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-bold">{booking.status}</span>
+        <div className="flex flex-col gap-2 p-1 min-w-[200px] text-slate-800 dark:text-slate-200">
+            <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-1">
+                <span className="font-bold text-yellow-600 dark:text-yellow-500">{booking._id}</span>
+                <span className="bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300">
+                    {t(`status_${booking.status}`, booking.status)}
+                </span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-                <Car className="w-3.5 h-3.5 text-slate-400" />
+                <Car className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{booking.license_plate} - {booking.vehicle_model}</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-                <User className="w-3.5 h-3.5 text-slate-400" />
+                <User className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{booking.customer_name}</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{booking.time_slot}</span>
             </div>
-            <div className="flex items-start gap-2 text-xs mt-1 bg-white/5 p-2 rounded">
-                <Wrench className="w-3.5 h-3.5 text-yellow-500 shrink-0 mt-0.5" />
-                <span className="text-slate-300">{booking.selected_services?.join(', ') || 'Dịch vụ'}</span>
+            <div className="flex items-start gap-2 text-xs mt-1 bg-slate-50 dark:bg-white/5 p-2 rounded">
+                <Wrench className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
+                <span className="text-slate-700 dark:text-slate-300">{booking.selected_services?.join(', ') || 'Dịch vụ'}</span>
             </div>
 
-            <div className="flex gap-2 mt-2 pt-2 border-t border-white/10">
+            <div className="flex gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-white/10">
                 <button
                     onClick={(e) => { e.stopPropagation(); adjustDuration(booking._id, -30); }}
-                    className="flex-1 bg-white/5 hover:bg-white/10 py-1 rounded text-xs text-slate-300 font-bold transition-colors"
+                    className="flex-1 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 py-1 rounded text-xs text-slate-700 dark:text-slate-300 font-bold transition-colors"
                 >
                     {t('tooltip_sub_time', '-30m')}
                 </button>
                 <button
                     onClick={(e) => { e.stopPropagation(); adjustDuration(booking._id, 30); }}
-                    className="flex-1 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 py-1 rounded text-xs font-bold transition-colors"
+                    className="flex-1 bg-yellow-100 dark:bg-yellow-500/10 hover:bg-yellow-200 dark:hover:bg-yellow-500/20 text-yellow-700 dark:text-yellow-500 py-1 rounded text-xs font-bold transition-colors"
                 >
                     {t('tooltip_add_time', '+30m')}
                 </button>
@@ -141,9 +143,9 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration }) => {
     if (isDragging) return blockContent;
 
     return (
-        <Tooltip title={tooltipContent} placement="bottom">
+        <Popover content={tooltipContent} placement="bottom" trigger="hover">
             {blockContent}
-        </Tooltip>
+        </Popover>
     );
 };
 

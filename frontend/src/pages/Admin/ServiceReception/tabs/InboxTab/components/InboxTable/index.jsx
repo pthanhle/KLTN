@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import InboxTableRow from './InboxTableRow';
 import { Inbox } from 'lucide-react';
 
-const InboxTable = ({ bookings, onConfirm }) => {
+const InboxTable = ({ bookings, onConfirm, onReject }) => {
     const { t } = useTranslation('adminServiceReception');
 
     if (!bookings || bookings.length === 0) {
@@ -25,10 +25,10 @@ const InboxTable = ({ bookings, onConfirm }) => {
             {/* Table Header */}
             <div className="hidden md:flex px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest font-bold">
                 <div className="w-[10%]">{t('inbox_col_aging', 'Aging')}</div>
-                <div className="w-[25%] pr-4">{t('inbox_col_customer', 'Customer')}</div>
-                <div className="w-[25%] pr-4">{t('inbox_col_vehicle', 'Vehicle')}</div>
+                <div className="w-[20%] pr-4">{t('inbox_col_customer', 'Customer')}</div>
+                <div className="w-[20%] pr-4">{t('inbox_col_vehicle', 'Vehicle')}</div>
                 <div className="w-[30%] pr-4">{t('inbox_col_details', 'Request Details')}</div>
-                <div className="w-[10%] text-right">{t('inbox_col_actions', 'Actions')}</div>
+                <div className="w-[20%] text-right">{t('inbox_col_actions', 'Actions')}</div>
             </div>
 
             {/* Table Body */}
@@ -37,7 +37,8 @@ const InboxTable = ({ bookings, onConfirm }) => {
                     <InboxTableRow 
                         key={booking._id} 
                         booking={booking} 
-                        onConfirm={onConfirm}
+                        onConfirm={onConfirm} 
+                        onReject={onReject}
                     />
                 ))}
             </div>

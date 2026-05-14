@@ -18,6 +18,24 @@ const qcDatabase = {
 
 export const getQcData = (code) => {
     const data = qcDatabase['SRV-2026-B77P'];
-    const serviceSession = getMasterServiceSession(data.booking_code);
-    return { ...data, vehicle_visual: { ...data.vehicle_visual, plate: serviceSession?.vehicle_info?.license_plate, model: serviceSession?.vehicle_info?.model, brand: serviceSession?.vehicle_info?.brand } };
+    const serviceSession = getMasterServiceSession(code);
+    const enrichedData = { ...data, vehicle_visual: { ...data.vehicle_visual, plate: serviceSession?.vehicle_info?.license_plate, model: serviceSession?.vehicle_info?.model, brand: serviceSession?.vehicle_info?.brand } };
+
+    if (['SRV-2026-R22', 'SRV-2026-X11A', 'SRV-2026-Y22B', 'SRV-2026-Z33C', 'SRV-2026-R11'].includes(code)) {
+        return null;
+    }
+
+    if (['SRV-2026-W33', 'SRV-2026-W44'].includes(code)) {
+        return { ...enrichedData, status: 'IN_PROGRESS' };
+    }
+
+    if (['SRV-2026-X99R'].includes(code)) {
+        return {
+            ...enrichedData,
+            status: 'COMPLETED',
+            kcs_tasks: enrichedData.kcs_tasks.map(i => ({ ...i, status: 'completed' }))
+        };
+    }
+
+    return { ...enrichedData, status: 'IN_PROGRESS' };
 };

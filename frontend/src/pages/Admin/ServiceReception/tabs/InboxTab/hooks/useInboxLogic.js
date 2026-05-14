@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 export const useInboxLogic = () => {
     const [bookings, setBookings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [bookingToReject, setBookingToReject] = useState(null);
 
     useEffect(() => {
         const fetchInboxData = async () => {
@@ -23,14 +24,48 @@ export const useInboxLogic = () => {
     }, []);
 
     const confirmBooking = async (bookingId) => {
-        await new Promise(resolve => setTimeout(resolve, 300));
+        try {
+            // TODO: API Integration Point for Confirming Booking
+            // await axios.patch(`/api/v1/bookings/${bookingId}/status`, {
+            //     status: 'CONFIRMED'
+            // });
+            setBookings(prev => prev.filter(b => b._id !== bookingId));
+        } catch (error) {
+            console.error('Failed to confirm booking:', error);
+        }
+    };
 
-        setBookings(prev => prev.filter(b => b._id !== bookingId));
+    const confirmReject = (bookingId) => {
+        setBookingToReject(bookingId);
+    };
+
+    const handleRejectConfirm = async () => {
+        if (!bookingToReject) return;
+        
+        try {
+            // TODO: API Integration Point for Rejecting Booking
+            // await axios.patch(`/api/v1/bookings/${bookingToReject}/status`, {
+            //     status: 'REJECTED'
+            // });
+            
+            setBookings(prev => prev.filter(b => b._id !== bookingToReject));
+            setBookingToReject(null);
+        } catch (error) {
+            console.error('Failed to reject booking:', error);
+        }
+    };
+
+    const handleRejectCancel = () => {
+        setBookingToReject(null);
     };
 
     return {
         bookings,
         isLoading,
-        confirmBooking
+        confirmBooking,
+        confirmReject,
+        handleRejectConfirm,
+        handleRejectCancel,
+        bookingToReject
     };
 };

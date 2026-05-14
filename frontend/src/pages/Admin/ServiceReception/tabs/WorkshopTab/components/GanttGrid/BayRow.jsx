@@ -18,6 +18,7 @@ const BayRow = ({ bay, assignedBookings, technicians, adjustDuration, activeBook
     const hasConflict = assignedBookings.length > 1;
 
     const totalAssignedHours = assignedBookings.reduce((total, booking) => {
+        if (!booking.time_slot) return total;
         const timeParts = booking.time_slot.split(' - ');
         if (timeParts.length === 2) {
             const start = timeParts[0].split(':').map(Number);

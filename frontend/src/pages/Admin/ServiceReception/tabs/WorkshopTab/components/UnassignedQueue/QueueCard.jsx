@@ -30,6 +30,11 @@ const QueueCard = ({ booking }) => {
                     {t(`status_${booking.status}`, booking.status)}
                 </span>
             </div>
+            <div className="flex items-center gap-2 mt-3 px-1 py-0.5 max-w-full">
+                <span className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">
+                    {booking.selected_services?.map(s => s.name).join(', ') || 'Dịch vụ'}
+                </span>
+            </div>
             <div className="flex items-center gap-2 text-xs">
                 <Car className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{booking.license_plate} - {booking.vehicle_model}</span>
@@ -62,7 +67,7 @@ const QueueCard = ({ booking }) => {
             </div>
             
             <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-snug line-clamp-2">
-                {booking.selected_services?.join(', ') || 'Dịch vụ'}
+                {booking.selected_services?.map(s => s.name).join(', ') || 'Dịch vụ'}
             </p>
         </div>
     );

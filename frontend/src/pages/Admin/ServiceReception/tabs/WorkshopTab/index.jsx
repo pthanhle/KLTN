@@ -6,7 +6,7 @@ import FilterToolbar from './components/FilterToolbar';
 import GanttGrid from './components/GanttGrid';
 import ROBlock from './components/GanttGrid/ROBlock';
 import UnassignedQueue from './components/UnassignedQueue';
-import AssignmentModal from './components/AssignmentModal';
+import AssignmentModal from './components/Modals/AssignmentModal';
 
 const WorkshopTab = ({ selectedDate }) => {
     const {
@@ -23,7 +23,8 @@ const WorkshopTab = ({ selectedDate }) => {
         adjustDuration,
         pendingAssignment,
         confirmAssignment,
-        cancelAssignment
+        cancelAssignment,
+        selectedDateStr
     } = useWorkshopLogic(selectedDate);
 
     const sensors = useSensors(
@@ -54,14 +55,14 @@ const WorkshopTab = ({ selectedDate }) => {
                 >
                     <div className="flex h-full w-full">
                         <div className="flex-1 h-full overflow-y-auto custom-scrollbar border border-slate-200 dark:border-white/10 rounded-xl bg-white dark:bg-[#0a0a0b]">
-                            <GanttGrid bays={bays} bookings={bookings} technicians={technicians} adjustDuration={adjustDuration} activeBooking={activeBooking} />
+                            <GanttGrid bays={bays} bookings={bookings} technicians={technicians} adjustDuration={adjustDuration} activeBooking={activeBooking} selectedDateStr={selectedDateStr} />
                         </div>
 
                         <UnassignedQueue bookings={unassignedBookings} />
                     </div>
 
                     <DragOverlay>
-                        {activeBooking ? <ROBlock booking={activeBooking} /> : null}
+                        {activeBooking ? <ROBlock booking={activeBooking} selectedDateStr={selectedDateStr} /> : null}
                     </DragOverlay>
                 </DndContext>
             </div>

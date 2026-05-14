@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Star } from 'lucide-react';
-import { getWorkloadStyle } from '../../utils/workloadUtils';
+import { getWorkloadStyle } from '../../../utils/workloadUtils';
 
 const TechOptionItem = ({ tech, isPreferred }) => {
     const { t } = useTranslation('adminServiceReception');

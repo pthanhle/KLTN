@@ -4,17 +4,42 @@ import { CSS } from '@dnd-kit/utilities';
 import { Car, MoreVertical, AlertTriangle, Clock, User, Wrench } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Popover, Image } from 'antd';
-import { calculateLeftPercentage, calculateWidthPercentage } from '../../utils/ganttUtils';
+import { calculateLeftPercentage, calculateWidthPercentage, calculateBlockBoundaries } from '../../utils/ganttUtils';
 
-const ROBlock = ({ booking, isConflict, technicians, adjustDuration }) => {
+const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDateStr }) => {
     const { t } = useTranslation('adminServiceReception');
 
-    const timeParts = booking.time_slot.split(' - ');
-    const startTime = timeParts[0];
-    const endTime = timeParts[1] || '17:00';
+    const now = new Date();
+    const currMins = now.getHours() * 60 + now.getMinutes();
 
-    const left = calculateLeftPercentage(startTime);
-    const width = calculateWidthPercentage(startTime, endTime);
+    const {
+        displayStart,
+        displayEnd,
+        isContinuedFromYesterday,
+        isContinuesToTomorrow,
+        isOverdue,
+        originalEndMins
+    } = calculateBlockBoundaries(booking, selectedDateStr, currMins);
+
+    let originalWidthPct = 100;
+
+    // If it's overdue, the block is stretched to current time, but we need to visualize the original planned part
+    // The original part ends at originalEndMins. The stretched part ends at currentMins (capped).
+    // displayEnd might have been stretched to currentMins. Let's calculate percentage.
+    if (isOverdue) {
+        // Parse displayStart and displayEnd to mins to calculate percentage
+        const startMins = parseInt(displayStart.split(':')[0]) * 60 + parseInt(displayStart.split(':')[1]);
+        const endMins = parseInt(displayEnd.split(':')[0]) * 60 + parseInt(displayEnd.split(':')[1]);
+
+        // The original planned end relative to this day's start
+        const plannedEndMins = Math.max(startMins, Math.min(originalEndMins, endMins));
+        if (endMins > startMins) {
+            originalWidthPct = ((plannedEndMins - startMins) / (endMins - startMins)) * 100;
+        }
+    }
+
+    const left = calculateLeftPercentage(displayStart);
+    const width = calculateWidthPercentage(displayStart, displayEnd);
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: booking._id,
@@ -34,6 +59,21 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration }) => {
         touchAction: 'none'
     };
 
+    let displayTimeSlot = booking.time_slot;
+    if (booking.expected_start_datetime && booking.expected_end_datetime) {
+        const startDt = new Date(booking.expected_start_datetime);
+        const endDt = new Date(booking.expected_end_datetime);
+        
+        const formatTime = (dt) => `${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}`;
+        const formatDate = (dt) => `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth() + 1).toString().padStart(2, '0')}`;
+        
+        if (startDt.toDateString() === endDt.toDateString()) {
+            displayTimeSlot = `${formatTime(startDt)} - ${formatTime(endDt)}`;
+        } else {
+            displayTimeSlot = `${formatTime(startDt)} (${formatDate(startDt)}) - ${formatTime(endDt)} (${formatDate(endDt)})`;
+        }
+    }
+
     const tooltipContent = (
         <div className="flex flex-col gap-2 p-1 min-w-[200px] text-slate-800 dark:text-slate-200">
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-1">
@@ -52,11 +92,12 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration }) => {
             </div>
             <div className="flex items-center gap-2 text-xs">
                 <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                <span>{booking.time_slot}</span>
+                <span>{displayTimeSlot}</span>
             </div>
             <div className="flex items-start gap-2 text-xs mt-1 bg-slate-50 dark:bg-white/5 p-2 rounded">
-                <Wrench className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
-                <span className="text-slate-700 dark:text-slate-300">{booking.selected_services?.join(', ') || 'Dịch vụ'}</span>
+                <div className="flex items-center gap-1.5 mt-2 overflow-hidden w-full">
+                    <span className="text-slate-700 dark:text-slate-300">{booking.selected_services?.map(s => s.name).join(', ') || 'Dịch vụ'}</span>
+                </div>
             </div>
 
             <div className="flex gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-white/10">
@@ -88,11 +129,42 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration }) => {
             style={style}
             {...attributes}
             {...listeners}
-            className={`top-3 bottom-3 rounded-xl shadow-sm hover:shadow-md p-3 flex flex-col justify-between border cursor-grab transition-all z-10 touch-none group ${isConflict
-                ? 'bg-red-500/10 dark:bg-red-500/20 border-red-500 animate-pulse'
-                : 'bg-white dark:bg-[#1c1c1e] border-slate-200 dark:border-white/10 hover:border-yellow-500/50'
-                }`}
+            className={`top-3 bottom-3 shadow-sm hover:shadow-md flex flex-col justify-between border cursor-grab transition-all z-10 touch-none group ${isConflict
+                ? 'border-red-500 animate-pulse'
+                : (isOverdue ? 'border-red-400 dark:border-red-500/50 shadow-red-500/20' : 'border-slate-200 dark:border-white/10 hover:border-yellow-500/50')
+                } ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none border-l-0' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none border-r-0' : 'rounded-xl')}`}
         >
+            {/* Arrows for multi-day */}
+            {isContinuedFromYesterday && (
+                <div className="absolute left-0 top-0 bottom-0 flex items-center justify-center bg-slate-200/50 dark:bg-white/10 w-4 z-20" title="Kế thừa từ hôm qua">
+                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400">{'<'}</span>
+                </div>
+            )}
+            {isContinuesToTomorrow && (
+                <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-slate-200/50 dark:bg-white/10 w-4 z-20" title="Chuyển sang ngày mai">
+                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400">{'>'}</span>
+                </div>
+            )}
+
+            {/* Background Layers */}
+            <div className={`absolute inset-0 flex overflow-hidden z-0 ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none pl-4' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none pr-4' : 'rounded-xl')}`}>
+                <div
+                    style={{ width: `${isOverdue ? originalWidthPct : 100}%` }}
+                    className={`h-full transition-all ${isConflict ? 'bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-[#1c1c1e]'}`}
+                ></div>
+                {isOverdue && (
+                    <div
+                        style={{ width: `${100 - originalWidthPct}%` }}
+                        className="h-full bg-red-50 dark:bg-red-900/20 border-l border-dashed border-red-400 dark:border-red-500/50 relative overflow-hidden transition-all"
+                        title={t('tooltip_overdue', 'Quá giờ thi công dự kiến')}
+                    >
+                        <div className="absolute inset-0 opacity-10 dark:opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #ef4444 10px, #ef4444 20px)' }}></div>
+                    </div>
+                )}
+            </div>
+
+            {/* Hover overlay */}
+            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity z-0 pointer-events-none ${isConflict ? 'bg-red-500/5' : 'bg-slate-50/50 dark:bg-white/5'} ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none' : 'rounded-xl')}`}></div>
             {primaryTech && (
                 <div className="absolute -right-2 -top-2 flex items-center z-20 shadow-md">
                     <div className="w-6 h-6 rounded-full border-2 border-white dark:border-[#1c1c1e] overflow-hidden bg-slate-700 shrink-0 flex items-center justify-center">
@@ -112,31 +184,36 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration }) => {
                 </div>
             )}
 
-            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity ${isConflict ? 'bg-red-500/5' : 'bg-slate-50/50 dark:bg-white/5'}`}></div>
-
-            <div className="flex justify-between items-start relative z-10">
-                <div className="flex flex-col gap-1">
-                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{booking._id}</span>
-                    <div className={`flex items-center gap-1.5 text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded border shadow-inner ${isConflict
-                        ? 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/20'
-                        : 'text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-black/30 border-slate-200 dark:border-white/5'
-                        }`}>
-                        {isConflict ? <AlertTriangle className="w-3.5 h-3.5" /> : <Car className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />}
-                        {booking.license_plate}
+            <div className={`relative z-10 p-3 flex flex-col justify-between h-full pointer-events-none ${isContinuedFromYesterday ? 'ml-3' : ''} ${isContinuesToTomorrow ? 'mr-3' : ''}`}>
+                <div className="flex justify-between items-start pointer-events-auto">
+                    <div className="flex flex-col gap-1">
+                        <span className={`text-[9px] font-bold uppercase tracking-widest ${isOverdue ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                            {booking._id} {isOverdue && t('status_overdue')}
+                        </span>
+                        <div className={`flex items-center gap-1.5 text-[10px] w-fit uppercase font-black tracking-wider px-2 py-0.5 rounded border shadow-inner ${isConflict
+                            ? 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/20'
+                            : (isOverdue ? 'text-red-700 dark:text-red-300 bg-red-100/50 dark:bg-red-900/30 border-red-200 dark:border-red-500/30' : 'text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-black/30 border-slate-200 dark:border-white/5')
+                            }`}>
+                            {isConflict ? <AlertTriangle className="w-3.5 h-3.5" /> : (isOverdue ? <Clock className="w-3.5 h-3.5 text-red-500" /> : <Car className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />)}
+                            {booking.license_plate}
+                        </div>
                     </div>
+                    {isConflict ? (
+                        <span className="text-[9px] font-black tracking-widest text-white bg-red-500 px-1.5 py-0.5 rounded shadow-sm">
+                            {t('status_conflict', 'CONFLICT')}
+                        </span>
+                    ) : (
+                        <MoreVertical className="w-4 h-4 text-slate-300 dark:bg-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    )}
                 </div>
-                {isConflict ? (
-                    <span className="text-[9px] font-black tracking-widest text-white bg-red-500 px-1.5 py-0.5 rounded shadow-sm">
-                        {t('status_conflict', 'CONFLICT')}
-                    </span>
-                ) : (
-                    <MoreVertical className="w-4 h-4 text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                )}
-            </div>
 
-            <p className={`text-[11px] font-medium leading-snug truncate mt-1 relative z-10 ${isConflict ? 'text-red-700 dark:text-red-300' : 'text-slate-600 dark:text-slate-400'}`}>
-                {booking.selected_services?.[0] || 'Dịch vụ'}
-            </p>
+                <div className="flex items-center gap-1 overflow-hidden min-w-0 pr-1 truncate opacity-70">
+                    {booking.selected_services?.[0]?.name || 'Dịch vụ'}
+                    {booking.selected_services?.length > 1 && ( 
+                         <span className="text-[9px] font-bold text-slate-500">+{booking.selected_services.length - 1}</span>
+                    )}
+                </div>
+            </div>
         </div>
     );
 

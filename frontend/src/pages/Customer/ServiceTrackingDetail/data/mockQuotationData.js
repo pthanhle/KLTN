@@ -29,7 +29,7 @@ export const getQuotationData = (code) => {
     let status = 'WAITING_FOR_APPROVAL';
     if (['SRV-2026-B77P'].includes(code)) {
         status = 'PENDING';
-    } else if (['SRV-2026-W11', 'SRV-2026-W22', 'SRV-2026-W33', 'SRV-2026-W44', 'SRV-2026-X99R'].includes(code)) {
+    } else if (['SRV-2026-W11', 'SRV-2026-W22', 'SRV-2026-W33', 'SRV-2026-W44', 'SRV-2026-X99R', 'SRV-2026-M01', 'SRV-2026-M02'].includes(code)) {
         status = 'APPROVED';
     }
 

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { message } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { MOCK_SERVICE_BOOKINGS } from '../../../data/mockServiceBookings';
 import { mockBays } from '../../../data/mockBays';
 import { mockStaffData } from '../../../../Staff/data/mockStaffData';
 
 export const useWorkshopLogic = (selectedDate) => {
+    const { t } = useTranslation('adminServiceReception');
     const [bookings, setBookings] = useState([]);
     const [bays, setBays] = useState([]);
     const [technicians, setTechnicians] = useState([]);
@@ -19,7 +22,26 @@ export const useWorkshopLogic = (selectedDate) => {
             setIsLoading(true);
             await new Promise(resolve => setTimeout(resolve, 800));
 
-            const bookingsForDate = MOCK_SERVICE_BOOKINGS.filter(b => b.booking_date === dateStr && (b.status === 'RO_CREATED' || b.status === 'IN_PROGRESS'));
+            const renderDate = new Date(dateStr);
+            renderDate.setHours(0, 0, 0, 0);
+            const renderEndOfDay = new Date(renderDate);
+            renderEndOfDay.setHours(23, 59, 59, 999);
+
+            const bookingsForDate = MOCK_SERVICE_BOOKINGS.filter(b => {
+                let startDt, endDt;
+                if (b.expected_start_datetime && b.expected_end_datetime) {
+                    startDt = new Date(b.expected_start_datetime);
+                    endDt = new Date(b.expected_end_datetime);
+                } else {
+                    const bDate = new Date(b.booking_date);
+                    startDt = new Date(bDate);
+                    endDt = new Date(bDate);
+                    endDt.setHours(23, 59, 59, 999);
+                }
+
+                const overlaps = (startDt <= renderEndOfDay) && (endDt >= renderDate);
+                return overlaps && (b.status === 'RO_CREATED' || b.status === 'IN_PROGRESS');
+            });
 
             const techs = mockStaffData.filter(staff => staff.role === 'TECHNICIAN' || staff.role === 'LEAD_TECHNICIAN');
 
@@ -46,8 +68,14 @@ export const useWorkshopLogic = (selectedDate) => {
 
         const bookingId = active.id;
         const targetId = over.id;
+        const draggedBooking = bookings.find(b => b._id === bookingId);
 
         if (targetId === 'unassigned_pool') {
+            if (draggedBooking?.status === 'IN_PROGRESS') {
+                message.error(t('toast_cannot_unassign', 'Không thể gỡ phân công Lệnh sửa chữa đang thi công.'));
+                return;
+            }
+
             setBookings(prevBookings =>
                 prevBookings.map(b => {
                     if (b._id === bookingId) {
@@ -80,6 +108,8 @@ export const useWorkshopLogic = (selectedDate) => {
                         ...b,
                         bay_id: pendingAssignment.targetBay.id,
                         time_slot: values.time_slot,
+                        expected_start_datetime: values.expected_start_datetime,
+                        expected_end_datetime: values.expected_end_datetime,
                         primary_technician: values.primary_technician,
                         assistant_technicians: values.assistant_technicians || [],
                         status: 'IN_PROGRESS'
@@ -157,6 +187,7 @@ export const useWorkshopLogic = (selectedDate) => {
         adjustDuration,
         pendingAssignment,
         confirmAssignment,
-        cancelAssignment
+        cancelAssignment,
+        selectedDateStr: dateStr
     };
 };

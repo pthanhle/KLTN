@@ -9,8 +9,8 @@ export const FitmentDataCard = ({ fitmentData, compatibleBrands, t }) => {
     if (!compatibleBrands?.length && !fitmentData?.length) return null;
 
     return (
-        <div className="bg-white dark:bg-[#151b2d] rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-lg shadow-slate-100/50 dark:shadow-none">
-            <div className="px-6 py-5 border-b border-slate-200 dark:border-white/10 flex items-center gap-3 bg-slate-50/50 dark:bg-white/5">
+        <div className="bg-white dark:bg-[#141416] rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-lg shadow-slate-100/50 dark:shadow-none">
+            <div className="px-6 py-5 border-b border-slate-200 dark:border-white/10 flex items-center gap-3 bg-slate-50/50 dark:bg-[#0a0a0b]">
                 <div className="p-2 bg-blue-500/10 rounded-xl text-blue-600 dark:text-blue-500">
                     <Car size={20} strokeWidth={2.5} />
                 </div>
@@ -27,7 +27,7 @@ export const FitmentDataCard = ({ fitmentData, compatibleBrands, t }) => {
                         </h4>
                         <div className="flex flex-wrap gap-3">
                             {compatibleBrands.map((brand, idx) => (
-                                <div key={idx} className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-sm border border-slate-200 dark:border-white/10 shadow-sm">
+                                <div key={idx} className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-[#0a0a0b] text-slate-800 dark:text-slate-200 font-bold text-sm border border-slate-200 dark:border-white/10 shadow-sm">
                                     {brand}
                                 </div>
                             ))}

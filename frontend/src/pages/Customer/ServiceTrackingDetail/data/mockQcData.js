@@ -29,7 +29,7 @@ export const getQcData = (code) => {
         return { ...enrichedData, status: 'IN_PROGRESS' };
     }
 
-    if (['SRV-2026-X99R'].includes(code)) {
+    if (['SRV-2026-X99R', 'SRV-2026-M01', 'SRV-2026-M02'].includes(code)) {
         return {
             ...enrichedData,
             status: 'COMPLETED',

@@ -6,7 +6,7 @@ export const ReviewStats = ({ part, t }) => {
     const revCount = part?.reviews_summary?.total || part?.reviews_count || part?.reviews?.length || 0;
 
     return (
-        <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm sticky top-32">
+        <div className="bg-white dark:bg-[#141416] p-8 rounded-[2rem] border border-slate-200 dark:border-white/10 shadow-sm sticky top-32">
             <div className="text-center mb-8">
                 <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{t('lbl_avg_rating', 'Đánh giá trung bình')}</h4>
                 <div className="text-6xl font-black text-slate-900 dark:text-white mb-2">{avgRating}</div>
@@ -29,7 +29,7 @@ export const ReviewStats = ({ part, t }) => {
                     return (
                         <div key={stars} className="flex items-center gap-4">
                             <span className="text-xs font-bold w-4 text-slate-600 dark:text-slate-400">{stars}</span>
-                            <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className="flex-1 h-2 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                                 <div className="h-full bg-yellow-500 rounded-full" style={{ width: `${percentage}%` }}></div>
                             </div>
                             <span className="text-xs text-slate-400 w-8">{percentage}%</span>

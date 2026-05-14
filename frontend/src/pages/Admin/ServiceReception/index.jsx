@@ -36,6 +36,7 @@ const ServiceReceptionPage = () => {
                                 format="DD/MM/YYYY"
                                 allowClear={false}
                                 variant="borderless"
+                                suffixIcon={null}
                                 className="p-0 font-bold text-slate-800 dark:text-white hover:bg-transparent focus:shadow-none"
                             />
                         </div>

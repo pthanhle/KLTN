@@ -6,6 +6,7 @@ import ReceptionTab from '../tabs/ReceptionTab';
 import WorkshopTab from '../tabs/WorkshopTab';
 import InboxTab from '../tabs/InboxTab';
 import TrackingTab from '../tabs/TrackingTab';
+import SettlementTab from '../tabs/SettlementTab';
 
 export const useServiceReception = () => {
     const { t } = useTranslation('adminServiceReception');
@@ -56,6 +57,16 @@ export const useServiceReception = () => {
                 </div>
             ),
             children: <TrackingTab />,
+        },
+        {
+            key: 'settlement',
+            label: (
+                <div className="flex items-center gap-2 px-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m22 11-3-3-3 3"/><path d="M19 19V8"/></svg>
+                    <span>{t('tab_settlement', 'Quyết Toán & Bàn Giao')}</span>
+                </div>
+            ),
+            children: <SettlementTab />,
         }
     ];
 

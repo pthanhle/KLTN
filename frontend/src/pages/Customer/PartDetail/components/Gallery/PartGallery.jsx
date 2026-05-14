@@ -2,10 +2,18 @@ import { useState } from 'react';
 import { Image } from 'antd';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export const PartGallery = ({ images }) => {
+export const PartGallery = ({ images, t }) => {
     const [activeIndex, setActiveIndex] = useState(0);
 
-    if (!images || images.length === 0) return null;
+    if (!images || images.length === 0) {
+        return (
+            <div className="lg:col-span-7 space-y-4">
+                <div className="relative aspect-square bg-slate-50 dark:bg-[#0a0a0b] rounded-[2rem] flex items-center justify-center border border-slate-200 dark:border-white/5">
+                    <span className="text-slate-400 dark:text-slate-500 font-bold">{t('lbl_no_image', 'Không có hình ảnh')}</span>
+                </div>
+            </div>
+        );
+    }
 
     const navigateImage = (direction) => {
         if (direction === 'prev') {
@@ -18,7 +26,7 @@ export const PartGallery = ({ images }) => {
     return (
         <div className="lg:col-span-7 space-y-4">
             {/* Main Image View */}
-            <div className="relative aspect-square bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden group border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="relative aspect-square bg-slate-50 dark:bg-[#0a0a0b] rounded-[2rem] overflow-hidden group border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center">
                 <Image
                     key={activeIndex}
                     src={images[activeIndex]}
@@ -51,7 +59,7 @@ export const PartGallery = ({ images }) => {
                     <div 
                         key={idx} 
                         onClick={() => setActiveIndex(idx)}
-                        className={`relative aspect-square rounded-2xl border-2 overflow-hidden bg-slate-200 dark:bg-slate-800 cursor-pointer transition-colors group/thumb ${activeIndex === idx ? 'border-yellow-500' : 'border-transparent hover:border-slate-300 dark:hover:border-slate-700'}`}
+                        className={`relative aspect-square rounded-2xl border-2 overflow-hidden bg-slate-100 dark:bg-[#0a0a0b] flex items-center justify-center cursor-pointer transition-colors group/thumb ${activeIndex === idx ? 'border-yellow-500' : 'border-transparent hover:border-slate-300 dark:border-white/5 dark:hover:border-white/20'}`}
                     >
                         <Image
                             src={img}

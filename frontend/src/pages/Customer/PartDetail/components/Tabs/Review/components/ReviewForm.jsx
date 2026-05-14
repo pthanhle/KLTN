@@ -21,7 +21,7 @@ export const ReviewForm = ({ part, selectedOptions, t }) => {
     } = useReviewFormLogic(part, selectedOptions, t);
 
     return (
-        <div className="bg-slate-100 dark:bg-slate-900/50 p-6 sm:p-8 rounded-[2rem] border border-dashed border-slate-300 dark:border-slate-700">
+        <div className="bg-slate-50 dark:bg-[#0a0a0b] p-6 sm:p-8 rounded-[2rem] border border-dashed border-slate-300 dark:border-white/10">
             <h4 className="text-xl font-bold mb-6 text-slate-900 dark:text-white">{t('btn_write_review', 'Viết đánh giá của bạn')}</h4>
             <div className="flex flex-col gap-5">
                 <div className="flex flex-wrap items-center gap-4">
@@ -33,7 +33,7 @@ export const ReviewForm = ({ part, selectedOptions, t }) => {
                     value={comment}
                     onChange={handleCommentChange}
                     style={{ resize: 'none' }}
-                    className="!w-full !min-h-[120px] !rounded-2xl !border-slate-200 dark:!border-slate-800 !bg-white dark:!bg-slate-900 !text-sm !p-4 !shadow-none" 
+                    className="!w-full !min-h-[120px] !rounded-2xl !border-slate-200 dark:!border-white/10 !bg-white dark:!bg-[#141416] !text-slate-900 dark:!text-white !text-sm !p-4 !shadow-none" 
                     placeholder={t('plh_review_input', 'Bạn chia sẻ cảm nhận tại đây...')}
                 />
 
@@ -41,7 +41,7 @@ export const ReviewForm = ({ part, selectedOptions, t }) => {
                 {uploadedImages.length > 0 && (
                     <div className="flex flex-wrap gap-3">
                         {uploadedImages.map((url, idx) => (
-                            <div key={idx} className="relative group w-20 h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                            <div key={idx} className="relative group w-20 h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
                                 <Image src={url} width="100%" height="100%" style={{ objectFit: 'cover' }} />
                                 <button 
                                     onClick={() => handleRemoveImage(url)}

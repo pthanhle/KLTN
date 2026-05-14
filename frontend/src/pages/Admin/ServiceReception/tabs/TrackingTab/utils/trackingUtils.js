@@ -12,7 +12,7 @@ export const getLiveStatusText = (status, quotationStatus, selectedServices, t) 
             return t('live_status_ro_created', 'Đã lập Lệnh, chờ xuất vật tư');
         case 'IN_PROGRESS':
             if (selectedServices && selectedServices.length > 0) {
-                const mainTask = selectedServices[0];
+                const mainTask = selectedServices[0]?.name;
                 const extraTasks = selectedServices.length - 1;
                 return extraTasks > 0 
                     ? `${t('live_status_executing', 'Đang thi công:')} ${mainTask} +${extraTasks}`

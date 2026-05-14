@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Form, Select, Input, TimePicker } from 'antd';
+import { Modal, Form, Select, Input, DatePicker } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { Clock, UserPlus, CheckCircle2, X } from 'lucide-react';
 import useAssignmentModal from './useAssignmentModal';
@@ -78,9 +78,9 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
                         name="time_slot"
                         rules={[{ required: true, message: 'Vui lòng chọn thời gian' }]}
                     >
-                        <TimePicker.RangePicker
-                            format="HH:mm"
-                            minuteStep={15}
+                        <DatePicker.RangePicker
+                            showTime={{ format: 'HH:mm', minuteStep: 15 }}
+                            format="DD/MM/YYYY HH:mm"
                             className="w-full bg-slate-50 dark:bg-[#1c1c1e] border-slate-200 dark:border-white/10 hover:border-yellow-500/50 focus:border-yellow-500 focus:shadow-none h-11 rounded-xl"
                             popupClassName="dark-time-picker"
                             suffixIcon={<Clock className="w-4 h-4 text-slate-400" />}
@@ -100,15 +100,14 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
                             size="large"
                             options={technicians.map(t => ({
                                 value: t._id,
-                                label: <TechOptionItem tech={t} isPreferred={t._id === assignmentData?.booking?.preferred_technician} />
+                                label: t.fullName,
+                                tech: t
                             }))}
+                            optionRender={(option) => (
+                                <TechOptionItem tech={option.data.tech} isPreferred={option.data.tech._id === assignmentData?.booking?.preferred_technician} />
+                            )}
                             listHeight={300}
-                            dropdownStyle={{
-                                backgroundColor: '#1c1c1e',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '12px',
-                                padding: '8px'
-                            }}
+                            popupClassName="custom-select-dropdown"
                         />
                     </Form.Item>
 
@@ -125,15 +124,14 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
                             maxTagCount="responsive"
                             options={technicians.map(t => ({
                                 value: t._id,
-                                label: <TechOptionItem tech={t} isPreferred={t._id === assignmentData?.booking?.preferred_technician} />
+                                label: t.fullName,
+                                tech: t
                             }))}
+                            optionRender={(option) => (
+                                <TechOptionItem tech={option.data.tech} isPreferred={option.data.tech._id === assignmentData?.booking?.preferred_technician} />
+                            )}
                             listHeight={300}
-                            dropdownStyle={{
-                                backgroundColor: '#1c1c1e',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '12px',
-                                padding: '8px'
-                            }}
+                            popupClassName="custom-select-dropdown"
                         />
                     </Form.Item>
                 </div>

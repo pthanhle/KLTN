@@ -2,8 +2,18 @@ import { mockServices } from '../../../Shared/Profile/pages/ServiceHistory/data/
 import { mockStaffData } from '../../Staff/data/mockStaffData';
 import { MOCK_CUSTOMERS } from '../../Customers/data/customers.mock';
 
+const today = new Date();
+const todayStr = today.toISOString().split('T')[0];
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
 const mappedServices = mockServices.map((service, index) => {
-    const status = service.booking_status || 'PENDING';
+    let status = service.booking_status || 'PENDING';
+
+    if (service.booking_code === 'SRV-2026-B77P') {
+        status = 'COMPLETED';
+    }
 
     let mappedAdvisorId = null;
     let bay_id = null;
@@ -33,7 +43,11 @@ const mappedServices = mockServices.map((service, index) => {
         vehicle_model: service.vehicle_info.model,
         license_plate: service.vehicle_info.license_plate,
         vehicle_condition: service.customer_note,
-        selected_services: service.services?.map(s => s.service_name) || [],
+        selected_services: (service.services || []).map((s, i) => ({
+            _id: s.service_id || s._id || `srv_${i}`,
+            name: s.service_name || s.name || s,
+            price: s.price !== undefined ? s.price : 500000
+        })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: service.time_slot,
         status: status,
@@ -58,7 +72,7 @@ const EXTRA_BOOKINGS = [
         vehicle_brand: 'Mazda',
         vehicle_model: 'CX-5',
         vehicle_condition: 'Khách yêu cầu sơn dặm và đánh bóng toàn xe',
-        selected_services: ['Sơn dặm cản trước', 'Đánh bóng'],
+        selected_services: ['Sơn dặm cản trước', 'Đánh bóng'].map((name, i) => ({ _id: `srv_x_${i}`, name, price: 800000 })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: '08:00 - 10:00',
         status: 'PENDING',
@@ -79,7 +93,7 @@ const EXTRA_BOOKINGS = [
         vehicle_brand: 'Toyota',
         vehicle_model: 'Camry',
         vehicle_condition: 'Bảo dưỡng định kỳ mốc 4 vạn km',
-        selected_services: ['Bảo dưỡng mốc 40v', 'Thay dầu'],
+        selected_services: ['Bảo dưỡng mốc 40v', 'Thay dầu'].map((name, i) => ({ _id: `srv_y_${i}`, name, price: 1500000 })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: '13:00 - 15:30',
         status: 'PENDING',
@@ -101,7 +115,7 @@ const EXTRA_BOOKINGS = [
         vehicle_brand: 'Ford',
         vehicle_model: 'Ranger',
         vehicle_condition: 'Xe bị nhao lái, cần cân chỉnh lại thước lái và thay lốp',
-        selected_services: ['Cân chỉnh thước lái', 'Thay 2 lốp trước'],
+        selected_services: ['Cân chỉnh thước lái', 'Thay 2 lốp trước'].map((name, i) => ({ _id: `srv_z_${i}`, name, price: 2000000 })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: '10:00 - 11:00',
         status: 'PENDING',
@@ -125,7 +139,7 @@ const EXTRA_RECEPTION_BOOKINGS = [
         vehicle_brand: 'Honda',
         vehicle_model: 'CR-V',
         vehicle_condition: 'Tiếng kêu lạ ở gầm xe khi qua gờ giảm tốc',
-        selected_services: ['Kiểm tra gầm', 'Bảo dưỡng gầm'],
+        selected_services: ['Kiểm tra gầm', 'Bảo dưỡng gầm'].map((name, i) => ({ _id: `srv_r1_${i}`, name, price: 300000 })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: '08:30 - 10:30',
         status: 'CONFIRMED',
@@ -146,7 +160,7 @@ const EXTRA_RECEPTION_BOOKINGS = [
         vehicle_brand: 'Ford',
         vehicle_model: 'Everest',
         vehicle_condition: 'Đến lịch bảo dưỡng 10,000km',
-        selected_services: ['Bảo dưỡng 10v', 'Thay nhớt'],
+        selected_services: ['Bảo dưỡng 10v', 'Thay nhớt'].map((name, i) => ({ _id: `srv_r2_${i}`, name, price: 600000 })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: '09:00 - 11:00',
         status: 'ASSIGNED_TO_SA',
@@ -171,7 +185,7 @@ const EXTRA_WORKSHOP_BOOKINGS = [
         vehicle_brand: 'Mercedes-Benz',
         vehicle_model: 'GLC 300',
         vehicle_condition: 'Khách báo xe báo lỗi động cơ (Check engine)',
-        selected_services: ['Scan lỗi máy', 'Thay bugi'],
+        selected_services: ['Scan lỗi máy', 'Thay bugi'].map((name, i) => ({ _id: `srv_w1_${i}`, name, price: 1200000 })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: '08:00 - 11:00',
         status: 'RO_CREATED',
@@ -193,7 +207,7 @@ const EXTRA_WORKSHOP_BOOKINGS = [
         vehicle_brand: 'BMW',
         vehicle_model: 'X5',
         vehicle_condition: 'Sơn lại dặm xước cản sau',
-        selected_services: ['Sơn cản sau', 'Phủ Ceramic'],
+        selected_services: ['Sơn cản sau', 'Phủ Ceramic'].map((name, i) => ({ _id: `srv_w2_${i}`, name, price: 4500000 })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: '09:30 - 14:00',
         status: 'RO_CREATED',
@@ -216,7 +230,7 @@ const EXTRA_WORKSHOP_BOOKINGS = [
         vehicle_brand: 'Hyundai',
         vehicle_model: 'Santafe',
         vehicle_condition: 'Thay lốp và cân mâm',
-        selected_services: ['Thay 4 lốp', 'Cân bằng động', 'Cân chỉnh thước lái'],
+        selected_services: ['Thay 4 lốp', 'Cân bằng động', 'Cân chỉnh thước lái'].map((name, i) => ({ _id: `srv_w3_${i}`, name, price: 8000000 })),
         booking_date: new Date().toISOString().split('T')[0],
         time_slot: '08:00 - 10:00',
         status: 'IN_PROGRESS',
@@ -224,8 +238,8 @@ const EXTRA_WORKSHOP_BOOKINGS = [
         sms_status: 'SENT',
         zalo_status: 'SENT',
         advisor_id: 'sa_03',
-        bay_id: 'bay_01', // Nằm ở khoang số 1
-        primary_technician: 'tech_01',
+        bay_id: 'bay_01',
+        primary_technician: '60d5ecb8b392d700153528a6',
         assistant_technicians: [],
         is_vip: false
     },
@@ -238,17 +252,19 @@ const EXTRA_WORKSHOP_BOOKINGS = [
         vehicle_brand: 'Toyota',
         vehicle_model: 'Fortuner',
         vehicle_condition: 'Bảo dưỡng lớn 8 vạn km',
-        selected_services: ['Bảo dưỡng toàn diện', 'Thay nhớt hộp số', 'Thay cua roa'],
-        booking_date: new Date().toISOString().split('T')[0],
-        time_slot: '09:00 - 16:00', // Kéo dài nhiều giờ
+        selected_services: ['Bảo dưỡng toàn diện', 'Thay nhớt hộp số', 'Thay cua roa'].map((name, i) => ({ service_id: `srv_w4_${i}`, name, price: 3500000 })),
+        booking_date: todayStr,
+        time_slot: '14:00 - 12:00', // Kéo dài qua ngày
+        expected_start_datetime: `${todayStr}T14:00:00`,
+        expected_end_datetime: `${tomorrowStr}T12:00:00`,
         status: 'IN_PROGRESS',
         created_at: new Date(Date.now() - 7 * 3600000).toISOString(),
         sms_status: 'SENT',
         zalo_status: 'SENT',
         advisor_id: 'sa_02',
-        bay_id: 'bay_03', // Nằm ở khoang số 3
-        primary_technician: 'tech_02',
-        assistant_technicians: ['tech_03'],
+        bay_id: 'bay_03',
+        primary_technician: '60d5ecb8b392d700153528a7',
+        assistant_technicians: ['60d5ecb8b392d700153528a8'],
         is_vip: true
     }
 ];

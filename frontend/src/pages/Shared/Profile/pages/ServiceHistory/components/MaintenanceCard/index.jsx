@@ -42,13 +42,13 @@ const MaintenanceCard = ({ service, index, t }) => {
                         <p className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">
                             {t('service_lbl_advisor', 'Cố vấn dịch vụ')}
                         </p>
-                        <p className="sm:text-lg font-black text-slate-900 dark:text-white truncate">{service.advisor_info.name}</p>
+                        <p className="sm:text-lg font-black text-slate-900 dark:text-white truncate">{service.advisor_info?.name || 'Chưa phân bổ'}</p>
                     </div>
                     <div className="bg-[#f8fafc] dark:bg-[#0a0a0b] p-3.5 sm:p-4 rounded-2xl border border-slate-100 dark:border-white/5">
                         <p className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">
                             {t('service_lbl_mechanic', 'Kỹ thuật viên')}
                         </p>
-                        <p className="sm:text-lg font-black text-slate-900 dark:text-white truncate">{service.mechanic_info.name}</p>
+                        <p className="sm:text-lg font-black text-slate-900 dark:text-white truncate">{service.mechanic_info?.name || 'Chưa phân bổ'}</p>
                     </div>
                     <div className="bg-[#f8fafc] dark:bg-[#0a0a0b] p-3.5 sm:p-4 rounded-2xl border border-slate-100 dark:border-white/5">
                         <p className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">
@@ -65,22 +65,15 @@ const MaintenanceCard = ({ service, index, t }) => {
                         {t('service_lbl_tasks', 'Nội dung thực hiện')}
                     </h4>
                     <ul className="space-y-3 text-[13px] sm:text-sm font-medium text-slate-600 dark:text-slate-300">
-                        {service.services.map((task, i) => (
+                        {(service.services || []).map((task, i) => (
                             <li key={task.service_id || i} className="flex items-start sm:items-center gap-3">
-                                <span className="w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full flex-shrink-0 mt-1.5 sm:mt-0"></span> {task.service_name}
+                                <span className="w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full flex-shrink-0 mt-1.5 sm:mt-0"></span> {task.service_name || task.name || task}
                             </li>
                         ))}
                     </ul>
                 </div>
 
-                {service.advisor_note && (
-                    <div className="mb-8 p-5 bg-blue-50/50 dark:bg-blue-500/5 rounded-2xl border border-blue-100/50 dark:border-blue-500/10">
-                        <p className="text-[10px] sm:text-xs text-blue-500 dark:text-blue-400 font-bold uppercase tracking-wider mb-2">
-                            {t('service_lbl_notes', 'Ghi chú chuyên gia')}
-                        </p>
-                        <p className="text-sm font-medium text-slate-600 dark:text-slate-300 italic leading-relaxed">"{service.advisor_note}"</p>
-                    </div>
-                )}
+
 
                 <ServiceGallery attachments={service.attachments} t={t} />
 

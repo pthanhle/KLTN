@@ -144,5 +144,69 @@ export const mockServices = [
         mechanic_info: null,
         vehicle_info: { brand: 'BMW', model: 'X5', license_plate: '30A-999.99', current_odometer: 70000 },
         booking_status: 'RO_CREATED'
+    },
+    {
+        booking_code: 'SRV-2026-M01', // Test case: COMPLETED MOCK
+        user_id: 'USR-08991',
+        service_type: 'MAINTENANCE',
+        advisor_info: { id: 'ADV-004', name: 'Phạm Tuấn Anh', phone: '0909.123.456', avatar: 'https://i.pravatar.cc/150?u=a04258114e29026709d' },
+        mechanic_info: { id: 'MEC-015', name: 'Đặng Thái', level: 'Master Technician', avatar: 'https://i.pravatar.cc/150?u=a048581f4e29026707d' },
+        vehicle_info: {
+            brand: 'Lexus',
+            model: 'RX350',
+            license_plate: '51H-123.88',
+            vin_number: 'JTJ4561831A12345',
+            current_odometer: 15200
+        },
+        services: [
+            { service_id: 'SRV-002', service_name: 'Bảo dưỡng cấp trung bình', price: 4500000 }
+        ],
+        total_cost: 4500000,
+        customer_note: 'Bảo dưỡng 15.000km',
+        attachments: { before: [], after: [] },
+        rating: null,
+        booking_date: '2026-06-20',
+        time_slot: '08:00 - 10:00',
+        booking_status: 'COMPLETED',
+        timeline: [
+            { step: 'RECEIVED', key: 'step_received', status: 'COMPLETED', time: '2026-06-20T08:00:00Z', note: 'Tiếp nhận xe', images: [] },
+            { step: 'DIAGNOSING', key: 'step_diagnosing', status: 'COMPLETED', time: '2026-06-20T08:15:00Z', note: 'Kiểm tra tổng quát đạt chuẩn.', images: [] },
+            { step: 'QUOTING', key: 'step_quoting', status: 'COMPLETED', time: '2026-06-20T08:30:00Z', note: 'Đã báo giá', images: [] },
+            { step: 'IN_PROGRESS', key: 'step_in_progress', status: 'COMPLETED', time: '2026-06-20T09:00:00Z', note: 'Thay dầu và lọc dầu', images: [] },
+            { step: 'QC_TESTING', key: 'step_qc', status: 'COMPLETED', time: '2026-06-20T09:45:00Z', note: 'Kiểm tra chất lượng thành công', images: [] },
+            { step: 'COMPLETED', key: 'step_completed', status: 'COMPLETED', time: '2026-06-20T10:00:00Z', note: 'Sẵn sàng bàn giao', images: [] }
+        ]
+    },
+    {
+        booking_code: 'SRV-2026-M02', // Test case: COMPLETED MOCK
+        user_id: 'USR-08992',
+        service_type: 'REPAIR',
+        advisor_info: { id: 'ADV-002', name: 'Nguyễn Thị Bích', phone: '0912.333.444', avatar: 'https://i.pravatar.cc/150?u=a04258114e29026702d' },
+        mechanic_info: { id: 'MEC-012', name: 'Trần Mạnh Hùng', level: 'Senior Detailer', avatar: 'https://i.pravatar.cc/150?u=a048581f4e29026701d' },
+        vehicle_info: {
+            brand: 'Porsche',
+            model: 'Macan',
+            license_plate: '30K-789.99',
+            vin_number: 'WP1ZZZ99ZLS12345',
+            current_odometer: 32000
+        },
+        services: [
+            { service_id: 'SRV-003', service_name: 'Thay má phanh và cân chỉnh thước lái', price: 12500000 }
+        ],
+        total_cost: 12500000,
+        customer_note: 'Phanh kêu to',
+        attachments: { before: [], after: [] },
+        rating: null,
+        booking_date: '2026-06-21',
+        time_slot: '13:00 - 15:30',
+        booking_status: 'COMPLETED',
+        timeline: [
+            { step: 'RECEIVED', key: 'step_received', status: 'COMPLETED', time: '2026-06-21T13:00:00Z', note: 'Tiếp nhận xe', images: [] },
+            { step: 'DIAGNOSING', key: 'step_diagnosing', status: 'COMPLETED', time: '2026-06-21T13:30:00Z', note: 'Má phanh mòn', images: [] },
+            { step: 'QUOTING', key: 'step_quoting', status: 'COMPLETED', time: '2026-06-21T14:00:00Z', note: 'Khách duyệt thay thế', images: [] },
+            { step: 'IN_PROGRESS', key: 'step_in_progress', status: 'COMPLETED', time: '2026-06-21T14:45:00Z', note: 'Đã thay thế và cân chỉnh', images: [] },
+            { step: 'QC_TESTING', key: 'step_qc', status: 'COMPLETED', time: '2026-06-21T15:15:00Z', note: 'KCS đạt', images: [] },
+            { step: 'COMPLETED', key: 'step_completed', status: 'COMPLETED', time: '2026-06-21T15:30:00Z', note: 'Sẵn sàng bàn giao', images: [] }
+        ]
     }
 ];

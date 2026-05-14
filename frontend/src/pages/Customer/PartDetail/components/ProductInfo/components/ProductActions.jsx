@@ -23,10 +23,10 @@ export const ProductActions = ({ part, selectedOptions, quantity, handleQuantity
             ) : (
                 <div className="pt-6 space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-2xl p-1 bg-white dark:bg-slate-900 w-full sm:w-32 justify-between shrink-0">
-                            <Button type="text" onClick={() => handleQuantityChange('decrement')} className="w-10 h-10 !flex !items-center !justify-center !text-lg !font-bold text-slate-900 dark:text-white">-</Button>
+                        <div className="flex items-center border border-slate-200 dark:border-white/10 rounded-2xl p-1 bg-white dark:bg-[#0a0a0b] w-full sm:w-32 justify-between shrink-0">
+                            <Button type="text" onClick={() => handleQuantityChange('decrement')} className="w-10 h-10 !flex !items-center !justify-center !text-lg !font-bold text-slate-900 dark:!text-white">-</Button>
                             <span className="font-bold text-slate-900 dark:text-white">{quantity}</span>
-                            <Button type="text" onClick={() => handleQuantityChange('increment')} className="w-10 h-10 !flex !items-center !justify-center !text-lg !font-bold text-slate-900 dark:text-white">+</Button>
+                            <Button type="text" onClick={() => handleQuantityChange('increment')} className="w-10 h-10 !flex !items-center !justify-center !text-lg !font-bold text-slate-900 dark:!text-white">+</Button>
                         </div>
                         
                         <div className="flex flex-1 gap-2 sm:gap-4">

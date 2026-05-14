@@ -104,13 +104,10 @@ const BookingCard = ({ booking, onReschedule, onNoShow }) => {
                 </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1 mt-3">
                 {booking.selected_services?.map((service, index) => (
-                    <span 
-                        key={index} 
-                        className="bg-slate-100 dark:bg-[#23293c] px-2 py-1 rounded-md text-[10px] uppercase tracking-wide text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                    >
-                        {service}
+                    <span key={index} className="px-2 py-0.5 bg-slate-100 dark:bg-white/5 text-[11px] font-medium text-slate-600 dark:text-slate-300 rounded-md border border-slate-200 dark:border-white/10">
+                        {service.name}
                     </span>
                 ))}
             </div>

@@ -1,7 +1,41 @@
 import User from '../../models/userModel.js'
 import Order from '../../models/orderModel.js'
 import Booking from '../../models/bookingModel.js'
+import Role from '../../models/roleModel.js'
+import mongoose from 'mongoose'
 import asyncHandler from 'express-async-handler'
+import crypto from 'crypto'
+import emailQueue from '../../queues/emailQueue.js'
+import { customerOtpCreationEmail, customerOtpResendEmail } from '../../utils/emailTemplates.js'
+
+
+export const getCustomerStats = asyncHandler(async (req, res) => {
+    const customerRoleIds = await getCustomerRoleIds()
+    const query = { role_id: { $in: customerRoleIds } }
+
+    const totalCustomers = await User.countDocuments(query)
+    
+    const vipCustomers = await User.countDocuments({
+        role_id: { $in: customerRoleIds },
+        'loyalty.tier': { $in: ['GOLD', 'PLATINUM', 'DIAMOND', 'TITANIUM'] }
+    })
+
+    const startOfWeek = new Date()
+    startOfWeek.setHours(0, 0, 0, 0)
+    startOfWeek.setDate(startOfWeek.getDate() - (startOfWeek.getDay() || 7))
+    
+    const newThisWeek = await User.countDocuments({
+        role_id: { $in: customerRoleIds },
+        createdAt: { $gte: startOfWeek }
+    })
+
+    res.json({
+        totalCustomers,
+        vipCustomers,
+        retentionRate: 85,
+        newThisWeek
+    })
+})
 
 
 export const getCustomers = asyncHandler(async (req, res) => {
@@ -49,9 +83,12 @@ export const getCustomerById = asyncHandler(async (req, res) => {
     }
 
     const customerRoleIds = await getCustomerRoleIds()
-    if (!customerRoleIds.includes(customer.role_id._id.toString())) {
+
+    const roleIdStr = customer.role_id?._id?.toString() || customer.role_id?.toString();
+
+    if (!roleIdStr || !customerRoleIds.includes(roleIdStr)) {
         res.status(400)
-        throw new Error('Người dùng này không phải là khách hàng')
+        throw new Error('Người dùng này không phải là khách hàng hoặc không có vai trò hợp lệ')
     }
 
     const orderCount = await Order.countDocuments({ user_id: customer._id })
@@ -66,7 +103,7 @@ export const getCustomerById = asyncHandler(async (req, res) => {
 
 
 export const updateCustomer = asyncHandler(async (req, res) => {
-    const { 
+    const {
         full_name, email, phone, address, status,
         addresses, garage, customer_type, tax_info,
         loyalty, debt, source, admin_notes, last_visit_date
@@ -90,13 +127,11 @@ export const updateCustomer = asyncHandler(async (req, res) => {
     if (address !== undefined) customer.address = address
     if (status !== undefined) customer.status = status
 
-    // Enterprise Fields (Admins can update everything, including Loyalty & Debt)
     if (addresses !== undefined) customer.addresses = addresses
     if (garage !== undefined) customer.garage = garage
     if (customer_type !== undefined) customer.customer_type = customer_type
     if (tax_info !== undefined) customer.tax_info = tax_info
-    
-    // Loyalty might be sent as an entire object from Admin UI
+
     if (loyalty !== undefined) {
         if (loyalty.points !== undefined) customer.loyalty.points = loyalty.points
         if (loyalty.tier !== undefined) customer.loyalty.tier = loyalty.tier
@@ -108,6 +143,10 @@ export const updateCustomer = asyncHandler(async (req, res) => {
     if (source !== undefined) customer.source = source
     if (admin_notes !== undefined) customer.admin_notes = admin_notes
     if (last_visit_date !== undefined) customer.last_visit_date = last_visit_date
+
+    if (req.file) {
+        customer.avatar = req.file.path
+    }
 
     const updated = await customer.save()
     res.json({
@@ -232,8 +271,131 @@ export const getBookingsByCustomer = asyncHandler(async (req, res) => {
     })
 })
 
+
+export const createCustomer = asyncHandler(async (req, res) => {
+    const { full_name, email, phone, username, address } = req.body
+    let avatar = req.body.avatar
+
+    if (req.file) {
+        avatar = req.file.path
+    }
+
+    if (!email || !full_name || !phone) {
+        res.status(400)
+        throw new Error('Vui lòng điền đầy đủ thông tin (Họ tên, Email, Số điện thoại)')
+    }
+
+    const emailExists = await User.findOne({ email })
+    if (emailExists) {
+        if (emailExists.status === 'inactive' && !emailExists.isEmailVerified) {
+            const otp = Math.floor(100000 + Math.random() * 900000).toString()
+            const otpHash = crypto.createHash('sha256').update(otp).digest('hex')
+            
+            emailExists.emailOTP = otpHash
+            emailExists.emailOTPExpire = Date.now() + 10 * 60 * 1000
+            await emailExists.save()
+
+            const resendTemplate = customerOtpResendEmail(otp)
+            await emailQueue.add('sendEmail', {
+                to: emailExists.email,
+                ...resendTemplate,
+            })
+
+            return res.status(200).json({
+                message: 'Mã OTP mới đã được gửi đến email.',
+                email: emailExists.email,
+            })
+        }
+        res.status(400)
+        throw new Error('Email đã tồn tại và đã được kích hoạt')
+    }
+
+    const finalUsername = username || email.split('@')[0] + Math.floor(Math.random() * 1000)
+    const usernameExists = await User.findOne({ username: finalUsername })
+    if (usernameExists) {
+        res.status(400)
+        throw new Error('Username đã tồn tại, vui lòng chọn username khác')
+    }
+
+    let customerRole = await Role.findOne({ role_name: { $in: ['Customer', 'customer'] } })
+    if (!customerRole) {
+        customerRole = await Role.create({ role_name: 'Customer' })
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex')
+    const tempPassword = crypto.randomBytes(8).toString('hex')
+
+    const customer = await User.create({
+        full_name,
+        email,
+        phone,
+        username: finalUsername,
+        password: tempPassword,
+        address,
+        avatar,
+        role_id: customerRole._id,
+        status: 'inactive',
+        isEmailVerified: false,
+        emailOTP: otpHash,
+        emailOTPExpire: Date.now() + 10 * 60 * 1000,
+    })
+
+    try {
+        const creationTemplate = customerOtpCreationEmail(customer.full_name, otp)
+        await emailQueue.add('sendEmail', {
+            to: customer.email,
+            ...creationTemplate,
+        })
+    } catch (error) {
+        console.error('Error queuing customer welcome email:', error.message)
+    }
+
+    res.status(201).json({
+        message: 'Đã tạo hồ sơ khách hàng. Vui lòng xác thực OTP gửi đến email.',
+        email: customer.email,
+    })
+})
+
+export const verifyCustomerOTP = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body
+
+    if (!email || !otp) {
+        res.status(400)
+        throw new Error('Thiếu email hoặc OTP')
+    }
+
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex')
+
+    const customer = await User.findOne({
+        email,
+        emailOTP: otpHash,
+        emailOTPExpire: { $gt: Date.now() },
+    })
+
+    if (!customer) {
+        res.status(400)
+        throw new Error('OTP không hợp lệ hoặc đã hết hạn')
+    }
+
+    customer.isEmailVerified = true
+    customer.status = 'active'
+    customer.emailOTP = undefined
+    customer.emailOTPExpire = undefined
+    await customer.save()
+
+    res.json({
+        message: 'Xác thực khách hàng thành công',
+        customer: {
+            _id: customer._id,
+            full_name: customer.full_name,
+            email: customer.email,
+            status: customer.status
+        }
+    })
+})
+
 const getCustomerRoleIds = async () => {
-    const Role = (await import('../../models/roleModel.js')).default
     const customerRoles = await Role.find({ role_name: { $in: ['customer', 'Customer'] } })
     return customerRoles.map(r => r._id.toString())
 }

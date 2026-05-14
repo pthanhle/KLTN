@@ -7,6 +7,7 @@ import sendEmail from '../../utils/sendEmail.js'
 import emailQueue from '../../queues/emailQueue.js'
 import { OAuth2Client } from 'google-auth-library'
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken.js'
+import { registerOtpEmail, resendRegisterOtpEmail, resetPasswordEmail } from '../../utils/emailTemplates.js'
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -105,15 +106,10 @@ export const registerUser = asyncHandler(async (req, res) => {
   })
 
   try {
+    const template = registerOtpEmail(user.full_name, otp)
     await emailQueue.add('sendEmail', {
       to: user.email,
-      subject: 'Mã OTP xác nhận đăng ký',
-      html: `
-        <h3>Xin chào ${user.full_name}</h3>
-        <p>Mã OTP xác nhận email của bạn là:</p>
-        <h2 style="color:red">${otp}</h2>
-        <p>Mã có hiệu lực trong 10 phút</p>
-      `,
+      ...template,
     })
   } catch (error) {
     console.log('Error queuing email:', error.message)
@@ -169,14 +165,10 @@ export const resendEmailOTP = asyncHandler(async (req, res) => {
   user.emailOTPExpire = Date.now() + 10 * 60 * 1000
   await user.save()
 
+  const template = resendRegisterOtpEmail(otp)
   await emailQueue.add('sendEmail', {
     to: user.email,
-    subject: 'Mã OTP xác nhận email (gửi lại)',
-    html: `
-      <h3>Mã OTP mới của bạn</h3>
-      <h2 style="color:red">${otp}</h2>
-      <p>Có hiệu lực trong 10 phút</p>
-    `,
+    ...template,
   })
 
   res.json({ message: 'OTP mới đã được gửi' })
@@ -419,30 +411,10 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`
 
   try {
+    const template = resetPasswordEmail(user.full_name || user.username, resetUrl)
     await emailQueue.add('sendEmail', {
       to: user.email,
-      subject: 'Đặt lại mật khẩu',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Đặt lại mật khẩu</h2>
-          <p>Xin chào <strong>${user.full_name || user.username}</strong>,</p>
-          <p>Bạn đã yêu cầu đặt lại mật khẩu. Click vào nút bên dưới để tiếp tục:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" 
-               style="background-color: #eab308; color: white; padding: 12px 30px; 
-                      text-decoration: none; border-radius: 5px; display: inline-block;">
-              Đặt lại mật khẩu
-            </a>
-          </div>
-          <p style="color: #666; font-size: 14px;">Link này chỉ có hiệu lực trong <strong>5 phút</strong>.</p>
-          <p style="color: #666; font-size: 14px;">Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="color: #999; font-size: 12px;">
-            Hoặc copy link này vào trình duyệt:<br>
-            <span style="word-break: break-all;">${resetUrl}</span>
-          </p>
-        </div>
-      `,
+      ...template,
     })
 
     res.json({ message: 'Link đặt lại mật khẩu đã được gửi đến email của bạn' })

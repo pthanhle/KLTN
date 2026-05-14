@@ -78,7 +78,11 @@ const userSchema = mongoose.Schema(
     passwordResetExpire: { type: Date },
     refreshTokens: { type: [String], default: [] },
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  }
 )
 
 userSchema.methods.matchPassword = async function (enteredPassword) {

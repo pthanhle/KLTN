@@ -1,8 +1,22 @@
+import { useState } from 'react';
 import { Drawer, Form, Input, Select, Button } from 'antd';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 
-export const CustomerEditorDrawer = ({ isOpen, onClose, customer, tiersList, t }) => {
+export const CustomerEditorDrawer = ({ isOpen, onClose, customer, tiersList, t, onSave }) => {
+    const [form] = Form.useForm();
+    const [isSaving, setIsSaving] = useState(false);
+
     if (!customer) return null;
+
+    const handleFinish = async (values) => {
+        if (!onSave) return;
+        setIsSaving(true);
+        try {
+            await onSave(values);
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     return (
         <Drawer
@@ -29,28 +43,71 @@ export const CustomerEditorDrawer = ({ isOpen, onClose, customer, tiersList, t }
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-8 py-4 custom-scrollbar">
-                    <Form layout="vertical" initialValues={{
-                        full_name: customer.full_name,
-                        tier: customer.tier,
-                        phone: customer.phone,
-                        email: customer.email
-                    }}>
-                        <Form.Item label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelFullName', 'Full Name')}</span>} name="full_name">
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        onFinish={handleFinish}
+                        initialValues={{
+                            full_name: customer.full_name,
+                            tier: customer.loyalty?.tier || customer.tier,
+                            phone: customer.phone,
+                            email: customer.email,
+                            address: customer.address,
+                            status: customer.status,
+                        }}
+                    >
+                        <Form.Item
+                            label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelFullName', 'Full Name')}</span>}
+                            name="full_name"
+                            rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
+                        >
                             <Input className="w-full bg-slate-50 dark:bg-[#141416] border-none focus:ring-1 focus:ring-yellow-500 text-slate-800 dark:text-slate-200 p-3 rounded-lg font-bold" />
                         </Form.Item>
 
-                        <Form.Item label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelPhone', 'Phone Number')}</span>} name="phone">
+                        <Form.Item
+                            label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelPhone', 'Phone Number')}</span>}
+                            name="phone"
+                        >
                             <Input className="w-full bg-slate-50 dark:bg-[#141416] border-none focus:ring-1 focus:ring-yellow-500 text-slate-800 dark:text-slate-200 p-3 rounded-lg font-bold" />
                         </Form.Item>
 
-                        <Form.Item label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelEmail', 'Email Address')}</span>} name="email">
+                        <Form.Item
+                            label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelEmail', 'Email Address')}</span>}
+                            name="email"
+                        >
                             <Input className="w-full bg-slate-50 dark:bg-[#141416] border-none focus:ring-1 focus:ring-yellow-500 text-slate-800 dark:text-slate-200 p-3 rounded-lg font-bold" />
                         </Form.Item>
 
-                        <Form.Item label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelTier', 'VIP Tier Ranking')}</span>} name="tier">
-                            <Select 
-                                className="w-full h-12" 
-                                bordered={false} 
+                        <Form.Item
+                            label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelAddress', 'Address')}</span>}
+                            name="address"
+                        >
+                            <Input className="w-full bg-slate-50 dark:bg-[#141416] border-none focus:ring-1 focus:ring-yellow-500 text-slate-800 dark:text-slate-200 p-3 rounded-lg font-bold" />
+                        </Form.Item>
+
+                        <Form.Item
+                            label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelStatus', 'Account Status')}</span>}
+                            name="status"
+                        >
+                            <Select
+                                className="w-full h-12"
+                                bordered={false}
+                                classNames={{ popup: 'dark:bg-[#141416]' }}
+                                options={[
+                                    { value: 'active', label: <span className="font-bold">Hoạt động</span> },
+                                    { value: 'inactive', label: <span className="font-bold">Không hoạt động</span> },
+                                    { value: 'suspended', label: <span className="font-bold">Bị khóa</span> },
+                                ]}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label={<span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('adminCustomers:labelTier', 'VIP Tier Ranking')}</span>}
+                            name="tier"
+                        >
+                            <Select
+                                className="w-full h-12"
+                                bordered={false}
                                 classNames={{ popup: 'dark:bg-[#141416]' }}
                                 options={tiersList?.map(tier => ({
                                     value: tier.id,
@@ -62,23 +119,27 @@ export const CustomerEditorDrawer = ({ isOpen, onClose, customer, tiersList, t }
                 </div>
 
                 <div className="p-8 pt-4 border-t border-slate-100 dark:border-white/10 flex gap-4 bg-white dark:bg-[#0c1324] sticky bottom-0">
-                    <Button 
-                        type="primary" 
-                        size="large" 
+                    <Button
+                        type="primary"
+                        size="large"
+                        onClick={() => form.submit()}
+                        loading={isSaving}
+                        disabled={isSaving}
+                        icon={isSaving ? <Loader2 size={16} className="animate-spin" /> : null}
                         className="flex-1 rounded-full bg-yellow-500 hover:bg-yellow-600 dark:bg-premium-gold dark:hover:bg-yellow-500 text-slate-900 font-black tracking-widest uppercase text-[11px] border-none h-[56px]"
                     >
                         {t('adminCustomers:btnSave', 'SAVE CHANGES')}
                     </Button>
-                    <Button 
-                        type="text" 
-                        onClick={onClose} 
+                    <Button
+                        type="text"
+                        onClick={onClose}
                         className="w-[56px] h-[56px] rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#141416] dark:hover:bg-white/5 flex items-center justify-center text-slate-500 border-none"
                     >
                         <X size={20} />
                     </Button>
                 </div>
             </div>
-            
+
             <style>{`
                 .ant-select-selector {
                     background-color: transparent !important;

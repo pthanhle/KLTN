@@ -3,7 +3,7 @@ import { Skeleton } from 'antd';
 import { ContactInfoCard } from './components/ContactInfoCard';
 import { PrivateNotesCard } from './components/PrivateNotesCard';
 
-export const DetailSidebar = ({ customer, isLoading, t }) => {
+export const DetailSidebar = ({ customer, onUpdate, isLoading, t }) => {
     if (isLoading || !customer) {
         return (
             <aside className="lg:col-span-3 space-y-8">
@@ -25,7 +25,7 @@ export const DetailSidebar = ({ customer, isLoading, t }) => {
     return (
         <aside className="lg:col-span-3 space-y-8">
             <ContactInfoCard customer={customer} t={t} />
-            <PrivateNotesCard customer={customer} t={t} />
+            <PrivateNotesCard customer={customer} onSave={onUpdate} t={t} />
         </aside>
     );
 };

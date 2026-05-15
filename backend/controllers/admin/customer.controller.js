@@ -2,11 +2,13 @@ import User from '../../models/userModel.js'
 import Order from '../../models/orderModel.js'
 import Booking from '../../models/bookingModel.js'
 import Role from '../../models/roleModel.js'
+import LoyaltyHistory from '../../models/loyaltyHistoryModel.js'
 import mongoose from 'mongoose'
 import asyncHandler from 'express-async-handler'
 import crypto from 'crypto'
 import emailQueue from '../../queues/emailQueue.js'
 import { customerOtpCreationEmail, customerOtpResendEmail } from '../../utils/emailTemplates.js'
+import { loyaltyService } from '../../services/loyalty.service.js'
 
 
 export const getCustomerStats = asyncHandler(async (req, res) => {
@@ -14,7 +16,7 @@ export const getCustomerStats = asyncHandler(async (req, res) => {
     const query = { role_id: { $in: customerRoleIds } }
 
     const totalCustomers = await User.countDocuments(query)
-    
+
     const vipCustomers = await User.countDocuments({
         role_id: { $in: customerRoleIds },
         'loyalty.tier': { $in: ['GOLD', 'PLATINUM', 'DIAMOND', 'TITANIUM'] }
@@ -23,7 +25,7 @@ export const getCustomerStats = asyncHandler(async (req, res) => {
     const startOfWeek = new Date()
     startOfWeek.setHours(0, 0, 0, 0)
     startOfWeek.setDate(startOfWeek.getDate() - (startOfWeek.getDay() || 7))
-    
+
     const newThisWeek = await User.countDocuments({
         role_id: { $in: customerRoleIds },
         createdAt: { $gte: startOfWeek }
@@ -290,7 +292,7 @@ export const createCustomer = asyncHandler(async (req, res) => {
         if (emailExists.status === 'inactive' && !emailExists.isEmailVerified) {
             const otp = Math.floor(100000 + Math.random() * 900000).toString()
             const otpHash = crypto.createHash('sha256').update(otp).digest('hex')
-            
+
             emailExists.emailOTP = otpHash
             emailExists.emailOTPExpire = Date.now() + 10 * 60 * 1000
             await emailExists.save()
@@ -399,3 +401,68 @@ const getCustomerRoleIds = async () => {
     const customerRoles = await Role.find({ role_name: { $in: ['customer', 'Customer'] } })
     return customerRoles.map(r => r._id.toString())
 }
+
+export const toggleLockStatus = asyncHandler(async (req, res) => {
+    const { status } = req.body
+    const customer = await User.findById(req.params.id)
+    if (!customer) {
+        res.status(404)
+        throw new Error('Khách hàng không tồn tại')
+    }
+    customer.status = status
+    await customer.save()
+    res.json({ message: 'Cập nhật trạng thái thành công', status: customer.status })
+})
+
+export const upgradeTier = asyncHandler(async (req, res) => {
+    const { tier } = req.body
+    const customer = await User.findById(req.params.id)
+    if (!customer) {
+        res.status(404)
+        throw new Error('Khách hàng không tồn tại')
+    }
+    const minPointsNeeded = loyaltyService.getMinPoints(tier)
+    if (customer.loyalty.accumulated_points < minPointsNeeded) {
+        const pointsToAdd = minPointsNeeded - customer.loyalty.accumulated_points
+        customer.loyalty.accumulated_points = minPointsNeeded
+        customer.loyalty.points += pointsToAdd
+    }
+
+    customer.loyalty.tier = tier
+    await customer.save()
+    res.json({ message: 'Nâng hạng thành công', loyalty: customer.loyalty })
+})
+
+export const addLoyaltyPoints = asyncHandler(async (req, res) => {
+    const { points, reason } = req.body
+    const customer = await User.findById(req.params.id)
+    if (!customer) {
+        res.status(404)
+        throw new Error('Khách hàng không tồn tại')
+    }
+
+    if (!points || points <= 0) {
+        res.status(400)
+        throw new Error('Số điểm phải lớn hơn 0')
+    }
+
+    customer.loyalty.points += parseInt(points)
+    customer.loyalty.accumulated_points += parseInt(points)
+
+    const newTier = loyaltyService.checkAndUpgradeTier(customer.loyalty.accumulated_points);
+    if (newTier !== customer.loyalty.tier) {
+        customer.loyalty.tier = newTier;
+    }
+
+    await customer.save()
+
+    const history = await LoyaltyHistory.create({
+        user: customer._id,
+        points_change: parseInt(points),
+        transaction_type: 'GIFT',
+        description: reason || 'Admin tặng điểm',
+        reference_model: 'Admin'
+    })
+
+    res.json({ message: 'Tặng điểm thành công', loyalty: customer.loyalty, history })
+})

@@ -1,6 +1,7 @@
 import Order from '../../models/orderModel.js'
 import Part from '../../models/partModel.js'
 import User from '../../models/userModel.js'
+import { loyaltyService } from '../../services/loyalty.service.js'
 import asyncHandler from 'express-async-handler'
 
 
@@ -205,6 +206,15 @@ export const updateOrder = asyncHandler(async (req, res) => {
                     Part.findByIdAndUpdate(item.part_id, { $inc: { 'inventory.warehouse': item.quantity } })
                 )
             )
+        }
+
+        if (order_status === 'COMPLETED' && order.order_status !== 'COMPLETED') {
+            try {
+                const totalAmount = order.financials?.grand_total || 0;
+                await loyaltyService.processOrderCompletion(order.user_id, order._id, totalAmount, 'Order');
+            } catch (err) {
+                console.error('Failed to process loyalty for order:', err);
+            }
         }
 
         order.order_status = order_status

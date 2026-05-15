@@ -9,6 +9,9 @@ import {
     getBookingsByCustomer,
     createCustomer,
     verifyCustomerOTP,
+    toggleLockStatus,
+    upgradeTier,
+    addLoyaltyPoints
 } from '../../controllers/admin/customer.controller.js'
 import { protect, admin } from '../../middleware/authMiddleware.js'
 import { upload } from '../../config/cloudinary.js'
@@ -37,4 +40,8 @@ router.route('/:id/orders')
 router.route('/:id/bookings')
     .get(getBookingsByCustomer)
 
-export default router
+router.patch('/:id/status', toggleLockStatus)
+router.patch('/:id/tier', upgradeTier)
+router.post('/:id/loyalty/points', addLoyaltyPoints)
+
+export default router

@@ -1,7 +1,8 @@
 export const MOCK_TIER_CONFIG = [
-    { id: 'member', name: 'Member', min_spend: 0 },
-    { id: 'silver', name: 'Silver', min_spend: 50000000 },
-    { id: 'gold', name: 'Gold', min_spend: 100000000 },
-    { id: 'platinum', name: 'Platinum', min_spend: 200000000 },
-    { id: 'titanium', name: 'Titanium', min_spend: 500000000 }
+    { id: 'BRONZE', name: 'Bronze', minPoints: 0, multiplier: 1.0 },
+    { id: 'SILVER', name: 'Silver', minPoints: 5000, multiplier: 1.2 },
+    { id: 'GOLD', name: 'Gold', minPoints: 15000, multiplier: 1.5 },
+    { id: 'PLATINUM', name: 'Platinum', minPoints: 50000, multiplier: 2.0 },
+    { id: 'DIAMOND', name: 'Diamond', minPoints: 150000, multiplier: 2.5 },
+    { id: 'TITANIUM', name: 'Titanium', minPoints: 500000, multiplier: 3.0 }
 ];

@@ -4,6 +4,7 @@ import { DetailHeader } from './components/DetailHeader';
 import { DetailSidebar } from './components/DetailSidebar/index.jsx';
 import { DetailMainPanel } from './components/DetailMainPanel';
 import { CustomerEditorDrawer } from './components/CustomerEditorDrawer';
+import { CustomerActionModals } from './components/CustomerActionModals';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
@@ -16,6 +17,11 @@ const CustomerDetailPage = () => {
         setActiveTab, 
         isEditorOpen, 
         setIsEditorOpen,
+        isTierModalOpen,
+        setIsTierModalOpen,
+        isPointsModalOpen,
+        setIsPointsModalOpen,
+        isActionLoading,
         tiersList,
         orders,
         ordersLoading,
@@ -26,6 +32,9 @@ const CustomerDetailPage = () => {
         bookingsPagination,
         fetchBookings,
         handleCustomerUpdate,
+        handleToggleLock,
+        handleUpgradeTier,
+        handleAddPoints,
     } = useCustomerDetail();
     const navigate = useNavigate();
 
@@ -46,11 +55,15 @@ const CustomerDetailPage = () => {
                 customer={customer} 
                 isLoading={isLoading} 
                 t={t} 
+                onToggleLock={handleToggleLock}
+                onOpenTierModal={() => setIsTierModalOpen(true)}
+                onOpenPointsModal={() => setIsPointsModalOpen(true)}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-10 gap-10">
                 <DetailSidebar 
                     customer={customer} 
+                    onUpdate={handleCustomerUpdate}
                     isLoading={isLoading} 
                     t={t} 
                 />
@@ -79,6 +92,19 @@ const CustomerDetailPage = () => {
                 tiersList={tiersList}
                 t={t}
                 onSave={handleCustomerUpdate}
+            />
+
+            <CustomerActionModals
+                customer={customer}
+                isTierModalOpen={isTierModalOpen}
+                setIsTierModalOpen={setIsTierModalOpen}
+                isPointsModalOpen={isPointsModalOpen}
+                setIsPointsModalOpen={setIsPointsModalOpen}
+                tiersList={tiersList}
+                onUpgradeTier={handleUpgradeTier}
+                onAddPoints={handleAddPoints}
+                isLoading={isActionLoading}
+                t={t}
             />
         </main>
     );

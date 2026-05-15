@@ -57,6 +57,7 @@ const userSchema = mongoose.Schema(
 
     loyalty: {
       points: { type: Number, default: 0 },
+      accumulated_points: { type: Number, default: 0 },
       tier: { type: String, enum: ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND', 'TITANIUM'], default: 'BRONZE' },
       total_spent: { type: Number, default: 0 },
       active_vouchers: { type: Number, default: 0 }

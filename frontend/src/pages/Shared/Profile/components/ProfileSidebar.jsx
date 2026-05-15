@@ -1,4 +1,4 @@
-import { Camera, Shield, User, Clock, ShoppingBag, Wrench, Car } from 'lucide-react';
+import { Camera, Shield, User, Clock, ShoppingBag, Wrench, Car, Gift } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Image } from 'antd';
 
@@ -107,6 +107,23 @@ const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
                         </span>
                     </div>
                 </button>
+
+                {!isAdminRole && (
+                    <button
+                        onClick={() => navigate('/profile/loyalty')}
+                        className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl group transition-all ${currentPath === '/profile/loyalty'
+                            ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-500 shadow-[0_4px_12px_rgba(234,179,8,0.15)]'
+                            : 'bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-white/10'
+                            }`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <Gift size={18} className={currentPath === '/profile/loyalty' ? 'text-yellow-600 dark:text-yellow-500' : 'text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors'} strokeWidth={2.5} />
+                            <span className={`text-[14px] font-bold transition-colors ${currentPath === '/profile/loyalty' ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'}`}>
+                                Tích điểm & Ưu đãi
+                            </span>
+                        </div>
+                    </button>
+                )}
 
                 {profile.authProvider === 'local' && (
                     <button

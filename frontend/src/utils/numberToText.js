@@ -1,7 +1,4 @@
-/**
- * Utility to convert numbers to text in Vietnamese and English.
- * Following 2026 Micro-Utility Architecture.
- */
+
 
 const baseNumVi = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
 const scalesVi = ["", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ", "tỷ tỷ"];
@@ -43,8 +40,6 @@ const num2TextVi = (num) => {
         if (chunks[i] !== 0) {
             const groupStr = readGroup3Vi(chunks[i], i === chunks.length - 1);
             res += groupStr + " " + scalesVi[i] + " ";
-        } else if (i > 0 && i !== chunks.length - 1 && chunks.length > 2 && res.length > 0) {
-
         }
     }
     res = res.trim() + " đồng";
@@ -93,12 +88,7 @@ const num2TextEn = (num) => {
     return res;
 };
 
-/**
- * Convert number to human-readable text based on locale
- * @param {number} num 
- * @param {string} lang 'vi' or 'en'
- * @returns {string} Formatted string
- */
+
 export const numberToText = (num, lang = 'vi') => {
     if (num === null || num === undefined || isNaN(num)) return '';
     return lang === 'vi' ? num2TextVi(num) : num2TextEn(num);

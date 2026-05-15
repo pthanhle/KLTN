@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '../../utils/settlementUtils';
+import { numberToText } from '@/utils/numberToText';
 
 export const PrintableInvoice = ({ activeTerminalData }) => {
     const { t } = useTranslation('adminServiceReception');
@@ -66,7 +67,6 @@ export const PrintableInvoice = ({ activeTerminalData }) => {
                 </div>
             </div>
 
-            {/* Invoice Table */}
             <table className="w-full mb-8 text-sm">
                 <thead className="border-b border-black">
                     <tr>
@@ -111,7 +111,11 @@ export const PrintableInvoice = ({ activeTerminalData }) => {
                 </div>
             </div>
 
-            {/* Signatures */}
+            <div className="mb-12 p-4 bg-slate-50 border-l-4 border-slate-900 italic">
+                <span className="font-bold not-italic">{t('print_amount_in_words', 'Bằng chữ')}: </span>
+                <span>{numberToText(financials.finalBalance)}</span>
+            </div>
+
             <div className="flex justify-around text-center pt-16 relative z-10">
                 <div>
                     <p className="font-bold mb-20">{t('print_sign_customer')}</p>

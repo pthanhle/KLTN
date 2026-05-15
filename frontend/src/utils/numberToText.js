@@ -52,7 +52,6 @@ const num2TextVi = (num) => {
     return res;
 };
 
-// English Logic
 const onesEn = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
 const tensEn = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
 const scalesEn = ["", "thousand", "million", "billion", "trillion"];

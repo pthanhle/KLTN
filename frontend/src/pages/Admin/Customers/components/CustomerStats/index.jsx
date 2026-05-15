@@ -1,5 +1,5 @@
 import { Skeleton } from 'antd';
-import { Users, Star, Activity, UserPlus } from 'lucide-react';
+import { Users, Star, Wallet, UserPlus } from 'lucide-react';
 import { StatCard } from './StatCard';
 
 export const CustomerStats = ({ stats, isLoading, t }) => {
@@ -39,13 +39,13 @@ export const CustomerStats = ({ stats, isLoading, t }) => {
             />
             <StatCard 
                 t={t}
-                title={t('adminCustomers:statsRetention', 'Tỷ lệ duy trì')} 
-                value={`${stats?.retention_rate || 0}%`} 
-                icon={<Activity size={20} />} 
-                trend={stats?.retention_trend || 0} 
-                trendLabel={t('adminCustomers:statsVsLastQuarter', 'so với quý trước')}
-                iconBg="bg-emerald-500/10 dark:bg-emerald-500/20"
-                iconColor="text-emerald-600 dark:text-emerald-400"
+                title={t('adminCustomers:statsDebt', 'Tổng công nợ')} 
+                value={(stats?.total_debt || 0).toLocaleString('vi-VN') + ' đ'} 
+                icon={<Wallet size={20} />} 
+                trend={stats?.debt_trend || 0} 
+                trendLabel={t('adminCustomers:statsVsLastMonth', 'so với tháng trước')}
+                iconBg="bg-rose-500/10 dark:bg-rose-500/20"
+                iconColor="text-rose-600 dark:text-rose-400"
                 delay={200}
             />
             <StatCard 

@@ -31,10 +31,16 @@ export const getCustomerStats = asyncHandler(async (req, res) => {
         createdAt: { $gte: startOfWeek }
     })
 
+    const debtStats = await User.aggregate([
+        { $match: query },
+        { $group: { _id: null, totalDebt: { $sum: "$debt" } } }
+    ])
+    const totalDebt = debtStats.length > 0 ? debtStats[0].totalDebt : 0
+
     res.json({
         totalCustomers,
         vipCustomers,
-        retentionRate: 85,
+        totalDebt,
         newThisWeek
     })
 })

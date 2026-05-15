@@ -36,20 +36,29 @@ const FOOTER_STYLE = `
 const HR_STYLE = `border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;`
 
 
-export const customerOtpCreationEmail = (fullName, otp) => ({
-    subject: 'Mã OTP xác nhận tài khoản khách hàng',
+export const customerOtpCreationEmail = (fullName, otp, tempPassword) => ({
+    subject: 'Chào mừng khách hàng mới & Xác nhận tài khoản',
     html: `
         <div style="${BASE_STYLE}">
-            <h2 style="color: #1e293b; text-align: center;">Xác nhận tài khoản</h2>
+            <h2 style="color: #1e293b; text-align: center;">Chào mừng khách hàng mới!</h2>
             <p>Xin chào <strong>${fullName}</strong>,</p>
             <p>Một tài khoản khách hàng đã được tạo cho bạn trên hệ thống của chúng tôi.</p>
-            <p>Mã OTP để xác nhận tài khoản của bạn là:</p>
+            
+            <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <p style="margin: 0; color: #475569; font-size: 14px;">Thông tin đăng nhập tạm thời:</p>
+                <p style="margin: 5px 0 0 0; font-family: monospace; font-size: 16px; font-weight: bold; color: #0f172a;">
+                    Mật khẩu: ${tempPassword}
+                </p>
+            </div>
+
+            <p>Vui lòng sử dụng mã OTP dưới đây để xác nhận và kích hoạt tài khoản:</p>
             <div style="${OTP_BOX_STYLE}">
                 <span style="${OTP_SPAN_STYLE}">${otp}</span>
             </div>
+            
             <p style="font-size: 14px; color: #64748b;">
-                Mã này có hiệu lực trong <strong>10 phút</strong>.
-                Vui lòng cung cấp mã này cho nhân viên hỗ trợ hoặc nhập vào trang web để kích hoạt tài khoản.
+                Mã OTP có hiệu lực trong <strong>10 phút</strong>. 
+                Sau khi đăng nhập lần đầu, bạn nên đổi mật khẩu để đảm bảo an toàn.
             </p>
             <hr style="${HR_STYLE}">
             <p style="${FOOTER_STYLE}">Đây là email tự động, vui lòng không phản hồi.</p>

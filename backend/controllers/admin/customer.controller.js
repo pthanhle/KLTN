@@ -281,8 +281,8 @@ export const getBookingsByCustomer = asyncHandler(async (req, res) => {
 
 
 export const createCustomer = asyncHandler(async (req, res) => {
-    const { full_name, email, phone, username, address } = req.body
-    let avatar = req.body.avatar
+    const { full_name, email, phone, username, address, source, tier, admin_notes } = req.body
+    let avatar = typeof req.body.avatar === 'string' ? req.body.avatar : undefined
 
     if (req.file) {
         avatar = req.file.path
@@ -347,10 +347,17 @@ export const createCustomer = asyncHandler(async (req, res) => {
         isEmailVerified: false,
         emailOTP: otpHash,
         emailOTPExpire: Date.now() + 10 * 60 * 1000,
+        source,
+        admin_notes,
+        loyalty: {
+            tier: tier || 'BRONZE',
+            accumulated_points: loyaltyService.getMinPoints(tier || 'BRONZE'),
+            points: loyaltyService.getMinPoints(tier || 'BRONZE')
+        }
     })
 
     try {
-        const creationTemplate = customerOtpCreationEmail(customer.full_name, otp)
+        const creationTemplate = customerOtpCreationEmail(customer.full_name, otp, tempPassword)
         await emailQueue.add('sendEmail', {
             to: customer.email,
             ...creationTemplate,
@@ -362,6 +369,7 @@ export const createCustomer = asyncHandler(async (req, res) => {
     res.status(201).json({
         message: 'Đã tạo hồ sơ khách hàng. Vui lòng xác thực OTP gửi đến email.',
         email: customer.email,
+        tempPassword: tempPassword
     })
 })
 

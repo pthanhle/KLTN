@@ -40,6 +40,13 @@ export const updateProfile = asyncHandler(async (req, res) => {
   if (customer_type) user.customer_type = customer_type;
   if (tax_info) user.tax_info = tax_info;
   if (preferences) user.preferences = preferences;
+  
+  if (req.file) {
+    console.log('Avatar file received:', req.file.path);
+    user.avatar = req.file.path;
+  } else {
+    console.log('No avatar file in request');
+  }
 
   if (newPassword) {
     if (!currentPassword) {

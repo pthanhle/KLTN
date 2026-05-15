@@ -1,8 +1,9 @@
 import { Camera, Shield, User, Clock, ShoppingBag, Wrench, Car, Gift } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Image } from 'antd';
+import { Image, Upload } from 'antd';
+import { getAvatarUrl } from '@/utils/imageUtils';
 
-const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
+const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen, handleAvatarUpload }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const currentPath = location.pathname;
@@ -15,23 +16,33 @@ const ProfileSidebar = ({ profile, t, setIsPasswordModalOpen }) => {
     return (
         <div className="flex flex-col items-center">
             <div className="relative mb-6">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-50 dark:border-[#1a1c23] shadow-[0_8px_30px_rgb(0,0,0,0.12)] bg-slate-100 flex items-center justify-center">
-                    {profile.avatar ? (
-                        <Image
-                            src={profile.avatar}
-                            alt="Avatar"
-                            width="100%"
-                            height="100%"
-                            className="object-cover"
-                            preview={false}
-                        />
-                    ) : (
-                        <User size={40} className="text-slate-300" />
-                    )}
-                </div>
-                <button className="absolute bottom-1 right-1 bg-yellow-500 text-slate-900 w-9 h-9 rounded-full flex items-center justify-center hover:bg-yellow-400 transition-colors shadow">
-                    <Camera size={16} strokeWidth={2.5} />
-                </button>
+                <Upload
+                    name="avatar"
+                    showUploadList={false}
+                    beforeUpload={handleAvatarUpload}
+                    accept="image/*"
+                >
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-slate-50 dark:border-[#1a1c23] shadow-[0_8px_30px_rgb(0,0,0,0.12)] bg-slate-100 flex items-center justify-center cursor-pointer group transition-all hover:border-yellow-500/50">
+                        {profile.avatar ? (
+                            <Image
+                                src={getAvatarUrl(profile.avatar)}
+                                alt="Avatar"
+                                width="100%"
+                                height="100%"
+                                className="object-cover group-hover:scale-105 transition-transform"
+                                preview={false}
+                            />
+                        ) : (
+                            <User size={40} className="text-slate-300" />
+                        )}
+                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <Camera size={24} className="text-white" />
+                        </div>
+                    </div>
+                    <div className="absolute bottom-1 right-1 bg-yellow-500 text-slate-900 w-9 h-9 rounded-full flex items-center justify-center hover:bg-yellow-400 transition-colors shadow z-10 pointer-events-none">
+                        <Camera size={16} strokeWidth={2.5} />
+                    </div>
+                </Upload>
             </div>
 
             <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 text-center">{profile.full_name}</h2>

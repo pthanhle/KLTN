@@ -171,6 +171,13 @@ export const useProfileLogic = (roleType = 'customer') => {
         });
     };
 
+    const handleAvatarUpload = async (file) => {
+        const formData = new FormData();
+        formData.append('avatar', file);
+        updateMutation.mutate(formData);
+        return false;
+    };
+
     return {
         t,
         isLoading: isLoading || updateMutation.isPending,
@@ -180,6 +187,7 @@ export const useProfileLogic = (roleType = 'customer') => {
         provinces, districts, wards,
         handleEditToggle,
         handleSave: methods.handleSubmit(handleSave),
+        handleAvatarUpload,
         isPasswordModalOpen,
         setIsPasswordModalOpen,
     };

@@ -1,6 +1,6 @@
 import { Image, Skeleton, Modal } from 'antd';
 import { Lock, Unlock, ArrowUpCircle, Plus, Verified } from 'lucide-react';
-import { formatDate } from '../../Customers/utils/format';
+import { formatDate, getAvatarUrl } from '../../Customers/utils/format';
 
 export const DetailHeader = ({ 
     customer, 
@@ -66,7 +66,7 @@ export const DetailHeader = ({
                 <div className="relative">
                     <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-xl border-2 border-yellow-500/20 dark:border-premium-gold/20 flex-shrink-0 bg-white dark:bg-[#141416]">
                         <Image 
-                            src={customer.avatar} 
+                            src={getAvatarUrl(customer.avatar)} 
                             alt={customer.full_name} 
                             width="100%" 
                             height="100%" 

@@ -25,6 +25,7 @@ const ProfilePage = () => {
         provinces, districts, wards,
         handleEditToggle,
         handleSave,
+        handleAvatarUpload,
         isPasswordModalOpen,
         setIsPasswordModalOpen,
     } = useProfileLogic(isCustomerRoute ? 'customer' : 'admin');
@@ -46,6 +47,7 @@ const ProfilePage = () => {
                                     profile={profile}
                                     t={t}
                                     setIsPasswordModalOpen={setIsPasswordModalOpen}
+                                    handleAvatarUpload={handleAvatarUpload}
                                 />
                             </div>
                         </aside>

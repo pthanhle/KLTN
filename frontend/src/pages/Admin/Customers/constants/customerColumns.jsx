@@ -9,6 +9,16 @@ const formatDate = (isoString) => {
     return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
+const getAvatarUrl = (path) => {
+    if (!path) return null;
+    if (typeof path !== 'string') return null;
+    if (path.startsWith('http')) return path;
+    const baseUrl = import.meta.env.VITE_API_URL 
+        ? import.meta.env.VITE_API_URL.replace('/api', '') 
+        : 'http://localhost:5000';
+    return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
 export const getCustomerColumns = (t, onViewDetails, onEditDetails) => [
     {
         title: t('adminCustomers:tableCode', 'MÃ KH'),
@@ -29,7 +39,7 @@ export const getCustomerColumns = (t, onViewDetails, onEditDetails) => [
         render: (_, record) => (
             <div className="flex items-center gap-3 py-1 cursor-pointer group" onClick={() => onViewDetails(record)}>
                 <Avatar 
-                    src={record.avatar} 
+                    src={getAvatarUrl(record.avatar)} 
                     alt="Avatar" 
                     size={42}
                     className="border border-slate-200 dark:border-white/10 object-cover flex-shrink-0 group-hover:scale-105 transition-transform"

@@ -85,3 +85,10 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+
+/mobile/build/
+/mobile/.dart_tool/
+/mobile/.pub-cache/
+/mobile/.pub/
+/mobile/.flutter-plugins
+/mobile/.flutter-plugins-dependencies

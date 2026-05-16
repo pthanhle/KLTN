@@ -6,20 +6,20 @@ import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getPreorderSchema } from '../schemas/preorderSchema';
-import { getMockPartDetail } from '@/pages/Customer/PartDetail/data/mockPartDetail';
+import { useClientSinglePartData } from '@/services/queries/clientPart.queries';
 
 export const usePreorderLogic = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
     const { message } = App.useApp();
-    const { t } = useTranslation('parts');
+    const { t } = useTranslation('partDetail');
     const { user } = useSelector((state) => state.auth);
 
     const [part, setPart] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     // Read state from Product Detail page
     const { selectedOptions: initialSelectedOptions = {}, quantity: defaultQuantity = 1 } = location.state || {};
 
@@ -36,7 +36,7 @@ export const usePreorderLogic = () => {
             return zodResolver(schema)(data, context, options);
         },
         defaultValues: {
-            fullName: user?.fullName || '',
+            fullName: user?.full_name || user?.fullName || '',
             phoneNumber: user?.phoneNumber || user?.phone || '',
             email: user?.email || '',
             vehicleBrand: '',
@@ -45,23 +45,22 @@ export const usePreorderLogic = () => {
         }
     });
 
+    const { data: partData, isLoading: isPartLoading } = useClientSinglePartData(id);
+
     useEffect(() => {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-            const fetchedPart = getMockPartDetail(id);
+        if (!isPartLoading) {
+            const fetchedPart = partData?.data;
             if (!fetchedPart) {
                 navigate('/parts');
             } else {
                 setPart(fetchedPart);
-                // Try pre-filling brand if universal is false
                 if (fetchedPart.compatible_brands && fetchedPart.compatible_brands.length === 1) {
                     setValue('vehicleBrand', fetchedPart.compatible_brands[0]);
                 }
             }
             setIsLoading(false);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [id, navigate, setValue]);
+        }
+    }, [isPartLoading, partData, navigate, setValue]);
 
     const quantityValue = watch('quantity');
     const handleQuantityChange = (amount) => {

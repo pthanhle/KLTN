@@ -85,7 +85,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       })
     }
 
-    const currentStock = p.inventory?.warehouse + p.inventory?.showroom || 0
+    const currentStock = p.inventory?.available_stock || 0
     if (currentStock < item.quantity) {
       return res.status(400).json({
         message: `Sản phẩm "${p.name}" chỉ còn ${currentStock} cái trong kho, không đủ số lượng ${item.quantity}!`,
@@ -160,7 +160,7 @@ export const createOrder = asyncHandler(async (req, res) => {
   await Promise.all(
     orderItems.map(item =>
       Part.findByIdAndUpdate(item.part_id, {
-        $inc: { 'inventory.warehouse': -item.quantity }
+        $inc: { 'inventory.allocated': item.quantity, 'inventory.available_stock': -item.quantity }
       })
     )
   )
@@ -225,7 +225,7 @@ export const cancelOrder = asyncHandler(async (req, res) => {
   await Promise.all(
     order.items.map(item =>
       Part.findByIdAndUpdate(item.part_id, {
-        $inc: { 'inventory.warehouse': item.quantity }
+        $inc: { 'inventory.allocated': -item.quantity, 'inventory.available_stock': item.quantity }
       })
     )
   )

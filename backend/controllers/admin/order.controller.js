@@ -97,7 +97,7 @@ export const createOrder = asyncHandler(async (req, res) => {
         const p = partMap[item.part_id]
         if (!p) throw Object.assign(new Error(`Sản phẩm ${item.part_id} không tồn tại`), { statusCode: 404 })
 
-        const currentStock = p.inventory?.warehouse + p.inventory?.showroom || 0
+        const currentStock = p.inventory?.available_stock || 0
         if (currentStock < item.quantity) throw Object.assign(new Error(`Sản phẩm "${p.name}" không đủ tồn kho`), { statusCode: 400 })
 
         const unit_price = Number(item.price || p.price)
@@ -169,7 +169,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
     await Promise.all(
         orderItems.map(item =>
-            Part.findByIdAndUpdate(item.part_id, { $inc: { 'inventory.warehouse': -item.quantity } })
+            Part.findByIdAndUpdate(item.part_id, { $inc: { 'inventory.allocated': item.quantity, 'inventory.available_stock': -item.quantity } })
         )
     )
 
@@ -203,7 +203,7 @@ export const updateOrder = asyncHandler(async (req, res) => {
         if (order_status === 'CANCELLED' && order.order_status !== 'CANCELLED') {
             await Promise.all(
                 order.items.map(item =>
-                    Part.findByIdAndUpdate(item.part_id, { $inc: { 'inventory.warehouse': item.quantity } })
+                    Part.findByIdAndUpdate(item.part_id, { $inc: { 'inventory.allocated': -item.quantity, 'inventory.available_stock': item.quantity } })
                 )
             )
         }

@@ -42,6 +42,10 @@ export const ProductMeta = ({ part, t, formatCurrency, setActiveTab }) => {
                     <Package className="w-4 h-4" />
                     <span className="font-black uppercase tracking-widest text-[11px]">{part.condition_name || part.condition || t('cart_condition_new', 'Mới 100%')}</span>
                 </div>
+
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full shadow-sm">
+                    <span className="font-black uppercase tracking-widest text-[11px]">{t('lbl_available_stock', 'Tồn kho khả dụng')}: {part.inventory?.available_stock || 0}</span>
+                </div>
             </div>
 
             <div className="flex items-baseline gap-4">

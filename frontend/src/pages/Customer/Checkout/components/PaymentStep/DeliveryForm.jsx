@@ -140,6 +140,24 @@ const DeliveryForm = ({ hookState }) => {
                         </div>
                     )}
                 />
+
+                <Controller
+                    name="note"
+                    control={methods.control}
+                    render={({ field, fieldState }) => (
+                        <div className="md:col-span-2 space-y-2 mt-2">
+                            <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">{t('checkout_note', 'Ghi chú đơn hàng (Tùy chọn)')}</label>
+                            <Input.TextArea
+                                {...field}
+                                status={fieldState.error ? 'error' : ''}
+                                placeholder={t('checkout_note_placeholder', 'Ví dụ: Giao giờ hành chính, gọi trước khi giao...')}
+                                rows={3}
+                                className="!min-h-[100px] !rounded-xl !bg-slate-50 dark:!bg-[#0a0a0b] !border-slate-200 dark:!border-white/10 hover:!border-yellow-500/50 focus:!border-yellow-500 !text-slate-900 dark:!text-white font-medium resize-none !p-4"
+                            />
+                            {fieldState.error && <p className="text-rose-500 text-xs mt-1 animate-in fade-in">{fieldState.error.message}</p>}
+                        </div>
+                    )}
+                />
             </div>
         </section>
     );

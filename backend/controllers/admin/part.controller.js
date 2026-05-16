@@ -51,7 +51,7 @@ export const getAllParts = asyncHandler(async (req, res) => {
   pipeline.push({
     $addFields: {
       id: "$_id",
-      stock: { $add: [{ $ifNull: ["$inventory.warehouse", 0] }, { $ifNull: ["$inventory.showroom", 0] }] },
+      stock: { $ifNull: ["$inventory.available_stock", 0] },
       image: { $arrayElemAt: ["$images", 0] },
       condition_name: { $ifNull: [{ $arrayElemAt: ["$condition_data.name", 0] }, "$condition", "Mới 100%"] }
     }
@@ -82,7 +82,7 @@ export const getAllParts = asyncHandler(async (req, res) => {
   const globalStatsPipeline = [
     {
       $addFields: {
-        stock: { $add: [{ $ifNull: ["$inventory.warehouse", 0] }, { $ifNull: ["$inventory.showroom", 0] }] }
+        stock: { $ifNull: ["$inventory.available_stock", 0] }
       }
     },
     {

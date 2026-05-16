@@ -30,11 +30,9 @@
   "trust_secure": "Thanh toán bảo mật 100%",
   "free_shipping_notice": "Miễn phí giao hàng toàn quốc trên 100.000.000 đ. Áp dụng cho các mặt hàng phụ tùng tiêu chuẩn. Phụ thu hàng Cồng Kềnh sẽ tính riêng.",
   "remove_success": "Đã xóa sản phẩm",
-
   "step_1": "Giỏ hàng",
   "step_2": "Thanh toán",
   "step_3": "Hoàn tất",
-
   "checkout_delivery_title": "Thông tin giao hàng",
   "checkout_shipping_title": "Phương thức vận chuyển",
   "checkout_payment_title": "Phương thức thanh toán",
@@ -45,47 +43,46 @@
   "checkout_district": "Quận / Huyện",
   "checkout_ward": "Phường / Xã",
   "checkout_address": "Số nhà, tên đường",
+  "checkout_note": "Ghi chú đơn hàng (Tùy chọn)",
   "checkout_city_placeholder": "Chọn Tỉnh/Thành phố",
   "checkout_district_placeholder": "Chọn Quận/Huyện",
   "checkout_ward_placeholder": "Chọn Phường/Xã",
   "checkout_address_placeholder": "123 Đường ABC...",
+  "checkout_note_placeholder": "Ví dụ: Giao giờ hành chính, gọi trước khi giao...",
   "support_title": "Cần hỗ trợ?",
   "support_desc": "Đội ngũ chuyên gia của TT AUTO luôn sẵn sàng hỗ trợ bạn 24/7 qua Hotline.",
   "support_call": "Gọi ngay 1900 1234",
-
   "success_title": "ĐẶT HÀNG THÀNH CÔNG!",
   "success_subtitle": "Cảm ơn bạn đã tin tưởng TT AUTO. Hệ thống đang tiến hành đóng gói và giao hàng cho bạn.",
   "success_order_id": "Mã đơn hàng: #{{id}}",
   "success_email_sent": "BIÊN LAI CHI TIẾT ĐÃ ĐƯỢC GỬI ĐẾN EMAIL {{email}}",
   "success_track_btn": "Theo dõi tiến độ đơn hàng",
   "success_continue_btn": "Tiếp tục mua sắm",
-
   "success_timeline_1": "ĐẶT HÀNG",
   "success_timeline_2": "ĐÓNG GÓI",
   "success_timeline_3": "ĐANG GIAO",
   "success_timeline_4": "HOÀN TẤT",
-
   "success_product_summary": "TÓM TẮT SẢN PHẨM",
   "success_qty": "Số lượng: {{count}}",
   "success_final_total": "TỔNG CỘNG THANH TOÁN",
   "success_tax_included": "Đã bao gồm VAT & Phí vận chuyển",
-
   "success_shipping_info": "THÔNG TIN GIAO NHẬN",
   "success_receiver": "Người nhận:",
   "success_phone": "Số điện thoại:",
   "success_address": "Địa chỉ:",
   "success_shipping_method": "Vận chuyển:",
   "success_delivery_est": "DỰ KIẾN: {{date}}",
-
   "success_payment_info": "THANH TOÁN",
   "success_payment_status": "THÀNH CÔNG",
   "success_payment_card_tail": "Đuôi thẻ: **** {{tail}}",
-
   "success_support_title": "Cần thay đổi thông tin giao hàng hoặc hủy đơn?",
   "success_support_desc": "Bạn có thể thực hiện thao tác trực tuyến hoặc liên hệ hỗ trợ trong 30 phút tới.",
   "success_support_hotline": "HOTLINE: 1900 88XX",
   "success_copied": "Đã copy mã đơn hàng",
   "summary_free_shipping_notice": "Miễn phí giao hàng toàn quốc trên 100.000.000 đ. Áp dụng cho mặt hàng phụ tùng tiêu chuẩn. Phụ thu hàng Cồng Kềnh tính riêng.",
   "summary_back": "Quay lại giỏ hàng",
-  "success_per_item": "/ sp"
+  "success_per_item": "/ sp",
+  "cart_ready_delivery": "Sẵn sàng giao",
+  "cart_condition_new": "Mới 100%",
+  "cart_condition_used": "Đã qua sử dụng"
 }

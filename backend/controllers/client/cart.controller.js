@@ -18,7 +18,7 @@ const mapCartItem = (item) => {
         slug: item.part.slug,
         type: 'part',
         is_best_seller: item.part.is_best_seller,
-        inventory: item.part.inventory || { showroom: 0, warehouse: 0 }
+        inventory: item.part.inventory || { stock_on_hand: 0, allocated: 0, available_stock: 0 }
     };
 };
 
@@ -76,7 +76,7 @@ export const addToCart = asyncHandler(async (req, res) => {
         }
     }
 
-    const stock = (part.inventory?.warehouse || 0) + (part.inventory?.showroom || 0);
+    const stock = part.inventory?.available_stock || 0;
     if (stock < quantity) {
         res.status(400);
         throw new Error(`Kho chỉ còn ${stock} đơn vị sản phẩm này.`);
@@ -142,7 +142,7 @@ export const updateCartItem = asyncHandler(async (req, res) => {
         throw new Error('Linh kiện này đã bị xoá khỏi hệ thống.');
     }
 
-    const stock = (part.inventory?.warehouse || 0) + (part.inventory?.showroom || 0);
+    const stock = part.inventory?.available_stock || 0;
     if (stock < quantity) {
         res.status(400);
         throw new Error(`Kho chỉ còn ${stock} đơn vị sản phẩm này. Hãy giảm số lượng.`);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ShoppingCart } from 'lucide-react';
-import { formatCurrency } from '../../Orders/utils/formatters';
+import { formatCurrency } from '../../../Orders/utils/formatters';
 
 export const ProductList = ({ items, t }) => {
     return (
@@ -16,7 +16,7 @@ export const ProductList = ({ items, t }) => {
 
             <div className="flex flex-col gap-6">
                 {items?.map((item, index) => (
-                    <div key={item._id || index} className="flex items-center gap-6 bg-slate-50 dark:bg-[#1a1a1c] p-4 rounded-xl border border-slate-100 dark:border-white/5">
+                    <div key={item._id || index} className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-slate-50 dark:bg-[#1a1a1c] p-4 rounded-xl border border-slate-100 dark:border-white/5">
                         <div className="flex-1 min-w-0">
                             <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1 truncate">
                                 {item.name}
@@ -30,7 +30,7 @@ export const ProductList = ({ items, t }) => {
                                 <span className="text-yellow-600 dark:text-yellow-500">{t('sku')} {item.sku}</span>
                             </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left sm:text-right border-t sm:border-t-0 border-slate-200 dark:border-white/5 pt-3 sm:pt-0 mt-2 sm:mt-0">
                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">
                                 {formatCurrency(item.unit_price)} × {item.quantity}
                             </p>

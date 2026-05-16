@@ -19,7 +19,7 @@ const PreorderPartPage = () => {
     if (!part) return null;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] pt-28 pb-20">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0b] pt-28 pb-20">
             <div className="container mx-auto px-4 max-w-6xl">
                 <button
                     onClick={() => navigate(`/parts/${part.id}`)}

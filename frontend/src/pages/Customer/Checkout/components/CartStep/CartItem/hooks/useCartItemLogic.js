@@ -1,6 +1,6 @@
 import { App } from 'antd';
 import { useToggleWishlist, useGetWishlist } from '@/services/queries/clientWishlist.queries';
-import { calculateStockStatus } from '../utils/inventoryUtils';
+import { calculateStockStatus } from '../../utils/inventoryUtils';
 
 export const useCartItemLogic = (item, t) => {
     const { message } = App.useApp();

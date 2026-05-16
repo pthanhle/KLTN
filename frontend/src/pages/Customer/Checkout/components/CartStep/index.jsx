@@ -1,6 +1,6 @@
 import { Checkbox, Image, Button } from 'antd';
 import { Skeleton } from '@/components/ui/skeleton';
-import CartItem from './CartItem';
+import CartItem from './CartItem/index';
 import CartSummary from './CartSummary';
 import { Link } from 'react-router-dom';
 import EmptyCart from './EmptyCart';

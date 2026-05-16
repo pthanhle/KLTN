@@ -384,8 +384,9 @@ export const getMockPartDetail = (id) => {
             brand: summaryData.compatible_brands?.[0] || 'Phụ kiện',
             stock: summaryData.stock,
             inventory: summaryData.inventory || {
-                showroom: Math.floor(Math.random() * 5),
-                warehouse: Math.floor(Math.random() * 50) + 10
+                stock_on_hand: 50,
+                allocated: 10,
+                available_stock: 40
             },
             in_stock: summaryData.stock > 0 || true,
             images: [summaryData.image, ...listDetail.images.slice(1)],

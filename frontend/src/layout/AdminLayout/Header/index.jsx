@@ -11,6 +11,7 @@ import {
     User,
     Menu
 } from 'lucide-react';
+import { getAvatarUrl } from '../../../utils/imageUtils';
 
 const Header = ({ collapsed, onToggle, hideToggle }) => {
     const navigate = useNavigate();
@@ -30,7 +31,6 @@ const Header = ({ collapsed, onToggle, hideToggle }) => {
     return (
         <header className="sticky top-0 z-50 w-full h-20 flex items-center justify-between px-6 lg:px-10 bg-white/80 dark:bg-[#0a0a0b]/80 backdrop-blur-md dark:backdrop-blur-xl border-b border-slate-200/80 dark:border-white/5 transition-all shadow-sm dark:shadow-none">
 
-            {/* TOGGLE BUTTON FOR SIDER */}
             <div className="flex-1 flex items-center">
                 {!hideToggle && (
                     <button
@@ -42,13 +42,7 @@ const Header = ({ collapsed, onToggle, hideToggle }) => {
                 )}
             </div>
 
-            {/* HEADER ACTIONS */}
             <div className="flex items-center space-x-2 md:space-x-4">
-
-                {/* UTILITY GROUP */}
-                <HeaderUtilities />
-
-                {/* NOTIFICATIONS */}
                 <Dropdown
                     menu={{
                         items: [
@@ -148,7 +142,7 @@ const Header = ({ collapsed, onToggle, hideToggle }) => {
                         </div>
                         <div className="relative">
                             {user?.avatar ? (
-                                <img src={user.avatar} alt="Admin Avatar" className="w-10 h-10 rounded-full border-2 border-yellow-200 dark:border-premium-gold/50 object-cover bg-white" />
+                                <img src={getAvatarUrl(user.avatar)} alt="Admin Avatar" className="w-10 h-10 rounded-full border-2 border-yellow-200 dark:border-premium-gold/50 object-cover bg-white" />
                             ) : (
                                 <div className="w-10 h-10 rounded-full border-2 border-yellow-200 dark:border-premium-gold/50 flex flex-col items-center justify-center bg-yellow-100 dark:bg-slate-800 text-yellow-600 dark:text-premium-gold font-bold text-lg">
                                     {userInitials}

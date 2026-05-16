@@ -9,6 +9,7 @@ import ServiceHistory from './pages/ServiceHistory/index.jsx';
 import ServiceQuotation from './pages/ServiceQuotation/index.jsx';
 import TestDriveHistory from './pages/TestDriveHistory/index.jsx';
 import ProfileNotifications from './pages/Notifications/index.jsx';
+import LoyaltyWallet from './pages/LoyaltyWallet/index.jsx';
 import { useLocation } from 'react-router-dom';
 
 const ProfilePage = () => {
@@ -24,6 +25,7 @@ const ProfilePage = () => {
         provinces, districts, wards,
         handleEditToggle,
         handleSave,
+        handleAvatarUpload,
         isPasswordModalOpen,
         setIsPasswordModalOpen,
     } = useProfileLogic(isCustomerRoute ? 'customer' : 'admin');
@@ -45,6 +47,7 @@ const ProfilePage = () => {
                                     profile={profile}
                                     t={t}
                                     setIsPasswordModalOpen={setIsPasswordModalOpen}
+                                    handleAvatarUpload={handleAvatarUpload}
                                 />
                             </div>
                         </aside>
@@ -62,6 +65,8 @@ const ProfilePage = () => {
                                 <TestDriveHistory />
                             ) : location.pathname === '/profile/notifications' ? (
                                 <ProfileNotifications />
+                            ) : location.pathname === '/profile/loyalty' ? (
+                                <LoyaltyWallet />
                             ) : (
                                 <>
                                     <ProfileForm

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Form, Input, Upload, message } from 'antd';
 import { User, Camera, PenSquare, Loader2 } from 'lucide-react';
 import { SectionHeader } from '../UI/SectionHeader';
+import { getAvatarUrl } from '../../../../utils/format';
 import axiosClient from '@/utils/axiosClient';
 
 export const PersonalInfoSection = ({ t, schemas }) => {
@@ -18,7 +19,7 @@ export const PersonalInfoSection = ({ t, schemas }) => {
     const getAvatarPreview = () => {
         if (!avatarUrl) return null;
         
-        if (typeof avatarUrl === 'string') return avatarUrl;
+        if (typeof avatarUrl === 'string') return getAvatarUrl(avatarUrl);
         
         if (avatarUrl instanceof File || avatarUrl instanceof Blob) {
             return URL.createObjectURL(avatarUrl);

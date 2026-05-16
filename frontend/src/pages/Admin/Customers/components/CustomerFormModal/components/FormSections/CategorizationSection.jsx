@@ -26,19 +26,6 @@ export const CategorizationSection = ({ t, tiersList, schemas }) => {
                 </Form.Item>
 
                 <Form.Item 
-                    name="status" 
-                    label={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">{t('adminCustomers:labelStatus', 'Trạng thái')}</span>}
-                    className="mb-0"
-                >
-                    <div className="flex items-center gap-3 bg-slate-50 dark:bg-white/5 px-5 h-[54px] rounded-xl border border-transparent hover:bg-slate-100 dark:hover:bg-white/10 transition-colors">
-                        <Form.Item name="status" valuePropName="checked" noStyle>
-                            <Switch className="bg-slate-300 dark:bg-slate-600 [&.ant-switch-checked]:bg-emerald-500 scale-110" />
-                        </Form.Item>
-                        <span className="text-[12px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mt-0.5">HOẠT ĐỘNG</span>
-                    </div>
-                </Form.Item>
-
-                <Form.Item 
                     name="tier" 
                     label={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">{t('adminCustomers:labelTier', 'Hạng VIP')}</span>}
                     rules={schemas?.tier}
@@ -60,13 +47,13 @@ export const CategorizationSection = ({ t, tiersList, schemas }) => {
                 </Form.Item>
 
                 <Form.Item 
-                    name="notes" 
+                    name="admin_notes" 
                     className="mb-0 col-span-1 md:col-span-2 lg:col-span-3 mt-4"
                 >
                     <Input.TextArea 
                         rows={4} 
                         className="w-full bg-yellow-50/50 dark:bg-[#ffd165]/5 border border-yellow-200/50 dark:border-[#ffd165]/10 rounded-2xl px-6 py-5 text-slate-900 dark:text-white focus:ring-2 focus:ring-yellow-500 transition-all outline-none resize-none font-medium placeholder:font-normal placeholder:opacity-60 !h-auto shadow-inner" 
-                        placeholder={t('adminCustomers:placeholderNotes', 'Ghi chú quan trọng: Yêu cầu đặc biệt, thói quen VIP...')}
+                        placeholder={t('adminCustomers:placeholderNotes', 'Ghi chú nội bộ: Yêu cầu đặc biệt, thói quen VIP...')}
                     />
                 </Form.Item>
             </div>

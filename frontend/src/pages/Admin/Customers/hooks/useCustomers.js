@@ -58,11 +58,11 @@ export const useCustomers = () => {
             setStats({
                 total_customers: resData.totalCustomers || 0,
                 vip_customers: resData.vipCustomers || 0,
-                retention_rate: resData.retentionRate || 85,
+                total_debt: resData.totalDebt || 0,
                 new_this_week: resData.newThisWeek || 0,
                 total_trend: 12.5,
                 vip_trend: 4,
-                retention_trend: 0,
+                debt_trend: 0,
                 new_trend: -2
             });
         } catch (err) {

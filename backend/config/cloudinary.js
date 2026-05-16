@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary'
 import multer from 'multer'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
@@ -28,28 +29,24 @@ const ensureConfigured = () => {
     fs.mkdirSync(uploadDir, { recursive: true })
   }
 
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, uploadDir)
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
-      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+
+  const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'carshop/uploads',
+      allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+      public_id: (req, file) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+        return file.fieldname + '-' + uniqueSuffix
+      }
     }
   })
 
   multerInstance = multer({
     storage: storage,
     limits: {
-      fileSize: 50 * 1024 * 1024,
-    },
-    fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith('image/')) {
-        cb(null, true)
-      } else {
-        cb(new Error('Chỉ chấp nhận file hình ảnh'), false)
-      }
-    },
+      fileSize: 10 * 1024 * 1024,
+    }
   })
 
   isConfigured = true

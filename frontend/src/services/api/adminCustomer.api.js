@@ -47,4 +47,20 @@ export const adminCustomerApi = {
         const response = await axiosClient.post('/admin/customers/verify-otp', { email, otp });
         return response;
     },
+
+    toggleLockStatus: async (id, currentStatus) => {
+        const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+        const response = await axiosClient.patch(`/admin/customers/${id}/status`, { status: newStatus });
+        return response;
+    },
+
+    upgradeTier: async (id, tier) => {
+        const response = await axiosClient.patch(`/admin/customers/${id}/tier`, { tier });
+        return response;
+    },
+
+    addLoyaltyPoints: async (id, { points, reason }) => {
+        const response = await axiosClient.post(`/admin/customers/${id}/loyalty/points`, { points, reason });
+        return response;
+    },
 };

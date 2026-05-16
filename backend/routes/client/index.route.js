@@ -16,6 +16,8 @@ import supportRoutes from './support.route.js'
 import wishlistRoutes from './wishlist.route.js'
 import contactRoutes from './contact.route.js'
 import trackingRoutes from './tracking.route.js'
+import loyaltyRoutes from './loyalty.routes.js'
+import voucherRoutes from './voucher.routes.js'
 
 const router = express.Router()
 
@@ -36,5 +38,7 @@ router.use('/support', supportRoutes)
 router.use('/wishlist', wishlistRoutes)
 router.use('/contact', contactRoutes)
 router.use('/tracking', trackingRoutes)
+router.use('/loyalty', loyaltyRoutes)
+router.use('/vouchers', voucherRoutes)
 
 export default router

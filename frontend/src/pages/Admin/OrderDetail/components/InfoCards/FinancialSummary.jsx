@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatCurrency } from '../../Orders/utils/formatters';
+import { formatCurrency } from '../../../Orders/utils/formatters';
 
 export const FinancialSummary = ({ financials, payment, t }) => {
     return (
@@ -23,22 +23,21 @@ export const FinancialSummary = ({ financials, payment, t }) => {
                         <span>- {formatCurrency(financials.discount)}</span>
                     </div>
                 )}
-                
+
                 <div className="h-px bg-slate-200 dark:bg-white/10 my-4 w-full"></div>
-                
+
                 <div className="flex justify-between items-center w-full mb-2">
                     <span className="text-[11px] font-bold uppercase tracking-widest text-slate-900 dark:text-white">
                         {t('grand_total')}
                     </span>
-                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border ${
-                        payment?.status === 'PAID' 
-                            ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-500 border-green-200 dark:border-green-500/30' 
+                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border ${payment?.status === 'PAID'
+                            ? 'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-500 border-green-200 dark:border-green-500/30'
                             : 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-500 border-red-200 dark:border-red-500/30'
-                    }`}>
-                        {payment?.status}
+                        }`}>
+                        {t(`payment_${payment?.status?.toLowerCase()}`, payment?.status)}
                     </span>
                 </div>
-                
+
                 <div className="flex justify-end w-full mt-2">
                     <span className="text-4xl font-extrabold text-yellow-600 dark:text-yellow-500 tracking-tight drop-shadow-sm">
                         {formatCurrency(financials?.grand_total || 0)}

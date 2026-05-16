@@ -43,6 +43,8 @@ const Header = ({ collapsed, onToggle, hideToggle }) => {
             </div>
 
             <div className="flex items-center space-x-2 md:space-x-4">
+                <HeaderUtilities />
+
                 <Dropdown
                     menu={{
                         items: [

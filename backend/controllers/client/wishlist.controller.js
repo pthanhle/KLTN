@@ -16,7 +16,7 @@ export const getWishlist = asyncHandler(async (req, res) => {
     }
 
     const activeParts = wishlist.parts.filter(p => p !== null).map(part => {
-        const stock = (part.inventory?.warehouse || 0) + (part.inventory?.showroom || 0);
+        const stock = part.inventory?.available_stock || 0;
         let stock_status = "in_stock";
         if (stock === 0) stock_status = "out_of_stock";
         else if (stock < 5) stock_status = "low_stock";

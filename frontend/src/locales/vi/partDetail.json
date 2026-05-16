@@ -95,5 +95,13 @@
     "lbl_supported_brands": "Nhãn Hiệu Hỗ Trợ",
     "lbl_applicable_models": "Phiên Bản & Đời Xe Áp Dụng",
     "universal_title": "Phụ tùng Phổ Thông (Universal Fit)",
-    "universal_desc": "Đây là dòng linh kiện mở, dễ dàng lắp ráp tương thích với hầu hết các mẫu xe thuộc mọi nhãn hiệu. Thiết kế tiêu chuẩn công nghiệp không kén đặc thù kỹ thuật của riêng dòng xe nào."
+    "universal_desc": "Đây là dòng linh kiện mở, dễ dàng lắp ráp tương thích với hầu hết các mẫu xe thuộc mọi nhãn hiệu. Thiết kế tiêu chuẩn công nghiệp không kén đặc thù kỹ thuật của riêng dòng xe nào.",
+    "cat_engine": "Động cơ",
+    "cat_tires": "Lốp xe",
+    "cat_wheels": "Mâm xe",
+    "cat_body": "Thân vỏ",
+    "cat_filter": "Lọc",
+    "cat_accessory": "Phụ kiện",
+    "cat_electrical": "Điện",
+    "cat_brake": "Phanh"
 }

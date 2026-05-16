@@ -4,17 +4,33 @@ import { Helmet } from 'react-helmet-async';
 import { Skeleton } from 'antd';
 import { useOrderDetailLogic } from './hooks/useOrderDetailLogic';
 
-// Components
-import { HeaderActions } from './components/HeaderActions';
-import { OrderStepper } from './components/OrderStepper';
-import { ProductList } from './components/ProductList';
-import { FinancialSummary } from './components/FinancialSummary';
-import { CustomerInfo } from './components/CustomerInfo';
-import { ShippingInfo, VatInfo } from './components/ShippingAndVat';
+import { HeaderActions } from './components/Header';
+import { OrderStepper } from './components/Stepper';
+import { ProductList } from './components/ProductSection';
+import { FinancialSummary } from './components/InfoCards/FinancialSummary';
+import { CustomerInfo } from './components/InfoCards/CustomerInfo';
+import { ShippingInfo, VatInfo } from './components/InfoCards/ShippingAndVat';
+import { ExceptionBanner } from './components/Alerts/ExceptionBanner';
+import { ActivityTimeline } from './components/Timeline/ActivityTimeline';
+import { ShippingModal } from './components/Modals/ShippingModal';
+import { CancelModal } from './components/Modals/CancelModal';
+import { PrintModal } from './components/Modals/PrintModal';
 
 const AdminOrderDetail = () => {
     const { t } = useTranslation('adminOrderDetail');
-    const { order, loading, handleAction } = useOrderDetailLogic();
+    const {
+        order,
+        loading,
+        handleAction,
+        isShippingModalVisible,
+        setIsShippingModalVisible,
+        handleShippingSubmit,
+        isCancelModalVisible,
+        setIsCancelModalVisible,
+        handleCancelSubmit,
+        isPrintModalVisible,
+        setIsPrintModalVisible
+    } = useOrderDetailLogic();
 
     return (
         <div className="bg-slate-50 dark:bg-[#0c0c0e] min-h-screen pb-20 animate-in fade-in duration-500">
@@ -22,19 +38,22 @@ const AdminOrderDetail = () => {
                 <title>{order ? `${t('title')} ${order.order_code}` : t('title')} | TT AUTO</title>
             </Helmet>
 
-            <HeaderActions 
-                order={order} 
-                loading={loading} 
-                t={t} 
-                onAction={handleAction} 
+            <HeaderActions
+                order={order}
+                loading={loading}
+                t={t}
+                onAction={handleAction}
             />
 
             <main className="max-w-[1400px] mx-auto px-8 py-10">
+                {!loading && order?.exception_issue && (
+                    <ExceptionBanner issue={order.exception_issue} />
+                )}
+
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Cột trái (70%) */}
                     <div className="w-full lg:w-[70%] flex flex-col">
                         <OrderStepper order={order} loading={loading} t={t} />
-                        
+
                         {loading ? (
                             <div className="bg-white dark:bg-[#141416] rounded-2xl p-8 border border-slate-200 dark:border-white/5 mb-8">
                                 <Skeleton active paragraph={{ rows: 4 }} />
@@ -52,7 +71,6 @@ const AdminOrderDetail = () => {
                         )}
                     </div>
 
-                    {/* Cột phải (30%) */}
                     <div className="w-full lg:w-[30%] flex flex-col">
                         {loading ? (
                             <div className="bg-white dark:bg-[#141416] rounded-2xl p-8 border border-slate-200 dark:border-white/5 space-y-8">
@@ -65,11 +83,37 @@ const AdminOrderDetail = () => {
                                 <div className="h-8"></div>
                                 <ShippingInfo shipping={order?.shipping} status={order?.order_status} t={t} />
                                 <VatInfo vatInfo={order?.vat_info} t={t} />
+                                {order?.activity_log && order.activity_log.length > 0 && (
+                                    <>
+                                        <div className="h-8"></div>
+                                        <ActivityTimeline logs={order.activity_log} />
+                                    </>
+                                )}
                             </>
                         )}
                     </div>
                 </div>
             </main>
+
+            <ShippingModal
+                isOpen={isShippingModalVisible}
+                onCancel={() => setIsShippingModalVisible(false)}
+                onSubmit={handleShippingSubmit}
+                order={order}
+            />
+
+            <CancelModal
+                isOpen={isCancelModalVisible}
+                onCancel={() => setIsCancelModalVisible(false)}
+                onSubmit={handleCancelSubmit}
+                order={order}
+            />
+
+            <PrintModal
+                isOpen={isPrintModalVisible}
+                onCancel={() => setIsPrintModalVisible(false)}
+                order={order}
+            />
         </div>
     );
 };

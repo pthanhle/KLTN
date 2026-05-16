@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { Select } from 'antd';
 import PartsFilter from './components/FilterSection/PartsFilter';
-import PartGrid from './components/PartSection/PartGrid';
+import PartGrid from './components/PartSection/PartGrid/index';
 import { usePartsLogic } from './hooks/usePartsLogic';
 
 const PartsPage = () => {

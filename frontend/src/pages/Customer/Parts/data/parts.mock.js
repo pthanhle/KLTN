@@ -30,8 +30,7 @@ export const MOCK_PARTS = [
         ],
         images: ['https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&q=80', 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&q=80',
-        inventory: { warehouse: 24, showroom: 5 },
-        stock: 29,
+        inventory: { stock_on_hand: 29, allocated: 3, available_stock: 26 },
         specs: [
             { label: 'Chất liệu', value: 'Hợp kim nhôm Forged' },
             { label: 'Đường kính', value: '84.5mm' },
@@ -75,8 +74,7 @@ export const MOCK_PARTS = [
         ],
         images: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
-        inventory: { warehouse: 2, showroom: 0 },
-        stock: 2,
+        inventory: { stock_on_hand: 2, allocated: 0, available_stock: 2 },
         specs: [
             { label: 'Kích thước đĩa', value: '420mm trước / 370mm sau' },
             { label: 'Chất liệu', value: 'Carbon Ceramic' }
@@ -118,8 +116,7 @@ export const MOCK_PARTS = [
         ],
         images: ['https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80',
-        inventory: { warehouse: 5, showroom: 2 },
-        stock: 7,
+        inventory: { stock_on_hand: 7, allocated: 1, available_stock: 6 },
         specs: [
             { label: 'Kiểu treo', value: 'Coilover 16 nấc chỉnh' },
             { label: 'Bảo hành', value: '2 năm' }
@@ -148,8 +145,7 @@ export const MOCK_PARTS = [
         ],
         images: ['https://images.unsplash.com/photo-1527515637462-cff94edd56f9?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1527515637462-cff94edd56f9?w=400&q=80',
-        inventory: { warehouse: 40, showroom: 18 },
-        stock: 58,
+        inventory: { stock_on_hand: 58, allocated: 3, available_stock: 55 },
         specs: [
             { label: 'Loại lõi lọc', value: 'Cotton Gauge' },
             { label: 'Thiết kế', value: 'Panel' }
@@ -177,8 +173,7 @@ export const MOCK_PARTS = [
         ],
         images: ['https://images.unsplash.com/photo-1609592424823-e80c7a1b4a09?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1609592424823-e80c7a1b4a09?w=400&q=80',
-        inventory: { warehouse: 50, showroom: 15 },
-        stock: 65,
+        inventory: { stock_on_hand: 65, allocated: 3, available_stock: 62 },
         specs: [
             { label: 'Điện cực', value: 'Iridium / Platinum' },
             { label: 'Nhiệt định mức', value: '7' }
@@ -204,8 +199,7 @@ export const MOCK_PARTS = [
         fitment_data: [],
         images: ['https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80',
-        inventory: { warehouse: 60, showroom: 20 },
-        stock: 80,
+        inventory: { stock_on_hand: 80, allocated: 3, available_stock: 77 },
         specs: [
             { label: 'Chất liệu', value: 'Sợi Carbon thật 100%' }
         ],
@@ -232,8 +226,7 @@ export const MOCK_PARTS = [
         fitment_data: [],
         images: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
-        inventory: { warehouse: 10, showroom: 4 },
-        stock: 14,
+        inventory: { stock_on_hand: 14, allocated: 3, available_stock: 11 },
         specs: [
             { label: 'Chỉ số', value: '97Y XL' },
             { label: 'Loại', value: 'Summer Tire' }
@@ -261,8 +254,7 @@ export const MOCK_PARTS = [
         ],
         images: ['https://images.unsplash.com/photo-1617531653332-bd46c16f4d68?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1617531653332-bd46c16f4d68?w=400&q=80',
-        inventory: { warehouse: 5, showroom: 1 },
-        stock: 6,
+        inventory: { stock_on_hand: 6, allocated: 1, available_stock: 5 },
         specs: [
             { label: 'Màu', value: 'Đen bóng piano' }
         ],
@@ -287,8 +279,7 @@ export const MOCK_PARTS = [
         fitment_data: [],
         images: ['https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=400&q=80',
-        inventory: { warehouse: 200, showroom: 50 },
-        stock: 250,
+        inventory: { stock_on_hand: 250, allocated: 3, available_stock: 247 },
         specs: [
             { label: 'Gốc nhớt', value: 'Tổng hợp toàn phần' }
         ],
@@ -313,8 +304,7 @@ export const MOCK_PARTS = [
         fitment_data: [],
         images: ['https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=400&q=80',
-        inventory: { warehouse: 10, showroom: 2 },
-        stock: 12,
+        inventory: { stock_on_hand: 12, allocated: 3, available_stock: 9 },
         specs: [
             { label: 'Độ phân giải', value: '1920x1080' },
             { label: 'Tính năng', value: 'Hiển thị vạch căn lề' }
@@ -342,8 +332,7 @@ export const MOCK_PARTS = [
         ],
         images: ['https://images.unsplash.com/photo-1599912027611-484b9fc447af?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1599912027611-484b9fc447af?w=400&q=80',
-        inventory: { warehouse: 2, showroom: 0 },
-        stock: 2,
+        inventory: { stock_on_hand: 2, allocated: 0, available_stock: 2 },
         specs: [
             { label: 'Kích thước', value: '19x8.5 Trước / 19x9.5 Sau' }
         ],
@@ -368,8 +357,7 @@ export const MOCK_PARTS = [
         fitment_data: [],
         images: ['https://images.unsplash.com/photo-1503376710349-41b8bc22839b?w=400&q=80'],
         image: 'https://images.unsplash.com/photo-1503376710349-41b8bc22839b?w=400&q=80',
-        inventory: { warehouse: 30, showroom: 10 },
-        stock: 40,
+        inventory: { stock_on_hand: 40, allocated: 3, available_stock: 37 },
         specs: [],
         options: [
             { type: 'Màu viền', choices: ['Đỏ', 'Bạc'] }

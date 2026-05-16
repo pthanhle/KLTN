@@ -25,6 +25,8 @@ export const getCheckoutSchema = (t) => {
             
         address: z.string()
             .min(1, { message: t('val_required', 'Vui lòng nhập địa chỉ cụ thể') })
-            .min(5, { message: t('val_address_min', 'Địa chỉ quá ngắn') })
+            .min(5, { message: t('val_address_min', 'Địa chỉ quá ngắn') }),
+            
+        note: z.string().optional()
     });
 };

@@ -71,12 +71,13 @@ const partSchema = new mongoose.Schema(
       default: [],
     },
     landing_blocks: {
-      type: mongoose.Schema.Types.Mixed, // Dynamic array of JSON blocks from Adaptive Builder
+      type: mongoose.Schema.Types.Mixed,
       default: [],
     },
     inventory: {
-      warehouse: { type: Number, default: 0, min: 0 },
-      showroom: { type: Number, default: 0, min: 0 },
+      stock_on_hand: { type: Number, default: 0, min: 0 },
+      allocated: { type: Number, default: 0, min: 0 },
+      available_stock: { type: Number, default: 0, min: 0 },
     },
     specs: {
       type: [specSchema],
@@ -133,7 +134,7 @@ const partSchema = new mongoose.Schema(
 
 // Virtual field to compute total stock dynamically
 partSchema.virtual('stock').get(function () {
-  return (this.inventory?.warehouse || 0) + (this.inventory?.showroom || 0);
+  return this.inventory?.available_stock || 0;
 });
 
 // Virtual field to extract the primary image
@@ -153,7 +154,6 @@ partSchema.pre('save', async function () {
   }
 });
 
-// Notice: In the future, we will mount Mongoose Audit Log middleware here
 
 const Part = mongoose.model('Part', partSchema);
 

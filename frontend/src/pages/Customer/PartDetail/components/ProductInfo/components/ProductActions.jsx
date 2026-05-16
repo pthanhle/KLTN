@@ -8,7 +8,7 @@ import { ShoppingCart } from 'lucide-react';
 export const ProductActions = ({ part, selectedOptions, quantity, handleQuantityChange, handleAddToCart, handleBuyNow, t, isSubmittingAction }) => {
     return (
         <>
-            {part.stock === 0 ? (
+            {(part.inventory?.available_stock || 0) <= 0 ? (
                 <div className="pt-6">
                     <OutofStockNotification t={t} />
                     <Link to={`/parts/pre-order/${part.id}`} state={{ selectedOptions, quantity }} className="block w-full">

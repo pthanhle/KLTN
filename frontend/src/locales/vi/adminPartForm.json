@@ -123,5 +123,11 @@
   "modalTitleCondition": "Thêm Tình Trạng Hiện Loại",
   "modalPhCondition": "Nhập tên tình trạng mới... (VD: Hàng OEM)",
   "btnApply": "Lưu",
-  "btnApplying": "Đang lưu..."
+  "btnApplying": "Đang lưu...",
+  "stockOnHand": "Tồn Kho Thực Tế",
+  "stockOnHandDesc": "Số lượng vật lý đếm được tại kho.",
+  "allocated": "Tạm Giữ",
+  "allocatedDesc": "Đơn chưa giao",
+  "availableStock": "Khả Dụng",
+  "availableStockDesc": "Có thể bán"
 }

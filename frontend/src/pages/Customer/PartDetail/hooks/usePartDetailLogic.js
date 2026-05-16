@@ -39,7 +39,8 @@ export const usePartDetailLogic = (id) => {
     };
 
     const handleQuantityChange = (type) => {
-        if (type === 'increment') setQuantity(q => q + 1);
+        const availableStock = part?.inventory?.available_stock ?? part?.stock ?? 0;
+        if (type === 'increment' && quantity < availableStock) setQuantity(q => q + 1);
         if (type === 'decrement' && quantity > 1) setQuantity(q => q - 1);
     };
 

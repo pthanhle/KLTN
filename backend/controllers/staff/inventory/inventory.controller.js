@@ -72,7 +72,9 @@ export const addInventoryByName = asyncHandler(async (req, res) => {
       images: images || [],
       category: category_name,
       type: "product",
-      "inventory.warehouse": 0
+      "inventory.stock_on_hand": 0,
+      "inventory.allocated": 0,
+      "inventory.available_stock": 0
     });
   } else {
     const existedInventory = await Inventory.findOne({ product_id: product._id });
@@ -123,7 +125,7 @@ export const deleteInventory = asyncHandler(async (req, res) => {
   if (!inventory)
     return res.status(404).json({ message: "Không tìm thấy mục kho" });
 
-  await Part.findByIdAndUpdate(inventory.product_id, { "inventory.warehouse": 0 });
+  await Part.findByIdAndUpdate(inventory.product_id, { "inventory.stock_on_hand": 0, "inventory.allocated": 0, "inventory.available_stock": 0 });
 
   await inventory.deleteOne();
   res.status(200).json({ message: "Xoá sản phẩm khỏi kho thành công" });

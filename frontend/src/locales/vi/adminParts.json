@@ -41,5 +41,8 @@
   "bulkDeleteSuccess": "Đã xóa {{count}} linh kiện thành công!",
   "bulkSelected": "Đã chọn {{count}} linh kiện",
   "btnHideBulk": "Ẩn hàng loạt",
-  "btnDeleteBulk": "Xóa hàng loạt"
+  "btnDeleteBulk": "Xóa hàng loạt",
+  "lblActual": "Thực tế:",
+  "lblAllocated": "Tạm giữ:",
+  "lblAvailable": "Khả dụng:"
 }

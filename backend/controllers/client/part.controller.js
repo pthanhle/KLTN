@@ -77,7 +77,7 @@ export const getActiveParts = asyncHandler(async (req, res) => {
   pipeline.push({
     $addFields: {
       id: "$_id",
-      stock: { $add: [{ $ifNull: ["$inventory.warehouse", 0] }, { $ifNull: ["$inventory.showroom", 0] }] },
+      stock: { $ifNull: ["$inventory.available_stock", 0] },
       image: { $arrayElemAt: ["$images", 0] },
       description: "$seo_description",
       condition_name: { $ifNull: [{ $arrayElemAt: ["$condition_data.name", 0] }, "$condition", "Mới 100%"] }
@@ -144,7 +144,7 @@ export const getPartBySlug = asyncHandler(async (req, res) => {
 
   // Calculate stock dynamically for the client response
   const partObj = part.toJSON();
-  partObj.stock = (part.inventory?.warehouse || 0) + (part.inventory?.showroom || 0);
+  partObj.stock = part.inventory?.available_stock || 0;
 
   // Fetch approved feedback (reviews) and map to UI schema
   const mongoose = await import('mongoose'); // Ensure we can use mongoose models dynamically

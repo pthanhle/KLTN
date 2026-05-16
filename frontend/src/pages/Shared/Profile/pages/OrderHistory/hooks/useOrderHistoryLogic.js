@@ -9,6 +9,7 @@ export const useOrderHistoryLogic = () => {
     const TABS = useMemo(() => [
         t('order_tab_all', 'Tất cả'),
         t('order_tab_pending', 'Chờ xử lý'),
+        t('order_tab_processing', 'Đang xử lý'),
         t('order_tab_shipping', 'Đang giao'),
         t('order_tab_completed', 'Hoàn thành'),
         t('order_tab_cancelled', 'Đã hủy')
@@ -29,9 +30,10 @@ export const useOrderHistoryLogic = () => {
         return mockOrders.filter(order => {
             if (activeTab === TABS[0]) return true;
             if (activeTab === TABS[1]) return order.order_status === 'PENDING';
-            if (activeTab === TABS[2]) return order.order_status === 'SHIPPING';
-            if (activeTab === TABS[3]) return order.order_status === 'COMPLETED';
-            if (activeTab === TABS[4]) return order.order_status === 'CANCELLED';
+            if (activeTab === TABS[2]) return order.order_status === 'PROCESSING' || order.order_status === 'PACKED' || order.order_status === 'CONFIRMED';
+            if (activeTab === TABS[3]) return order.order_status === 'SHIPPING';
+            if (activeTab === TABS[4]) return order.order_status === 'COMPLETED';
+            if (activeTab === TABS[5]) return order.order_status === 'CANCELLED';
             return true;
         });
     }, [activeTab, TABS]);

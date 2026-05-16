@@ -11,6 +11,30 @@ export const ORDER_STATUSES = {
         bg: 'bg-blue-50 dark:bg-blue-500/10',
         border: 'border-blue-200 dark:border-blue-500/20'
     },
+    PROCESSING: {
+        value: 'PROCESSING',
+        color: 'text-purple-600 dark:text-purple-500',
+        bg: 'bg-purple-50 dark:bg-purple-500/10',
+        border: 'border-purple-200 dark:border-purple-500/20'
+    },
+    EXCEPTION: {
+        value: 'EXCEPTION',
+        color: 'text-rose-600 dark:text-rose-500',
+        bg: 'bg-rose-50 dark:bg-rose-500/10',
+        border: 'border-rose-200 dark:border-rose-500/20'
+    },
+    PENDING_QUOTE: {
+        value: 'PENDING_QUOTE',
+        color: 'text-cyan-600 dark:text-cyan-500',
+        bg: 'bg-cyan-50 dark:bg-cyan-500/10',
+        border: 'border-cyan-200 dark:border-cyan-500/20'
+    },
+    PACKED: {
+        value: 'PACKED',
+        color: 'text-indigo-600 dark:text-indigo-500',
+        bg: 'bg-indigo-50 dark:bg-indigo-500/10',
+        border: 'border-indigo-200 dark:border-indigo-500/20'
+    },
     SHIPPING: {
         value: 'SHIPPING',
         color: 'text-orange-600 dark:text-orange-500',
@@ -56,8 +80,10 @@ export const STEP_STATUS_MAP = {
     'PENDING': 1,
     'CONFIRMED': 2,
     'PROCESSING': 2,
-    'SHIPPED': 3,
-    'DELIVERED': 4,
-    'COMPLETED': 4,
+    'PACKED': 3,
+    'SHIPPING': 4,
+    'SHIPPED': 4,
+    'DELIVERED': 5,
+    'COMPLETED': 5,
     'CANCELLED': -1
 };

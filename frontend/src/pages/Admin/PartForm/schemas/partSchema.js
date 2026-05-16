@@ -28,8 +28,9 @@ export const getPartFormSchema = (t) => z.object({
     cover_image: z.string().optional()
   })).optional(),
   inventory: z.object({
-    warehouse: z.number().min(0),
-    showroom: z.number().min(0)
+    stock_on_hand: z.number().min(0, { message: 'Tồn kho vật lý không hợp lệ' }),
+    allocated: z.number().min(0).default(0),
+    available_stock: z.number().min(0).default(0)
   }),
   specs: z.array(z.object({
     label: z.string(),

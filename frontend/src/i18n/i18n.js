@@ -8,6 +8,8 @@ import enAuth from '../locales/en/auth.json';
 import viAuth from '../locales/vi/auth.json';
 import enAdmin from '../locales/en/admin.json';
 import viAdmin from '../locales/vi/admin.json';
+import enAdminOrders from '../locales/en/adminOrders.json';
+import viAdminOrders from '../locales/vi/adminOrders.json';
 import enAdminCustomers from '../locales/en/adminCustomers.json';
 import viAdminCustomers from '../locales/vi/adminCustomers.json';
 import enAdminBrands from '../locales/en/adminBrands.json';
@@ -62,6 +64,8 @@ import enAdminServiceReception from '../locales/en/adminServiceReception.json';
 import viAdminServiceReception from '../locales/vi/adminServiceReception.json';
 import enAdminRODetail from '../locales/en/adminRODetail.json';
 import viAdminRODetail from '../locales/vi/adminRODetail.json';
+import enAdminOrderDetail from '../locales/en/adminOrderDetail.json';
+import viAdminOrderDetail from '../locales/vi/adminOrderDetail.json';
 
 i18n
     .use(initReactI18next)
@@ -72,6 +76,7 @@ i18n
                 layout: enLayout,
                 auth: enAuth,
                 admin: enAdmin,
+                adminOrders: enAdminOrders,
                 adminCustomers: enAdminCustomers,
                 adminBrands: enAdminBrands,
                 adminCategories: enAdminCategories,
@@ -99,12 +104,14 @@ i18n
                 adminTestDriveBookings: enAdminTestDriveBookings,
                 adminServiceReception: enAdminServiceReception,
                 adminRODetail: enAdminRODetail,
+                adminOrderDetail: enAdminOrderDetail,
             },
             vi: {
                 translation: viTranslation,
                 layout: viLayout,
                 auth: viAuth,
                 admin: viAdmin,
+                adminOrders: viAdminOrders,
                 adminCustomers: viAdminCustomers,
                 adminBrands: viAdminBrands,
                 adminCategories: viAdminCategories,
@@ -132,6 +139,7 @@ i18n
                 adminTestDriveBookings: viAdminTestDriveBookings,
                 adminServiceReception: viAdminServiceReception,
                 adminRODetail: viAdminRODetail,
+                adminOrderDetail: viAdminOrderDetail,
             },
         },
         lng: 'vi',

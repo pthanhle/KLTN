@@ -44,7 +44,7 @@ export const mockOrders = [
                 sku: MOCK_PARTS[2].sku,
                 name: MOCK_PARTS[2].name,
                 image: MOCK_PARTS[2].image,
-                properties: 'Màu Hỏa Tinh | Mâm 19"',
+                properties: '', // MOCK_PARTS[2] (Giảm Xóc Bilstein B16) không có options
                 quantity: 1,
                 original_price: MOCK_PARTS[2].original_price || MOCK_PARTS[2].price + 50000,
                 unit_price: MOCK_PARTS[2].price,
@@ -57,7 +57,7 @@ export const mockOrders = [
                 sku: MOCK_PARTS[1].sku,
                 name: MOCK_PARTS[1].name,
                 image: MOCK_PARTS[1].image,
-                properties: 'Custom Size X',
+                properties: '', // MOCK_PARTS[1] (Đĩa Phanh Carbon Ceramic) không có options
                 quantity: 1,
                 original_price: MOCK_PARTS[1].original_price,
                 unit_price: MOCK_PARTS[1].price,
@@ -108,7 +108,7 @@ export const mockOrders = [
                 sku: MOCK_PARTS[5] ? MOCK_PARTS[5].sku : 'SKU-XX',
                 name: MOCK_PARTS[5] ? MOCK_PARTS[5].name : 'Linh kiện X',
                 image: MOCK_PARTS[5] ? MOCK_PARTS[5].image : '',
-                properties: 'Màu xám | Loại B',
+                properties: 'Màu logo: Đỏ', // MOCK_PARTS[5] (Ốp Chia Khóa Carbon) có options: Màu logo
                 quantity: 1,
                 original_price: null,
                 unit_price: 12500000,

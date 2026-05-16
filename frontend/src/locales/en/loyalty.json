@@ -1,0 +1,21 @@
+{
+    "loyalty_title": "Points & Offers",
+    "loyalty_membership": "TT Auto Membership",
+    "loyalty_current_points": "Current points",
+    "loyalty_pts": "pts",
+    "loyalty_tab_store": "Voucher Store",
+    "loyalty_tab_my_vouchers": "My Vouchers",
+    "loyalty_tab_history": "Points History",
+    "loyalty_btn_redeem": "Redeem Now",
+    "loyalty_status_unused": "UNUSED",
+    "loyalty_status_used": "USED",
+    "loyalty_status_expired": "EXPIRED",
+    "loyalty_hsd": "EXP",
+    "loyalty_empty_store": "No vouchers available for redemption right now.",
+    "loyalty_empty_my_vouchers": "You don't have any vouchers yet. Use your points to redeem!",
+    "loyalty_empty_history": "No points transaction history yet.",
+    "loyalty_msg_redeem_success": "Voucher redeemed successfully!",
+    "loyalty_msg_not_enough_points": "You do not have enough points to redeem this Voucher!",
+    "loyalty_msg_fetch_error": "Failed to fetch Loyalty data",
+    "loyalty_msg_redeem_error": "An error occurred while redeeming the Voucher"
+}

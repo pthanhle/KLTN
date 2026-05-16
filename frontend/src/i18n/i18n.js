@@ -66,6 +66,8 @@ import enAdminRODetail from '../locales/en/adminRODetail.json';
 import viAdminRODetail from '../locales/vi/adminRODetail.json';
 import enAdminOrderDetail from '../locales/en/adminOrderDetail.json';
 import viAdminOrderDetail from '../locales/vi/adminOrderDetail.json';
+import enLoyalty from '../locales/en/loyalty.json';
+import viLoyalty from '../locales/vi/loyalty.json';
 
 i18n
     .use(initReactI18next)
@@ -105,6 +107,7 @@ i18n
                 adminServiceReception: enAdminServiceReception,
                 adminRODetail: enAdminRODetail,
                 adminOrderDetail: enAdminOrderDetail,
+                loyalty: enLoyalty,
             },
             vi: {
                 translation: viTranslation,
@@ -140,6 +143,7 @@ i18n
                 adminServiceReception: viAdminServiceReception,
                 adminRODetail: viAdminRODetail,
                 adminOrderDetail: viAdminOrderDetail,
+                loyalty: viLoyalty,
             },
         },
         lng: 'vi',

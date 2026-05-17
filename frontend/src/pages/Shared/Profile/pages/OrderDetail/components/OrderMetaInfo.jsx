@@ -63,7 +63,7 @@ export const OrderMetaInfo = ({ orderDetail, handleCopy, isCancelled, t }) => {
                 <div className="space-y-3">
                     <div className="flex justify-between items-center">
                         <span className="text-slate-500 dark:text-slate-400 text-sm">{t('order_dtl_method', 'Phương thức')}</span>
-                        <span className="text-slate-900 dark:text-slate-200 font-semibold text-sm text-right">{orderDetail.payment.method}</span>
+                        <span className="text-slate-900 dark:text-slate-200 font-semibold text-sm text-right">{orderDetail.payment.method_name || orderDetail.payment.method}</span>
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-slate-500 dark:text-slate-400 text-sm">{t('order_dtl_paystt', 'Trạng thái')}</span>

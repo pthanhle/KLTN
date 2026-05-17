@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getMockOrderDetail } from '../data/mockOrderDetail';
-import { getOrderStatusConfig } from '../../../../../../utils/statusHelpers';
+import { mockOrders } from '../../OrderHistory/data/mockOrderData';
 import { useTranslation } from 'react-i18next';
 import { ClipboardList, ShieldCheck, Truck, Package } from 'lucide-react';
 
@@ -12,15 +11,15 @@ export const useOrderDetailLogic = (orderId) => {
     useEffect(() => {
         setIsLoading(true);
         const timer = setTimeout(() => {
-            setOrderDetail(getMockOrderDetail(orderId));
+            const foundOrder = mockOrders.find(o => o.order_code === orderId);
+            setOrderDetail(foundOrder || null);
             setIsLoading(false);
         }, 600);
         return () => clearTimeout(timer);
     }, [orderId]);
 
-    const statusConfig = orderDetail ? getOrderStatusConfig(orderDetail.status, t) : {};
-
     const formatCurrency = (amount) => {
+        if (!amount) return '0 đ';
         return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
     };
 
@@ -29,26 +28,28 @@ export const useOrderDetailLogic = (orderId) => {
     };
 
     const steps = [
-        { key: 'PENDING', label: t('order_step_placed', 'Đã Đặt Hàng'), time: 'Oct 24, 14:32', icon: ClipboardList },
-        { key: 'CONFIRMED', label: t('order_step_confirmed', 'Đã Xác Nhận'), time: 'Oct 24, 14:45', icon: ShieldCheck },
-        { key: 'SHIPPING', label: t('order_step_transit', 'Đang Giao Hàng'), time: t('order_step_arriving', 'Sắp giao'), icon: Truck },
-        { key: 'DELIVERED', label: t('order_step_delivered', 'Đã Giao Vận'), time: t('order_step_est', 'Dự kiến 2-3 ngày'), icon: Package },
+        { key: 'PENDING', label: t('order_step_placed', 'Tạo Đơn'), icon: ClipboardList },
+        { key: 'CONFIRMED', label: t('order_step_confirmed', 'Xác Nhận'), icon: ShieldCheck },
+        { key: 'PROCESSING', label: t('order_step_processing', 'Đang Xử Lý / Đóng Gói'), icon: Package },
+        { key: 'SHIPPING', label: t('order_step_transit', 'Đang Giao Hàng'), icon: Truck },
+        { key: 'COMPLETED', label: t('order_step_delivered', 'Hoàn Tất'), icon: ShieldCheck },
     ];
 
     const getStatusIndex = (stt) => {
         if (stt === 'PENDING') return 0;
         if (stt === 'CONFIRMED') return 1;
-        if (stt === 'SHIPPING') return 2;
-        if (stt === 'DELIVERED' || stt === 'COMPLETED') return 3;
+        if (stt === 'PROCESSING' || stt === 'PACKED') return 2;
+        if (stt === 'SHIPPING') return 3;
+        if (stt === 'COMPLETED' || stt === 'DELIVERED') return 4;
         return 0;
     };
 
-    const currentStepIndex = orderDetail ? getStatusIndex(orderDetail.status) : 0;
+    const currentStepIndex = orderDetail ? getStatusIndex(orderDetail.order_status) : 0;
 
-    const isPending = orderDetail?.status === 'PENDING';
-    const isCompleted = orderDetail?.status === 'COMPLETED' || orderDetail?.status === 'DELIVERED';
-    const isShipping = orderDetail?.status === 'SHIPPING';
-    const isCancelled = orderDetail?.status === 'CANCELLED';
+    const isPending = orderDetail?.order_status === 'PENDING';
+    const isCompleted = orderDetail?.order_status === 'COMPLETED' || orderDetail?.order_status === 'DELIVERED';
+    const isShipping = orderDetail?.order_status === 'SHIPPING';
+    const isCancelled = orderDetail?.order_status === 'CANCELLED';
 
     const handleCancelOrder = () => console.log('Huỷ đơn');
     const handleConfirmReceipt = () => console.log('Đã nhận hàng');
@@ -57,7 +58,7 @@ export const useOrderDetailLogic = (orderId) => {
     return {
         t,
         orderDetail,
-        statusConfig,
+        orderDetail,
         formatCurrency,
         handleCopy,
         steps,

@@ -8,12 +8,12 @@ export const getPartColumns = (t, handleEdit, handleDelete) => [
         key: 'product',
         render: (_, record) => (
             <div className="flex items-center gap-4 group/item">
-                <div 
+                <div
                     className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-50 dark:bg-white/5 flex-shrink-0 border border-slate-100 dark:border-white/5 flex items-center justify-center cursor-pointer"
                     onClick={() => handleEdit && handleEdit(record)}
                 >
-                    <Image 
-                        src={record.image} 
+                    <Image
+                        src={record.image}
                         alt={record.name}
                         fallback="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNlMmU4ZjAiLz48cGF0aCBkPSJNMzAgMjBhNiA2IDAgMSAwIDAgMTIgNiA2IDAgMCAwIDAtMTJ6bS0xMiAwaC00djE2aDRWMjB6bTIwIDIwaDRWMjBoLTR2MjB6IiBmaWxsPSIjOTRhaTNiIi8+PC9zdmc+"
                         preview={false}
@@ -21,8 +21,8 @@ export const getPartColumns = (t, handleEdit, handleDelete) => [
                     />
                 </div>
                 <div>
-                    <h4 
-                        className="text-sm font-bold text-slate-800 dark:text-white leading-tight max-w-[250px] truncate hover:text-yellow-600 dark:hover:text-yellow-500 cursor-pointer transition-colors" 
+                    <h4
+                        className="text-sm font-bold text-slate-800 dark:text-white leading-tight max-w-[250px] truncate hover:text-yellow-600 dark:hover:text-yellow-500 cursor-pointer transition-colors"
                         title={record.name}
                         onClick={() => handleEdit && handleEdit(record)}
                     >
@@ -79,24 +79,39 @@ export const getPartColumns = (t, handleEdit, handleDelete) => [
         title: t('adminParts:colPriceStock', 'Giá & Kho'),
         dataIndex: 'price_stock',
         key: 'price_stock',
-        render: (_, record) => (
-            <div className="flex flex-col">
-                <span className="text-yellow-600 dark:text-yellow-500 font-bold">
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price)}
-                </span>
-                {record.stock > 0 ? (
-                    <span className="text-xs text-green-500 flex items-center gap-1.5 font-medium mt-0.5">
-                        <Badge status="success" />
-                        {record.stock} {t('adminParts:inStock')}
+        render: (_, record) => {
+            const { stock_on_hand = 0, allocated = 0, available_stock = 0 } = record.inventory || {};
+            return (
+                <div className="flex flex-col gap-1.5">
+                    <span className="text-yellow-600 dark:text-yellow-500 font-bold">
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price)}
                     </span>
-                ) : (
-                    <span className="text-xs text-red-500 flex items-center gap-1 font-medium mt-0.5">
-                        <Badge status="error" />
-                        {t('adminParts:outOfStock')}
-                    </span>
-                )}
-            </div>
-        )
+
+                    <div className="flex flex-col gap-1 text-[11px]">
+                        <div className="flex items-center justify-between">
+                            <span className="text-slate-500 dark:text-slate-400">{t('adminParts:lblActual', 'Thực tế:')}</span>
+                            <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{stock_on_hand}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-slate-500 dark:text-slate-400">{t('adminParts:lblAllocated', 'Tạm giữ:')}</span>
+                            <span className="font-mono font-medium text-orange-600 dark:text-orange-500">{allocated}</span>
+                        </div>
+                        <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/10 pt-1 mt-0.5">
+                            <span className="text-slate-600 dark:text-slate-300 font-bold">{t('adminParts:lblAvailable', 'Khả dụng:')}</span>
+                            {available_stock > 0 ? (
+                                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-500 flex items-center gap-1">
+                                    <Badge status="success" /> {available_stock}
+                                </span>
+                            ) : (
+                                <span className="font-mono font-bold text-red-500 flex items-center gap-1">
+                                    <Badge status="error" /> 0
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
     },
 
     {
@@ -104,17 +119,18 @@ export const getPartColumns = (t, handleEdit, handleDelete) => [
         key: 'action',
         align: 'right',
         render: (_, record) => {
-            const isLocked = record.stock > 0;
+            const { stock_on_hand = 0, allocated = 0 } = record.inventory || {};
+            const isLocked = stock_on_hand > 0 || allocated > 0;
             return (
                 <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <EditAction 
-                        onEdit={() => handleEdit && handleEdit(record)} 
-                        tooltipText={t('adminParts:btnEdit')} 
+                    <EditAction
+                        onEdit={() => handleEdit && handleEdit(record)}
+                        tooltipText={t('adminParts:btnEdit')}
                     />
-                    
+
                     {isLocked ? (
-                        <DeleteLockedAction 
-                            tooltipTitle={t('adminParts:errDeleteLock')} 
+                        <DeleteLockedAction
+                            tooltipTitle={t('adminParts:errDeleteLock')}
                         />
                     ) : (
                         <DeleteAction

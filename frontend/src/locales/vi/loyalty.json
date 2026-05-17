@@ -1,0 +1,21 @@
+{
+    "loyalty_title": "Tích điểm & Ưu đãi",
+    "loyalty_membership": "TT Auto Membership",
+    "loyalty_current_points": "Điểm hiện tại",
+    "loyalty_pts": "pts",
+    "loyalty_tab_store": "Cửa hàng Voucher",
+    "loyalty_tab_my_vouchers": "Voucher của tôi",
+    "loyalty_tab_history": "Lịch sử điểm",
+    "loyalty_btn_redeem": "Đổi ngay",
+    "loyalty_status_unused": "CÒN HẠN",
+    "loyalty_status_used": "ĐÃ DÙNG",
+    "loyalty_status_expired": "HẾT HẠN",
+    "loyalty_hsd": "HSD",
+    "loyalty_empty_store": "Hiện tại chưa có Voucher nào để đổi.",
+    "loyalty_empty_my_vouchers": "Bạn chưa có Voucher nào. Hãy dùng điểm để đổi nhé!",
+    "loyalty_empty_history": "Chưa có lịch sử giao dịch điểm nào.",
+    "loyalty_msg_redeem_success": "Đổi Voucher thành công!",
+    "loyalty_msg_not_enough_points": "Bạn không đủ điểm để đổi Voucher này!",
+    "loyalty_msg_fetch_error": "Không thể tải dữ liệu Tích điểm",
+    "loyalty_msg_redeem_error": "Có lỗi xảy ra khi đổi Voucher"
+}

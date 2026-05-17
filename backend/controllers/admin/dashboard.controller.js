@@ -37,7 +37,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
     })
 
     const lowStockProducts = await Part.countDocuments({
-        "inventory.warehouse": { $lt: 5 },
+        "inventory.available_stock": { $lt: 5 },
     })
 
     const bookings = await Booking.countDocuments({

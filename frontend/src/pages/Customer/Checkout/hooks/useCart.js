@@ -36,10 +36,22 @@ export const useCart = (t) => {
     const hasCheckedItems = checkedItems.length > 0;
 
     const toggleItemCheck = (id) => {
-        dispatch(toggleChecked(id));
+        const item = cartItems.find(i => i.id === id);
+        if (item && (item.inventory?.available_stock || 0) > 0) {
+            dispatch(toggleChecked(id));
+        } else {
+            message.warning(t('item_out_of_stock', 'Sản phẩm tạm hết hàng, không thể chọn mua.'));
+        }
     };
 
     const toggleAllChecks = (selectAll) => {
+        if (selectAll) {
+            const inStockItems = cartItems.filter(item => (item.inventory?.available_stock || 0) > 0);
+            if (inStockItems.length === 0) {
+                message.warning(t('no_in_stock_items', 'Không có sản phẩm nào còn hàng để chọn.'));
+                return;
+            }
+        }
         dispatch(toggleAllRedux(selectAll));
     };
 
@@ -47,7 +59,7 @@ export const useCart = (t) => {
         const item = cartItems.find(i => i.id === id);
         if (!item) return;
         const newQuantity = item.quantity + delta;
-        const maxStock = item.inventory ? (item.inventory.showroom + item.inventory.warehouse) : (item.stock || 99);
+        const maxStock = item.inventory?.available_stock || 0;
 
         if (newQuantity >= 1 && newQuantity <= maxStock) {
             updateApiQuantity({ item_id: id, quantity: newQuantity }, {

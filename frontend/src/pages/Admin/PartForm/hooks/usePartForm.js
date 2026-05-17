@@ -16,7 +16,7 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
             original_price: 0,
             price: 0,
             status: 'active',
-            inventory: { warehouse: 0, showroom: 0 },
+            inventory: { stock_on_hand: 0, allocated: 0, available_stock: 0 },
             images: [],
             compatible_brands: [],
             fitment_data: [],
@@ -33,7 +33,7 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
 
     useEffect(() => {
         if (isEditMode && initialData) {
-            
+
             // Map the choices if they are objects, convert them to strings for the UI tags
             const mappedOptions = (initialData.options || []).map(opt => ({
                 ...opt,
@@ -42,7 +42,7 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
 
             reset({
                 ...initialData,
-                inventory: initialData.inventory || { warehouse: 0, showroom: 0 },
+                inventory: initialData.inventory || { stock_on_hand: 0, allocated: 0, available_stock: 0 },
                 specs: initialData.specs || [],
                 options: mappedOptions
             });
@@ -66,12 +66,9 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
     // Thực thi Submit với Action
     const submitWithAction = (action) => (data) => {
         const apiPayload = { ...data };
-        
-        // Ghi đè Status tuỳ theo nút được bấm
+
         if (action === 'draft') apiPayload.status = 'draft';
-        if (action === 'save' || action === 'duplicate' || action === 'apply') {
-            apiPayload.status = 'active';
-        }
+        if (action === 'publish') apiPayload.status = 'active';
 
         // The backend `partModel.js` and frontend `partSchema.js` natively expect Arrays of Objects
         apiPayload.specs = data.specs || [];

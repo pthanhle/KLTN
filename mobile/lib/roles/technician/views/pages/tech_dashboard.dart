@@ -24,7 +24,7 @@ class TechDashboardPage extends StatelessWidget {
                 GlassCard(
                   child: Center(
                     child: Text(
-                      'technician_welcome'.tr(),
+                      'Chào mừng trở lại, Kỹ thuật viên'.tr(),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),

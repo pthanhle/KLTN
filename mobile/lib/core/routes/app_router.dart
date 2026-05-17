@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../roles/auth/views/pages/login_page.dart';
 import '../../roles/auth/views/pages/profile_page.dart';
 import '../views/pages/dynamic_dashboard.dart';
+import '../views/pages/dynamic_tasks.dart';
 import '../views/pages/main_scaffold.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -43,9 +44,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: '/tasks',
               name: 'tasks',
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Trang Công Việc (Đang phát triển)')),
-              ),
+              builder: (context, state) => const DynamicTasks(),
             ),
           ],
         ),

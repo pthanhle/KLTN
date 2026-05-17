@@ -28,7 +28,7 @@ class ProfilePage extends ConsumerWidget {
               surfaceTintColor: Colors.transparent,
               centerTitle: true,
               title: Text(
-                'profile_title'.tr(),
+                'Tài khoản'.tr(),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),

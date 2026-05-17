@@ -24,7 +24,7 @@ class WarehouseDashboardPage extends StatelessWidget {
                 GlassCard(
                   child: Center(
                     child: Text(
-                      'warehouse_welcome'.tr(),
+                      'Chào mừng trở lại, Quản lý Kho'.tr(),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),

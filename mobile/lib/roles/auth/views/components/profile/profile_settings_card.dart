@@ -33,7 +33,7 @@ class _ProfileSettingsCardState extends ConsumerState<ProfileSettingsCard> {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 8),
           child: Text(
-            'profile_preferences'.tr().toUpperCase(),
+            'Tuỳ chọn'.tr().toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
               letterSpacing: 1.2,
@@ -48,7 +48,7 @@ class _ProfileSettingsCardState extends ConsumerState<ProfileSettingsCard> {
               _buildSettingRow(
                 context,
                 icon: Icons.dark_mode_outlined,
-                title: 'profile_dark_mode'.tr(),
+                title: 'Chế độ ban đêm'.tr(),
                 trailing: CupertinoSwitch(
                   value: _isDarkMode,
                   activeColor: Theme.of(context).colorScheme.primary,
@@ -71,7 +71,7 @@ class _ProfileSettingsCardState extends ConsumerState<ProfileSettingsCard> {
               _buildSettingRow(
                 context,
                 icon: Icons.language_outlined,
-                title: 'profile_language'.tr(),
+                title: 'Ngôn ngữ'.tr(),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -117,7 +117,7 @@ class _ProfileSettingsCardState extends ConsumerState<ProfileSettingsCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'profile_language'.tr(),
+                'Ngôn ngữ'.tr(),
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

@@ -284,7 +284,7 @@ as String,
 /// @nodoc
 mixin _$TaskModel {
 
- String get id; String get title; String get priority; String? get sla; int? get progress; String? get customerName; String? get licensePlate; String? get customerPhone; String? get vehicleModel; String? get appointmentTime; String? get description; String? get billed; String? get taskType; bool? get isBlinking; String? get locationType; String? get address; List<ChatLog>? get chatLogs;
+ String get id; String get title; String get priority; String? get status; String? get sla; int? get progress; String? get customerName; String? get licensePlate; String? get customerPhone; String? get vehicleModel; String? get appointmentTime; String? get description; String? get billed; String? get taskType; bool? get isBlinking; String? get locationType; String? get address; List<ChatLog>? get chatLogs;
 /// Create a copy of TaskModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -297,16 +297,16 @@ $TaskModelCopyWith<TaskModel> get copyWith => _$TaskModelCopyWithImpl<TaskModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.sla, sla) || other.sla == sla)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.licensePlate, licensePlate) || other.licensePlate == licensePlate)&&(identical(other.customerPhone, customerPhone) || other.customerPhone == customerPhone)&&(identical(other.vehicleModel, vehicleModel) || other.vehicleModel == vehicleModel)&&(identical(other.appointmentTime, appointmentTime) || other.appointmentTime == appointmentTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.billed, billed) || other.billed == billed)&&(identical(other.taskType, taskType) || other.taskType == taskType)&&(identical(other.isBlinking, isBlinking) || other.isBlinking == isBlinking)&&(identical(other.locationType, locationType) || other.locationType == locationType)&&(identical(other.address, address) || other.address == address)&&const DeepCollectionEquality().equals(other.chatLogs, chatLogs));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.status, status) || other.status == status)&&(identical(other.sla, sla) || other.sla == sla)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.licensePlate, licensePlate) || other.licensePlate == licensePlate)&&(identical(other.customerPhone, customerPhone) || other.customerPhone == customerPhone)&&(identical(other.vehicleModel, vehicleModel) || other.vehicleModel == vehicleModel)&&(identical(other.appointmentTime, appointmentTime) || other.appointmentTime == appointmentTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.billed, billed) || other.billed == billed)&&(identical(other.taskType, taskType) || other.taskType == taskType)&&(identical(other.isBlinking, isBlinking) || other.isBlinking == isBlinking)&&(identical(other.locationType, locationType) || other.locationType == locationType)&&(identical(other.address, address) || other.address == address)&&const DeepCollectionEquality().equals(other.chatLogs, chatLogs));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,priority,sla,progress,customerName,licensePlate,customerPhone,vehicleModel,appointmentTime,description,billed,taskType,isBlinking,locationType,address,const DeepCollectionEquality().hash(chatLogs));
+int get hashCode => Object.hash(runtimeType,id,title,priority,status,sla,progress,customerName,licensePlate,customerPhone,vehicleModel,appointmentTime,description,billed,taskType,isBlinking,locationType,address,const DeepCollectionEquality().hash(chatLogs));
 
 @override
 String toString() {
-  return 'TaskModel(id: $id, title: $title, priority: $priority, sla: $sla, progress: $progress, customerName: $customerName, licensePlate: $licensePlate, customerPhone: $customerPhone, vehicleModel: $vehicleModel, appointmentTime: $appointmentTime, description: $description, billed: $billed, taskType: $taskType, isBlinking: $isBlinking, locationType: $locationType, address: $address, chatLogs: $chatLogs)';
+  return 'TaskModel(id: $id, title: $title, priority: $priority, status: $status, sla: $sla, progress: $progress, customerName: $customerName, licensePlate: $licensePlate, customerPhone: $customerPhone, vehicleModel: $vehicleModel, appointmentTime: $appointmentTime, description: $description, billed: $billed, taskType: $taskType, isBlinking: $isBlinking, locationType: $locationType, address: $address, chatLogs: $chatLogs)';
 }
 
 
@@ -317,7 +317,7 @@ abstract mixin class $TaskModelCopyWith<$Res>  {
   factory $TaskModelCopyWith(TaskModel value, $Res Function(TaskModel) _then) = _$TaskModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String priority, String? sla, int? progress, String? customerName, String? licensePlate, String? customerPhone, String? vehicleModel, String? appointmentTime, String? description, String? billed, String? taskType, bool? isBlinking, String? locationType, String? address, List<ChatLog>? chatLogs
+ String id, String title, String priority, String? status, String? sla, int? progress, String? customerName, String? licensePlate, String? customerPhone, String? vehicleModel, String? appointmentTime, String? description, String? billed, String? taskType, bool? isBlinking, String? locationType, String? address, List<ChatLog>? chatLogs
 });
 
 
@@ -334,12 +334,13 @@ class _$TaskModelCopyWithImpl<$Res>
 
 /// Create a copy of TaskModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? priority = null,Object? sla = freezed,Object? progress = freezed,Object? customerName = freezed,Object? licensePlate = freezed,Object? customerPhone = freezed,Object? vehicleModel = freezed,Object? appointmentTime = freezed,Object? description = freezed,Object? billed = freezed,Object? taskType = freezed,Object? isBlinking = freezed,Object? locationType = freezed,Object? address = freezed,Object? chatLogs = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? priority = null,Object? status = freezed,Object? sla = freezed,Object? progress = freezed,Object? customerName = freezed,Object? licensePlate = freezed,Object? customerPhone = freezed,Object? vehicleModel = freezed,Object? appointmentTime = freezed,Object? description = freezed,Object? billed = freezed,Object? taskType = freezed,Object? isBlinking = freezed,Object? locationType = freezed,Object? address = freezed,Object? chatLogs = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
-as String,sla: freezed == sla ? _self.sla : sla // ignore: cast_nullable_to_non_nullable
+as String,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,sla: freezed == sla ? _self.sla : sla // ignore: cast_nullable_to_non_nullable
 as String?,progress: freezed == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
 as int?,customerName: freezed == customerName ? _self.customerName : customerName // ignore: cast_nullable_to_non_nullable
 as String?,licensePlate: freezed == licensePlate ? _self.licensePlate : licensePlate // ignore: cast_nullable_to_non_nullable
@@ -438,10 +439,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String priority,  String? sla,  int? progress,  String? customerName,  String? licensePlate,  String? customerPhone,  String? vehicleModel,  String? appointmentTime,  String? description,  String? billed,  String? taskType,  bool? isBlinking,  String? locationType,  String? address,  List<ChatLog>? chatLogs)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String priority,  String? status,  String? sla,  int? progress,  String? customerName,  String? licensePlate,  String? customerPhone,  String? vehicleModel,  String? appointmentTime,  String? description,  String? billed,  String? taskType,  bool? isBlinking,  String? locationType,  String? address,  List<ChatLog>? chatLogs)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TaskModel() when $default != null:
-return $default(_that.id,_that.title,_that.priority,_that.sla,_that.progress,_that.customerName,_that.licensePlate,_that.customerPhone,_that.vehicleModel,_that.appointmentTime,_that.description,_that.billed,_that.taskType,_that.isBlinking,_that.locationType,_that.address,_that.chatLogs);case _:
+return $default(_that.id,_that.title,_that.priority,_that.status,_that.sla,_that.progress,_that.customerName,_that.licensePlate,_that.customerPhone,_that.vehicleModel,_that.appointmentTime,_that.description,_that.billed,_that.taskType,_that.isBlinking,_that.locationType,_that.address,_that.chatLogs);case _:
   return orElse();
 
 }
@@ -459,10 +460,10 @@ return $default(_that.id,_that.title,_that.priority,_that.sla,_that.progress,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String priority,  String? sla,  int? progress,  String? customerName,  String? licensePlate,  String? customerPhone,  String? vehicleModel,  String? appointmentTime,  String? description,  String? billed,  String? taskType,  bool? isBlinking,  String? locationType,  String? address,  List<ChatLog>? chatLogs)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String priority,  String? status,  String? sla,  int? progress,  String? customerName,  String? licensePlate,  String? customerPhone,  String? vehicleModel,  String? appointmentTime,  String? description,  String? billed,  String? taskType,  bool? isBlinking,  String? locationType,  String? address,  List<ChatLog>? chatLogs)  $default,) {final _that = this;
 switch (_that) {
 case _TaskModel():
-return $default(_that.id,_that.title,_that.priority,_that.sla,_that.progress,_that.customerName,_that.licensePlate,_that.customerPhone,_that.vehicleModel,_that.appointmentTime,_that.description,_that.billed,_that.taskType,_that.isBlinking,_that.locationType,_that.address,_that.chatLogs);case _:
+return $default(_that.id,_that.title,_that.priority,_that.status,_that.sla,_that.progress,_that.customerName,_that.licensePlate,_that.customerPhone,_that.vehicleModel,_that.appointmentTime,_that.description,_that.billed,_that.taskType,_that.isBlinking,_that.locationType,_that.address,_that.chatLogs);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -479,10 +480,10 @@ return $default(_that.id,_that.title,_that.priority,_that.sla,_that.progress,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String priority,  String? sla,  int? progress,  String? customerName,  String? licensePlate,  String? customerPhone,  String? vehicleModel,  String? appointmentTime,  String? description,  String? billed,  String? taskType,  bool? isBlinking,  String? locationType,  String? address,  List<ChatLog>? chatLogs)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String priority,  String? status,  String? sla,  int? progress,  String? customerName,  String? licensePlate,  String? customerPhone,  String? vehicleModel,  String? appointmentTime,  String? description,  String? billed,  String? taskType,  bool? isBlinking,  String? locationType,  String? address,  List<ChatLog>? chatLogs)?  $default,) {final _that = this;
 switch (_that) {
 case _TaskModel() when $default != null:
-return $default(_that.id,_that.title,_that.priority,_that.sla,_that.progress,_that.customerName,_that.licensePlate,_that.customerPhone,_that.vehicleModel,_that.appointmentTime,_that.description,_that.billed,_that.taskType,_that.isBlinking,_that.locationType,_that.address,_that.chatLogs);case _:
+return $default(_that.id,_that.title,_that.priority,_that.status,_that.sla,_that.progress,_that.customerName,_that.licensePlate,_that.customerPhone,_that.vehicleModel,_that.appointmentTime,_that.description,_that.billed,_that.taskType,_that.isBlinking,_that.locationType,_that.address,_that.chatLogs);case _:
   return null;
 
 }
@@ -494,12 +495,13 @@ return $default(_that.id,_that.title,_that.priority,_that.sla,_that.progress,_th
 @JsonSerializable()
 
 class _TaskModel extends TaskModel {
-  const _TaskModel({required this.id, required this.title, required this.priority, this.sla, this.progress, this.customerName, this.licensePlate, this.customerPhone, this.vehicleModel, this.appointmentTime, this.description, this.billed, this.taskType, this.isBlinking, this.locationType, this.address, final  List<ChatLog>? chatLogs}): _chatLogs = chatLogs,super._();
+  const _TaskModel({required this.id, required this.title, required this.priority, this.status, this.sla, this.progress, this.customerName, this.licensePlate, this.customerPhone, this.vehicleModel, this.appointmentTime, this.description, this.billed, this.taskType, this.isBlinking, this.locationType, this.address, final  List<ChatLog>? chatLogs}): _chatLogs = chatLogs,super._();
   factory _TaskModel.fromJson(Map<String, dynamic> json) => _$TaskModelFromJson(json);
 
 @override final  String id;
 @override final  String title;
 @override final  String priority;
+@override final  String? status;
 @override final  String? sla;
 @override final  int? progress;
 @override final  String? customerName;
@@ -536,16 +538,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.sla, sla) || other.sla == sla)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.licensePlate, licensePlate) || other.licensePlate == licensePlate)&&(identical(other.customerPhone, customerPhone) || other.customerPhone == customerPhone)&&(identical(other.vehicleModel, vehicleModel) || other.vehicleModel == vehicleModel)&&(identical(other.appointmentTime, appointmentTime) || other.appointmentTime == appointmentTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.billed, billed) || other.billed == billed)&&(identical(other.taskType, taskType) || other.taskType == taskType)&&(identical(other.isBlinking, isBlinking) || other.isBlinking == isBlinking)&&(identical(other.locationType, locationType) || other.locationType == locationType)&&(identical(other.address, address) || other.address == address)&&const DeepCollectionEquality().equals(other._chatLogs, _chatLogs));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.status, status) || other.status == status)&&(identical(other.sla, sla) || other.sla == sla)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.licensePlate, licensePlate) || other.licensePlate == licensePlate)&&(identical(other.customerPhone, customerPhone) || other.customerPhone == customerPhone)&&(identical(other.vehicleModel, vehicleModel) || other.vehicleModel == vehicleModel)&&(identical(other.appointmentTime, appointmentTime) || other.appointmentTime == appointmentTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.billed, billed) || other.billed == billed)&&(identical(other.taskType, taskType) || other.taskType == taskType)&&(identical(other.isBlinking, isBlinking) || other.isBlinking == isBlinking)&&(identical(other.locationType, locationType) || other.locationType == locationType)&&(identical(other.address, address) || other.address == address)&&const DeepCollectionEquality().equals(other._chatLogs, _chatLogs));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,priority,sla,progress,customerName,licensePlate,customerPhone,vehicleModel,appointmentTime,description,billed,taskType,isBlinking,locationType,address,const DeepCollectionEquality().hash(_chatLogs));
+int get hashCode => Object.hash(runtimeType,id,title,priority,status,sla,progress,customerName,licensePlate,customerPhone,vehicleModel,appointmentTime,description,billed,taskType,isBlinking,locationType,address,const DeepCollectionEquality().hash(_chatLogs));
 
 @override
 String toString() {
-  return 'TaskModel(id: $id, title: $title, priority: $priority, sla: $sla, progress: $progress, customerName: $customerName, licensePlate: $licensePlate, customerPhone: $customerPhone, vehicleModel: $vehicleModel, appointmentTime: $appointmentTime, description: $description, billed: $billed, taskType: $taskType, isBlinking: $isBlinking, locationType: $locationType, address: $address, chatLogs: $chatLogs)';
+  return 'TaskModel(id: $id, title: $title, priority: $priority, status: $status, sla: $sla, progress: $progress, customerName: $customerName, licensePlate: $licensePlate, customerPhone: $customerPhone, vehicleModel: $vehicleModel, appointmentTime: $appointmentTime, description: $description, billed: $billed, taskType: $taskType, isBlinking: $isBlinking, locationType: $locationType, address: $address, chatLogs: $chatLogs)';
 }
 
 
@@ -556,7 +558,7 @@ abstract mixin class _$TaskModelCopyWith<$Res> implements $TaskModelCopyWith<$Re
   factory _$TaskModelCopyWith(_TaskModel value, $Res Function(_TaskModel) _then) = __$TaskModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, String priority, String? sla, int? progress, String? customerName, String? licensePlate, String? customerPhone, String? vehicleModel, String? appointmentTime, String? description, String? billed, String? taskType, bool? isBlinking, String? locationType, String? address, List<ChatLog>? chatLogs
+ String id, String title, String priority, String? status, String? sla, int? progress, String? customerName, String? licensePlate, String? customerPhone, String? vehicleModel, String? appointmentTime, String? description, String? billed, String? taskType, bool? isBlinking, String? locationType, String? address, List<ChatLog>? chatLogs
 });
 
 
@@ -573,12 +575,13 @@ class __$TaskModelCopyWithImpl<$Res>
 
 /// Create a copy of TaskModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? priority = null,Object? sla = freezed,Object? progress = freezed,Object? customerName = freezed,Object? licensePlate = freezed,Object? customerPhone = freezed,Object? vehicleModel = freezed,Object? appointmentTime = freezed,Object? description = freezed,Object? billed = freezed,Object? taskType = freezed,Object? isBlinking = freezed,Object? locationType = freezed,Object? address = freezed,Object? chatLogs = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? priority = null,Object? status = freezed,Object? sla = freezed,Object? progress = freezed,Object? customerName = freezed,Object? licensePlate = freezed,Object? customerPhone = freezed,Object? vehicleModel = freezed,Object? appointmentTime = freezed,Object? description = freezed,Object? billed = freezed,Object? taskType = freezed,Object? isBlinking = freezed,Object? locationType = freezed,Object? address = freezed,Object? chatLogs = freezed,}) {
   return _then(_TaskModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
-as String,sla: freezed == sla ? _self.sla : sla // ignore: cast_nullable_to_non_nullable
+as String,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,sla: freezed == sla ? _self.sla : sla // ignore: cast_nullable_to_non_nullable
 as String?,progress: freezed == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
 as int?,customerName: freezed == customerName ? _self.customerName : customerName // ignore: cast_nullable_to_non_nullable
 as String?,licensePlate: freezed == licensePlate ? _self.licensePlate : licensePlate // ignore: cast_nullable_to_non_nullable

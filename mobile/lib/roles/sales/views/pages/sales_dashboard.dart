@@ -1,10 +1,14 @@
+import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../auth/controllers/auth_controller.dart';
 import '../../controllers/sales_dashboard_controller.dart';
 import '../components/dashboard/sections/quick_stats_section.dart';
 import '../components/dashboard/sections/the_pool_section.dart';
+import '../components/dashboard/cards/pool_item_skeleton.dart';
 
 class SalesDashboardPage extends ConsumerStatefulWidget {
   const SalesDashboardPage({super.key});
@@ -21,10 +25,9 @@ class _SalesDashboardPageState extends ConsumerState<SalesDashboardPage> {
     final state = ref.watch(salesDashboardProvider);
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // Nền gradient được set ở cấp cao hơn (Main Layout) hoặc tự handle tại đây
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          // Fixed background
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -51,80 +54,128 @@ class _SalesDashboardPageState extends ConsumerState<SalesDashboardPage> {
               physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               slivers: [
                 SliverAppBar.large(
-                  backgroundColor: Colors.transparent, // Sẽ blend vào background
+                  backgroundColor: Colors.transparent,
                   elevation: 0,
                   pinned: true,
-                  floating: true,
+                  stretch: false,
                   flexibleSpace: FlexibleSpaceBar(
+                    stretchModes: const [], 
+                    titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     title: Text(
                       'Tổng quan'.tr(),
                       style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.8,
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
-                    titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   ),
                   actions: [
                     Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: GestureDetector(
-                        onTap: () {
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          HapticFeedback.selectionClick();
                           // Handle notifications
                         },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                          ),
-                          child: Stack(
-                            children: [
-                              Icon(
-                                Icons.notifications_none,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                              Positioned(
-                                right: 2,
-                                top: 2,
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
+                        child: ClipOval(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                                border: Border.all(
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
                                 ),
-                              )
-                            ],
+                              ),
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Icon(
+                                    CupertinoIcons.bell_fill,
+                                    size: 22,
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                                  ),
+                                  Positioned(
+                                    right: -2,
+                                    top: -2,
+                                    child: Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: CupertinoColors.systemRed,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          // Đục lỗ (Punch hole) chuẩn Apple cho Notification Badge
+                                          color: theme.scaffoldBackgroundColor, 
+                                          width: 2,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ],
                   leading: Padding(
-                    padding: const EdgeInsets.only(left: 24.0, top: 8, bottom: 8),
-                    child: CircleAvatar(
-                      backgroundImage: user?.avatarUrl != null 
-                          ? NetworkImage(user!.avatarUrl!)
-                          : null,
-                      backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
-                      child: user?.avatarUrl == null
-                          ? Icon(Icons.person, color: theme.colorScheme.primary)
-                          : null,
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        HapticFeedback.selectionClick();
+                        // Handle profile tap
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundImage: user?.avatarUrl != null 
+                              ? NetworkImage(user!.avatarUrl!)
+                              : null,
+                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                          child: user?.avatarUrl == null
+                              ? Icon(CupertinoIcons.person_fill, color: theme.colorScheme.primary, size: 20)
+                              : null,
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 
-                // Loading Skeleton (Simplistic wrapper) or Data
                 if (state.isLoading && state.poolBookings.isEmpty)
-                  const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 100.0, left: 16.0, right: 16.0),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => const PoolItemSkeleton(),
+                        childCount: 3,
+                      ),
+                    ),
                   )
                 else
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 16.0, bottom: 100.0), // Padding bottom for nav bar
+                      padding: const EdgeInsets.only(top: 16.0, bottom: 100.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -132,7 +183,7 @@ class _SalesDashboardPageState extends ConsumerState<SalesDashboardPage> {
                             todayCount: state.todayBookings.length,
                             waitingCount: state.poolBookings.length,
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 24),
                           const ThePoolSection(),
                         ],
                       ),

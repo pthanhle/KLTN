@@ -44,9 +44,18 @@ class GlassNavigationBar extends StatelessWidget {
           child: Container(
             padding: padding,
             decoration: ShapeDecoration(
-              color: isDark
-                  ? colorScheme.surface.withValues(alpha: 0.6)
-                  : colorScheme.surface.withValues(alpha: 0.7),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  isDark
+                      ? colorScheme.surface.withValues(alpha: 0.4)
+                      : colorScheme.surface.withValues(alpha: 0.8),
+                  isDark
+                      ? colorScheme.surface.withValues(alpha: 0.2)
+                      : colorScheme.surface.withValues(alpha: 0.5),
+                ],
+              ),
               shape: squircleShape,
               shadows: [
                 BoxShadow(

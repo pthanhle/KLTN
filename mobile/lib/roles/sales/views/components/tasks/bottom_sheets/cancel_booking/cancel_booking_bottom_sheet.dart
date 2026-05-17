@@ -4,10 +4,11 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:ui';
 import '../../../../../../auth/models/task_model.dart';
-import '../../../../../constants/cancel_reasons_data.dart';
+import 'data/mock_cancel_reasons.dart';
 import 'controllers/cancel_booking_controller.dart';
 import 'widgets/cancel_reason_item.dart';
 import 'widgets/cancel_note_input.dart';
+import 'widgets/cancel_action_button.dart';
 
 class CancelBookingBottomSheet extends ConsumerWidget {
   final TaskModel task;
@@ -38,11 +39,17 @@ class CancelBookingBottomSheet extends ConsumerWidget {
 
     return Container(
       decoration: ShapeDecoration(
-        color: theme.colorScheme.surface.withOpacity(0.9),
+        // Tăng độ sáng (alpha cao hơn) để nền bớt tối nhưng vẫn giữ mờ (Liquid)
+        color: theme.colorScheme.surface.withValues(alpha: 0.65),
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
             cornerRadius: 32,
             cornerSmoothing: 1.0,
+          ),
+          // Specular Highlight
+          side: BorderSide(
+            color: theme.colorScheme.surface.withValues(alpha: 0.2),
+            width: 0.5,
           ),
         ),
       ),
@@ -52,7 +59,7 @@ class CancelBookingBottomSheet extends ConsumerWidget {
           cornerSmoothing: 1.0,
         ),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
           child: Padding(
             padding: const EdgeInsets.only(
               top: 16,
@@ -70,52 +77,65 @@ class CancelBookingBottomSheet extends ConsumerWidget {
                     width: 48,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sáng hơn
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Stack(
+                  alignment: Alignment.topCenter,
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.warning_amber_rounded,
-                          color: theme.colorScheme.error,
-                          size: 20,
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close, size: 20),
+                        style: IconButton.styleFrom(
+                          backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.5),
+                          foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                          padding: const EdgeInsets.all(8),
+                          minimumSize: const Size(36, 36),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          tr('BÁO HỦY LỊCH'),
-                          style: theme.textTheme.labelSmall?.copyWith(
+                      ),
+                    ),
+                    // Nội dung Căn giữa (Chuẩn iOS Destructive Sheet)
+                    Column(
+                      children: [
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.error.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.event_busy_rounded,
                             color: theme.colorScheme.error,
-                            letterSpacing: 1.5,
-                            fontWeight: FontWeight.w600,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          tr('Hủy lịch lái thử'),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurface,
+                            letterSpacing: -0.5, // Chữ khít nhẹ đặc trưng iOS
                           ),
                         ),
                       ],
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close),
-                      style: IconButton.styleFrom(
-                        backgroundColor: theme.colorScheme.surfaceContainerHigh,
-                        foregroundColor: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32), // Tăng khoảng cách dưới header
 
                 // Reasons List
                 Text(
                   tr('Vui lòng chọn lý do hủy:'),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.onSurface, // Đổi từ onSurfaceVariant sang onSurface cho sáng
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -125,7 +145,7 @@ class CancelBookingBottomSheet extends ConsumerWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        ...CancelReasons.allReasons.map((reason) {
+                        ...MockCancelReasonsData.allReasons.map((reason) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 12),
                             child: CancelReasonItem(
@@ -147,36 +167,10 @@ class CancelBookingBottomSheet extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Submit Button
-                FilledButton(
-                  onPressed: controller.isValid
-                      ? () => controller.submitCancelBooking(task.id)
-                      : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: theme.colorScheme.error,
-                    foregroundColor: theme.colorScheme.onError,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: SmoothRectangleBorder(
-                      borderRadius: SmoothBorderRadius(
-                        cornerRadius: 9999, // Pill shape
-                        cornerSmoothing: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: state.isSubmitting
-                      ? SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: theme.colorScheme.onError,
-                          ),
-                        )
-                      : Text(
-                          tr('Xác nhận Hủy'),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                CancelActionButton(
+                  isEnabled: controller.isValid,
+                  isLoading: state.isSubmitting,
+                  onPressed: () => controller.submitCancelBooking(task.id),
                 ),
               ],
             ),

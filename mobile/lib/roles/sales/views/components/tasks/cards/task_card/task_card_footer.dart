@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../../../../../../core/utils/theme_extension.dart';
 import '../../../../../../auth/models/task_model.dart';
 
@@ -30,32 +31,34 @@ class TaskCardFooter extends StatelessWidget {
                   if (hasTime)
                     Row(
                       children: [
-                        Icon(Icons.schedule, size: 14, color: context.colors.onSurfaceVariant),
-                        const SizedBox(width: 4),
+                        Icon(Icons.schedule_rounded, size: 16, color: context.colors.onSurfaceVariant.withValues(alpha: 0.8)),
+                        const SizedBox(width: 6),
                         Text(
                           task.appointmentTime!,
-                          style: context.textTheme.bodySmall?.copyWith(
-                            color: context.colors.onSurfaceVariant,
-                            fontWeight: FontWeight.w500,
+                          style: context.textTheme.labelMedium?.copyWith(
+                            color: context.colors.onSurfaceVariant.withValues(alpha: 0.9),
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0,
                           ),
                         ),
                       ],
                     ),
-                  if (hasTime && hasLocation) const SizedBox(height: 4),
+                  if (hasTime && hasLocation) const SizedBox(height: 6),
                   if (hasLocation)
                     Row(
                       children: [
                         Icon(
-                          task.locationType?.toUpperCase() == 'HOME' ? Icons.home : Icons.location_on, 
-                          size: 14, 
-                          color: context.colors.onSurfaceVariant
+                          task.locationType?.toUpperCase() == 'HOME' ? Icons.home_rounded : Icons.location_on_rounded, 
+                          size: 16, 
+                          color: context.colors.onSurfaceVariant.withValues(alpha: 0.8)
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             task.address ?? tr('Tại Showroom', context: context),
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: context.colors.onSurfaceVariant,
+                            style: context.textTheme.labelMedium?.copyWith(
+                              color: context.colors.onSurfaceVariant.withValues(alpha: 0.9),
+                              letterSpacing: 0,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -69,29 +72,36 @@ class TaskCardFooter extends StatelessWidget {
             if (task.billed != null)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: context.colors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                decoration: ShapeDecoration(
+                  color: context.colors.primary.withValues(alpha: 0.15),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(cornerRadius: 10, cornerSmoothing: 1.0),
+                    side: BorderSide(
+                      color: context.colors.primary.withValues(alpha: 0.2),
+                      width: 0.5,
+                    ),
+                  ),
                 ),
                 child: Text(
                   task.billed!,
                   style: context.textTheme.labelLarge?.copyWith(
                     color: context.colors.primary,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
           ],
         ),
         if (task.progress != null) ...[
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(2),
+          const SizedBox(height: 16),
+          ClipSmoothRect(
+            radius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
             child: LinearProgressIndicator(
               value: task.progress! / 100,
-              backgroundColor: context.colors.surfaceContainerHigh,
+              backgroundColor: context.colors.surfaceContainerHigh.withValues(alpha: 0.5),
               valueColor: AlwaysStoppedAnimation<Color>(context.colors.primary),
-              minHeight: 4,
+              minHeight: 6, // Slightly thicker for better visibility in glassmorphism
             ),
           ),
         ]

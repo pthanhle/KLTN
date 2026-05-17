@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../roles/auth/views/pages/login_page.dart';
+import '../../roles/auth/views/pages/login/login_page.dart';
 import '../../roles/auth/views/pages/profile_page.dart';
 import '../views/pages/dynamic_dashboard.dart';
 import '../views/pages/dynamic_tasks.dart';
@@ -26,7 +26,6 @@ final GoRouter appRouter = GoRouter(
         return MainScaffold(navigationShell: navigationShell);
       },
       branches: [
-        // Tab 1: Dashboard (Dynamic based on Role)
         StatefulShellBranch(
           navigatorKey: _shellNavigatorDashboardKey,
           routes: [
@@ -37,7 +36,6 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
-        // Tab 2: Tasks (Placeholder)
         StatefulShellBranch(
           navigatorKey: _shellNavigatorTasksKey,
           routes: [
@@ -48,7 +46,6 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
-        // Tab 3: Calendar (Placeholder)
         StatefulShellBranch(
           navigatorKey: _shellNavigatorCalendarKey,
           routes: [
@@ -61,7 +58,6 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
-        // Tab 4: Profile
         StatefulShellBranch(
           navigatorKey: _shellNavigatorProfileKey,
           routes: [

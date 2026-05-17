@@ -1,46 +1,41 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/post_drive_state_model.dart';
 
-class PostDriveState {
-  final int selectedInterestLevelId;
-  final String feedback;
-
-  const PostDriveState({
-    this.selectedInterestLevelId = -1,
-    this.feedback = '',
-  });
-
-  PostDriveState copyWith({
-    int? selectedInterestLevelId,
-    String? feedback,
-  }) {
-    return PostDriveState(
-      selectedInterestLevelId: selectedInterestLevelId ?? this.selectedInterestLevelId,
-      feedback: feedback ?? this.feedback,
-    );
-  }
-}
-
-class PostDriveController extends Notifier<PostDriveState> {
+class PostDriveController extends Notifier<PostDriveStateModel> {
   @override
-  PostDriveState build() {
-    return const PostDriveState();
+  PostDriveStateModel build() {
+    return const PostDriveStateModel();
   }
 
   void setInterestLevel(int id) {
-    state = state.copyWith(selectedInterestLevelId: id);
+    state = state.copyWith(interestLevelId: id);
   }
 
   void setFeedback(String text) {
     state = state.copyWith(feedback: text);
   }
 
+  bool get isValid => state.interestLevelId != null;
+
   Future<void> submitPostDriveData(String taskId) async {
-    // This is a placeholder for actual API integration later
-    // e.g. await apiService.submitTestDriveDebrief(taskId, state.selectedInterestLevelId, state.feedback);
-    await Future.delayed(const Duration(milliseconds: 500)); 
+    if (!isValid) return;
+
+    state = state.copyWith(isSubmitting: true, error: null);
+
+    try {
+      // Print payload to verify BE integration readiness
+      print('Submitting post-drive for $taskId with payload: ${state.toJson()}');
+      
+      // Mock API delay
+      await Future.delayed(const Duration(milliseconds: 1200)); 
+      
+      state = state.copyWith(isSubmitting: false, isSuccess: true);
+    } catch (e) {
+      state = state.copyWith(isSubmitting: false, error: e.toString());
+    }
   }
 }
 
-final postDriveControllerProvider = NotifierProvider<PostDriveController, PostDriveState>(() {
+final postDriveControllerProvider = NotifierProvider<PostDriveController, PostDriveStateModel>(() {
   return PostDriveController();
 });

@@ -9,27 +9,22 @@ class TasksHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          color: context.colors.surface.withValues(alpha: 0.65),
-          padding: const EdgeInsets.only(top: 16, left: 24, right: 24, bottom: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tr('Danh sách Lái Thử', context: context),
-                style: context.textTheme.headlineLarge?.copyWith(
-                  color: context.colors.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const TasksSegmentedControl(),
-            ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, left: 24, right: 24, bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tr('Danh sách Lái Thử', context: context),
+            style: context.textTheme.headlineLarge?.copyWith(
+              color: context.colors.onSurface,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.8,
+            ),
           ),
-        ),
+          const SizedBox(height: 16),
+          const TasksSegmentedControl(),
+        ],
       ),
     );
   }

@@ -32,7 +32,7 @@ class _CancelReasonItemState extends State<CancelReasonItem>
       duration: const Duration(milliseconds: 150),
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
   }
 
@@ -48,7 +48,7 @@ class _CancelReasonItemState extends State<CancelReasonItem>
 
   void _handleTapUp(TapUpDetails details) {
     _controller.reverse();
-    HapticFeedback.selectionClick();
+    HapticFeedback.selectionClick(); // Apple 2026 standard haptic
     widget.onTap();
   }
 
@@ -64,27 +64,29 @@ class _CancelReasonItemState extends State<CancelReasonItem>
       onTapDown: _handleTapDown,
       onTapUp: _handleTapUp,
       onTapCancel: _handleTapCancel,
+      behavior: HitTestBehavior.opaque,
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
+          curve: Curves.fastLinearToSlowEaseIn,
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: ShapeDecoration(
+            // Deep Vibrancy logic - Tăng sáng lên
             color: widget.isSelected
-                ? theme.colorScheme.errorContainer.withOpacity(0.3)
-                : theme.colorScheme.surfaceContainerLowest.withOpacity(0.5),
+                ? theme.colorScheme.errorContainer.withValues(alpha: 0.25)
+                : theme.colorScheme.surface.withValues(alpha: 0.35),
             shape: SmoothRectangleBorder(
               borderRadius: SmoothBorderRadius(
-                cornerRadius: 16,
+                cornerRadius: 999, // Pill shape instead of squircle
                 cornerSmoothing: 1.0,
               ),
               side: BorderSide(
                 color: widget.isSelected
-                    ? theme.colorScheme.errorContainer
-                    : theme.colorScheme.outlineVariant.withOpacity(0.3),
-                width: 1,
+                    ? theme.colorScheme.errorContainer.withValues(alpha: 0.8)
+                    : theme.colorScheme.surface.withValues(alpha: 0.3), // Specular Highlight
+                width: 0.5,
               ),
             ),
           ),
@@ -98,8 +100,8 @@ class _CancelReasonItemState extends State<CancelReasonItem>
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: widget.isSelected
                         ? theme.colorScheme.error
-                        : theme.colorScheme.onSurfaceVariant,
-                    fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+                        : theme.colorScheme.onSurface, // Đổi sang onSurface cho sáng rõ
+                    fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500, // Tăng font weight nhẹ
                   ),
                 ),
               ),
@@ -113,15 +115,19 @@ class _CancelReasonItemState extends State<CancelReasonItem>
   Widget _buildRadioIndicator(ThemeData theme) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutCubic,
       width: 20,
       height: 20,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
+        color: widget.isSelected
+            ? theme.colorScheme.error.withValues(alpha: 0.1)
+            : Colors.transparent,
         border: Border.all(
           color: widget.isSelected
               ? theme.colorScheme.error
-              : theme.colorScheme.outlineVariant,
-          width: 2,
+              : theme.colorScheme.outline.withValues(alpha: 0.6), // Sáng và rõ hơn outlineVariant
+          width: 1.5,
         ),
       ),
       child: Center(

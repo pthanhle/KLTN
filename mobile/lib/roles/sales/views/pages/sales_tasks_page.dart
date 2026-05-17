@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/theme_extension.dart';
 import '../components/tasks/header/tasks_header.dart';
@@ -14,24 +15,44 @@ class SalesTasksPage extends StatelessWidget {
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: theme.brightness == Brightness.dark
-                      ? [
-                          const Color(0xFF0F172A),
-                          const Color(0xFF1E293B),
-                        ]
-                      : [
-                          const Color(0xFFF7F9FB),
-                          const Color(0xFFE0E3E5),
-                        ],
+          Stack(
+            children: [
+              Container(
+                color: theme.brightness == Brightness.dark 
+                  ? const Color(0xFF0F172A) 
+                  : const Color(0xFFF1F5F9)
+              ),
+              Positioned(
+                top: -100,
+                left: -100,
+                child: Container(
+                  width: 400,
+                  height: 400,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: theme.brightness == Brightness.dark ? 0.15 : 0.1),
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ),
-            ),
+              Positioned(
+                bottom: -50,
+                right: -100,
+                child: Container(
+                  width: 500,
+                  height: 500,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.tertiary.withValues(alpha: theme.brightness == Brightness.dark ? 0.1 : 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                  child: Container(color: Colors.transparent),
+                ),
+              ),
+            ],
           ),
           SafeArea(
             bottom: false,

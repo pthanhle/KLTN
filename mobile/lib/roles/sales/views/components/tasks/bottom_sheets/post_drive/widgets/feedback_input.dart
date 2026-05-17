@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../controllers/post_drive_controller.dart';
 
@@ -8,52 +9,50 @@ class FeedbackInput extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final isRequired = false;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          tr('PHẢN HỒI KHÁCH HÀNG (TÙY CHỌN)'),
-          style: textTheme.labelSmall?.copyWith(
+          isRequired ? tr('ĐÁNH GIÁ/PHẢN HỒI (Bắt buộc)') : tr('ĐÁNH GIÁ/PHẢN HỒI'),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w600,
-            letterSpacing: 0.05,
+            letterSpacing: 0.5,
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
-          maxLines: 3,
-          onChanged: (text) {
-            ref.read(postDriveControllerProvider.notifier).setFeedback(text);
-          },
-          decoration: InputDecoration(
-            hintText: tr('Khách chê ồn, thích màu đỏ...'),
-            hintStyle: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.outline.withValues(alpha: 0.6),
-            ),
-            filled: true,
-            fillColor: colorScheme.surfaceContainerHigh.withValues(alpha: 0.5),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                width: 1,
+        Container(
+          decoration: ShapeDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: 0.35), // Sáng hơn, Liquid Glass
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 16,
+                cornerSmoothing: 1.0,
+              ),
+              side: BorderSide(
+                color: theme.colorScheme.surface.withValues(alpha: 0.3), // Specular highlight mỏng
+                width: 0.5,
               ),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                width: 1,
-              ),
+          ),
+          child: TextFormField(
+            onChanged: (text) {
+              ref.read(postDriveControllerProvider.notifier).setFeedback(text);
+            },
+            maxLines: 4,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: colorScheme.primary.withValues(alpha: 0.5),
-                width: 1.5,
+            decoration: InputDecoration(
+              hintText: tr('Nhập chi tiết đánh giá của khách hàng về xe, mức giá, ý định mua...'),
+              hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sáng hơn
               ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(16),
             ),
           ),
         ),

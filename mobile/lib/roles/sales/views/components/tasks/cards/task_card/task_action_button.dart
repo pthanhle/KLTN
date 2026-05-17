@@ -6,7 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../../../auth/models/task_model.dart';
 import '../../../../../controllers/sales_tasks_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../bottom_sheets/checkin_bottom_sheet.dart';
+import '../../bottom_sheets/checkin/checkin_bottom_sheet.dart';
 import '../../bottom_sheets/post_drive/post_drive_bottom_sheet.dart';
 import '../../bottom_sheets/cancel_booking/cancel_booking_bottom_sheet.dart';
 
@@ -82,29 +82,29 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
         _handleAction(context, ref, status);
       },
       onTapCancel: () => setState(() => _isMainPressed = false),
+      behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: ShapeDecoration(
-          color: bgColor,
+          color: isFilled 
+              ? bgColor
+              : bgColor.withValues(alpha: 0.15),
           shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
-            side: isFilled ? BorderSide(
-              color: Colors.white.withOpacity(isDark ? 0.1 : 0.4),
-              width: 1.2,
-            ) : BorderSide.none,
+            borderRadius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
+            side: BorderSide(
+              color: isFilled 
+                  ? Colors.white.withValues(alpha: 0.2) 
+                  : bgColor.withValues(alpha: 0.3),
+              width: 0.5,
+            ),
           ),
-          shadows: isFilled ? [
+          shadows: isFilled && !isDark ? [
             BoxShadow(
-              color: bgColor.withOpacity(0.25),
-              blurRadius: 24,
-              offset: const Offset(0, 10),
-            ),
-            BoxShadow(
-              color: bgColor.withOpacity(0.35),
-              blurRadius: 8,
+              color: bgColor.withValues(alpha: 0.3),
+              blurRadius: 12,
               offset: const Offset(0, 4),
-            ),
+            )
           ] : [],
         ),
         child: Row(
@@ -116,35 +116,34 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
               tr(textKey),
               style: theme.textTheme.titleSmall?.copyWith(
                 color: fgColor,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.2,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
               ),
             ),
           ],
         ),
       ),
     ).animate(target: _isMainPressed ? 1 : 0)
-     .scaleXY(end: 0.92, duration: 120.ms, curve: Curves.easeOutCubic);
+     .scaleXY(end: 0.94, duration: 200.ms, curve: Curves.easeOutCubic);
 
     if (status == 'todo' || status == 'confirmed') {
       Widget cancelButton = GestureDetector(
         onTapDown: (_) => setState(() => _isCancelPressed = true),
         onTapUp: (_) {
           setState(() => _isCancelPressed = false);
-          HapticFeedback.lightImpact();
+          HapticFeedback.selectionClick();
           _showCancelBottomSheet(context, ref);
         },
         onTapCancel: () => setState(() => _isCancelPressed = false),
+        behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
           decoration: ShapeDecoration(
-            color: isDark ? const Color(0xFF3A3A3C).withOpacity(0.6) : const Color(0xFFE5E5EA).withOpacity(0.8),
+            color: isDark 
+                ? theme.colorScheme.surface.withValues(alpha: 0.4) 
+                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5), // Nền xám mờ chuẩn Apple
             shape: SmoothRectangleBorder(
-              borderRadius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
-              side: BorderSide(
-                color: Colors.white.withOpacity(isDark ? 0.05 : 0.4),
-                width: 1.2,
-              ),
+              borderRadius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
             ),
           ),
           alignment: Alignment.center,
@@ -152,12 +151,13 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
             tr('Hủy'),
             style: theme.textTheme.titleSmall?.copyWith(
               color: theme.colorScheme.error,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
             ),
           ),
         ),
       ).animate(target: _isCancelPressed ? 1 : 0)
-       .scaleXY(end: 0.90, duration: 120.ms, curve: Curves.easeOutCubic);
+       .scaleXY(end: 0.94, duration: 200.ms, curve: Curves.easeOutCubic);
 
       return Row(
         children: [
@@ -202,7 +202,6 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
           task: widget.task,
           onComplete: () {
             controller.updateTaskStatus(widget.task.id, 'customer_arrived');
-            Navigator.pop(ctx);
           },
         ),
       );
@@ -218,7 +217,6 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
           task: widget.task,
           onComplete: () {
             controller.updateTaskStatus(widget.task.id, 'post_drive');
-            Navigator.pop(ctx);
           },
         ),
       );

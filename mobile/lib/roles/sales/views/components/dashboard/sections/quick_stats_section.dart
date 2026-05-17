@@ -14,34 +14,27 @@ class QuickStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 140, // Fixed height for horizontal scroll
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
         children: [
-          SizedBox(
-            width: 160,
+          Expanded(
             child: StatGlassCard(
               title: 'Hôm nay'.tr(),
               value: todayCount.toString().padLeft(2, '0'),
-              glowColor: Theme.of(context).primaryColor,
-              valueColor: Theme.of(context).primaryColor,
+              glowColor: Theme.of(context).colorScheme.primary,
+              valueColor: Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(width: 16),
-          SizedBox(
-            width: 160,
+          Expanded(
             child: StatGlassCard(
-              title: 'Khách đang chờ'.tr(),
+              title: 'Khách chờ'.tr(), // Rút gọn title để vừa vặn Grid
               value: waitingCount.toString().padLeft(2, '0'),
-              glowColor: Colors.blueAccent, // Equivalent to accent-blue
-              valueColor: Colors.blueAccent,
+              glowColor: Theme.of(context).colorScheme.secondary,
+              valueColor: Theme.of(context).colorScheme.secondary,
             ),
           ),
-          // Có thể thêm padding cuối nếu cần
-          const SizedBox(width: 8),
         ],
       ),
     );

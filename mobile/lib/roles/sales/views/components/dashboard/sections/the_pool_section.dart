@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../../../controllers/sales_dashboard_controller.dart';
 import '../../../../../auth/controllers/auth_controller.dart';
 import '../cards/pool_item_card.dart';
@@ -23,17 +24,21 @@ class ThePoolSection extends ConsumerWidget {
             children: [
               Text(
                 'Khu vực chờ'.tr(),
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: ShapeDecoration(
                   color: Theme.of(context).colorScheme.primaryContainer,
-                  shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 12,
+                      cornerSmoothing: 1.0,
+                    ),
                   ),
                 ),
                 child: Text(
@@ -72,9 +77,7 @@ class ThePoolSection extends ConsumerWidget {
                 return PoolItemCard(
                   booking: booking,
                   isRequestedByMe: isRequestedByMe,
-                  onRequestJob: () {
-                    ref.read(salesDashboardProvider.notifier).requestJob(booking.id);
-                  },
+                  onRequestJob: () => ref.read(salesDashboardProvider.notifier).requestJob(booking.id),
                 );
               },
             ),

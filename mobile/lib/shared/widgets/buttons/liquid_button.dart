@@ -1,10 +1,12 @@
+import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class LiquidButton extends StatefulWidget {
-  final VoidCallback onPressed;
+  final FutureOr<void> Function() onPressed;
   final Widget child;
   final bool isLoading;
   
@@ -21,21 +23,35 @@ class LiquidButton extends StatefulWidget {
 
 class _LiquidButtonState extends State<LiquidButton> {
   bool _isPressed = false;
+  bool _isProcessing = false;
+
+  bool get _effectiveIsLoading => widget.isLoading || _isProcessing;
 
   void _handleTapDown(TapDownDetails details) {
-    if (widget.isLoading) return;
+    if (_effectiveIsLoading) return;
     HapticFeedback.lightImpact();
     setState(() => _isPressed = true);
   }
 
-  void _handleTapUp(TapUpDetails details) {
-    if (widget.isLoading) return;
+  Future<void> _handleTapUp(TapUpDetails details) async {
+    if (_effectiveIsLoading) return;
     setState(() => _isPressed = false);
-    widget.onPressed();
+    
+    final result = widget.onPressed();
+    if (result is Future) {
+      setState(() => _isProcessing = true);
+      try {
+        await result;
+      } finally {
+        if (mounted) {
+          setState(() => _isProcessing = false);
+        }
+      }
+    }
   }
 
   void _handleTapCancel() {
-    if (widget.isLoading) return;
+    if (_effectiveIsLoading) return;
     setState(() => _isPressed = false);
   }
 
@@ -51,14 +67,14 @@ class _LiquidButtonState extends State<LiquidButton> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: ShapeDecoration(
-          color: widget.isLoading ? theme.disabledColor : theme.primaryColor,
+          color: _effectiveIsLoading ? theme.primaryColor.withValues(alpha: 0.7) : theme.primaryColor,
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
               cornerRadius: 32,
               cornerSmoothing: 1.0,
             ),
           ),
-          shadows: _isPressed || widget.isLoading
+          shadows: _isPressed || _effectiveIsLoading
               ? []
               : [
                   BoxShadow(
@@ -74,15 +90,8 @@ class _LiquidButtonState extends State<LiquidButton> {
                 ],
         ),
         child: Center(
-          child: widget.isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
+          child: _effectiveIsLoading
+              ? const CupertinoActivityIndicator(color: Colors.white)
               : DefaultTextStyle(
                   style: const TextStyle(
                     color: Colors.white,

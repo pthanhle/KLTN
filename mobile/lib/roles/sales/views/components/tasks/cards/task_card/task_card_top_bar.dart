@@ -36,7 +36,8 @@ class TaskCardTopBar extends StatelessWidget {
                 color: task.priority.toUpperCase() == 'URGENT' 
                     ? context.colors.error 
                     : context.colors.onSurfaceVariant,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
               ),
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.right,

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../../../shared/widgets/containers/glass_card.dart';
 
 class StatGlassCard extends StatefulWidget {
@@ -26,8 +27,14 @@ class _StatGlassCardState extends State<StatGlassCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isHovered = true),
-      onTapUp: (_) => setState(() => _isHovered = false),
+      onTapDown: (_) {
+        setState(() => _isHovered = true);
+        HapticFeedback.lightImpact();
+      },
+      onTapUp: (_) {
+        setState(() => _isHovered = false);
+        HapticFeedback.selectionClick();
+      },
       onTapCancel: () => setState(() => _isHovered = false),
       child: AnimatedScale(
         scale: _isHovered ? 0.96 : 1.0,
@@ -37,7 +44,6 @@ class _StatGlassCardState extends State<StatGlassCard> {
           padding: const EdgeInsets.all(24.0),
           child: Stack(
             children: [
-              // Glow Effect
               Positioned(
                 right: -20,
                 top: -20,

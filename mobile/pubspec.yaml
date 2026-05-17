@@ -48,6 +48,9 @@ dependencies:
   flutter_slidable: ^4.0.3
   flutter_animate: ^4.5.2
   figma_squircle: ^0.6.3
+  image_picker: ^1.2.2
+  signature: ^6.3.0
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

@@ -22,19 +22,24 @@ class CancelNoteInput extends StatelessWidget {
         Text(
           isRequired
               ? tr('Ghi chú thêm (Bắt buộc nếu chọn "Lý do khác")')
-              : tr('Ghi chú thêm'), // Or a non-required key if you have one
+              : tr('Ghi chú thêm'),
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: ShapeDecoration(
-            color: theme.colorScheme.surfaceContainerHigh,
+            color: theme.colorScheme.surface.withValues(alpha: 0.35), // Sáng hơn
             shape: SmoothRectangleBorder(
               borderRadius: SmoothBorderRadius(
                 cornerRadius: 16,
                 cornerSmoothing: 1.0,
+              ),
+              side: BorderSide(
+                color: theme.colorScheme.surface.withValues(alpha: 0.3), // Specular highlight mỏng
+                width: 0.5,
               ),
             ),
           ),
@@ -47,7 +52,7 @@ class CancelNoteInput extends StatelessWidget {
             decoration: InputDecoration(
               hintText: tr('Nhập ghi chú chi tiết...'),
               hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.outlineVariant,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sáng hơn xíu
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(16),

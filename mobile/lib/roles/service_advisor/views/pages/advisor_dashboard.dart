@@ -24,7 +24,7 @@ class AdvisorDashboardPage extends StatelessWidget {
                 GlassCard(
                   child: Center(
                     child: Text(
-                      'advisor_welcome'.tr(),
+                      'Chào mừng trở lại, Cố vấn Dịch vụ'.tr(),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),

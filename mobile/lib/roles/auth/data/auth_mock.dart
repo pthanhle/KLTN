@@ -52,16 +52,14 @@ class AuthMock implements AuthRepository {
             csat: CsatMetric(score: 4.6, totalReviews: 45, percentile: "Top 20%"),
           ),
           kanban: KanbanModel(
-            todo: [
-              TaskModel(id: 'LD-881', title: 'Lịch lái thử xe CR-V', priority: 'URGENT', sla: '2h', customerName: 'Phạm Anh Tuấn', vehicleModel: 'Honda CR-V', appointmentTime: '14:00'),
+            tasks: [
+              TaskModel(id: 'LD-881', status: 'todo', title: 'Lịch lái thử xe CR-V', priority: 'URGENT', sla: '2h', customerName: 'Phạm Anh Tuấn', customerPhone: '0901234567', vehicleModel: 'Honda CR-V', appointmentTime: '14:00', taskType: 'TEST_DRIVE', description: 'Khách VIP quan tâm bản L 1 cầu. Đã chốt thời gian lái thử tại showroom.', locationType: 'SHOWROOM', licensePlate: '51H-123.45', address: 'Showroom Quận 7', chatLogs: [ChatLog(sender: 'Khách', time: '13:00', text: 'Tôi tới trễ 15p nhé')]),
+              TaskModel(id: 'CS-102', status: 'confirmed', taskType: 'CONSULTATION', title: 'Tư vấn giá lăn bánh CR-V', priority: 'HIGH', progress: 50, customerName: 'Hoàng Minh', isBlinking: true, description: 'Cần gửi bảng chiết tính trả góp 80% qua ngân hàng VIB.', billed: '1.1 Tỷ'),
+              TaskModel(id: 'LD-870', status: 'in_progress', taskType: 'CONTRACT', title: 'Ký hợp đồng Ford Everest', priority: 'HIGH', progress: 90, customerName: 'Bùi Minh Sơn', locationType: 'HOME', address: 'Quận 2, TP.HCM', billed: '1.45 Tỷ', description: 'Giao xe và ký hợp đồng tận nhà khách.'),
+              TaskModel(id: 'LD-865', status: 'done', taskType: 'DELIVERY', title: 'Giao xe Tucson', priority: 'LOW', customerName: 'Vũ Thanh Bình', vehicleModel: 'Hyundai Tucson', billed: '950 Tr'),
+              TaskModel(id: 'TD-001', status: 'customer_arrived', taskType: 'TEST_DRIVE', title: 'Lái thử Honda Civic RS', priority: 'HIGH', customerName: 'Trần Thị B', customerPhone: '0987654321', vehicleModel: 'Honda Civic RS', licensePlate: '51H-678.90', locationType: 'SHOWROOM', appointmentTime: '10:30'),
+              TaskModel(id: 'TD-002', status: 'post_drive', taskType: 'TEST_DRIVE', title: 'Đánh giá sau lái thử HR-V', priority: 'MEDIUM', customerName: 'Lê Văn C', customerPhone: '0912345678', vehicleModel: 'Honda HR-V', licensePlate: '51G-246.80', locationType: 'SHOWROOM', appointmentTime: '15:00'),
             ],
-            inProgress: [
-              TaskModel(id: 'CS-102', taskType: 'CHAT', title: 'Tư vấn giá lăn bánh CR-V', priority: 'HIGH', progress: 50, customerName: 'Hoàng Minh', isBlinking: true),
-              TaskModel(id: 'LD-870', title: 'Gửi báo giá Ford Everest', priority: 'HIGH', progress: 90, customerName: 'Bùi Minh Sơn'),
-            ],
-            done: [
-              TaskModel(id: 'LD-865', title: 'Đã thu cọc - Chờ giao xe', priority: 'LOW', customerName: 'Vũ Thanh Bình'),
-            ]
           )
         )
       );
@@ -93,14 +91,10 @@ class AuthMock implements AuthRepository {
             csat: CsatMetric(score: 4.8, totalReviews: 124, percentile: "Top 5% Regional"),
           ),
           kanban: KanbanModel(
-            todo: [
-              TaskModel(id: 'RO-101', title: 'Booking: Khách VIP bảo dưỡng', priority: 'HIGH', sla: '2h', customerName: 'Lê Trần B', vehicleModel: 'BMW 320i', appointmentTime: '11:00'),
-            ],
-            inProgress: [
-              TaskModel(id: 'RO-105', title: 'Báo giá đại tu chờ duyệt', priority: 'HIGH', progress: 65, customerName: 'Nguyễn Quang Dũng', vehicleModel: 'Honda City', appointmentTime: '10:00'),
-            ],
-            done: [
-              TaskModel(id: 'RO-099', title: 'Đã thanh toán - Chờ giao xe', priority: 'LOW', customerName: 'Phạm Văn Hương', vehicleModel: 'Hyundai SantaFe'),
+            tasks: [
+              TaskModel(id: 'RO-101', status: 'todo', title: 'Booking: Khách VIP bảo dưỡng', priority: 'HIGH', sla: '2h', customerName: 'Lê Trần B', vehicleModel: 'BMW 320i', appointmentTime: '11:00'),
+              TaskModel(id: 'RO-105', status: 'in_progress', title: 'Báo giá đại tu chờ duyệt', priority: 'HIGH', progress: 65, customerName: 'Nguyễn Quang Dũng', vehicleModel: 'Honda City', appointmentTime: '10:00'),
+              TaskModel(id: 'RO-099', status: 'done', title: 'Đã thanh toán - Chờ giao xe', priority: 'LOW', customerName: 'Phạm Văn Hương', vehicleModel: 'Hyundai SantaFe'),
             ]
           )
         )
@@ -134,14 +128,10 @@ class AuthMock implements AuthRepository {
             rework: ReworkMetric(rate: 2.1, trend: -0.4),
           ),
           kanban: KanbanModel(
-            todo: [
-              TaskModel(id: 'RO-201', title: 'Khám xe & Lên Checklist lỗi', priority: 'HIGH', sla: '24h', vehicleModel: 'Mercedes C200', appointmentTime: '08:00'),
-            ],
-            inProgress: [
-              TaskModel(id: 'RO-195', title: 'Đang tháo cụm lốc điều hoà', priority: 'MEDIUM', progress: 80, vehicleModel: 'Mazda 3', appointmentTime: '11:00'),
-            ],
-            done: [
-              TaskModel(id: 'RO-180', title: 'Hoàn thành bảo dưỡng', priority: 'LOW', billed: '4h', vehicleModel: 'Toyota Camry', appointmentTime: '14:00'),
+            tasks: [
+              TaskModel(id: 'RO-201', status: 'todo', title: 'Khám xe & Lên Checklist lỗi', priority: 'HIGH', sla: '24h', vehicleModel: 'Mercedes C200', appointmentTime: '08:00'),
+              TaskModel(id: 'RO-195', status: 'in_progress', title: 'Đang tháo cụm lốc điều hoà', priority: 'MEDIUM', progress: 80, vehicleModel: 'Mazda 3', appointmentTime: '11:00'),
+              TaskModel(id: 'RO-180', status: 'done', title: 'Hoàn thành bảo dưỡng', priority: 'LOW', billed: '4h', vehicleModel: 'Toyota Camry', appointmentTime: '14:00'),
             ]
           )
         )
@@ -174,14 +164,10 @@ class AuthMock implements AuthRepository {
             avgSla: TimeMetric(time: 1.2, unit: 'h'),
           ),
           kanban: KanbanModel(
-            todo: [
-              TaskModel(id: 'PO-551', title: 'Web Order: Khách đặt lốp Michelin', priority: 'HIGH', sla: '2h', vehicleModel: 'Porsche Macan', appointmentTime: '13:00'),
-            ],
-            inProgress: [
-              TaskModel(id: 'IV-220', title: 'Đang đóng gói lốp gửi Viettel Post', priority: 'MEDIUM', progress: 60, vehicleModel: 'Toyota Camry', appointmentTime: '09:00'),
-            ],
-            done: [
-              TaskModel(id: 'IV-210', title: 'Đã xuất 4 lốp xe cho KTV (RO-099)', priority: 'HIGH', vehicleModel: 'Mercedes C200', appointmentTime: '09:00'),
+            tasks: [
+              TaskModel(id: 'PO-551', status: 'todo', title: 'Web Order: Khách đặt lốp Michelin', priority: 'HIGH', sla: '2h', vehicleModel: 'Porsche Macan', appointmentTime: '13:00'),
+              TaskModel(id: 'IV-220', status: 'in_progress', title: 'Đang đóng gói lốp gửi Viettel Post', priority: 'MEDIUM', progress: 60, vehicleModel: 'Toyota Camry', appointmentTime: '09:00'),
+              TaskModel(id: 'IV-210', status: 'done', title: 'Đã xuất 4 lốp xe cho KTV (RO-099)', priority: 'HIGH', vehicleModel: 'Mercedes C200', appointmentTime: '09:00'),
             ]
           )
         )

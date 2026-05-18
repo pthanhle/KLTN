@@ -9,9 +9,7 @@ abstract class KanbanModel with _$KanbanModel {
   const KanbanModel._();
 
   const factory KanbanModel({
-    @Default([]) List<TaskModel> todo,
-    @Default([]) List<TaskModel> inProgress,
-    @Default([]) List<TaskModel> done,
+    @Default([]) List<TaskModel> tasks,
   }) = _KanbanModel;
 
   factory KanbanModel.fromJson(Map<String, dynamic> json) =>

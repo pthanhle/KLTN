@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$KanbanModel {
 
- List<TaskModel> get todo; List<TaskModel> get inProgress; List<TaskModel> get done;
+ List<TaskModel> get tasks;
 /// Create a copy of KanbanModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $KanbanModelCopyWith<KanbanModel> get copyWith => _$KanbanModelCopyWithImpl<Kanb
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is KanbanModel&&const DeepCollectionEquality().equals(other.todo, todo)&&const DeepCollectionEquality().equals(other.inProgress, inProgress)&&const DeepCollectionEquality().equals(other.done, done));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KanbanModel&&const DeepCollectionEquality().equals(other.tasks, tasks));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(todo),const DeepCollectionEquality().hash(inProgress),const DeepCollectionEquality().hash(done));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(tasks));
 
 @override
 String toString() {
-  return 'KanbanModel(todo: $todo, inProgress: $inProgress, done: $done)';
+  return 'KanbanModel(tasks: $tasks)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $KanbanModelCopyWith<$Res>  {
   factory $KanbanModelCopyWith(KanbanModel value, $Res Function(KanbanModel) _then) = _$KanbanModelCopyWithImpl;
 @useResult
 $Res call({
- List<TaskModel> todo, List<TaskModel> inProgress, List<TaskModel> done
+ List<TaskModel> tasks
 });
 
 
@@ -65,11 +65,9 @@ class _$KanbanModelCopyWithImpl<$Res>
 
 /// Create a copy of KanbanModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? todo = null,Object? inProgress = null,Object? done = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? tasks = null,}) {
   return _then(_self.copyWith(
-todo: null == todo ? _self.todo : todo // ignore: cast_nullable_to_non_nullable
-as List<TaskModel>,inProgress: null == inProgress ? _self.inProgress : inProgress // ignore: cast_nullable_to_non_nullable
-as List<TaskModel>,done: null == done ? _self.done : done // ignore: cast_nullable_to_non_nullable
+tasks: null == tasks ? _self.tasks : tasks // ignore: cast_nullable_to_non_nullable
 as List<TaskModel>,
   ));
 }
@@ -155,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<TaskModel> todo,  List<TaskModel> inProgress,  List<TaskModel> done)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<TaskModel> tasks)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _KanbanModel() when $default != null:
-return $default(_that.todo,_that.inProgress,_that.done);case _:
+return $default(_that.tasks);case _:
   return orElse();
 
 }
@@ -176,10 +174,10 @@ return $default(_that.todo,_that.inProgress,_that.done);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<TaskModel> todo,  List<TaskModel> inProgress,  List<TaskModel> done)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<TaskModel> tasks)  $default,) {final _that = this;
 switch (_that) {
 case _KanbanModel():
-return $default(_that.todo,_that.inProgress,_that.done);case _:
+return $default(_that.tasks);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +194,10 @@ return $default(_that.todo,_that.inProgress,_that.done);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<TaskModel> todo,  List<TaskModel> inProgress,  List<TaskModel> done)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<TaskModel> tasks)?  $default,) {final _that = this;
 switch (_that) {
 case _KanbanModel() when $default != null:
-return $default(_that.todo,_that.inProgress,_that.done);case _:
+return $default(_that.tasks);case _:
   return null;
 
 }
@@ -211,28 +209,14 @@ return $default(_that.todo,_that.inProgress,_that.done);case _:
 @JsonSerializable()
 
 class _KanbanModel extends KanbanModel {
-  const _KanbanModel({final  List<TaskModel> todo = const [], final  List<TaskModel> inProgress = const [], final  List<TaskModel> done = const []}): _todo = todo,_inProgress = inProgress,_done = done,super._();
+  const _KanbanModel({final  List<TaskModel> tasks = const []}): _tasks = tasks,super._();
   factory _KanbanModel.fromJson(Map<String, dynamic> json) => _$KanbanModelFromJson(json);
 
- final  List<TaskModel> _todo;
-@override@JsonKey() List<TaskModel> get todo {
-  if (_todo is EqualUnmodifiableListView) return _todo;
+ final  List<TaskModel> _tasks;
+@override@JsonKey() List<TaskModel> get tasks {
+  if (_tasks is EqualUnmodifiableListView) return _tasks;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_todo);
-}
-
- final  List<TaskModel> _inProgress;
-@override@JsonKey() List<TaskModel> get inProgress {
-  if (_inProgress is EqualUnmodifiableListView) return _inProgress;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_inProgress);
-}
-
- final  List<TaskModel> _done;
-@override@JsonKey() List<TaskModel> get done {
-  if (_done is EqualUnmodifiableListView) return _done;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_done);
+  return EqualUnmodifiableListView(_tasks);
 }
 
 
@@ -249,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KanbanModel&&const DeepCollectionEquality().equals(other._todo, _todo)&&const DeepCollectionEquality().equals(other._inProgress, _inProgress)&&const DeepCollectionEquality().equals(other._done, _done));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KanbanModel&&const DeepCollectionEquality().equals(other._tasks, _tasks));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_todo),const DeepCollectionEquality().hash(_inProgress),const DeepCollectionEquality().hash(_done));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_tasks));
 
 @override
 String toString() {
-  return 'KanbanModel(todo: $todo, inProgress: $inProgress, done: $done)';
+  return 'KanbanModel(tasks: $tasks)';
 }
 
 
@@ -269,7 +253,7 @@ abstract mixin class _$KanbanModelCopyWith<$Res> implements $KanbanModelCopyWith
   factory _$KanbanModelCopyWith(_KanbanModel value, $Res Function(_KanbanModel) _then) = __$KanbanModelCopyWithImpl;
 @override @useResult
 $Res call({
- List<TaskModel> todo, List<TaskModel> inProgress, List<TaskModel> done
+ List<TaskModel> tasks
 });
 
 
@@ -286,11 +270,9 @@ class __$KanbanModelCopyWithImpl<$Res>
 
 /// Create a copy of KanbanModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? todo = null,Object? inProgress = null,Object? done = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? tasks = null,}) {
   return _then(_KanbanModel(
-todo: null == todo ? _self._todo : todo // ignore: cast_nullable_to_non_nullable
-as List<TaskModel>,inProgress: null == inProgress ? _self._inProgress : inProgress // ignore: cast_nullable_to_non_nullable
-as List<TaskModel>,done: null == done ? _self._done : done // ignore: cast_nullable_to_non_nullable
+tasks: null == tasks ? _self._tasks : tasks // ignore: cast_nullable_to_non_nullable
 as List<TaskModel>,
   ));
 }

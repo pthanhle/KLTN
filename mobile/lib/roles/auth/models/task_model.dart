@@ -25,6 +25,7 @@ abstract class TaskModel with _$TaskModel {
     required String id,
     required String title,
     required String priority,
+    String? status,
     String? sla,
     int? progress,
     String? customerName,

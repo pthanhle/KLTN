@@ -45,6 +45,12 @@ dependencies:
   gap: ^3.0.1
   go_router: ^17.2.3
   intl: ^0.20.2
+  flutter_slidable: ^4.0.3
+  flutter_animate: ^4.5.2
+  figma_squircle: ^0.6.3
+  image_picker: ^1.2.2
+  signature: ^6.3.0
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

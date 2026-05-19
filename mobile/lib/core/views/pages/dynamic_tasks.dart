@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../roles/auth/controllers/auth_controller.dart';
-import '../../../roles/sales/views/pages/sales_tasks_page.dart';
+import 'package:ttauto_staff/roles/sales/features/tasks/sales_tasks_page.dart';
 
 class DynamicTasks extends ConsumerWidget {
   const DynamicTasks({super.key});

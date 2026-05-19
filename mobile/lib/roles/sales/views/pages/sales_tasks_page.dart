@@ -54,16 +54,24 @@ class SalesTasksPage extends StatelessWidget {
               ),
             ],
           ),
-          SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                const TasksHeader(),
-                const Expanded(
-                  child: TasksListView(),
+          Stack(
+            children: [
+              Positioned.fill(
+                child: TasksListView(
+                  topPadding: MediaQuery.of(context).padding.top + 130,
                 ),
-              ],
-            ),
+              ),
+              
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                  child: const TasksHeader(),
+                ),
+              ),
+            ],
           ),
         ],
       ),

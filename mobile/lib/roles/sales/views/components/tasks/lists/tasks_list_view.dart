@@ -8,7 +8,12 @@ import '../cards/task_card.dart';
 import '../cards/task_card_skeleton.dart';
 
 class TasksListView extends ConsumerWidget {
-  const TasksListView({super.key});
+  final double topPadding;
+
+  const TasksListView({
+    super.key,
+    this.topPadding = 8.0,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,7 +22,7 @@ class TasksListView extends ConsumerWidget {
 
     if (state.isLoading) {
       return ListView.builder(
-        padding: const EdgeInsets.only(top: 8, bottom: 100),
+        padding: EdgeInsets.only(top: topPadding, bottom: 100),
         physics: const BouncingScrollPhysics(),
         itemCount: 4,
         itemBuilder: (context, index) => const TaskCardSkeleton(),
@@ -45,7 +50,7 @@ class TasksListView extends ConsumerWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.only(top: 8, bottom: 100),
+      padding: EdgeInsets.only(top: topPadding, bottom: 100),
       physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       itemCount: tasks.length,
       itemBuilder: (context, index) {

@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -74,56 +76,58 @@ class _CheckInSubmitButtonState extends State<CheckInSubmitButton>
       behavior: HitTestBehavior.opaque,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          height: 56,
-          decoration: ShapeDecoration(
-            color: widget.isEnabled
-                ? appleGreen.withValues(alpha: widget.isLoading ? 0.7 : 1.0)
-                : theme.colorScheme.surface.withValues(alpha: 0.3),
-            shape: SmoothRectangleBorder(
-              borderRadius: SmoothBorderRadius(
-                cornerRadius: 999, // Pill shape
-                cornerSmoothing: 1.0,
+        child: ClipSmoothRect(
+          radius: SmoothBorderRadius(
+            cornerRadius: 999, // Pill shape
+            cornerSmoothing: 1.0,
+          ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              height: 56,
+              decoration: ShapeDecoration(
+                color: widget.isEnabled
+                    ? appleGreen.withOpacity(widget.isLoading ? 0.6 : 0.85) // 0.85 translucent emerald glass
+                    : theme.colorScheme.surface.withOpacity(0.15), // Translucent grey glass when disabled
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 999,
+                    cornerSmoothing: 1.0,
+                  ),
+                  side: BorderSide(
+                    color: Colors.white.withOpacity(widget.isEnabled ? 0.6 : 0.2), // Specular highlight
+                    width: 1.0, // 1px border highlight
+                  ),
+                ),
+                shadows: widget.isEnabled && !widget.isLoading
+                    ? [
+                        BoxShadow(
+                          color: appleGreen.withOpacity(isDark ? 0.4 : 0.35),
+                          blurRadius: 24, // High blur radiant glow
+                          offset: const Offset(0, 8),
+                        )
+                      ]
+                    : [],
               ),
-              side: BorderSide(
-                color: widget.isEnabled 
-                    ? Colors.white.withValues(alpha: 0.2) // Apple glass highlight
-                    : theme.colorScheme.surface.withValues(alpha: 0.5),
-                width: 0.5,
+              child: Center(
+                child: widget.isLoading
+                    ? const CupertinoActivityIndicator(
+                        color: Colors.white,
+                      )
+                    : Text(
+                        tr('Hoàn tất Check-in'),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: widget.isEnabled
+                              ? Colors.white
+                              : theme.colorScheme.onSurface.withOpacity(0.4),
+                          letterSpacing: -0.2, // Standard iOS typography
+                        ),
+                      ),
               ),
             ),
-            shadows: widget.isEnabled && !widget.isLoading && !isDark
-                ? [
-                    BoxShadow(
-                      color: appleGreen.withValues(alpha: 0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
-                    )
-                  ]
-                : [],
-          ),
-          child: Center(
-            child: widget.isLoading
-                ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : Text(
-                    tr('Hoàn tất Check-in'),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: widget.isEnabled
-                          ? Colors.white
-                          : theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                      letterSpacing: -0.2, // Standard iOS typography
-                    ),
-                  ),
           ),
         ),
       ),

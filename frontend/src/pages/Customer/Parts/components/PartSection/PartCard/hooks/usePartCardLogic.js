@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { App } from 'antd';
 import { useAddToCart } from '@/services/queries/clientCart.queries';
 import { useToggleWishlist, useGetWishlist } from '@/services/queries/clientWishlist.queries';
+import { useSelector } from 'react-redux';
 
 export const usePartCardLogic = (part) => {
     const { t } = useTranslation('parts');
     const navigate = useNavigate();
     const { message } = App.useApp();
+    const cartItems = useSelector(state => state.cart.items);
 
     const availableStock = part?.inventory?.available_stock ?? part?.stock ?? 0;
     const isOutOfStock = availableStock <= 0;
@@ -48,6 +50,19 @@ export const usePartCardLogic = (part) => {
         if (part.options && part.options.length > 0) {
             message.info(t('require_options', 'Vui lòng chọn biến thể trước khi thêm vào giỏ.'));
             navigate(`/parts/${part.id}`);
+            return;
+        }
+
+        const existingCartItem = cartItems.find(item => 
+            item.part_id === part.id && 
+            JSON.stringify(item.selected_options || {}) === JSON.stringify({})
+        );
+        const existingQuantity = existingCartItem ? existingCartItem.quantity : 0;
+
+        if (1 + existingQuantity > availableStock) {
+            message.warning(t('exceeds_stock_warning', {
+                defaultValue: `Sản phẩm này không đủ số lượng tồn kho để đáp ứng yêu cầu của bạn.`
+            }));
             return;
         }
 

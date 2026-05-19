@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../../../auth/models/task_model.dart';
 import 'models/checkin_state_model.dart';
 import 'controllers/checkin_controller.dart';
 import 'widgets/checkin_camera_box.dart';
 import 'widgets/checkin_signature_box.dart';
 import 'widgets/checkin_submit_button.dart';
+import 'widgets/checkin_image_source_sheet.dart';
 
 class CheckInBottomSheet extends ConsumerWidget {
   final TaskModel task;
@@ -134,7 +137,15 @@ class CheckInBottomSheet extends ConsumerWidget {
                 // Driver License Upload Box
                 CheckInCameraBox(
                   imagePath: state.driverLicensePath,
-                  onTap: controller.pickDriverLicenseImage,
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      barrierColor: Colors.black.withOpacity(0.4),
+                      useRootNavigator: true,
+                      builder: (context) => CheckInImageSourceSheet(controller: controller),
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
 

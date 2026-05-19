@@ -9,6 +9,8 @@ import '../../controllers/sales_dashboard_controller.dart';
 import '../components/dashboard/sections/quick_stats_section.dart';
 import '../components/dashboard/sections/the_pool_section.dart';
 import '../components/dashboard/cards/pool_item_skeleton.dart';
+import '../../../../core/views/components/navigation/header/header_avatar_button.dart';
+import '../../../../core/views/components/navigation/header/header_notification_button.dart';
 
 class SalesDashboardPage extends ConsumerStatefulWidget {
   const SalesDashboardPage({super.key});
@@ -63,102 +65,26 @@ class _SalesDashboardPageState extends ConsumerState<SalesDashboardPage> {
                     titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     title: Text(
                       'Tổng quan'.tr(),
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.8,
+                      style: theme.textTheme.headlineLarge?.copyWith(
+                        fontSize: 34,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -1.2,
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
                   ),
                   actions: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12.0),
-                      child: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          HapticFeedback.selectionClick();
-                          // Handle notifications
-                        },
-                        child: ClipOval(
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                                border: Border.all(
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
-                                ),
-                              ),
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Icon(
-                                    CupertinoIcons.bell_fill,
-                                    size: 22,
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                                  ),
-                                  Positioned(
-                                    right: -2,
-                                    top: -2,
-                                    child: Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: BoxDecoration(
-                                        color: CupertinoColors.systemRed,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          // Đục lỗ (Punch hole) chuẩn Apple cho Notification Badge
-                                          color: theme.scaffoldBackgroundColor, 
-                                          width: 2,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                    HeaderNotificationButton(
+                      unreadCount: 1, // Mock data, should connect to a provider
+                      onPressed: () {
+                        // Show notifications
+                      },
                     ),
                   ],
-                  leading: Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    child: CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        HapticFeedback.selectionClick();
-                        // Handle profile tap
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          radius: 18,
-                          backgroundImage: user?.avatarUrl != null 
-                              ? NetworkImage(user!.avatarUrl!)
-                              : null,
-                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                          child: user?.avatarUrl == null
-                              ? Icon(CupertinoIcons.person_fill, color: theme.colorScheme.primary, size: 20)
-                              : null,
-                        ),
-                      ),
-                    ),
+                  leading: HeaderAvatarButton(
+                    onPressed: () {
+                      // Open profile or settings
+                    },
                   ),
                 ),
                 

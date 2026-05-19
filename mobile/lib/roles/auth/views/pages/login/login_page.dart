@@ -143,7 +143,11 @@ class LoginPage extends ConsumerWidget {
       if (!next.isLoading && next.hasError) {
         _showAppleErrorAlert(context, next.error.toString().replaceAll("Exception: ", ""));
       } else if (!next.isLoading && next.hasValue && next.value != null) {
-        context.go('/dashboard');
+        if (next.value!.role == 'INVENTORY_MGR') {
+          context.go('/warehouse');
+        } else {
+          context.go('/dashboard');
+        }
       }
     });
 

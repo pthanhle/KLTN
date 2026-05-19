@@ -5,9 +5,9 @@ import '../../roles/auth/views/pages/profile_page.dart';
 import '../views/pages/dynamic_dashboard.dart';
 import '../views/pages/dynamic_tasks.dart';
 import '../views/pages/main_scaffold.dart';
-import '../../roles/warehouse/views/warehouse_shell.dart';
-import '../../roles/warehouse/views/pages/warehouse_home_page.dart';
-import '../../roles/warehouse/views/pages/warehouse_orders_page.dart';
+import '../../roles/warehouse/warehouse_shell.dart';
+import '../../roles/warehouse/features/dashboard/warehouse_home_page.dart';
+import '../../roles/warehouse/features/orders/warehouse_orders_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorDashboardKey = GlobalKey<NavigatorState>(debugLabel: 'shellDashboard');

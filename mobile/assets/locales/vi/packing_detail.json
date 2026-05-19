@@ -20,5 +20,9 @@
   "Mã vận đơn": "Mã vận đơn",
   "Nhập hoặc quét mã vạch": "Nhập hoặc quét mã vạch",
   "Hoàn tất bàn giao": "Hoàn tất bàn giao",
-  "Bàn giao đơn {orderId} thành công!": "Bàn giao đơn {orderId} thành công!"
+  "Bàn giao đơn {orderId} thành công!": "Bàn giao đơn {orderId} thành công!",
+  "Nhặt đủ": "Nhặt đủ",
+  "Hoàn tác": "Hoàn tác",
+  "Chọn đơn vị vận chuyển": "Chọn đơn vị vận chuyển",
+  "Chọn hãng vận chuyển": "Chọn hãng vận chuyển"
 }

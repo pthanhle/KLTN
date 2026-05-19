@@ -8,7 +8,7 @@ const FormHeader = ({ isEditMode, onSubmit, onApply, onDraft, onDuplicate, isSav
 
     return (
         <header className="mb-12">
-            <nav className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-widest mb-3">
+            <nav className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm tracking-wide mb-3">
                 <span onClick={() => navigate('/admin/dashboard')} className="hover:text-yellow-500 transition-colors cursor-pointer flex items-center">
                     <Home size={14} />
                 </span>

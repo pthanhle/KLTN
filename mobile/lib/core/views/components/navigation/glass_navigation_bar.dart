@@ -4,16 +4,14 @@ import 'package:figma_squircle/figma_squircle.dart';
 
 class GlassNavigationBar extends StatelessWidget {
   final List<Widget> items;
-  final EdgeInsetsGeometry margin;
   final EdgeInsetsGeometry padding;
   final double blurSigma;
 
   const GlassNavigationBar({
     super.key,
     required this.items,
-    this.margin = const EdgeInsets.only(left: 24, right: 24, bottom: 32),
-    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    this.blurSigma = 24.0,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    this.blurSigma = 32.0,
   });
 
   @override
@@ -21,22 +19,27 @@ class GlassNavigationBar extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final bottomSafeArea = MediaQuery.of(context).padding.bottom;
 
     final squircleShape = SmoothRectangleBorder(
       borderRadius: SmoothBorderRadius(
-        cornerRadius: 64,
+        cornerRadius: 44,
         cornerSmoothing: 1.0,
       ),
       side: BorderSide(
         color: isDark
-            ? Colors.white.withValues(alpha: 0.1)
+            ? Colors.white.withValues(alpha: 0.15)
             : Colors.white.withValues(alpha: 0.4),
         width: 1.0,
       ),
     );
 
     return Padding(
-      padding: margin,
+      padding: EdgeInsets.only(
+        left: 20, 
+        right: 20, 
+        bottom: bottomSafeArea > 0 ? 24 : 16,
+      ),
       child: ClipPath(
         clipper: ShapeBorderClipper(shape: squircleShape),
         child: BackdropFilter(
@@ -49,22 +52,22 @@ class GlassNavigationBar extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: [
                   isDark
-                      ? colorScheme.surface.withValues(alpha: 0.4)
-                      : colorScheme.surface.withValues(alpha: 0.8),
+                      ? colorScheme.surface.withValues(alpha: 0.25)
+                      : Colors.white.withValues(alpha: 0.4),
                   isDark
-                      ? colorScheme.surface.withValues(alpha: 0.2)
-                      : colorScheme.surface.withValues(alpha: 0.5),
+                      ? colorScheme.surface.withValues(alpha: 0.1)
+                      : Colors.white.withValues(alpha: 0.15),
                 ],
               ),
               shape: squircleShape,
               shadows: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),

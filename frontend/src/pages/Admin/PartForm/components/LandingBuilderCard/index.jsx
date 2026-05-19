@@ -25,12 +25,6 @@ const LandingBuilderCard = ({ control, t }) => {
             </div>
             
             <div className="space-y-6">
-                <div className="flex justify-between items-center mb-2">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                        {t('adminPartForm:dragToReorderBlock', 'Kéo Thả Để Sắp Xếp Block')}
-                    </p>
-                </div>
-
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={fields.map(f => f.id)} strategy={verticalListSortingStrategy}>
                         <div className="space-y-6">

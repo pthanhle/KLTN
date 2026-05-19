@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +11,7 @@ class LiquidButton extends StatefulWidget {
   final Widget child;
   final bool isLoading;
   final bool isGlass;
-  
+
   const LiquidButton({
     super.key,
     required this.onPressed,
@@ -29,98 +30,105 @@ class _LiquidButtonState extends State<LiquidButton> {
 
   bool get _isDisabled => widget.onPressed == null;
   bool get _effectiveIsLoading => widget.isLoading || _isProcessing;
+  bool get _isActive => !_isDisabled && !_effectiveIsLoading;
 
-  void _handleTapDown(TapDownDetails details) {
-    if (_effectiveIsLoading || _isDisabled) return;
+  void _handleTapDown(TapDownDetails _) {
+    if (!_isActive) return;
     HapticFeedback.lightImpact();
     setState(() => _isPressed = true);
   }
 
-  Future<void> _handleTapUp(TapUpDetails details) async {
-    if (_effectiveIsLoading || _isDisabled) return;
+  Future<void> _handleTapUp(TapUpDetails _) async {
+    if (!_isActive) return;
     setState(() => _isPressed = false);
-    
+
     final result = widget.onPressed!();
     if (result is Future) {
       setState(() => _isProcessing = true);
       try {
         await result;
       } finally {
-        if (mounted) {
-          setState(() => _isProcessing = false);
-        }
+        if (mounted) setState(() => _isProcessing = false);
       }
     }
   }
 
   void _handleTapCancel() {
-    if (_effectiveIsLoading || _isDisabled) return;
     setState(() => _isPressed = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+    final primary = theme.colorScheme.primary;
+
+    final bgAlpha = _isDisabled
+        ? 0.35
+        : _effectiveIsLoading
+            ? 0.70
+            : 0.88;
+
     return GestureDetector(
       onTapDown: _handleTapDown,
       onTapUp: _handleTapUp,
       onTapCancel: _handleTapCancel,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: ShapeDecoration(
-          color: _isDisabled
-              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: widget.isGlass ? 0.5 : 0.5)
-              : _effectiveIsLoading 
-                  ? theme.primaryColor.withValues(alpha: widget.isGlass ? 0.7 : 0.7) 
-                  : theme.primaryColor.withValues(alpha: widget.isGlass ? 0.85 : 1.0),
+          color: primary.withValues(alpha: bgAlpha),
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
               cornerRadius: 16,
               cornerSmoothing: 1.0,
             ),
-            side: widget.isGlass && !_isDisabled
-                ? BorderSide(color: Colors.white.withValues(alpha: 0.6), width: 1.0)
-                : BorderSide.none,
+            side: _isDisabled
+                ? BorderSide.none
+                : BorderSide(
+                    color: Colors.white.withValues(alpha: 0.55),
+                    width: 1.0,
+                  ),
           ),
-          shadows: _isPressed || _effectiveIsLoading || _isDisabled
+          shadows: (_isPressed || _isDisabled)
               ? []
               : widget.isGlass
                   ? [
                       BoxShadow(
-                        color: theme.primaryColor.withValues(alpha: 0.5),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      )
+                        color: primary.withValues(alpha: _effectiveIsLoading ? 0.15 : 0.28),
+                        blurRadius: 14,
+                        offset: const Offset(0, 5),
+                      ),
                     ]
                   : [
                       BoxShadow(
-                        color: theme.primaryColor.withValues(alpha: 0.15),
-                        blurRadius: 30,
-                        offset: const Offset(0, 10),
-                      ),
-                      BoxShadow(
-                        color: theme.primaryColor.withValues(alpha: 0.25),
-                        blurRadius: 10,
+                        color: primary.withValues(alpha: _effectiveIsLoading ? 0.10 : 0.22),
+                        blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
                     ],
         ),
-        child: Center(
-          child: _effectiveIsLoading
-              ? const CupertinoActivityIndicator(color: Colors.white)
-              : DefaultTextStyle(
-                  style: TextStyle(
-                    color: _isDisabled 
-                        ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)
-                        : Colors.white,
-                    fontSize: 17,
-                    fontWeight: widget.isGlass ? FontWeight.w700 : FontWeight.w600,
-                    letterSpacing: widget.isGlass ? -0.5 : 0,
-                  ),
-                  child: widget.child,
-                ),
+        child: ClipSmoothRect(
+          radius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 18),
+              child: Center(
+                child: _effectiveIsLoading
+                    ? const CupertinoActivityIndicator(color: Colors.white)
+                    : DefaultTextStyle(
+                        style: TextStyle(
+                          color: Colors.white.withValues(
+                            alpha: _isDisabled ? 0.45 : 1.0,
+                          ),
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.5,
+                        ),
+                        child: widget.child,
+                      ),
+              ),
+            ),
+          ),
         ),
       ).animate(target: _isPressed ? 1 : 0)
        .scaleXY(end: 0.96, duration: 150.ms, curve: Curves.easeOutCubic),

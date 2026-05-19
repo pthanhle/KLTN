@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:figma_squircle/figma_squircle.dart';
@@ -9,6 +10,7 @@ import 'controllers/cancel_booking_controller.dart';
 import 'widgets/cancel_reason_item.dart';
 import 'widgets/cancel_note_input.dart';
 import 'widgets/cancel_action_button.dart';
+import 'package:ttauto_staff/shared/widgets/buttons/glass_close_button.dart';
 
 class CancelBookingBottomSheet extends ConsumerWidget {
   final TaskModel task;
@@ -85,15 +87,8 @@ class CancelBookingBottomSheet extends ConsumerWidget {
                   children: [
                     Align(
                       alignment: Alignment.topRight,
-                      child: IconButton(
+                      child: GlassCloseButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close, size: 20),
-                        style: IconButton.styleFrom(
-                          backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.5),
-                          foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                          padding: const EdgeInsets.all(8),
-                          minimumSize: const Size(36, 36),
-                        ),
                       ),
                     ),
                     Column(

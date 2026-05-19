@@ -83,9 +83,10 @@ class _TaskCardState extends ConsumerState<TaskCard> {
               ),
             ],
           ),
-          clipBehavior: Clip.antiAlias,
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: ClipSmoothRect(
+            radius: SmoothBorderRadius(cornerRadius: 32, cornerSmoothing: 1.0),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Stack(
             children: [
               if (isUrgent)
@@ -132,6 +133,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
               ),
             ],
           )),
+          ),
         ).animate(target: _isPressed ? 1 : 0)
          .scaleXY(end: 0.95, duration: 150.ms, curve: Curves.easeOutCubic),
       );

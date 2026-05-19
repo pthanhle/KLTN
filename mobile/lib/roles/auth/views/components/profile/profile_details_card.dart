@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../models/user_model.dart';
@@ -19,21 +20,20 @@ class ProfileDetailsCard extends StatelessWidget {
         children: [
           _buildRow(
             context,
-            icon: Icons.calendar_today_outlined,
+            icon: CupertinoIcons.calendar,
             iconColor: Theme.of(context).colorScheme.secondary,
             title: 'Ngày gia nhập'.tr(),
             value: Formatters.formatDate(user!.joinDate),
             isFirst: true,
           ),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-            indent: 56,
+          Container(
+            height: 0.5,
+            margin: const EdgeInsets.only(left: 56),
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.15),
           ),
           _buildRow(
             context,
-            icon: Icons.attach_money_rounded,
+            icon: CupertinoIcons.money_dollar_circle,
             iconColor: Theme.of(context).colorScheme.primary,
             title: 'Lương cơ bản'.tr(),
             value: Formatters.formatCurrency(user!.baseSalary),
@@ -55,46 +55,40 @@ class ProfileDetailsCard extends StatelessWidget {
     bool isLast = false,
     bool isHighlight = false,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {}, // For subtle ripple
-        borderRadius: BorderRadius.vertical(
-          top: isFirst ? const Radius.circular(24) : Radius.zero,
-          bottom: isLast ? const Radius.circular(24) : Radius.zero,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: iconColor, size: 20),
+    return GestureDetector(
+      onTap: () {},
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
               ),
-              const SizedBox(width: 16),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Icon(icon, color: iconColor, size: 18),
+            ),
+            const SizedBox(width: 14),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w500,
               ),
-              const Spacer(),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: isHighlight
-                      ? Theme.of(context).colorScheme.onSurface
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontWeight: isHighlight ? FontWeight.w600 : FontWeight.w400,
-                ),
+            ),
+            const Spacer(),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: isHighlight
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: isHighlight ? FontWeight.w600 : FontWeight.w400,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

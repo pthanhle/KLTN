@@ -1,3 +1,5 @@
+import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -9,7 +11,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ttauto_staff/roles/sales/features/checkin/checkin_bottom_sheet.dart';
 import 'package:ttauto_staff/roles/sales/features/post_drive/post_drive_bottom_sheet.dart';
 import 'package:ttauto_staff/roles/sales/features/cancel_booking/cancel_booking_bottom_sheet.dart';
-
 
 class TaskActionButton extends ConsumerStatefulWidget {
   final TaskModel task;
@@ -32,45 +33,37 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
     final status = widget.task.status ?? 'todo';
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
-    // Apple System Colors
-    final Color appleBlue = isDark ? const Color(0xFF0A84FF) : const Color(0xFF007AFF);
-    final Color appleGreen = isDark ? const Color(0xFF32D74B) : const Color(0xFF34C759);
+
+    final Color appleBlue   = isDark ? const Color(0xFF0A84FF) : const Color(0xFF007AFF);
+    final Color appleGreen  = isDark ? const Color(0xFF32D74B) : const Color(0xFF34C759);
     final Color appleOrange = isDark ? const Color(0xFFFF9F0A) : const Color(0xFFFF9500);
-    final Color secondaryBg = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7);
 
     String textKey = 'Xác nhận Lịch';
-    IconData icon = Icons.event_available_rounded;
-    Color bgColor = secondaryBg;
-    Color fgColor = appleBlue;
-    bool isFilled = false;
+    IconData icon  = CupertinoIcons.calendar_badge_plus;
+    Color  bgColor = appleBlue;
+    bool   isFilled = false;
 
     if (status == 'todo') {
-      textKey = 'Xác nhận Lịch';
-      icon = Icons.event_available_rounded;
-      isFilled = false; // Secondary button style
-      bgColor = secondaryBg;
-      fgColor = appleBlue;
+      textKey  = 'Xác nhận Lịch';
+      icon     = CupertinoIcons.calendar_badge_plus;
+      isFilled = false;
+      bgColor  = appleBlue;
     } else if (status == 'confirmed') {
-      textKey = 'Khách đã đến / Check-in';
-      icon = Icons.how_to_reg_rounded;
+      textKey  = 'Khách đã đến / Check-in';
+      icon     = CupertinoIcons.person_badge_plus;
       isFilled = true;
-      bgColor = appleBlue;
-      fgColor = Colors.white;
+      bgColor  = appleBlue;
     } else if (status == 'customer_arrived') {
-      textKey = 'Bắt đầu chạy';
-      icon = Icons.play_circle_fill_rounded;
+      textKey  = 'Bắt đầu chạy';
+      icon     = CupertinoIcons.play_circle_fill;
       isFilled = true;
-      bgColor = appleGreen;
-      fgColor = Colors.white;
+      bgColor  = appleGreen;
     } else if (status == 'in_progress') {
-      textKey = 'Kết thúc lái thử';
-      icon = Icons.stop_circle_rounded;
+      textKey  = 'Kết thúc lái thử';
+      icon     = CupertinoIcons.stop_circle_fill;
       isFilled = true;
-      bgColor = appleOrange;
-      fgColor = Colors.white;
+      bgColor  = appleOrange;
     } else {
-      // Done / Post Drive -> usually don't show action button or disabled
       return const SizedBox.shrink();
     }
 
@@ -85,46 +78,65 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: ShapeDecoration(
-          color: isFilled 
-              ? bgColor
-              : bgColor.withValues(alpha: 0.15),
+          color: isFilled
+              ? bgColor.withValues(alpha: 0.88)
+              : bgColor.withValues(alpha: isDark ? 0.15 : 0.10),
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
             side: BorderSide(
-              color: isFilled 
-                  ? Colors.white.withValues(alpha: 0.2) 
-                  : bgColor.withValues(alpha: 0.3),
-              width: 0.5,
+              color: isFilled
+                  ? Colors.white.withValues(alpha: 0.55)  
+                  : bgColor.withValues(alpha: isDark ? 0.5 : 0.4),
+              width: isFilled ? 1.0 : 0.5,
             ),
           ),
-          shadows: isFilled && !isDark ? [
-            BoxShadow(
-              color: bgColor.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            )
-          ] : [],
+          shadows: isFilled
+              ? [
+                  BoxShadow(
+                    color: bgColor.withValues(alpha: isDark ? 0.35 : 0.28),
+                    blurRadius: 16,
+                    offset: const Offset(0, 5),
+                  ),
+                  BoxShadow(
+                    color: bgColor.withValues(alpha: isDark ? 0.15 : 0.10),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : [],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: fgColor, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              tr(textKey),
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: fgColor,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.2,
+        child: ClipSmoothRect(
+          radius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    color: isFilled ? Colors.white : bgColor,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    tr(textKey),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: isFilled ? Colors.white : bgColor,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     ).animate(target: _isMainPressed ? 1 : 0)
-     .scaleXY(end: 0.94, duration: 200.ms, curve: Curves.easeOutCubic);
+     .scaleXY(end: 0.94, duration: 150.ms, curve: Curves.easeOutCubic);
 
     if (status == 'todo' || status == 'confirmed') {
       Widget cancelButton = GestureDetector(
@@ -139,25 +151,34 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
           decoration: ShapeDecoration(
-            color: isDark 
-                ? theme.colorScheme.surface.withValues(alpha: 0.4) 
-                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5), // Nền xám mờ chuẩn Apple
+            // Nút Hủy: Tinted Glass đỏ — giữ đúng chuẩn iOS 26 cancel style
+            color: theme.colorScheme.error.withValues(alpha: isDark ? 0.15 : 0.08),
             shape: SmoothRectangleBorder(
               borderRadius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
+              side: BorderSide(
+                color: theme.colorScheme.error.withValues(alpha: isDark ? 0.4 : 0.3),
+                width: 0.5,
+              ),
             ),
           ),
           alignment: Alignment.center,
-          child: Text(
-            tr('Hủy'),
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: theme.colorScheme.error,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.2,
+          child: ClipSmoothRect(
+            radius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Text(
+                tr('Hủy'),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                ),
+              ),
             ),
           ),
         ),
       ).animate(target: _isCancelPressed ? 1 : 0)
-       .scaleXY(end: 0.94, duration: 200.ms, curve: Curves.easeOutCubic);
+       .scaleXY(end: 0.94, duration: 150.ms, curve: Curves.easeOutCubic);
 
       return Row(
         children: [
@@ -180,8 +201,8 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
       builder: (ctx) => CancelBookingBottomSheet(
         task: widget.task,
         onComplete: () {
-          final controller = ref.read(salesTasksControllerProvider.notifier);
-          controller.updateTaskStatus(widget.task.id, 'cancelled');
+          ref.read(salesTasksControllerProvider.notifier)
+              .updateTaskStatus(widget.task.id, 'cancelled');
         },
       ),
     );
@@ -189,7 +210,7 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
 
   void _handleAction(BuildContext context, WidgetRef ref, String status) {
     final controller = ref.read(salesTasksControllerProvider.notifier);
-    
+
     if (status == 'todo') {
       controller.updateTaskStatus(widget.task.id, 'confirmed');
     } else if (status == 'confirmed') {
@@ -200,9 +221,7 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
         backgroundColor: Colors.transparent,
         builder: (ctx) => CheckInBottomSheet(
           task: widget.task,
-          onComplete: () {
-            controller.updateTaskStatus(widget.task.id, 'customer_arrived');
-          },
+          onComplete: () => controller.updateTaskStatus(widget.task.id, 'customer_arrived'),
         ),
       );
     } else if (status == 'customer_arrived') {
@@ -215,9 +234,7 @@ class _TaskActionButtonState extends ConsumerState<TaskActionButton> {
         backgroundColor: Colors.transparent,
         builder: (ctx) => PostDriveBottomSheet(
           task: widget.task,
-          onComplete: () {
-            controller.updateTaskStatus(widget.task.id, 'post_drive');
-          },
+          onComplete: () => controller.updateTaskStatus(widget.task.id, 'post_drive'),
         ),
       );
     }

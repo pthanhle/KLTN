@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -42,13 +43,13 @@ class _LoginInputsState extends ConsumerState<LoginInputs> {
         GlassTextField(
           controller: _employeeIdController,
           hintText: 'Mã nhân viên / Email'.tr(),
-          prefixIcon: Icons.person_outline,
+          prefixIcon: CupertinoIcons.person,
         ),
         const SizedBox(height: 16),
         GlassTextField(
           controller: _passwordController,
           hintText: 'Mật khẩu'.tr(),
-          prefixIcon: Icons.lock_outline,
+          prefixIcon: CupertinoIcons.lock,
           isPassword: true,
         ),
       ],

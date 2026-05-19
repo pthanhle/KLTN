@@ -1,7 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../../../../shared/widgets/containers/glass_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/theme_provider.dart';
@@ -105,44 +107,163 @@ class _ProfileSettingsCardState extends ConsumerState<ProfileSettingsCard> {
   void _showLanguagePicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      barrierColor: Colors.black.withValues(alpha: 0.4),
+      elevation: 0,
+      isScrollControlled: true,
+      builder: (BuildContext ctx) {
+        final theme = Theme.of(ctx);
+        final isDark = theme.brightness == Brightness.dark;
+        final glassColor = isDark ? Colors.grey[900]!.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.7);
+        final borderColor = isDark ? Colors.white.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.6);
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipPath(
+                  clipper: ShapeBorderClipper(
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                    ),
+                  ),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: ShapeDecoration(
+                        color: glassColor,
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                          side: BorderSide(color: borderColor, width: 1),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Text(
+                              'Ngôn ngữ'.tr(),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                          ),
+                          Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.15)),
+                          _buildLanguageTile(
+                            ctx,
+                            title: 'Tiếng Việt',
+                            isSelected: context.locale.languageCode == 'vi',
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              context.setLocale(const Locale('vi', 'VN'));
+                              Navigator.pop(ctx);
+                            },
+                          ),
+                          Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.15)),
+                          _buildLanguageTile(
+                            ctx,
+                            title: 'English',
+                            isSelected: context.locale.languageCode == 'en',
+                            isLast: true,
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              context.setLocale(const Locale('en', 'US'));
+                              Navigator.pop(ctx);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ClipPath(
+                  clipper: ShapeBorderClipper(
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                    ),
+                  ),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: ShapeDecoration(
+                        color: glassColor,
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                          side: BorderSide(color: borderColor, width: 1),
+                        ),
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.pop(ctx);
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          color: Colors.transparent,
+                          child: Text(
+                            'Hủy'.tr(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLanguageTile(
+    BuildContext context, {
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+    bool isLast = false,
+  }) {
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: isLast 
+            ? const BorderRadius.vertical(bottom: Radius.circular(24))
+            : null,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Ngôn ngữ'.tr(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+                title,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 24),
-              ListTile(
-                title: const Text('Tiếng Việt'),
-                trailing: context.locale.languageCode == 'vi'
-                    ? Icon(Icons.check_circle_rounded, color: Theme.of(context).colorScheme.primary)
-                    : null,
-                onTap: () {
-                  context.setLocale(const Locale('vi', 'VN'));
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text('English'),
-                trailing: context.locale.languageCode == 'en'
-                    ? Icon(Icons.check_circle_rounded, color: Theme.of(context).colorScheme.primary)
-                    : null,
-                onTap: () {
-                  context.setLocale(const Locale('en', 'US'));
-                  Navigator.pop(context);
-                },
-              ),
+              if (isSelected)
+                Icon(
+                  CupertinoIcons.checkmark_alt,
+                  color: theme.colorScheme.primary,
+                  size: 22,
+                ),
             ],
           ),
         ),

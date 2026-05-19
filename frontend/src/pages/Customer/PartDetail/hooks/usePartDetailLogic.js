@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { App } from 'antd';
 import { useClientSinglePartData, useSubmitPartReviewMutation } from '../../../../services/queries/clientPart.queries';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAddToCart } from '@/services/queries/clientCart.queries';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
@@ -12,6 +12,7 @@ export const usePartDetailLogic = (id) => {
     const navigate = useNavigate();
     const { message } = App.useApp();
     const dispatch = useDispatch();
+    const cartItems = useSelector(state => state.cart.items);
 
     const { data, isLoading } = useClientSinglePartData(id);
     const part = data?.data || null;
@@ -58,6 +59,20 @@ export const usePartDetailLogic = (id) => {
             }
         }
 
+        const availableStock = part.inventory?.available_stock ?? part.stock ?? 0;
+        const existingCartItem = cartItems.find(item => 
+            item.part_id === part.id && 
+            JSON.stringify(item.selected_options || {}) === JSON.stringify(selectedOptions)
+        );
+        const existingQuantity = existingCartItem ? existingCartItem.quantity : 0;
+
+        if (quantity + existingQuantity > availableStock) {
+            message.warning(t('exceeds_stock_warning', {
+                defaultValue: `Sản phẩm này không đủ số lượng tồn kho để đáp ứng yêu cầu của bạn.`
+            }));
+            return;
+        }
+
         addToCartApi({
             part_id: part.id,
             quantity: quantity,
@@ -81,6 +96,20 @@ export const usePartDetailLogic = (id) => {
                 message.warning(t('missing_options_warning', `Vui lòng chọn ${missingOptions[0].type} để Mua Nhanh!`));
                 return;
             }
+        }
+
+        const availableStock = part.inventory?.available_stock ?? part.stock ?? 0;
+        const existingCartItem = cartItems.find(item => 
+            item.part_id === part.id && 
+            JSON.stringify(item.selected_options || {}) === JSON.stringify(selectedOptions)
+        );
+        const existingQuantity = existingCartItem ? existingCartItem.quantity : 0;
+
+        if (quantity + existingQuantity > availableStock) {
+            message.warning(t('exceeds_stock_warning', {
+                defaultValue: `Sản phẩm này không đủ số lượng tồn kho để đáp ứng yêu cầu của bạn.`
+            }));
+            return;
         }
 
         addToCartApi({

@@ -11,9 +11,9 @@ class CheckInController extends Notifier<CheckInStateModel> {
     return const CheckInStateModel();
   }
 
-  Future<void> pickDriverLicenseImage() async {
+  Future<void> pickDriverLicenseImage(ImageSource source) async {
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+      final XFile? image = await _picker.pickImage(source: source, imageQuality: 80);
       if (image != null) {
         state = state.copyWith(driverLicensePath: image.path);
       }

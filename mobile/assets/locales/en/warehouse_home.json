@@ -1,0 +1,16 @@
+{
+    "Chào buổi sáng, {name}": "Good morning, {name}",
+    "Chào buổi chiều, {name}": "Good afternoon, {name}",
+    "Chào buổi tối, {name}": "Good evening, {name}",
+    "Đơn gấp": "Urgent",
+    "Chờ giao": "To Deliver",
+    "Tiến độ ca trực": "Shift Progress",
+    "Đã đóng gói": "Packed",
+    "Tổng chỉ tiêu": "Total Target",
+    "Hoàn thành": "Completed",
+    "Trang chủ": "Home",
+    "Lệnh kho": "Orders",
+    "Cá nhân": "Profile",
+    "Thiếu hàng kệ {shelf}": "Missing on shelf {shelf}",
+    "Quét mã": "Scan"
+}

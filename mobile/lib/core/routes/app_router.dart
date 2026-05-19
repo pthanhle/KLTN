@@ -5,12 +5,19 @@ import '../../roles/auth/views/pages/profile_page.dart';
 import '../views/pages/dynamic_dashboard.dart';
 import '../views/pages/dynamic_tasks.dart';
 import '../views/pages/main_scaffold.dart';
+import '../../roles/warehouse/views/warehouse_shell.dart';
+import '../../roles/warehouse/views/pages/warehouse_home_page.dart';
+import '../../roles/warehouse/views/pages/warehouse_orders_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorDashboardKey = GlobalKey<NavigatorState>(debugLabel: 'shellDashboard');
 final GlobalKey<NavigatorState> _shellNavigatorTasksKey = GlobalKey<NavigatorState>(debugLabel: 'shellTasks');
 final GlobalKey<NavigatorState> _shellNavigatorCalendarKey = GlobalKey<NavigatorState>(debugLabel: 'shellCalendar');
 final GlobalKey<NavigatorState> _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
+
+final GlobalKey<NavigatorState> _shellNavigatorWarehouseHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellWarehouseHome');
+final GlobalKey<NavigatorState> _shellNavigatorWarehouseOrdersKey = GlobalKey<NavigatorState>(debugLabel: 'shellWarehouseOrders');
+final GlobalKey<NavigatorState> _shellNavigatorWarehouseProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellWarehouseProfile');
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -65,6 +72,43 @@ final GoRouter appRouter = GoRouter(
               path: '/profile',
               name: 'profile',
               builder: (context, state) => const ProfilePage(),
+            ),
+          ],
+        ),
+      ],
+    ),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return WarehouseShell(navigationShell: navigationShell);
+      },
+      branches: [
+        StatefulShellBranch(
+          navigatorKey: _shellNavigatorWarehouseHomeKey,
+          routes: [
+            GoRoute(
+              path: '/warehouse',
+              name: 'warehouse_home',
+              builder: (context, state) => const WarehouseHomePage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          navigatorKey: _shellNavigatorWarehouseOrdersKey,
+          routes: [
+            GoRoute(
+              path: '/warehouse/orders',
+              name: 'warehouse_orders',
+              builder: (context, state) => const WarehouseOrdersPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          navigatorKey: _shellNavigatorWarehouseProfileKey,
+          routes: [
+            GoRoute(
+              path: '/warehouse/profile',
+              name: 'warehouse_profile',
+              builder: (context, state) => const ProfilePage(), // Reusing profile page
             ),
           ],
         ),

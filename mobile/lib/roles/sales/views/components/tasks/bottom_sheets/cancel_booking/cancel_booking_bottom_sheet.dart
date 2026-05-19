@@ -26,7 +26,6 @@ class CancelBookingBottomSheet extends ConsumerWidget {
     final controller = ref.read(cancelBookingControllerProvider.notifier);
     final theme = Theme.of(context);
 
-    // Watch for success state to close bottom sheet
     ref.listen<CancelBookingState>(
       cancelBookingControllerProvider,
       (previous, next) {
@@ -39,14 +38,12 @@ class CancelBookingBottomSheet extends ConsumerWidget {
 
     return Container(
       decoration: ShapeDecoration(
-        // Tăng độ sáng (alpha cao hơn) để nền bớt tối nhưng vẫn giữ mờ (Liquid)
         color: theme.colorScheme.surface.withValues(alpha: 0.65),
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
             cornerRadius: 32,
             cornerSmoothing: 1.0,
           ),
-          // Specular Highlight
           side: BorderSide(
             color: theme.colorScheme.surface.withValues(alpha: 0.2),
             width: 0.5,
@@ -71,13 +68,12 @@ class CancelBookingBottomSheet extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Drag handle
                 Center(
                   child: Container(
                     width: 48,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sáng hơn
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
@@ -100,7 +96,6 @@ class CancelBookingBottomSheet extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    // Nội dung Căn giữa (Chuẩn iOS Destructive Sheet)
                     Column(
                       children: [
                         const SizedBox(height: 8),
@@ -122,20 +117,19 @@ class CancelBookingBottomSheet extends ConsumerWidget {
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.onSurface,
-                            letterSpacing: -0.5, // Chữ khít nhẹ đặc trưng iOS
+                            letterSpacing: -0.5,
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 32), // Tăng khoảng cách dưới header
+                const SizedBox(height: 32),
 
-                // Reasons List
                 Text(
                   tr('Vui lòng chọn lý do hủy:'),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface, // Đổi từ onSurfaceVariant sang onSurface cho sáng
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -158,7 +152,7 @@ class CancelBookingBottomSheet extends ConsumerWidget {
                         const SizedBox(height: 8),
                         CancelNoteInput(
                           onChanged: controller.updateNote,
-                          isRequired: state.selectedReasonId == 4, // ID 4 is "Lý do khác"
+                          isRequired: state.selectedReasonId == 4,
                         ),
                       ],
                     ),

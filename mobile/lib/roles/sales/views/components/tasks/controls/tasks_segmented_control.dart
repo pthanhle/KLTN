@@ -28,34 +28,38 @@ class _TasksSegmentedControlState extends ConsumerState<TasksSegmentedControl> {
       tr('Hoàn thành', context: context),
     ];
 
-    return ClipPath(
-      clipper: ShapeBorderClipper(
+    return Container(
+      height: 44,
+      decoration: ShapeDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
             cornerRadius: 22,
             cornerSmoothing: 1.0,
           ),
-        ),
-      ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          height: 44,
-          decoration: ShapeDecoration(
-            color: context.colors.surface.withValues(alpha: 0.15), // Giảm alpha để trong suốt hơn
-            shape: SmoothRectangleBorder(
-              borderRadius: SmoothBorderRadius(
-                cornerRadius: 22,
-                cornerSmoothing: 1.0,
-              ),
-              side: BorderSide(
-                color: context.colors.surface.withValues(alpha: 0.3), // Specular highlight (Viền sáng bóng mỏng nhẹ)
-                width: 0.5,
-              ),
-            ),
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.3),
+            width: 0.5,
           ),
-          padding: const EdgeInsets.all(4),
-          child: LayoutBuilder(
+        ),
+        shadows: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.2 : 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipSmoothRect(
+        radius: SmoothBorderRadius(
+          cornerRadius: 22,
+          cornerSmoothing: 1.0,
+        ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: LayoutBuilder(
             builder: (context, constraints) {
               final tabWidth = constraints.maxWidth / tabs.length;
               
@@ -84,26 +88,23 @@ class _TasksSegmentedControlState extends ConsumerState<TasksSegmentedControl> {
                       },
                       child: Container(
                         decoration: ShapeDecoration(
-                          color: context.colors.surface.withValues(alpha: 0.55),
+                          color: Theme.of(context).brightness == Brightness.dark 
+                              ? Colors.white.withValues(alpha: 0.25) 
+                              : Colors.white,
                           shape: SmoothRectangleBorder(
                             borderRadius: SmoothBorderRadius(
                               cornerRadius: 18,
                               cornerSmoothing: 1.0,
                             ),
                             side: BorderSide(
-                              color: context.colors.surface.withValues(alpha: 0.4), // Highlight bắt sáng ở viền
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 0.5,
                             ),
                           ),
                           shadows: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.02),
-                              blurRadius: 30,
-                              offset: const Offset(0, 10),
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 10,
+                              color: Colors.black.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.1),
+                              blurRadius: 20,
                               offset: const Offset(0, 4),
                             ),
                           ],
@@ -160,6 +161,7 @@ class _TasksSegmentedControlState extends ConsumerState<TasksSegmentedControl> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }

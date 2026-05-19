@@ -38,8 +38,8 @@ class _StatGlassCardState extends State<StatGlassCard> {
       onTapCancel: () => setState(() => _isHovered = false),
       child: AnimatedScale(
         scale: _isHovered ? 0.96 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutBack,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutCubic,
         child: GlassCard(
           padding: const EdgeInsets.all(24.0),
           child: Stack(
@@ -54,19 +54,18 @@ class _StatGlassCardState extends State<StatGlassCard> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _isHovered
-                        ? widget.glowColor.withOpacity(0.15)
-                        : widget.glowColor.withOpacity(0.05),
+                        ? widget.glowColor.withValues(alpha: 0.20)
+                        : widget.glowColor.withValues(alpha: 0.08),
                     boxShadow: [
                       BoxShadow(
-                        color: widget.glowColor.withOpacity(0.2),
-                        blurRadius: 24,
-                        spreadRadius: 12,
+                        color: widget.glowColor.withValues(alpha: 0.25),
+                        blurRadius: 28,
+                        spreadRadius: 10,
                       )
                     ],
                   ),
                 ),
               ),
-              // Content
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,

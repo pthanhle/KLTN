@@ -10,6 +10,7 @@ import 'package:ttauto_staff/roles/warehouse/features/orders/controllers/warehou
 import 'package:ttauto_staff/shared/widgets/toast/glass_toast.dart';
 import 'package:ttauto_staff/shared/widgets/buttons/liquid_button.dart';
 import 'shipping_provider_modal.dart';
+import 'package:ttauto_staff/shared/widgets/buttons/glass_close_button.dart';
 
 class DispatchBottomSheet extends StatefulWidget {
   final String orderId;
@@ -106,15 +107,8 @@ class _DispatchBottomSheetState extends State<DispatchBottomSheet> {
                   children: [
                     Align(
                       alignment: Alignment.topRight,
-                      child: IconButton(
+                      child: GlassCloseButton(
                         onPressed: () => context.pop(),
-                        icon: const Icon(Icons.close, size: 20),
-                        style: IconButton.styleFrom(
-                          backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.5),
-                          foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                          padding: const EdgeInsets.all(8),
-                          minimumSize: const Size(36, 36),
-                        ),
                       ),
                     ),
                     Column(

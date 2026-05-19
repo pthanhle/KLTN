@@ -12,6 +12,7 @@ import 'widgets/checkin_camera_box.dart';
 import 'widgets/checkin_signature_box.dart';
 import 'widgets/checkin_submit_button.dart';
 import 'widgets/checkin_image_source_sheet.dart';
+import 'package:ttauto_staff/shared/widgets/buttons/glass_close_button.dart';
 
 class CheckInBottomSheet extends ConsumerWidget {
   final TaskModel task;
@@ -72,38 +73,27 @@ class CheckInBottomSheet extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Drag handle
                 Center(
                   child: Container(
                     width: 48,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sáng rõ
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // Header (Apple 2026 Style)
                 Stack(
                   alignment: Alignment.topCenter,
                   children: [
-                    // Nút Close góc phải (Nổi mờ)
                     Align(
                       alignment: Alignment.topRight,
-                      child: IconButton(
+                      child: GlassCloseButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close, size: 20),
-                        style: IconButton.styleFrom(
-                          backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.5),
-                          foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                          padding: const EdgeInsets.all(8),
-                          minimumSize: const Size(36, 36),
-                        ),
                       ),
                     ),
-                    // Nội dung Căn giữa
                     Column(
                       children: [
                         const SizedBox(height: 8),
@@ -125,7 +115,7 @@ class CheckInBottomSheet extends ConsumerWidget {
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.onSurface,
-                            letterSpacing: -0.5, // Chữ khít nhẹ đặc trưng iOS
+                            letterSpacing: -0.5,
                           ),
                         ),
                       ],
@@ -134,7 +124,6 @@ class CheckInBottomSheet extends ConsumerWidget {
                 ),
                 const SizedBox(height: 32),
 
-                // Driver License Upload Box
                 CheckInCameraBox(
                   imagePath: state.driverLicensePath,
                   onTap: () {
@@ -149,7 +138,6 @@ class CheckInBottomSheet extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // E-Signature Box
                 CheckInSignatureBox(
                   signatureBytes: state.signatureBytes,
                   onSign: controller.saveSignature,
@@ -157,7 +145,6 @@ class CheckInBottomSheet extends ConsumerWidget {
                 ),
                 const SizedBox(height: 32),
 
-                // Submit Button
                 CheckInSubmitButton(
                   isEnabled: controller.isValid,
                   isLoading: state.isSubmitting,

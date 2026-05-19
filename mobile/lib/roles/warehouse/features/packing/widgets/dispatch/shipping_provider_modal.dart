@@ -6,6 +6,7 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ttauto_staff/roles/warehouse/features/packing/models/shipping_provider_model.dart';
+import 'package:ttauto_staff/shared/widgets/buttons/glass_close_button.dart';
 
 class ShippingProviderModal extends StatelessWidget {
   const ShippingProviderModal({super.key});
@@ -70,16 +71,9 @@ class ShippingProviderModal extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
+                      alignment: Alignment.centerRight,
+                      child: GlassCloseButton(
                         onPressed: () => context.pop(),
-                        icon: const Icon(Icons.close, size: 20),
-                        style: IconButton.styleFrom(
-                          backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.5),
-                          foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                          padding: const EdgeInsets.all(8),
-                          minimumSize: const Size(36, 36),
-                        ),
                       ),
                     ),
                     Text(

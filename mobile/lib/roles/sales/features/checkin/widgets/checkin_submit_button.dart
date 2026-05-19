@@ -1,9 +1,10 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class CheckInSubmitButton extends StatefulWidget {
   final bool isEnabled;
@@ -21,116 +22,79 @@ class CheckInSubmitButton extends StatefulWidget {
   State<CheckInSubmitButton> createState() => _CheckInSubmitButtonState();
 }
 
-class _CheckInSubmitButtonState extends State<CheckInSubmitButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _handleTapDown(TapDownDetails details) {
-    if (widget.isEnabled && !widget.isLoading) {
-      _controller.forward();
-    }
-  }
-
-  void _handleTapUp(TapUpDetails details) {
-    if (widget.isEnabled && !widget.isLoading) {
-      _controller.reverse();
-      HapticFeedback.mediumImpact();
-      widget.onPressed();
-    }
-  }
-
-  void _handleTapCancel() {
-    _controller.reverse();
-  }
+class _CheckInSubmitButtonState extends State<CheckInSubmitButton> {
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
     final Color appleGreen = isDark ? const Color(0xFF32D74B) : const Color(0xFF34C759);
 
+    final bgAlpha = !widget.isEnabled ? 0.30 : widget.isLoading ? 0.70 : 0.88;
+
     return GestureDetector(
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
+      onTapDown: (_) {
+        if (widget.isEnabled && !widget.isLoading) {
+          HapticFeedback.lightImpact();
+          setState(() => _isPressed = true);
+        }
+      },
+      onTapUp: (_) {
+        if (widget.isEnabled && !widget.isLoading) {
+          setState(() => _isPressed = false);
+          HapticFeedback.mediumImpact();
+          widget.onPressed();
+        }
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
       behavior: HitTestBehavior.opaque,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: ClipSmoothRect(
-          radius: SmoothBorderRadius(
-            cornerRadius: 999, // Pill shape
-            cornerSmoothing: 1.0,
+      child: Container(
+        height: 56,
+        decoration: ShapeDecoration(
+          color: appleGreen.withValues(alpha: bgAlpha),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: widget.isEnabled ? 0.55 : 0.20),
+              width: 1.0,
+            ),
           ),
+          shadows: (widget.isEnabled && !widget.isLoading && !_isPressed)
+              ? [
+                  BoxShadow(
+                    color: appleGreen.withValues(alpha: isDark ? 0.35 : 0.28),
+                    blurRadius: 16,
+                    offset: const Offset(0, 5),
+                  ),
+                  BoxShadow(
+                    color: appleGreen.withValues(alpha: isDark ? 0.15 : 0.10),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : [],
+        ),
+        child: ClipSmoothRect(
+          radius: SmoothBorderRadius(cornerRadius: 999, cornerSmoothing: 1.0),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
-              height: 56,
-              decoration: ShapeDecoration(
-                color: widget.isEnabled
-                    ? appleGreen.withOpacity(widget.isLoading ? 0.6 : 0.85) // 0.85 translucent emerald glass
-                    : theme.colorScheme.surface.withOpacity(0.15), // Translucent grey glass when disabled
-                shape: SmoothRectangleBorder(
-                  borderRadius: SmoothBorderRadius(
-                    cornerRadius: 999,
-                    cornerSmoothing: 1.0,
-                  ),
-                  side: BorderSide(
-                    color: Colors.white.withOpacity(widget.isEnabled ? 0.6 : 0.2), // Specular highlight
-                    width: 1.0, // 1px border highlight
-                  ),
-                ),
-                shadows: widget.isEnabled && !widget.isLoading
-                    ? [
-                        BoxShadow(
-                          color: appleGreen.withOpacity(isDark ? 0.4 : 0.35),
-                          blurRadius: 24, // High blur radiant glow
-                          offset: const Offset(0, 8),
-                        )
-                      ]
-                    : [],
-              ),
-              child: Center(
-                child: widget.isLoading
-                    ? const CupertinoActivityIndicator(
-                        color: Colors.white,
-                      )
-                    : Text(
-                        tr('Hoàn tất Check-in'),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: widget.isEnabled
-                              ? Colors.white
-                              : theme.colorScheme.onSurface.withOpacity(0.4),
-                          letterSpacing: -0.2, // Standard iOS typography
-                        ),
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Center(
+              child: widget.isLoading
+                  ? const CupertinoActivityIndicator(color: Colors.white)
+                  : Text(
+                      tr('Hoàn tất Check-in'),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white.withValues(alpha: widget.isEnabled ? 1.0 : 0.45),
+                        letterSpacing: -0.3,
                       ),
-              ),
+                    ),
             ),
           ),
         ),
-      ),
+      ).animate(target: _isPressed ? 1 : 0)
+       .scaleXY(end: 0.96, duration: 150.ms, curve: Curves.easeOutCubic),
     );
   }
 }

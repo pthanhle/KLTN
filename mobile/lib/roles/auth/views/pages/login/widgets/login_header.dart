@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
@@ -21,35 +22,34 @@ class LoginHeader extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        ClipPath(
-          clipper: ShapeBorderClipper(
+        Container(
+          width: 72,
+          height: 72,
+          decoration: ShapeDecoration(
+            color: glassColor,
             shape: SmoothRectangleBorder(
-              borderRadius: SmoothBorderRadius(
-                cornerRadius: 24,
-                cornerSmoothing: 1.0,
+              borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+              side: BorderSide(
+                color: borderColor,
+                width: 0.5,
               ),
             ),
-          ),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              width: 72,
-              height: 72,
-              decoration: ShapeDecoration(
-                color: glassColor,
-                shape: SmoothRectangleBorder(
-                  borderRadius: SmoothBorderRadius(
-                    cornerRadius: 24,
-                    cornerSmoothing: 1.0,
-                  ),
-                  side: BorderSide(color: borderColor, width: 1.5),
-                ),
+            shadows: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                blurRadius: 20, offset: const Offset(0, 6),
               ),
-              child: const Center(
+            ],
+          ),
+          child: ClipSmoothRect(
+            radius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Center(
                 child: Icon(
-                  Icons.directions_car_rounded,
-                  size: 40,
-                  color: Colors.blueAccent,
+                  CupertinoIcons.car_detailed,
+                  size: 36,
+                  color: isDark ? const Color(0xFF0A84FF) : const Color(0xFF007AFF),
                 ),
               ),
             ),

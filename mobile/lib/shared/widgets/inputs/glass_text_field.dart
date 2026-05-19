@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
@@ -9,7 +10,7 @@ class GlassTextField extends StatefulWidget {
   final IconData prefixIcon;
   final bool isPassword;
   final TextEditingController? controller;
-  
+
   const GlassTextField({
     super.key,
     required this.hintText,
@@ -49,32 +50,26 @@ class _GlassTextFieldState extends State<GlassTextField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
-    final squircleShape = SmoothRectangleBorder(
-      borderRadius: SmoothBorderRadius(
-        cornerRadius: 20,
-        cornerSmoothing: 1.0,
-      ),
-      side: BorderSide(
-        color: _isFocused 
-            ? theme.primaryColor.withValues(alpha: 0.5)
-            : Colors.transparent,
-        width: 1,
-      ),
-    );
 
-    return ClipPath(
-      clipper: ShapeBorderClipper(shape: squircleShape),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: ShapeDecoration(
-            color: isDark 
-                ? Colors.white.withValues(alpha: _isFocused ? 0.1 : 0.05)
-                : Colors.black.withValues(alpha: _isFocused ? 0.08 : 0.03),
-            shape: squircleShape,
+    return Container(
+      decoration: ShapeDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: _isFocused ? 0.10 : 0.05)
+            : Colors.black.withValues(alpha: _isFocused ? 0.08 : 0.03),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(cornerRadius: 20, cornerSmoothing: 1.0),
+          side: BorderSide(
+            color: _isFocused
+                ? theme.primaryColor.withValues(alpha: 0.6)
+                : Colors.white.withValues(alpha: isDark ? 0.12 : 0.5),
+            width: 0.5,
           ),
+        ),
+      ),
+      child: ClipSmoothRect(
+        radius: SmoothBorderRadius(cornerRadius: 20, cornerSmoothing: 1.0),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextField(
             controller: widget.controller,
             focusNode: _focusNode,
@@ -86,22 +81,26 @@ class _GlassTextFieldState extends State<GlassTextField> {
             decoration: InputDecoration(
               hintText: widget.hintText,
               hintStyle: TextStyle(
-                color: isDark ? Colors.white54 : Colors.black54,
+                color: isDark ? Colors.white38 : Colors.black38,
               ),
               prefixIcon: Icon(
                 widget.prefixIcon,
-                color: _isFocused ? theme.primaryColor : (isDark ? Colors.white54 : Colors.black54),
+                color: _isFocused
+                    ? theme.primaryColor
+                    : (isDark ? Colors.white38 : Colors.black38),
+                size: 20,
               ),
               suffixIcon: widget.isPassword
-                  ? IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: isDark ? Colors.white54 : Colors.black54,
-                      ),
-                      onPressed: () {
+                  ? GestureDetector(
+                      onTap: () {
                         HapticFeedback.selectionClick();
                         setState(() => _obscureText = !_obscureText);
                       },
+                      child: Icon(
+                        _obscureText ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
+                        color: isDark ? Colors.white38 : Colors.black38,
+                        size: 20,
+                      ),
                     )
                   : null,
               border: InputBorder.none,

@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -38,7 +40,7 @@ class PoolItemAction extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: ShapeDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
                 shape: SmoothRectangleBorder(
                   borderRadius: SmoothBorderRadius(
                     cornerRadius: 32,
@@ -52,7 +54,7 @@ class PoolItemAction extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.sync_rounded, size: 20, color: theme.colorScheme.primary)
+                  Icon(CupertinoIcons.arrow_2_circlepath, size: 18, color: theme.colorScheme.primary)
                       .animate(onPlay: (controller) => controller.repeat())
                       .rotate(duration: 2.seconds, curve: Curves.linear),
                   const SizedBox(width: 8),
@@ -83,7 +85,7 @@ class PoolItemAction extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(Icons.arrow_forward_rounded, size: 20, color: Colors.white),
+                  const Icon(CupertinoIcons.arrow_right, size: 18, color: Colors.white),
                 ],
               ),
             ),

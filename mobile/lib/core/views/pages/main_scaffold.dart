@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -22,34 +23,34 @@ class MainScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // Crucial for floating nav bar
+      extendBody: true,
       body: navigationShell,
       bottomNavigationBar: GlassNavigationBar(
         items: [
           GlassNavItem(
-            icon: Icons.dashboard_outlined,
-            activeIcon: Icons.dashboard_rounded,
+            icon: CupertinoIcons.square_grid_2x2,
+            activeIcon: CupertinoIcons.square_grid_2x2_fill,
             label: 'Trang chủ'.tr(),
             isSelected: navigationShell.currentIndex == 0,
             onTap: () => _goBranch(0),
           ),
           GlassNavItem(
-            icon: Icons.assignment_outlined,
-            activeIcon: Icons.assignment_rounded,
+            icon: CupertinoIcons.briefcase,
+            activeIcon: CupertinoIcons.briefcase_fill,
             label: 'Công việc'.tr(),
             isSelected: navigationShell.currentIndex == 1,
             onTap: () => _goBranch(1),
           ),
           GlassNavItem(
-            icon: Icons.calendar_today_outlined,
-            activeIcon: Icons.calendar_today_rounded,
+            icon: CupertinoIcons.calendar,
+            activeIcon: CupertinoIcons.calendar_today,
             label: 'Lịch hẹn'.tr(),
             isSelected: navigationShell.currentIndex == 2,
             onTap: () => _goBranch(2),
           ),
           GlassNavItem(
-            icon: Icons.person_outline_rounded,
-            activeIcon: Icons.person_rounded,
+            icon: CupertinoIcons.person,
+            activeIcon: CupertinoIcons.person_solid,
             label: 'Tài khoản'.tr(),
             isSelected: navigationShell.currentIndex == 3,
             onTap: () => _goBranch(3),

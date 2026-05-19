@@ -10,6 +10,10 @@ import enAdmin from '../locales/en/admin.json';
 import viAdmin from '../locales/vi/admin.json';
 import enAdminOrders from '../locales/en/adminOrders.json';
 import viAdminOrders from '../locales/vi/adminOrders.json';
+import enAdminPromotions from '../locales/en/adminPromotions.json';
+import viAdminPromotions from '../locales/vi/adminPromotions.json';
+import enAdminPromotionForm from '../locales/en/adminPromotionForm.json';
+import viAdminPromotionForm from '../locales/vi/adminPromotionForm.json';
 import enAdminCustomers from '../locales/en/adminCustomers.json';
 import viAdminCustomers from '../locales/vi/adminCustomers.json';
 import enAdminBrands from '../locales/en/adminBrands.json';
@@ -79,6 +83,8 @@ i18n
                 auth: enAuth,
                 admin: enAdmin,
                 adminOrders: enAdminOrders,
+                adminPromotions: enAdminPromotions,
+                adminPromotionForm: enAdminPromotionForm,
                 adminCustomers: enAdminCustomers,
                 adminBrands: enAdminBrands,
                 adminCategories: enAdminCategories,
@@ -115,6 +121,8 @@ i18n
                 auth: viAuth,
                 admin: viAdmin,
                 adminOrders: viAdminOrders,
+                adminPromotions: viAdminPromotions,
+                adminPromotionForm: viAdminPromotionForm,
                 adminCustomers: viAdminCustomers,
                 adminBrands: viAdminBrands,
                 adminCategories: viAdminCategories,

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 class ScannerGlassButton extends StatelessWidget {
   final IconData icon;
@@ -15,19 +16,27 @@ class ScannerGlassButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
+      child: ClipSmoothRect(
+        radius: SmoothBorderRadius(
+          cornerRadius: 30,
+          cornerSmoothing: 1.0,
+        ),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             width: 60,
             height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withOpacity(0.2),
-                width: 0.5,
+            decoration: ShapeDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 30,
+                  cornerSmoothing: 1.0,
+                ),
+                side: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 0.5,
+                ),
               ),
             ),
             child: Icon(

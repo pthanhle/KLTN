@@ -41,8 +41,11 @@ class _ScannerModalState extends State<ScannerModal> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height * ScannerConstants.modalHeightRatio;
 
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+    return ClipSmoothRect(
+      radius: SmoothBorderRadius(
+        cornerRadius: ScannerConstants.cornerRadius,
+        cornerSmoothing: 1.0,
+      ),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
         child: Container(

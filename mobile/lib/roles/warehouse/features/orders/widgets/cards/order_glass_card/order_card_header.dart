@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:ttauto_staff/roles/warehouse/features/shared/models/warehouse_enums.dart';
 import 'package:ttauto_staff/roles/warehouse/features/shared/models/warehouse_order_model.dart';
 
@@ -25,21 +26,34 @@ class OrderCardHeader extends StatelessWidget {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: isUrgent 
-                ? theme.colorScheme.errorContainer 
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: ShapeDecoration(
+            color: isUrgent
+                ? theme.colorScheme.errorContainer.withValues(alpha: 0.85)
                 : theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(20),
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 10,
+                cornerSmoothing: 1.0,
+              ),
+              side: BorderSide(
+                color: isUrgent
+                    ? theme.colorScheme.error.withValues(alpha: 0.3)
+                    : theme.colorScheme.outline.withValues(alpha: 0.15),
+                width: 0.5,
+              ),
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                isUrgent ? CupertinoIcons.clock_fill : CupertinoIcons.check_mark_circled_solid,
-                size: 14,
-                color: isUrgent 
-                    ? theme.colorScheme.error 
+                isUrgent
+                    ? CupertinoIcons.clock_fill
+                    : CupertinoIcons.check_mark_circled_solid,
+                size: 13,
+                color: isUrgent
+                    ? theme.colorScheme.error
                     : theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 4),
@@ -47,9 +61,9 @@ class OrderCardHeader extends StatelessWidget {
                 isUrgent ? 'Gấp'.tr() : 'Thường'.tr(),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                  color: isUrgent 
-                      ? theme.colorScheme.error 
+                  letterSpacing: 0.3,
+                  color: isUrgent
+                      ? theme.colorScheme.error
                       : theme.colorScheme.onSurfaceVariant,
                 ),
               ),

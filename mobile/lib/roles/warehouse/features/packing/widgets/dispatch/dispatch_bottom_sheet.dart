@@ -116,9 +116,14 @@ class _DispatchBottomSheetState extends State<DispatchBottomSheet> {
                         const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
+                          decoration: ShapeDecoration(
                             color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                            shape: BoxShape.circle,
+                            shape: SmoothRectangleBorder(
+                              borderRadius: SmoothBorderRadius(
+                                cornerRadius: 20,
+                                cornerSmoothing: 1.0,
+                              ),
+                            ),
                           ),
                           child: Icon(
                             CupertinoIcons.car_detailed,

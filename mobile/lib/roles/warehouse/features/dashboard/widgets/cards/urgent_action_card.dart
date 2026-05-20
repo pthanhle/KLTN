@@ -1,7 +1,6 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 class UrgentActionCard extends StatelessWidget {
   final String title;
@@ -24,7 +23,10 @@ class UrgentActionCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: ShapeDecoration(
@@ -49,17 +51,22 @@ class UrgentActionCard extends StatelessWidget {
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(
-                    color: baseColor.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: baseColor.withValues(alpha: 0.4),
-                        blurRadius: 15,
-                        offset: Offset.zero,
-                      ),
-                    ],
+                  decoration: ShapeDecoration(
+                  color: baseColor.withValues(alpha: 0.2),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 16,
+                      cornerSmoothing: 1.0,
+                    ),
                   ),
+                  shadows: [
+                    BoxShadow(
+                      color: baseColor.withValues(alpha: 0.4),
+                      blurRadius: 15,
+                      offset: Offset.zero,
+                    ),
+                  ],
+                ),
                   child: Icon(
                     icon,
                     color: baseColor.withValues(alpha: 0.8),
@@ -92,14 +99,7 @@ class UrgentActionCard extends StatelessWidget {
             ),
           ],
         ),
-      ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-       // Subtle breathing effect for urgent cards
-       .scale(
-         begin: const Offset(1, 1),
-         end: const Offset(1.02, 1.02),
-         duration: const Duration(seconds: 2),
-         curve: Curves.easeInOut,
-       ),
+        ),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import '../../../../../core/views/components/navigation/glass_nav_item.dart';
 
 class FloatingGlassTabBar extends StatelessWidget {
   final int currentIndex;
@@ -20,6 +21,7 @@ class FloatingGlassTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomSafeArea = MediaQuery.of(context).padding.bottom;
+    final theme = Theme.of(context);
 
     return Positioned(
       bottom: bottomSafeArea > 0 ? 24 : 16,
@@ -27,153 +29,108 @@ class FloatingGlassTabBar extends StatelessWidget {
       right: 20,
       child: Container(
         height: 68,
-                decoration: ShapeDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  shape: SmoothRectangleBorder(
-                    borderRadius: SmoothBorderRadius(
-                      cornerRadius: 36,
-                      cornerSmoothing: 1.0,
-                    ),
-                    side: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 0.5,
-                    ),
-                  ),
-                  shadows: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      blurRadius: 40,
-                      offset: const Offset(0, 10),
-                    )
-                  ],
-                ),
-                child: ClipSmoothRect(
-                  radius: SmoothBorderRadius(
-                    cornerRadius: 36,
-                    cornerSmoothing: 1.0,
-                  ),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _buildTabItem(
-                            context, 
-                            icon: CupertinoIcons.house, 
-                            activeIcon: CupertinoIcons.house,
-                            label: 'Trang chủ'.tr(), 
-                            index: 0,
-                          ),
-                        ),
-                        Expanded(
-                          child: _buildTabItem(
-                            context, 
-                            icon: CupertinoIcons.cube_box, 
-                            activeIcon: CupertinoIcons.cube_box,
-                            label: 'Lệnh kho'.tr(), 
-                            index: 1,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            HapticFeedback.heavyImpact();
-                            onScannerTapped();
-                          },
-                          child: ClipOval(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                              child: Container(
-                                width: 52,
-                                height: 52,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFD60A).withValues(alpha: 0.15),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.5),
-                                    width: 1,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFFFF9F0A).withValues(alpha: 0.3),
-                                      blurRadius: 16,
-                                      spreadRadius: 0,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ]
-                                ),
-                                child: const Icon(
-                                  CupertinoIcons.barcode_viewfinder,
-                                  color: Color(0xFFFFD60A),
-                                  size: 26,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        
-                        Expanded(
-                          child: _buildTabItem(
-                            context, 
-                            icon: CupertinoIcons.person, 
-                            activeIcon: CupertinoIcons.person,
-                            label: 'Tài khoản'.tr(), 
-                            index: 2,
-                          ),
-                        ),
-                        Expanded(child: const SizedBox()),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-      );
-  }
-
-  Widget _buildTabItem(BuildContext context, {
-    required IconData icon, 
-    required IconData activeIcon,
-    required String label, 
-    required int index,
-  }) {
-    final isSelected = currentIndex == index;
-    final theme = Theme.of(context);
-    
-    final activeColor = theme.colorScheme.primary;
-    final inactiveColor = theme.brightness == Brightness.dark 
-        ? Colors.white.withValues(alpha: 0.5) 
-        : Colors.black.withValues(alpha: 0.4);
-    
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        if (!isSelected) {
-          HapticFeedback.selectionClick();
-          onTabTapped(index);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 80,
-        curve: Curves.easeOutCubic,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isSelected ? activeIcon : icon,
-              color: isSelected ? activeColor : inactiveColor,
-              size: isSelected ? 26 : 24,
+        decoration: ShapeDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 44,
+              cornerSmoothing: 1.0,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? activeColor : inactiveColor,
-                letterSpacing: 0.5,
-              ),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: 0.3),
+              width: 0.5,
+            ),
+          ),
+          shadows: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              blurRadius: 40,
+              offset: const Offset(0, 10),
             ),
           ],
+        ),
+        child: ClipSmoothRect(
+          radius: SmoothBorderRadius(
+            cornerRadius: 44,
+            cornerSmoothing: 1.0,
+          ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GlassNavItem(
+                    icon: CupertinoIcons.house,
+                    activeIcon: CupertinoIcons.house,
+                    label: 'Trang chủ'.tr(),
+                    isSelected: currentIndex == 0,
+                    onTap: () {
+                      if (currentIndex != 0) onTabTapped(0);
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: GlassNavItem(
+                    icon: CupertinoIcons.cube_box,
+                    activeIcon: CupertinoIcons.cube_box,
+                    label: 'Lệnh kho'.tr(),
+                    isSelected: currentIndex == 1,
+                    onTap: () {
+                      if (currentIndex != 1) onTabTapped(1);
+                    },
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.heavyImpact();
+                    onScannerTapped();
+                  },
+                  child: ClipOval(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.5),
+                            width: 0.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                              blurRadius: 16,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          CupertinoIcons.barcode_viewfinder,
+                          color: theme.colorScheme.primary,
+                          size: 26,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GlassNavItem(
+                    icon: CupertinoIcons.person,
+                    activeIcon: CupertinoIcons.person,
+                    label: 'Tài khoản'.tr(),
+                    isSelected: currentIndex == 3,
+                    onTap: () {
+                      if (currentIndex != 3) onTabTapped(2);
+                    },
+                  ),
+                ),
+                const Expanded(child: SizedBox()),
+              ],
+            ),
+          ),
         ),
       ),
     );

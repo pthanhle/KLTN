@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../../../../../core/utils/theme_extension.dart';
 
 class PriorityBadge extends StatelessWidget {
@@ -16,19 +17,19 @@ class PriorityBadge extends StatelessWidget {
 
     switch (priority.toUpperCase()) {
       case 'URGENT':
-        bgColor = context.colors.errorContainer;
+        bgColor = context.colors.errorContainer.withValues(alpha: 0.85);
         textColor = context.colors.onErrorContainer;
         dotColor = context.colors.error;
         labelKey = 'KHẨN CẤP';
         break;
       case 'HIGH':
-        bgColor = const Color(0xFFffedd5); // Orange-100 equivalent
-        textColor = const Color(0xFF9a3412); // Orange-800
-        dotColor = const Color(0xFFf97316); // Orange-500
+        bgColor = const Color(0xFFffedd5);
+        textColor = const Color(0xFF9a3412);
+        dotColor = const Color(0xFFf97316);
         labelKey = 'CAO';
         break;
       case 'MEDIUM':
-        bgColor = context.colors.primaryContainer;
+        bgColor = context.colors.primaryContainer.withValues(alpha: 0.85);
         textColor = context.colors.onPrimaryContainer;
         dotColor = context.colors.primary;
         labelKey = 'TRUNG BÌNH';
@@ -44,19 +45,34 @@ class PriorityBadge extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 10,
+            cornerSmoothing: 1.0,
+          ),
+          side: BorderSide(
+            color: dotColor.withValues(alpha: 0.25),
+            width: 0.5,
+          ),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Dot nhỏ dùng squircle thay BoxShape.circle
           Container(
             width: 6,
             height: 6,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: dotColor,
-              shape: BoxShape.circle,
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 3,
+                  cornerSmoothing: 1.0,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 4),
@@ -64,8 +80,8 @@ class PriorityBadge extends StatelessWidget {
             tr(labelKey, context: context),
             style: context.textTheme.labelSmall?.copyWith(
               color: textColor,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.3,
             ),
           ),
         ],

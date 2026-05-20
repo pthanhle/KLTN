@@ -1,0 +1,141 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
+import '../models/walkaround_model.dart';
+import '../models/service_package_model.dart';
+import '../models/hotspot_model.dart';
+import '../models/checklist_item_model.dart';
+import '../data/walkaround_mock_data.dart';
+import '../../dashboard/data/advisor_mock_data.dart';
+
+class WalkaroundState {
+  final WalkaroundModel data;
+  final int currentStep;
+  final bool isLoading;
+
+  WalkaroundState({
+    required this.data,
+    this.currentStep = 0,
+    this.isLoading = false,
+  });
+
+  WalkaroundState copyWith({
+    WalkaroundModel? data,
+    int? currentStep,
+    bool? isLoading,
+  }) {
+    return WalkaroundState(
+      data: data ?? this.data,
+      currentStep: currentStep ?? this.currentStep,
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
+}
+
+class WalkaroundController extends Notifier<WalkaroundState> {
+  @override
+  WalkaroundState build() {
+    return WalkaroundState(
+      data: mockWalkaroundData,
+    );
+  }
+
+  void init(String orderId) {
+    try {
+      final order = mockRepairOrders.firstWhere((o) => o.id == orderId);
+      state = state.copyWith(
+        data: state.data.copyWith(
+          orderId: order.id,
+          selectedPackages: order.selectedServices,
+          imageUrl: order.vehicleInfo.imageUrl ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0', // Fallback for mock if not provided
+        ),
+      );
+    } catch (e) {
+      // Fallback
+    }
+  }
+
+  void setStep(int step) {
+    if (step >= 0 && step <= 3) {
+      state = state.copyWith(currentStep: step);
+    }
+  }
+
+  void updateComplaint(String text) {
+    state = state.copyWith(data: state.data.copyWith(customerComplaint: text));
+  }
+
+  void addPackage(ServicePackageModel package) {
+    if (!state.data.selectedPackages.any((p) => p.id == package.id)) {
+      final newPackages = List<ServicePackageModel>.from(state.data.selectedPackages)..add(package);
+      state = state.copyWith(data: state.data.copyWith(selectedPackages: newPackages));
+    }
+  }
+
+  void removePackage(String packageId) {
+    final newPackages = state.data.selectedPackages.where((p) => p.id != packageId).toList();
+    state = state.copyWith(data: state.data.copyWith(selectedPackages: newPackages));
+  }
+
+  void updateFuel(double level) {
+    state = state.copyWith(data: state.data.copyWith(fuelLevel: level));
+  }
+
+  void updateOdometer(int km) {
+    state = state.copyWith(data: state.data.copyWith(odometer: km));
+  }
+
+  void addHotspot(HotspotModel hotspot) {
+    final newHotspots = List<HotspotModel>.from(state.data.hotspots)..add(hotspot);
+    state = state.copyWith(data: state.data.copyWith(hotspots: newHotspots));
+  }
+
+  void removeHotspot(String id) {
+    final newHotspots = state.data.hotspots.where((h) => h.id != id).toList();
+    state = state.copyWith(data: state.data.copyWith(hotspots: newHotspots));
+  }
+
+  void toggleChecklist(String id, bool value) {
+    final newChecklist = state.data.checklist.map((item) {
+      if (item.id == id) {
+        return item.copyWith(checked: value);
+      }
+      return item;
+    }).toList();
+    state = state.copyWith(data: state.data.copyWith(checklist: newChecklist));
+  }
+
+  void addCustomChecklistItem(String name) {
+    final newItem = ChecklistItemModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+      checked: true,
+    );
+    final newChecklist = List<ChecklistItemModel>.from(state.data.checklist)..add(newItem);
+    state = state.copyWith(data: state.data.copyWith(checklist: newChecklist));
+  }
+
+  void removeChecklistItem(String id) {
+    final newChecklist = state.data.checklist.where((item) => item.id != id).toList();
+    state = state.copyWith(data: state.data.copyWith(checklist: newChecklist));
+  }
+
+  void setSignature(String signaturePath) {
+    state = state.copyWith(data: state.data.copyWith(signatureData: signaturePath));
+  }
+
+  bool canSubmit() {
+    return state.data.signatureData != null && 
+           state.data.signatureData!.isNotEmpty && 
+           state.data.odometer > 0;
+  }
+
+  Future<void> submit() async {
+    state = state.copyWith(isLoading: true);
+    await Future.delayed(const Duration(seconds: 1));
+    state = state.copyWith(isLoading: false);
+  }
+}
+
+final walkaroundControllerProvider = NotifierProvider<WalkaroundController, WalkaroundState>(() {
+  return WalkaroundController();
+});

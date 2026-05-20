@@ -26,7 +26,8 @@ class OrderGlassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
@@ -57,20 +58,27 @@ class OrderGlassCard extends StatelessWidget {
           ),
           child: Container(
             decoration: ShapeDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.white.withValues(alpha: 0.15),
               shape: SmoothRectangleBorder(
                 borderRadius: SmoothBorderRadius(
                   cornerRadius: 22,
                   cornerSmoothing: 1.0,
                 ),
+                side: BorderSide(
+                  color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.45),
+                  width: 0.5,
+                ),
               ),
               shadows: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
+                  color: Colors.black.withValues(alpha: isDark ? 0.04 : 0.02),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: Colors.black.withValues(alpha: isDark ? 0.08 : 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -82,33 +90,18 @@ class OrderGlassCard extends StatelessWidget {
                 cornerSmoothing: 1.0,
               ),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-                child: Container(
-                  decoration: ShapeDecoration(
-                    color: theme.colorScheme.surface.withValues(alpha: 0.15),
-                    shape: SmoothRectangleBorder(
-                      borderRadius: SmoothBorderRadius(
-                        cornerRadius: 22,
-                        cornerSmoothing: 1.0,
-                      ),
-                      side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.3),
-                        width: 0.5,
-                      ),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        OrderCardHeader(order: order),
-                        const SizedBox(height: 16),
-                        OrderCardCustomerInfo(order: order),
-                        const SizedBox(height: 16),
-                        OrderCardItemsPreview(order: order),
-                      ],
-                    ),
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      OrderCardHeader(order: order),
+                      const SizedBox(height: 16),
+                      OrderCardCustomerInfo(order: order),
+                      const SizedBox(height: 16),
+                      OrderCardItemsPreview(order: order),
+                    ],
                   ),
                 ),
               ),

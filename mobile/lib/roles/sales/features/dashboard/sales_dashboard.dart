@@ -57,6 +57,10 @@ class _SalesDashboardPageState extends ConsumerState<SalesDashboardPage> {
               slivers: [
                 SliverAppBar.large(
                   backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                  forceMaterialTransparency: true,
                   elevation: 0,
                   pinned: true,
                   stretch: false,

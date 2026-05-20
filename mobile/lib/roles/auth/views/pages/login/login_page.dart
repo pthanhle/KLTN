@@ -145,6 +145,8 @@ class LoginPage extends ConsumerWidget {
       } else if (!next.isLoading && next.hasValue && next.value != null) {
         if (next.value!.role == 'INVENTORY_MGR') {
           context.go('/warehouse');
+        } else if (next.value!.role == 'SERVICE_ADVISOR') {
+          context.go('/advisor');
         } else {
           context.go('/dashboard');
         }

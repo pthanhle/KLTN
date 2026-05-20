@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -10,8 +11,8 @@ class AdvisorEmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.dashboard_customize_outlined,
+          Icon(
+            CupertinoIcons.square_grid_2x2,
             size: 64,
             color: Colors.grey,
           ),

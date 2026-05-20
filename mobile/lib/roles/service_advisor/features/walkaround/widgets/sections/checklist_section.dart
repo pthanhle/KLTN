@@ -58,7 +58,7 @@ class ChecklistSection extends ConsumerWidget {
                     ...state.data.checklist.asMap().entries.map((entry) {
                       final index = entry.key;
                       final item = entry.value;
-                      final isCustom = int.tryParse(item.id) == null || int.parse(item.id) > 1000; // Mock check for custom item (id > 1000 or uuid)
+                      final isCustom = int.tryParse(item.id) == null || int.parse(item.id) > 1000;
                       
                       return ChecklistItemRow(
                         item: item,

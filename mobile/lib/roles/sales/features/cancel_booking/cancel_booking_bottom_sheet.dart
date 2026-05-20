@@ -95,15 +95,27 @@ class CancelBookingBottomSheet extends ConsumerWidget {
                       children: [
                         const SizedBox(height: 8),
                         Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
+                          padding: const EdgeInsets.all(14),
+                          decoration: ShapeDecoration(
                             color: theme.colorScheme.error.withValues(alpha: 0.15),
-                            shape: BoxShape.circle,
+                            shape: SmoothRectangleBorder(
+                              borderRadius: SmoothBorderRadius(
+                                cornerRadius: 20,
+                                cornerSmoothing: 1.0,
+                              ),
+                            ),
+                            shadows: [
+                              BoxShadow(
+                                color: theme.colorScheme.error.withValues(alpha: 0.2),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
                           child: Icon(
-                            Icons.event_busy_rounded,
+                            CupertinoIcons.calendar_badge_minus,
                             color: theme.colorScheme.error,
-                            size: 28,
+                            size: 26,
                           ),
                         ),
                         const SizedBox(height: 16),

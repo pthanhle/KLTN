@@ -38,8 +38,8 @@ class GlassCard extends StatelessWidget {
             cornerSmoothing: 1.0,
           ),
           side: BorderSide(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-            width: 1,
+            color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.45),
+            width: 0.5,
           ),
         ),
         shadows: hasShadow ? QuotationConstants.glassShadows : null,

@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:ttauto_staff/shared/widgets/buttons/liquid_button.dart';
 
 class AddHotspotNoteModal extends StatefulWidget {
   const AddHotspotNoteModal({super.key});
@@ -12,18 +14,15 @@ class AddHotspotNoteModal extends StatefulWidget {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      barrierColor: Colors.black.withValues(alpha: 0.5),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return const AddHotspotNoteModal();
-      },
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      transitionDuration: const Duration(milliseconds: 320),
+      pageBuilder: (context, animation, secondaryAnimation) => const AddHotspotNoteModal(),
       transitionBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(
-          opacity: animation,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.95, end: 1.0).animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-            ),
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
+                .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
             child: child,
           ),
         );
@@ -42,7 +41,7 @@ class _AddHotspotNoteModalState extends State<AddHotspotNoteModal> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 120), () {
       if (mounted) _focusNode.requestFocus();
     });
   }
@@ -56,11 +55,7 @@ class _AddHotspotNoteModalState extends State<AddHotspotNoteModal> {
 
   void _submit() {
     final note = _controller.text.trim();
-    if (note.isNotEmpty) {
-      Navigator.of(context).pop(note);
-    } else {
-      Navigator.of(context).pop();
-    }
+    Navigator.of(context).pop(note.isNotEmpty ? note : null);
   }
 
   @override
@@ -77,132 +72,118 @@ class _AddHotspotNoteModalState extends State<AddHotspotNoteModal> {
             left: 24,
             right: 24,
           ),
-          child: ClipSmoothRect(
-            radius: SmoothBorderRadius(
-              cornerRadius: 24,
-              cornerSmoothing: 1.0,
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: isDark 
-                      ? Colors.black.withValues(alpha: 0.65)
-                      : Colors.white.withValues(alpha: 0.75),
-                  border: Border.all(
-                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                    width: 0.5,
-                  ),
+          child: Container(
+            width: double.infinity,
+            decoration: ShapeDecoration(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.55)
+                  : Colors.white.withValues(alpha: 0.70),
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(cornerRadius: 28, cornerSmoothing: 1.0),
+                side: BorderSide(
+                  color: Colors.white.withValues(alpha: isDark ? 0.20 : 0.80),
+                  width: 0.5,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Ghi chú ngoại quan'.tr(),
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Mô tả chi tiết vết xước, móp hoặc hư hại tại vị trí này.'.tr(),
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Container(
-                      decoration: ShapeDecoration(
-                        color: isDark 
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : theme.colorScheme.surfaceContainerLowest.withValues(alpha: 0.8),
-                        shape: SmoothRectangleBorder(
-                          borderRadius: SmoothBorderRadius(
-                            cornerRadius: 16,
-                            cornerSmoothing: 1.0,
-                          ),
-                          side: BorderSide(
-                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                            width: 1,
-                          ),
+              ),
+              shadows: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.18),
+                  blurRadius: 40,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: ClipSmoothRect(
+              radius: SmoothBorderRadius(cornerRadius: 28, cornerSmoothing: 1.0),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: isDark ? 0.25 : 0.40),
+                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      child: CupertinoTextField(
-                        controller: _controller,
-                        focusNode: _focusNode,
-                        maxLines: 3,
-                        minLines: 1,
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => _submit(),
-                        style: theme.textTheme.bodyLarge,
-                        placeholder: 'VD: Móp cản trước...'.tr(),
-                        placeholderStyle: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.outline,
+                      Text(
+                        'Ghi chú ngoại quan'.tr(),
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.5,
                         ),
-                        padding: const EdgeInsets.all(16),
-                        decoration: null,
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              decoration: ShapeDecoration(
-                                color: isDark ? Colors.white.withValues(alpha: 0.1) : theme.colorScheme.surfaceContainerHighest,
-                                shape: SmoothRectangleBorder(
-                                  borderRadius: SmoothBorderRadius(
-                                    cornerRadius: 16,
-                                    cornerSmoothing: 1.0,
-                                  ),
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Hủy'.tr(),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Mô tả chi tiết vết xước, móp hoặc hư hại tại vị trí này.'.tr(),
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: ShapeDecoration(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.07)
+                              : Colors.white.withValues(alpha: 0.55),
+                          shape: SmoothRectangleBorder(
+                            borderRadius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+                            side: BorderSide(
+                              color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.70),
+                              width: 0.5,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: _submit,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              decoration: ShapeDecoration(
-                                color: theme.colorScheme.primary,
-                                shape: SmoothRectangleBorder(
-                                  borderRadius: SmoothBorderRadius(
-                                    cornerRadius: 16,
-                                    cornerSmoothing: 1.0,
-                                  ),
-                                ),
+                        child: ClipSmoothRect(
+                          radius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            child: CupertinoTextField(
+                              controller: _controller,
+                              focusNode: _focusNode,
+                              maxLines: 3,
+                              minLines: 1,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) => _submit(),
+                              style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                              placeholder: 'VD: Móp cản trước...'.tr(),
+                              placeholderStyle: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
+                                height: 1.5,
                               ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Lưu'.tr(),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.colorScheme.onPrimary,
-                                ),
-                              ),
+                              padding: const EdgeInsets.all(16),
+                              decoration: null,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: LiquidButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              variant: LiquidButtonVariant.neutral,
+                              child: Text('Hủy'.tr()),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: LiquidButton(
+                              onPressed: _submit,
+                              child: Text('Lưu'.tr()),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

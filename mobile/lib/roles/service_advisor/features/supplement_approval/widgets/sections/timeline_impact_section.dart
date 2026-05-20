@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../../quotation/widgets/shared/glass_card.dart';
 import '../../utils/supplement_utils.dart';
 import '../../constants/supplement_constants.dart';
@@ -47,7 +48,6 @@ class TimelineImpactSection extends StatelessWidget {
             padding: const EdgeInsets.only(left: 8.0),
             child: Stack(
               children: [
-                // Timeline vertical line
                 Positioned(
                   left: 5,
                   top: 10,
@@ -61,24 +61,28 @@ class TimelineImpactSection extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Old Time Item
                     Padding(
                       padding: const EdgeInsets.only(left: 24.0),
                       child: Stack(
                         clipBehavior: Clip.none,
                         children: [
                           Positioned(
-                            left: -24 - 4, // 24 padding + 4 for center alignment
+                            left: -24 - 4,
                             top: 4,
                             child: Container(
                               width: 10,
                               height: 10,
-                              decoration: BoxDecoration(
+                              decoration: ShapeDecoration(
                                 color: theme.colorScheme.outline,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.colorScheme.surface,
-                                  width: 2,
+                                shape: SmoothRectangleBorder(
+                                  borderRadius: SmoothBorderRadius(
+                                    cornerRadius: 5,
+                                    cornerSmoothing: 1.0,
+                                  ),
+                                  side: BorderSide(
+                                    color: theme.colorScheme.surface,
+                                    width: 2,
+                                  ),
                                 ),
                               ),
                             ),
@@ -112,7 +116,6 @@ class TimelineImpactSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 32),
                     
-                    // New Time Item
                     Padding(
                       padding: const EdgeInsets.only(left: 24.0),
                       child: Stack(
@@ -124,12 +127,17 @@ class TimelineImpactSection extends StatelessWidget {
                             child: Container(
                               width: 12,
                               height: 12,
-                              decoration: BoxDecoration(
+                              decoration: ShapeDecoration(
                                 color: theme.colorScheme.error,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.colorScheme.surface,
-                                  width: 2,
+                                shape: SmoothRectangleBorder(
+                                  borderRadius: SmoothBorderRadius(
+                                    cornerRadius: 6,
+                                    cornerSmoothing: 1.0,
+                                  ),
+                                  side: BorderSide(
+                                    color: theme.colorScheme.surface,
+                                    width: 2,
+                                  ),
                                 ),
                               ),
                             ),

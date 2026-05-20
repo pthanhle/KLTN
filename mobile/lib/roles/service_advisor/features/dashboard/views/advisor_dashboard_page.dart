@@ -11,7 +11,6 @@ import '../widgets/cards/repair_order_skeleton.dart';
 import '../../../../../core/views/components/navigation/header/header_avatar_button.dart';
 import '../../../../../core/views/components/navigation/header/header_notification_button.dart';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
-import 'dart:ui';
 
 class AdvisorDashboardPage extends ConsumerWidget {
   const AdvisorDashboardPage({super.key});
@@ -30,13 +29,17 @@ class AdvisorDashboardPage extends ConsumerWidget {
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             slivers: [
-              SliverAppBar.large(
+              SliverAppBar.medium(
                 backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                scrolledUnderElevation: 0,
+                forceMaterialTransparency: true,
                 elevation: 0,
                 pinned: true,
                 stretch: false,
                 flexibleSpace: FlexibleSpaceBar(
-                  stretchModes: const [], 
+                  stretchModes: const [],
                   titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   title: Text(
                     'Trang chủ'.tr(),
@@ -58,25 +61,18 @@ class AdvisorDashboardPage extends ConsumerWidget {
                   onPressed: () {},
                 ),
               ),
-
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _KanbanTabsDelegate(
-                  child: Container(
-                    color: Colors.transparent,
-                    padding: const EdgeInsets.only(bottom: 16, top: 8),
-                    child: AdvisorKanbanTabs(
-                      selectedStage: state.selectedStage,
-                      onStageSelected: controller.selectStage,
-                    ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 16),
+                  child: AdvisorKanbanTabs(
+                    selectedStage: state.selectedStage,
+                    onStageSelected: controller.selectStage,
                   ),
                 ),
               ),
-              
-              // List of Orders
               if (state.isLoading)
                 SliverPadding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 100.0),
+                  padding: const EdgeInsets.only(top: 4, left: 16.0, right: 16.0, bottom: 100.0),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => const RepairOrderSkeleton(),
@@ -94,7 +90,7 @@ class AdvisorDashboardPage extends ConsumerWidget {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 100.0),
+                  padding: const EdgeInsets.only(top: 4, left: 16.0, right: 16.0, bottom: 100.0),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -108,7 +104,6 @@ class AdvisorDashboardPage extends ConsumerWidget {
                             } else if (order.stage == ROStage.inProgress) {
                               context.go('/advisor/supplement/${order.id}');
                             } else {
-                              // Mặc định các xe chờ đón sẽ vào Walkaround
                               context.go('/advisor/walkaround/${order.id}');
                             }
                           },
@@ -123,26 +118,5 @@ class AdvisorDashboardPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-class _KanbanTabsDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-
-  _KanbanTabsDelegate({required this.child});
-
-  @override
-  double get minExtent => 60.0;
-  @override
-  double get maxExtent => 60.0;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return child;
-  }
-
-  @override
-  bool shouldRebuild(covariant _KanbanTabsDelegate oldDelegate) {
-    return true; // Always rebuild to reflect state changes in tabs
   }
 }

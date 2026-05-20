@@ -71,8 +71,8 @@ class TechnicianDiagnosisSection extends ConsumerWidget {
                           cornerSmoothing: 1.0,
                         ),
                         side: BorderSide(
-                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                          width: 1,
+                          color: Colors.white.withValues(alpha: 0.35),
+                          width: 0.5,
                         ),
                       ),
                     ),

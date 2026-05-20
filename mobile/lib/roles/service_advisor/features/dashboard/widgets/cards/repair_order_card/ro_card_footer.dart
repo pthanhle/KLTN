@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../../models/repair_order_model.dart';
 
 class ROCardFooter extends StatelessWidget {
@@ -13,6 +14,7 @@ class ROCardFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     if (technician == null) {
       return Row(
@@ -20,9 +22,14 @@ class ROCardFooter extends StatelessWidget {
           Container(
             width: 32,
             height: 32,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: theme.colorScheme.errorContainer,
-              shape: BoxShape.circle,
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 16,
+                  cornerSmoothing: 1.0,
+                ),
+              ),
             ),
             alignment: Alignment.center,
             child: Text(
@@ -50,9 +57,20 @@ class ROCardFooter extends StatelessWidget {
         Container(
           width: 32,
           height: 32,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.secondaryContainer,
-            shape: BoxShape.circle,
+          decoration: ShapeDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.10)
+                : theme.colorScheme.secondaryContainer,
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 16,
+                cornerSmoothing: 1.0,
+              ),
+              side: BorderSide(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 0.5,
+              ),
+            ),
             image: DecorationImage(
               image: NetworkImage(technician!.avatarUrl),
               fit: BoxFit.cover,
@@ -61,7 +79,7 @@ class ROCardFooter extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          'KTV: '.tr() + technician!.name,
+          '${'KTV'.tr()}: ${technician!.name}',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurface,
           ),

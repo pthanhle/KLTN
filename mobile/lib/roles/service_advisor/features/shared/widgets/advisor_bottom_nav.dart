@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import '../../../../../core/views/components/navigation/glass_nav_item.dart';
 
 class AdvisorBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -20,7 +21,7 @@ class AdvisorBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomSafeArea = MediaQuery.of(context).padding.bottom;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     return Positioned(
       bottom: bottomSafeArea > 0 ? 24 : 16,
@@ -32,7 +33,7 @@ class AdvisorBottomNav extends StatelessWidget {
           color: Colors.white.withValues(alpha: 0.15),
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
-              cornerRadius: 36,
+              cornerRadius: 44,
               cornerSmoothing: 1.0,
             ),
             side: BorderSide(
@@ -45,12 +46,12 @@ class AdvisorBottomNav extends StatelessWidget {
               color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 40,
               offset: const Offset(0, 10),
-            )
+            ),
           ],
         ),
         child: ClipSmoothRect(
           radius: SmoothBorderRadius(
-            cornerRadius: 36,
+            cornerRadius: 44,
             cornerSmoothing: 1.0,
           ),
           child: BackdropFilter(
@@ -58,23 +59,28 @@ class AdvisorBottomNav extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: _buildTabItem(
-                    context,
+                  child: GlassNavItem(
                     icon: CupertinoIcons.house,
-                    activeIcon: CupertinoIcons.house_fill,
+                    activeIcon: CupertinoIcons.house,
                     label: 'Trang chủ'.tr(),
-                    index: 0,
+                    isSelected: currentIndex == 0,
+                    onTap: () {
+                      if (currentIndex != 0) onTabTapped(0);
+                    },
                   ),
                 ),
                 Expanded(
-                  child: _buildTabItem(
-                    context,
+                  child: GlassNavItem(
                     icon: CupertinoIcons.calendar,
-                    activeIcon: CupertinoIcons.calendar_today,
+                    activeIcon: CupertinoIcons.calendar,
                     label: 'Lịch hẹn'.tr(),
-                    index: 1,
+                    isSelected: currentIndex == 1,
+                    onTap: () {
+                      if (currentIndex != 1) onTabTapped(1);
+                    },
                   ),
                 ),
+                // Scanner CTA — center pill
                 GestureDetector(
                   onTap: () {
                     HapticFeedback.heavyImpact();
@@ -87,24 +93,24 @@ class AdvisorBottomNav extends StatelessWidget {
                         width: 52,
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.5),
-                            width: 1,
+                            width: 0.5,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                              color: theme.colorScheme.primary.withValues(alpha: 0.3),
                               blurRadius: 16,
                               spreadRadius: 0,
                               offset: const Offset(0, 4),
                             ),
-                          ]
+                          ],
                         ),
                         child: Icon(
                           CupertinoIcons.qrcode_viewfinder,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: theme.colorScheme.primary,
                           size: 26,
                         ),
                       ),
@@ -112,69 +118,22 @@ class AdvisorBottomNav extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: _buildTabItem(
-                    context,
+                  child: GlassNavItem(
                     icon: CupertinoIcons.person,
-                    activeIcon: CupertinoIcons.person_solid,
+                    activeIcon: CupertinoIcons.person,
                     label: 'Tài khoản'.tr(),
-                    index: 2,
+                    // branch 2 → visualIndex 3 (do scanner chiếm slot giữa)
+                    isSelected: currentIndex == 3,
+                    onTap: () {
+                      if (currentIndex != 3) onTabTapped(2);
+                    },
                   ),
                 ),
+                // Placeholder to balance the scanner button
                 const Expanded(child: SizedBox()),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabItem(
-    BuildContext context, {
-    required IconData icon,
-    required IconData activeIcon,
-    required String label,
-    required int index,
-  }) {
-    final isSelected = currentIndex == index;
-    final theme = Theme.of(context);
-    
-    final activeColor = theme.colorScheme.primary;
-    final inactiveColor = theme.brightness == Brightness.dark 
-        ? Colors.white.withValues(alpha: 0.5) 
-        : Colors.black.withValues(alpha: 0.4);
-    
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        if (!isSelected) {
-          HapticFeedback.selectionClick();
-          onTabTapped(index);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 80,
-        curve: Curves.easeOutCubic,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isSelected ? activeIcon : icon,
-              color: isSelected ? activeColor : inactiveColor,
-              size: isSelected ? 26 : 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? activeColor : inactiveColor,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
         ),
       ),
     );

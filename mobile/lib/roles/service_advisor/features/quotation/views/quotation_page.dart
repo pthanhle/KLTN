@@ -5,12 +5,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'dart:ui';
 import 'package:go_router/go_router.dart';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
+import '../../../../../shared/widgets/buttons/glass_nav_back_button.dart';
+import '../../../../../shared/widgets/buttons/glass_menu_button.dart';
 import '../controllers/quotation_controller.dart';
 import '../widgets/shared/quotation_skeleton.dart';
 import '../widgets/sections/technician_diagnosis_section.dart';
 import '../widgets/sections/service_cart_section.dart';
 import '../widgets/sections/promotions_section.dart';
-import '../widgets/shared/quotation_bottom_sheet.dart';
+import '../widgets/shared/quotation_summary_card.dart';
 
 class QuotationPage extends ConsumerWidget {
   final String orderId;
@@ -27,23 +29,28 @@ class QuotationPage extends ConsumerWidget {
       body: Stack(
         children: [
           const MeshBackground(child: SizedBox()),
-          
+
           CustomScrollView(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             slivers: [
               // Liquid App Bar
               SliverAppBar(
                 pinned: true,
-                backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.6),
+                backgroundColor:
+                    theme.colorScheme.surface.withValues(alpha: 0.6),
                 flexibleSpace: ClipRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
                     child: Container(color: Colors.transparent),
                   ),
                 ),
-                leading: IconButton(
-                  icon: const Icon(CupertinoIcons.back),
-                  color: theme.colorScheme.primary,
-                  onPressed: () => context.pop(),
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: GlassNavBackButton(
+                    onPressed: () => context.pop(),
+                  ),
                 ),
                 title: Text(
                   'Lập Báo Giá'.tr(),
@@ -54,14 +61,15 @@ class QuotationPage extends ConsumerWidget {
                 ),
                 centerTitle: true,
                 actions: [
-                  IconButton(
-                    icon: const Icon(CupertinoIcons.ellipsis),
-                    color: theme.colorScheme.primary,
-                    onPressed: () {},
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: GlassMenuButton(
+                      onPressed: () {},
+                    ),
                   ),
                 ],
               ),
-              
+
               SliverToBoxAdapter(
                 child: asyncData.when(
                   loading: () => const QuotationSkeleton(),
@@ -74,22 +82,17 @@ class QuotationPage extends ConsumerWidget {
                       ServiceCartSection(data: data),
                       const SizedBox(height: 32),
                       PromotionsSection(data: data),
-                      const SizedBox(height: 400), // Padding for sticky bottom sheet
+                      const SizedBox(height: 32),
+                      // Inline summary + CTA — cuộn cùng content
+                      QuotationSummaryCard(data: data),
+                      // Bottom safe area padding
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-
-          // Sticky Bottom Sheet
-          if (asyncData.hasValue && asyncData.value != null)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: QuotationBottomSheet(data: asyncData.value!),
-            ),
         ],
       ),
     );

@@ -59,6 +59,10 @@ class _WarehouseHomePageState extends ConsumerState<WarehouseHomePage> {
               slivers: [
                 SliverAppBar.large(
                   backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                  forceMaterialTransparency: true,
                   elevation: 0,
                   pinned: true,
                   stretch: false,
@@ -106,7 +110,7 @@ class _WarehouseHomePageState extends ConsumerState<WarehouseHomePage> {
                                 child: UrgentActionCard(
                                   title: 'Đơn gấp'.tr(),
                                   count: '${state.urgentCount} Đơn',
-                                  icon: Icons.local_fire_department_rounded,
+                                  icon: CupertinoIcons.flame,
                                   baseColor: const Color(0xFFEF4444),
                                   onTap: () {},
                                 ),
@@ -116,7 +120,7 @@ class _WarehouseHomePageState extends ConsumerState<WarehouseHomePage> {
                                 child: UrgentActionCard(
                                   title: 'Chờ giao'.tr(),
                                   count: '${state.packedCount} Đơn',
-                                  icon: Icons.local_shipping_rounded,
+                                  icon: CupertinoIcons.cube_box_fill,
                                   baseColor: const Color(0xFFEAB308),
                                   onTap: () {},
                                 ),

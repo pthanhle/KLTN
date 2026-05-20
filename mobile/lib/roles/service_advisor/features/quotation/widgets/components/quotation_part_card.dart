@@ -61,8 +61,8 @@ class QuotationPartCard extends StatelessWidget {
                         cornerSmoothing: 1.0,
                       ),
                       side: BorderSide(
-                        color: theme.colorScheme.error.withValues(alpha: 0.2),
-                        width: 1,
+                        color: theme.colorScheme.error.withValues(alpha: 0.30),
+                        width: 0.5,
                       ),
                     ),
                   ),
@@ -92,17 +92,18 @@ class QuotationPartCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: ShapeDecoration(
-                      color: isDark 
+                      color: isDark
                           ? Colors.white.withValues(alpha: 0.05)
-                          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                          : theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.3),
                       shape: SmoothRectangleBorder(
                         borderRadius: SmoothBorderRadius(
-                          cornerRadius: QuotationConstants.radiusSmall, 
+                          cornerRadius: QuotationConstants.radiusSmall,
                           cornerSmoothing: 1.0,
                         ),
                         side: BorderSide(
-                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                          width: 1,
+                          color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.35),
+                          width: 0.5,
                         ),
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,24 +69,32 @@ class _VibrantLiquidButtonState extends State<VibrantLiquidButton> {
               ),
             ],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widget.isLoading
-                ? [
-                    CupertinoActivityIndicator(color: Colors.white),
-                  ]
-                : [
-                    Text(
-                      widget.text,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(widget.icon, size: 20, color: Colors.white),
-                  ],
+          child: ClipSmoothRect(
+            radius: SmoothBorderRadius(
+              cornerRadius: SupplementConstants.cardRadius,
+              cornerSmoothing: 1.0,
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: widget.isLoading
+                    ? [const CupertinoActivityIndicator(color: Colors.white)]
+                    : [
+                        Text(
+                          widget.text,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(widget.icon, size: 20, color: Colors.white),
+                      ],
+              ),
+            ),
           ),
         ),
       ),

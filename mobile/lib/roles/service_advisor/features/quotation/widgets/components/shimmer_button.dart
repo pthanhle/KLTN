@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import '../../constants/quotation_constants.dart';
 
@@ -39,7 +40,12 @@ class _ShimmerButtonState extends State<ShimmerButton> with SingleTickerProvider
     final theme = Theme.of(context);
     
     return GestureDetector(
-      onTap: widget.onTap,
+      onTapDown: (_) => HapticFeedback.lightImpact(),
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        widget.onTap();
+      },
+      behavior: HitTestBehavior.opaque,
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {

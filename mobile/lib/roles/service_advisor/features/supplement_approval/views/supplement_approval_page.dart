@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
+import '../../../../../shared/widgets/buttons/glass_nav_back_button.dart';
+import '../../../../../shared/widgets/buttons/glass_menu_button.dart';
 import '../controllers/supplement_controller.dart';
 import '../widgets/shared/supplement_skeleton.dart';
 import '../widgets/shared/glass_warning_banner.dart';
@@ -36,16 +38,24 @@ class SupplementApprovalPage extends ConsumerWidget {
               slivers: [
                 SliverAppBar.large(
                   backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                  forceMaterialTransparency: true,
                   elevation: 0,
                   pinned: true,
-                  leading: IconButton(
-                    icon: const Icon(CupertinoIcons.back),
-                    onPressed: () => context.pop(),
+                  leading: Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: GlassNavBackButton(
+                      onPressed: () => context.pop(),
+                    ),
                   ),
                   actions: [
-                    IconButton(
-                      icon: const Icon(CupertinoIcons.ellipsis_vertical),
-                      onPressed: () {},
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GlassMenuButton(
+                        onPressed: () {},
+                      ),
                     ),
                   ],
                   flexibleSpace: FlexibleSpaceBar(
@@ -85,7 +95,10 @@ class SupplementApprovalPage extends ConsumerWidget {
                         SupplementIssueSection(
                           title: data.issueTitle,
                           description: data.issueDescription,
-                          imageUrl: data.evidenceMediaUrl,
+                          proposedFix: data.proposedFix,
+                          mechanicName: data.mechanicName,
+                          mechanicRole: data.mechanicRole,
+                          imageUrls: data.evidenceMediaUrls,
                         ),
                         const SizedBox(height: SupplementConstants.sectionSpacing),
                         FinancialImpactSection(
@@ -104,44 +117,54 @@ class SupplementApprovalPage extends ConsumerWidget {
                 ),
               ],
             ),
-            
-            // Bottom Action Button
             if (state.hasValue)
               Positioned(
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                    child: Container(
-                      padding: EdgeInsets.only(
-                        left: SupplementConstants.cardPadding,
-                        right: SupplementConstants.cardPadding,
-                        top: 16,
-                        bottom: bottomSafeArea > 0 ? bottomSafeArea : SupplementConstants.cardPadding,
+                child: Container(
+                  decoration: ShapeDecoration(
+                    color: theme.colorScheme.surface.withValues(alpha: 0.60),
+                    shape: SmoothRectangleBorder(
+                      borderRadius: const SmoothBorderRadius.only(
+                        topLeft: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                        topRight: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
                       ),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            theme.scaffoldBackgroundColor,
-                            theme.scaffoldBackgroundColor.withValues(alpha: 0.5),
-                          ],
-                        ),
-                        border: Border(
-                          top: BorderSide(
-                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
-                            width: 0.5,
-                          ),
-                        ),
+                      side: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.20),
+                        width: 0.5,
                       ),
-                      child: VibrantLiquidButton(
-                        text: 'Gửi Yêu Cầu Duyệt Bổ Sung'.tr(),
-                        icon: CupertinoIcons.paperplane_fill,
-                        onPressed: () => controller.submitApproval(),
-                        isLoading: state.isLoading,
+                    ),
+                    shadows: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.10),
+                        blurRadius: 20,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: ClipSmoothRect(
+                    radius: const SmoothBorderRadius.only(
+                      topLeft: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                      topRight: SmoothRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                    ),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: SupplementConstants.cardPadding,
+                          right: SupplementConstants.cardPadding,
+                          top: 16,
+                          bottom: bottomSafeArea > 0
+                              ? bottomSafeArea
+                              : SupplementConstants.cardPadding,
+                        ),
+                        child: VibrantLiquidButton(
+                          text: 'Gửi Yêu Cầu Duyệt Bổ Sung'.tr(),
+                          icon: CupertinoIcons.paperplane_fill,
+                          onPressed: () => controller.submitApproval(),
+                          isLoading: state.isLoading,
+                        ),
                       ),
                     ),
                   ),

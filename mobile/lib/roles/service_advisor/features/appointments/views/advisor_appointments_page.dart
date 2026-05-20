@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../../core/views/components/navigation/header/header_avatar_button.dart';
@@ -71,8 +72,8 @@ class AdvisorAppointmentsPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.calendar_month_outlined,
+                      Icon(
+                        CupertinoIcons.calendar_today,
                         size: 64,
                         color: Colors.grey,
                       ),

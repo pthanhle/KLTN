@@ -3,7 +3,10 @@ class SupplementModel {
   final String orderId;
   final String issueTitle;
   final String issueDescription;
-  final String evidenceMediaUrl;
+  final String proposedFix;
+  final String mechanicName;
+  final String mechanicRole;
+  final List<String> evidenceMediaUrls;
   final double oldCost;
   final double newCost;
   final DateTime oldDeliveryTime;
@@ -16,7 +19,10 @@ class SupplementModel {
     required this.orderId,
     required this.issueTitle,
     required this.issueDescription,
-    required this.evidenceMediaUrl,
+    required this.proposedFix,
+    required this.mechanicName,
+    required this.mechanicRole,
+    required this.evidenceMediaUrls,
     required this.oldCost,
     required this.newCost,
     required this.oldDeliveryTime,
@@ -31,7 +37,10 @@ class SupplementModel {
       orderId: json['order_id'] ?? '',
       issueTitle: json['issue_title'] ?? '',
       issueDescription: json['issue_description'] ?? '',
-      evidenceMediaUrl: json['evidence_media_url'] ?? '',
+      proposedFix: json['proposed_fix'] ?? '',
+      mechanicName: json['mechanic_name'] ?? '',
+      mechanicRole: json['mechanic_role'] ?? '',
+      evidenceMediaUrls: List<String>.from(json['evidence_media_urls'] ?? []),
       oldCost: (json['old_cost'] ?? 0).toDouble(),
       newCost: (json['new_cost'] ?? 0).toDouble(),
       oldDeliveryTime: DateTime.parse(json['old_delivery_time']),
@@ -50,7 +59,10 @@ class SupplementModel {
       'order_id': orderId,
       'issue_title': issueTitle,
       'issue_description': issueDescription,
-      'evidence_media_url': evidenceMediaUrl,
+      'proposed_fix': proposedFix,
+      'mechanic_name': mechanicName,
+      'mechanic_role': mechanicRole,
+      'evidence_media_urls': evidenceMediaUrls,
       'old_cost': oldCost,
       'new_cost': newCost,
       'old_delivery_time': oldDeliveryTime.toIso8601String(),

@@ -6,11 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+enum LiquidButtonVariant { primary, neutral }
+
 class LiquidButton extends StatefulWidget {
   final FutureOr<void> Function()? onPressed;
   final Widget child;
   final bool isLoading;
   final bool isGlass;
+  final LiquidButtonVariant variant;
 
   const LiquidButton({
     super.key,
@@ -18,6 +21,7 @@ class LiquidButton extends StatefulWidget {
     required this.child,
     this.isLoading = false,
     this.isGlass = false,
+    this.variant = LiquidButtonVariant.primary,
   });
 
   @override
@@ -60,13 +64,35 @@ class _LiquidButtonState extends State<LiquidButton> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isPrimary = widget.variant == LiquidButtonVariant.primary;
     final primary = theme.colorScheme.primary;
 
-    final bgAlpha = _isDisabled
-        ? 0.35
-        : _effectiveIsLoading
-            ? 0.70
-            : 0.88;
+    final bgColor = isPrimary
+        ? primary.withValues(alpha: _isDisabled ? 0.35 : _effectiveIsLoading ? 0.70 : 0.88)
+        : isDark
+            ? Colors.white.withValues(alpha: 0.09)
+            : Colors.black.withValues(alpha: 0.06);
+
+    final borderColor = isPrimary
+        ? Colors.white.withValues(alpha: isDark ? 0.35 : 0.50)
+        : Colors.white.withValues(alpha: isDark ? 0.18 : 0.55);
+
+    final shadows = (_isPressed || _isDisabled)
+        ? <BoxShadow>[]
+        : isPrimary
+            ? [
+                BoxShadow(
+                  color: primary.withValues(alpha: _effectiveIsLoading ? 0.15 : widget.isGlass ? 0.28 : 0.22),
+                  blurRadius: widget.isGlass ? 14 : 12,
+                  offset: Offset(0, widget.isGlass ? 5 : 4),
+                ),
+              ]
+            : <BoxShadow>[];
+
+    final textColor = isPrimary
+        ? Colors.white.withValues(alpha: _isDisabled ? 0.45 : 1.0)
+        : theme.colorScheme.onSurfaceVariant;
 
     return GestureDetector(
       onTapDown: _handleTapDown,
@@ -75,54 +101,30 @@ class _LiquidButtonState extends State<LiquidButton> {
       child: Container(
         width: double.infinity,
         decoration: ShapeDecoration(
-          color: primary.withValues(alpha: bgAlpha),
+          color: bgColor,
           shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: 16,
-              cornerSmoothing: 1.0,
-            ),
-            side: _isDisabled
+            borderRadius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+            side: _isDisabled && isPrimary
                 ? BorderSide.none
-                : BorderSide(
-                    color: Colors.white.withValues(alpha: 0.55),
-                    width: 1.0,
-                  ),
+                : BorderSide(color: borderColor, width: isPrimary ? 1.0 : 0.5),
           ),
-          shadows: (_isPressed || _isDisabled)
-              ? []
-              : widget.isGlass
-                  ? [
-                      BoxShadow(
-                        color: primary.withValues(alpha: _effectiveIsLoading ? 0.15 : 0.28),
-                        blurRadius: 14,
-                        offset: const Offset(0, 5),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: primary.withValues(alpha: _effectiveIsLoading ? 0.10 : 0.22),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+          shadows: shadows,
         ),
         child: ClipSmoothRect(
           radius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 18),
+              padding: const EdgeInsets.symmetric(vertical: 15),
               child: Center(
                 child: _effectiveIsLoading
-                    ? const CupertinoActivityIndicator(color: Colors.white)
+                    ? CupertinoActivityIndicator(color: isPrimary ? Colors.white : theme.colorScheme.primary)
                     : DefaultTextStyle(
                         style: TextStyle(
-                          color: Colors.white.withValues(
-                            alpha: _isDisabled ? 0.45 : 1.0,
-                          ),
+                          color: textColor,
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.4,
                         ),
                         child: widget.child,
                       ),

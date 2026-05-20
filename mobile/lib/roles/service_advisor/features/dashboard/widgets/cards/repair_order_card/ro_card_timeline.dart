@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 class ROCardTimeline extends StatelessWidget {
   final DateTime scheduledTime;
@@ -19,14 +18,13 @@ class ROCardTimeline extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     final bool hasArrived = arrivalTime != null;
     final DateTime effectiveArrival = arrivalTime ?? scheduledTime;
-    
-    // Format: 14:30 - 20/05
+
     final dateFormat = DateFormat('HH:mm - dd/MM');
     final arrivalFormat = dateFormat.format(effectiveArrival);
-    
+
     bool isUrgent = false;
     bool isLate = false;
     String timeLeft = '';
@@ -48,10 +46,18 @@ class ROCardTimeline extends StatelessWidget {
       deliveryFormat = dateFormat.format(deliveryTime!);
     }
 
+    final urgentColor = isLate
+        ? theme.colorScheme.error
+        : isUrgent
+            ? Colors.orange
+            : null;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: ShapeDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.black.withValues(alpha: 0.03),
         shape: SmoothRectangleBorder(
           borderRadius: SmoothBorderRadius(
             cornerRadius: 16,
@@ -98,24 +104,19 @@ class ROCardTimeline extends StatelessWidget {
                       deliveryFormat,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: isUrgent || isLate ? theme.colorScheme.error : null,
+                        color: urgentColor,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '($timeLeft)',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: isUrgent || isLate ? theme.colorScheme.error : theme.colorScheme.onSurfaceVariant,
+                        color: urgentColor ?? theme.colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
-                ).animate(target: isUrgent || isLate ? 1 : 0)
-                 .tint(color: theme.colorScheme.error, duration: 200.ms)
-                 .shimmer(duration: 2.seconds, color: theme.colorScheme.error.withValues(alpha: 0.3))
-                 .callback(callback: (val) {
-                 }).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                 .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 500.ms, curve: Curves.easeInOut)
+                )
               else
                 Text(
                   'Chưa có dự kiến'.tr(),

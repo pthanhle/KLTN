@@ -34,42 +34,42 @@ class _MeshBackgroundState extends State<MeshBackground>
     
     return Stack(
       children: [
-        // Base background color
         Container(color: theme.scaffoldBackgroundColor),
-        
-        // Animated Mesh Gradient Elements
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Stack(
-              children: [
-                Positioned(
-                  top: -100 + (_controller.value * 50),
-                  left: -100 - (_controller.value * 50),
-                  child: Container(
-                    width: 400,
-                    height: 400,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: theme.primaryColor.withOpacity(0.3),
+
+        RepaintBoundary(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Stack(
+                children: [
+                  Positioned(
+                    top: -100 + (_controller.value * 50),
+                    left: -100 - (_controller.value * 50),
+                    child: Container(
+                      width: 400,
+                      height: 400,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: theme.primaryColor.withOpacity(0.3),
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  bottom: -50 - (_controller.value * 30),
-                  right: -150 + (_controller.value * 80),
-                  child: Container(
-                    width: 500,
-                    height: 500,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.purple.withOpacity(0.2),
+                  Positioned(
+                    bottom: -50 - (_controller.value * 30),
+                    right: -150 + (_controller.value * 80),
+                    child: Container(
+                      width: 500,
+                      height: 500,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.purple.withOpacity(0.2),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
         
         // Heavy blur to blend the colors (Glass effect)

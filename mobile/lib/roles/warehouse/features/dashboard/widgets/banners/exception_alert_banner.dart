@@ -1,5 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class ExceptionAlertBanner extends StatelessWidget {
@@ -13,31 +14,36 @@ class ExceptionAlertBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: Colors.red.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: Colors.red.withValues(alpha: 0.3),
-          width: 1,
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 999,
+            cornerSmoothing: 1.0,
+          ),
+          side: BorderSide(
+            color: Colors.red.withValues(alpha: 0.3),
+            width: 0.5,
+          ),
         ),
-        boxShadow: [
+        shadows: [
           BoxShadow(
             color: Colors.red.withValues(alpha: 0.2),
             blurRadius: 15,
             offset: Offset.zero,
-          )
-        ]
+          ),
+        ],
       ),
       child: Row(
         children: [
           Icon(
-            Icons.error_rounded,
+            CupertinoIcons.exclamationmark_circle_fill,
             color: Colors.red.shade400,
-            size: 24,
+            size: 22,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -51,13 +57,12 @@ class ExceptionAlertBanner extends StatelessWidget {
             ),
           ),
           Icon(
-            Icons.chevron_right_rounded,
+            CupertinoIcons.chevron_right,
             color: Colors.red.shade400.withValues(alpha: 0.7),
-            size: 24,
+            size: 18,
           ),
         ],
       ),
-    ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-     .shimmer(duration: const Duration(seconds: 3), color: Colors.white.withValues(alpha: 0.2));
+    );
   }
 }

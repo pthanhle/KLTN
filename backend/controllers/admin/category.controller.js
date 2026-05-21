@@ -36,12 +36,29 @@ export const getCategories = asyncHandler(async (req, res) => {
       .limit(limit);
   }
 
-  const enrichedCategories = await Promise.all(categories.map(async (c) => {
-    const count = await Car.countDocuments({ bodyStyle: c.category_name });
-    return {
-      ...c.toObject(),
-      count
-    };
+  const categoryNames = categories.map(c => c.category_name);
+  const carCounts = await Car.aggregate([
+    {
+      $match: {
+        bodyStyle: { $in: categoryNames }
+      }
+    },
+    {
+      $group: {
+        _id: '$bodyStyle',
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  const countMap = {};
+  carCounts.forEach(item => {
+    countMap[item._id] = item.count;
+  });
+
+  const enrichedCategories = categories.map(c => ({
+    ...c.toObject(),
+    count: countMap[c.category_name] || 0
   }));
 
   res.json({
@@ -101,7 +118,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
   }
 
   if (category_name && category_name !== category.category_name) {
-    const existingCategory = await Category.findOne({ 
+    const existingCategory = await Category.findOne({
       category_name: { $regex: new RegExp(`^${category_name}$`, 'i') },
       _id: { $ne: id }
     })
@@ -146,3 +163,4 @@ export const deleteCategory = asyncHandler(async (req, res) => {
   await category.deleteOne()
   res.json({ message: 'Đã xóa danh mục thành công' })
 })
+

@@ -19,7 +19,7 @@ export const CategoryTable = ({ categories, isLoading, handleEdit, handleDelete,
                 <Table
                     columns={columns}
                     dataSource={categories}
-                    rowKey="id"
+                    rowKey={(record) => record._id || record.id}
                     pagination={{
                         defaultPageSize: 10,
                         showSizeChanger: true,

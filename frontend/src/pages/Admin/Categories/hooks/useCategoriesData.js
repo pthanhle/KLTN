@@ -1,30 +1,34 @@
 import { useState, useEffect, useMemo } from 'react';
-import { MOCK_CATEGORIES_ADMIN } from '../data/category.mock';
+import { CategoryAPI } from '../../../../services/api/category';
 
 export const useCategoriesData = () => {
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const fetchCategories = async () => {
+        setIsLoading(true);
+        try {
+            const response = await CategoryAPI.getAdminCategories({ all: true });
+            setCategories(response.categories || []);
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách kiểu dáng:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        // Giả lập API Fetch
-        const fetchCategories = async () => {
-            setIsLoading(true);
-            setTimeout(() => {
-                setCategories(MOCK_CATEGORIES_ADMIN);
-                setIsLoading(false);
-            }, 800);
-        };
         fetchCategories();
     }, []);
 
     const stats = useMemo(() => {
         const totalCategories = categories.length;
-        const totalCars = categories.reduce((sum, item) => sum + item.count, 0);
+        const totalCars = categories.reduce((sum, item) => sum + (item.count || 0), 0);
 
         let mostPopular = 'N/A';
         if (totalCategories > 0) {
-            const top = categories.reduce((prev, current) => (prev.count > current.count) ? prev : current);
-            mostPopular = top.name;
+            const top = categories.reduce((prev, current) => ((prev.count || 0) > (current.count || 0)) ? prev : current);
+            mostPopular = top.category_name || top.name || 'N/A';
         }
 
         return {
@@ -38,6 +42,7 @@ export const useCategoriesData = () => {
         categories,
         setCategories,
         stats,
-        isLoading
+        isLoading,
+        reloadCategories: fetchCategories
     };
 };

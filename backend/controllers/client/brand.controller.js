@@ -1,4 +1,5 @@
 import Brand from '../../models/brandModel.js';
+import Car from '../../models/carModel.js';
 
 export const getBrands = async (req, res) => {
     try {
@@ -30,9 +31,30 @@ export const getBrands = async (req, res) => {
 
         const brands = await brandsQuery.lean();
 
+        const brandIds = brands.map(b => b._id.toString());
+        const carCounts = await Car.aggregate([
+            {
+                $match: {
+                    brandId: { $in: brandIds },
+                    status: 'Published'
+                }
+            },
+            {
+                $group: {
+                    _id: '$brandId',
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const countMap = {};
+        carCounts.forEach(item => {
+            countMap[item._id] = item.count;
+        });
+
         const enrichedBrands = brands.map(b => ({
             ...b,
-            count: Math.floor(Math.random() * 50) + 1
+            count: countMap[b._id.toString()] || 0
         }));
 
         if (isPaginated) {

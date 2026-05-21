@@ -9,8 +9,8 @@ export const useCategoryFormState = (isOpen, editingData) => {
         if (isOpen) {
             if (editingData) {
                 form.setFieldsValue({
-                    name: editingData.name,
-                    id: editingData.id,
+                    name: editingData.category_name || editingData.name,
+                    id: editingData._id || editingData.id,
                     description: editingData.description
                 });
             } else {

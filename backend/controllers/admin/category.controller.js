@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import Part from '../../models/partModel.js'
 import Category from '../../models/categoryModel.js'
+import Car from '../../models/carModel.js'
 import mongoose from 'mongoose'
 
 
@@ -10,6 +11,7 @@ export const getCategories = asyncHandler(async (req, res) => {
   const search = req.query.search || '';
   const sortField = req.query.sortField || 'createdAt';
   const sortOrder = (req.query.sortOrder === 'ascend' || req.query.sortOrder === 'asc') ? 1 : -1;
+  const all = req.query.all === 'true';
 
   let filter = {};
   if (search) {
@@ -23,16 +25,30 @@ export const getCategories = asyncHandler(async (req, res) => {
   sortObj[sortField] = sortOrder;
 
   const total = await Category.countDocuments(filter);
-  const categories = await Category.find(filter)
-    .sort(sortObj)
-    .skip((page - 1) * limit)
-    .limit(limit);
+
+  let categories;
+  if (all) {
+    categories = await Category.find(filter).sort(sortObj);
+  } else {
+    categories = await Category.find(filter)
+      .sort(sortObj)
+      .skip((page - 1) * limit)
+      .limit(limit);
+  }
+
+  const enrichedCategories = await Promise.all(categories.map(async (c) => {
+    const count = await Car.countDocuments({ bodyStyle: c.category_name });
+    return {
+      ...c.toObject(),
+      count
+    };
+  }));
 
   res.json({
-    categories,
+    categories: enrichedCategories,
     pagination: {
       current: page,
-      pageSize: limit,
+      pageSize: all ? total : limit,
       total
     }
   });
@@ -47,7 +63,7 @@ export const createCategory = asyncHandler(async (req, res) => {
     throw new Error('Tên danh mục là bắt buộc')
   }
 
-  const categoryExists = await Category.findOne({ category_name })
+  const categoryExists = await Category.findOne({ category_name: { $regex: new RegExp(`^${category_name}$`, 'i') } })
   if (categoryExists) {
     res.status(400)
     throw new Error('Danh mục đã tồn tại')
@@ -85,7 +101,10 @@ export const updateCategory = asyncHandler(async (req, res) => {
   }
 
   if (category_name && category_name !== category.category_name) {
-    const existingCategory = await Category.findOne({ category_name })
+    const existingCategory = await Category.findOne({ 
+      category_name: { $regex: new RegExp(`^${category_name}$`, 'i') },
+      _id: { $ne: id }
+    })
     if (existingCategory) {
       res.status(400)
       throw new Error('Tên danh mục đã tồn tại')

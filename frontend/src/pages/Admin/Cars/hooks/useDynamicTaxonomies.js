@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { BODY_STYLES } from '../../../Customer/Cars/constants/cars.constants';
+import { brandAPI } from '../../../../services/api/brands';
+import { CategoryAPI } from '../../../../services/api/category';
 
 export const useDynamicTaxonomies = () => {
     const [brands, setBrands] = useState([]);
@@ -9,33 +10,31 @@ export const useDynamicTaxonomies = () => {
     useEffect(() => {
         const fetchTaxonomies = async () => {
             setIsLoadingTaxonomies(true);
-            setTimeout(() => {
-                setBrands([
-                    { value: 'porsche', label: 'Porsche' },
-                    { value: 'mercedes-benz', label: 'Mercedes-Benz' },
-                    { value: 'bmw', label: 'BMW' },
-                    { value: 'audi', label: 'Audi' },
-                    { value: 'lexus', label: 'Lexus' }
-                ]);
-                setBodyStyles(
-                    BODY_STYLES.filter(b => b.value !== 'Tất cả')
-                );
+            try {
+                const brandsData = await brandAPI.getAdminBrands();
+                const formattedBrands = brandsData.map(b => ({
+                    value: b.id || b._id,
+                    label: b.name
+                }));
+
+                const categoriesRes = await CategoryAPI.getAdminCategories({ all: true });
+                const categoriesData = categoriesRes.categories || [];
+                const formattedStyles = categoriesData.map(c => ({
+                    value: c.category_name,
+                    label: c.category_name
+                }));
+
+                setBrands(formattedBrands);
+                setBodyStyles(formattedStyles);
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu Thương hiệu/Kiểu dáng:', error);
+            } finally {
                 setIsLoadingTaxonomies(false);
-            }, 500);
+            }
         };
 
         fetchTaxonomies();
     }, []);
 
-    const addBrandConfig = (newBrand) => {
-        const formattedBrand = { value: newBrand.name, label: newBrand.name };
-        setBrands(prev => [...prev, formattedBrand]);
-    };
-
-    const addBodyStyleConfig = (newBodyStyle) => {
-        const formattedStyle = { value: newBodyStyle.name, label: newBodyStyle.name };
-        setBodyStyles(prev => [...prev, formattedStyle]);
-    };
-
-    return { brands, bodyStyles, isLoadingTaxonomies, addBrandConfig, addBodyStyleConfig };
+    return { brands, bodyStyles, isLoadingTaxonomies };
 };

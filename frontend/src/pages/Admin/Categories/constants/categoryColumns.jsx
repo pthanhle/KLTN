@@ -4,15 +4,15 @@ import { EditAction, DeleteAction, DeleteLockedAction } from '../../../../compon
 export const getCategoryColumns = (t, handleEdit, handleDelete) => [
     {
         title: t('adminCategories:colCategory', 'KIỂU DÁNG'),
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'category_name',
+        key: 'category_name',
         render: (text, record) => (
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-[#2e3447] flex items-center justify-center text-yellow-500 shadow-sm border border-white/5">
                     <Layers size={22} strokeWidth={2} />
                 </div>
                 <div>
-                    <p className="font-bold text-slate-800 dark:text-white text-lg">{text}</p>
+                    <p className="font-bold text-slate-800 dark:text-white text-lg">{text || record.name}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[280px] truncate">{record.description}</p>
                 </div>
             </div>
@@ -20,12 +20,12 @@ export const getCategoryColumns = (t, handleEdit, handleDelete) => [
     },
     {
         title: t('adminCategories:colId', 'MÃ HỆ THỐNG'),
-        dataIndex: 'id',
-        key: 'id',
+        dataIndex: '_id',
+        key: '_id',
         align: 'center',
-        render: (text) => (
+        render: (text, record) => (
             <span className="font-mono text-xs bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-[#9b8f79]/10 text-slate-600 dark:text-slate-300">
-                {text}
+                {text || record.id}
             </span>
         )
     },

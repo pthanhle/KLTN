@@ -22,5 +22,10 @@ export const CategoryAPI = {
             console.error('[CategoryAPI] Error fetching categories:', error);
             throw error;
         }
-    }
+    },
+
+    getAdminCategories: (params) => axiosClient.get('/admin/categories', { params }),
+    createAdminCategory: (data) => axiosClient.post('/admin/categories', data),
+    updateAdminCategory: (id, data) => axiosClient.put(`/admin/categories/${id}`, data),
+    deleteAdminCategory: (id) => axiosClient.delete(`/admin/categories/${id}`)
 };

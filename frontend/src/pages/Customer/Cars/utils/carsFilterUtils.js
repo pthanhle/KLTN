@@ -12,7 +12,7 @@ export const applyCarsFilters = (cars, filters, sort) => {
     if (filters.minPrice) {
         result = result.filter(c => c.price >= Number(filters.minPrice));
     }
-    
+
     if (filters.maxPrice) {
         result = result.filter(c => c.price <= Number(filters.maxPrice));
     }
@@ -21,9 +21,9 @@ export const applyCarsFilters = (cars, filters, sort) => {
         result = result.filter(c => c.bodyStyle === filters.bodyStyle);
     }
 
-    if (sort === 'priceAsc') {
+    if (sort === 'price_asc') {
         result.sort((a, b) => a.price - b.price);
-    } else if (sort === 'priceDesc') {
+    } else if (sort === 'price_desc') {
         result.sort((a, b) => b.price - a.price);
     } else {
         result.sort((a, b) => b.id - a.id);

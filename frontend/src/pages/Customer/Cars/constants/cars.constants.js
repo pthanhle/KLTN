@@ -8,6 +8,6 @@ export const BODY_STYLES = [
 
 export const CAR_SORT_OPTIONS = [
     { label: 'cars_sort_newest', value: 'newest' },
-    { label: 'cars_sort_priceAsc', value: 'priceAsc' },
-    { label: 'cars_sort_priceDesc', value: 'priceDesc' },
+    { label: 'cars_sort_priceAsc', value: 'price_asc' },
+    { label: 'cars_sort_priceDesc', value: 'price_desc' },
 ];

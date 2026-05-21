@@ -18,7 +18,7 @@ const CarsToolbar = ({ isLoading, carsCount, totalCars, sort, handleSortChange, 
                 </span>
                 <div className="relative group/sort">
                     <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/10 rounded-xl text-[13px] font-bold text-slate-800 dark:text-white hover:border-yellow-500/50 transition-colors">
-                        {sort === 'newest' ? t('cars.sort.newest', 'Mới nhất') : sort === 'priceAsc' ? t('cars.sort.priceAsc', 'Giá: Thấp đến Cao') : t('cars.sort.priceDesc', 'Giá: Cao đến Thấp')}
+                        {sort === 'newest' ? t('cars.sort.newest', 'Mới nhất') : sort === 'price_asc' ? t('cars.sort.priceAsc', 'Giá: Thấp đến Cao') : t('cars.sort.priceDesc', 'Giá: Cao đến Thấp')}
                         <ChevronDown size={14} className="text-slate-400 group-hover/sort:text-yellow-500 transition-colors" />
                     </button>
 
@@ -31,14 +31,14 @@ const CarsToolbar = ({ isLoading, carsCount, totalCars, sort, handleSortChange, 
                             {t('cars.sort.newest', 'Mới nhất')}
                         </button>
                         <button
-                            onClick={() => handleSortChange('priceAsc')}
-                            className={`w-full text-left px-5 py-2.5 text-[13px] font-bold transition-colors ${sort === 'priceAsc' ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-500/10' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}`}
+                            onClick={() => handleSortChange('price_asc')}
+                            className={`w-full text-left px-5 py-2.5 text-[13px] font-bold transition-colors ${sort === 'price_asc' ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-500/10' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}`}
                         >
                             {t('cars.sort.priceAsc', 'Giá: Thấp đến Cao')}
                         </button>
                         <button
-                            onClick={() => handleSortChange('priceDesc')}
-                            className={`w-full text-left px-5 py-2.5 text-[13px] font-bold transition-colors ${sort === 'priceDesc' ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-500/10' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}`}
+                            onClick={() => handleSortChange('price_desc')}
+                            className={`w-full text-left px-5 py-2.5 text-[13px] font-bold transition-colors ${sort === 'price_desc' ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-500/10' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'}`}
                         >
                             {t('cars.sort.priceDesc', 'Giá: Cao đến Thấp')}
                         </button>

@@ -9,7 +9,7 @@ export const OrderTable = ({ data, columns, pagination, onChange, loading }) => 
     const handleRowClick = (record) => {
         return {
             onClick: () => {
-                navigate(`/admin/orders/${record.order_code}`);
+                navigate(`/admin/orders/${record._id}`);
             },
             className: 'cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors',
         };
@@ -37,7 +37,7 @@ export const OrderTable = ({ data, columns, pagination, onChange, loading }) => 
                 loading={loading}
                 columns={columns}
                 dataSource={data}
-                rowKey="order_code"
+                rowKey="_id"
                 scroll={{ x: 1360 }}
                 pagination={{
                     ...pagination,

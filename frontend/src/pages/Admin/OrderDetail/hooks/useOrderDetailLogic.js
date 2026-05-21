@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockOrders } from '../../../Shared/Profile/pages/OrderHistory/data/mockOrderData';
+import { message } from 'antd';
+import { adminOrderApi } from '@/services/api/adminOrder.api';
 import { orderDetailSchema } from '../schemas/orderDetailSchema';
 
 export const useOrderDetailLogic = () => {
@@ -13,44 +14,37 @@ export const useOrderDetailLogic = () => {
     const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
     const [isPrintModalVisible, setIsPrintModalVisible] = useState(false);
 
-    useEffect(() => {
-        const fetchOrder = () => {
-            setLoading(true);
-            setTimeout(() => {
-                const foundOrder = mockOrders.find(o => o.order_code === id);
-                if (foundOrder) {
-                    try {
-                        const validatedOrder = orderDetailSchema.parse(foundOrder);
-                        setOrder(validatedOrder);
-                    } catch (error) {
-                        console.error('Data validation failed:', error);
-                        // Xử lý fallback an toàn nhất
-                        setOrder(orderDetailSchema.parse({ order_code: id }));
-                    }
-                } else {
-                    // Xử lý không tìm thấy đơn hàng, quay lại trang trước
-                    navigate('/admin/orders');
-                }
-                setLoading(false);
-            }, 500); // 500ms delay to simulate network latency and show Skeleton
-        };
-
-        fetchOrder();
+    const fetchOrder = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await adminOrderApi.getOrderById(id);
+            try {
+                const validatedOrder = orderDetailSchema.parse(data);
+                setOrder(validatedOrder);
+            } catch (validationError) {
+                console.error('Data validation failed:', validationError);
+                setOrder(data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch order:', err);
+            if (err.response?.status === 404) {
+                message.error('Đơn hàng không tồn tại');
+                navigate('/admin/orders');
+            } else {
+                setError('Không thể tải thông tin đơn hàng');
+                message.error('Không thể tải thông tin đơn hàng');
+            }
+        } finally {
+            setLoading(false);
+        }
     }, [id, navigate]);
 
-    const addActivityLog = (status, note, actor = 'Admin (Demo)') => {
-        const newLog = {
-            status,
-            timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-            actor,
-            note
-        };
-        setOrder(prev => ({
-            ...prev,
-            order_status: status,
-            activity_log: [newLog, ...(prev.activity_log || [])]
-        }));
-    };
+    useEffect(() => {
+        if (id) {
+            fetchOrder();
+        }
+    }, [id, fetchOrder]);
 
     const handleAction = async (actionType) => {
         try {
@@ -59,10 +53,14 @@ export const useOrderDetailLogic = () => {
                     setIsCancelModalVisible(true);
                     break;
                 case 'approve_order':
-                    addActivityLog('CONFIRMED', 'Đã duyệt đơn hàng');
+                    await adminOrderApi.updateOrder(id, { order_status: 'CONFIRMED' });
+                    message.success('Đã duyệt đơn hàng');
+                    await fetchOrder();
                     break;
                 case 'pack_order':
-                    addActivityLog('PACKED', 'Đã đóng gói xong, chờ lấy hàng.');
+                    await adminOrderApi.updateOrder(id, { order_status: 'PROCESSING' });
+                    message.success('Đã chuyển trạng thái đóng gói');
+                    await fetchOrder();
                     break;
                 case 'print_order':
                     setIsPrintModalVisible(true);
@@ -71,57 +69,52 @@ export const useOrderDetailLogic = () => {
                     setIsShippingModalVisible(true);
                     break;
                 case 'complete_order':
-                    addActivityLog('COMPLETED', 'Đã giao hàng thành công');
+                    await adminOrderApi.updateOrder(id, { order_status: 'COMPLETED' });
+                    message.success('Đã hoàn tất đơn hàng');
+                    await fetchOrder();
                     break;
                 default:
                     console.log('Unknown action', actionType);
             }
         } catch (err) {
             console.error('Error performing action:', err);
+            const errorMsg = err.response?.data?.message || 'Thao tác thất bại';
+            message.error(errorMsg);
         }
     };
 
-    const handleShippingSubmit = (data) => {
-        console.log('Shipping Data:', data);
-        setOrder(prev => ({
-            ...prev,
-            order_status: 'SHIPPING',
-            shipping: {
-                ...prev.shipping,
-                provider: data.provider,
-                tracking_code: data.tracking_code,
-                estimated_delivery: data.estimated_delivery
-            },
-            activity_log: [
-                {
-                    status: 'SHIPPING',
-                    timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-                    actor: 'Admin (Demo)',
-                    note: `Bàn giao ĐVVC: ${data.provider} - Mã: ${data.tracking_code}`
-                },
-                ...(prev.activity_log || [])
-            ]
-        }));
-        setIsShippingModalVisible(false);
+    const handleShippingSubmit = async (data) => {
+        try {
+            await adminOrderApi.updateOrder(id, {
+                order_status: 'SHIPPED',
+                tracking_info: {
+                    provider: data.provider,
+                    tracking_code: data.tracking_code,
+                }, 
+            });
+            message.success('Đã cập nhật thông tin vận chuyển');
+            setIsShippingModalVisible(false);
+            await fetchOrder();
+        } catch (err) {
+            console.error('Error updating shipping:', err);
+            const errorMsg = err.response?.data?.message || 'Cập nhật vận chuyển thất bại';
+            message.error(errorMsg);
+        }
     };
 
-    const handleCancelSubmit = (data) => {
-        console.log('Cancel Data:', data);
-        setOrder(prev => ({
-            ...prev,
-            order_status: 'CANCELLED',
-            cancel_reason: data.cancel_reason,
-            activity_log: [
-                {
-                    status: 'CANCELLED',
-                    timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-                    actor: 'Admin (Demo)',
-                    note: `Hủy đơn: ${data.cancel_reason}. (Simulated BE: allocated -1, available_stock +1)`
-                },
-                ...(prev.activity_log || [])
-            ]
-        }));
-        setIsCancelModalVisible(false);
+    const handleCancelSubmit = async (data) => {
+        try {
+            await adminOrderApi.updateOrder(id, {
+                order_status: 'CANCELLED',
+            });
+            message.success('Đã hủy đơn hàng');
+            setIsCancelModalVisible(false);
+            await fetchOrder();
+        } catch (err) {
+            console.error('Error cancelling order:', err);
+            const errorMsg = err.response?.data?.message || 'Hủy đơn hàng thất bại';
+            message.error(errorMsg);
+        }
     };
 
     return {

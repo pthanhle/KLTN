@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { mockOrders } from '../data/mockOrders';
+import { message } from 'antd';
+import { adminOrderApi } from '@/services/api/adminOrder.api';
 import { FILTER_DEFAULT_VALUE } from '../constants/filterOptions';
 import { useOrderFilters } from './useOrderFilters';
 import { useOrderPagination } from './useOrderPagination';
@@ -11,67 +12,72 @@ export const useOrderListLogic = () => {
     const filterState = useOrderFilters();
     const paginationState = useOrderPagination();
     const [loading, setLoading] = useState(true);
+    const [data, setData] = useState([]);
+    const [total, setTotal] = useState(0);
 
-    const filteredData = useMemo(() => {
-        let result = [...mockOrders];
+    const fetchOrders = useCallback(async () => {
+        setLoading(true);
+        try {
+            const params = {
+                page: paginationState.currentPage,
+                limit: paginationState.pageSize,
+            };
 
-        // Lọc trạng thái
-        if (filterState.filterStatus !== FILTER_DEFAULT_VALUE) {
-            result = result.filter(order => order.order_status === filterState.filterStatus);
+            if (filterState.filterStatus !== FILTER_DEFAULT_VALUE) {
+                params.order_status = filterState.filterStatus;
+            }
+
+            if (filterState.filterPayment !== FILTER_DEFAULT_VALUE) {
+                params.payment_status = filterState.filterPayment;
+            }
+
+            if (filterState.searchText) {
+                params.search = filterState.searchText;
+            }
+
+            const response = await adminOrderApi.getOrders(params);
+            setData(response.orders || []);
+            setTotal(response.pagination?.total || 0);
+        } catch (error) {
+            console.error('Failed to fetch orders:', error);
+            message.error(t('fetch_error', 'Không thể tải danh sách đơn hàng'));
+            setData([]);
+            setTotal(0);
+        } finally {
+            setLoading(false);
         }
-
-        // Lọc thanh toán
-        if (filterState.filterPayment !== FILTER_DEFAULT_VALUE) {
-            result = result.filter(order => order.payment?.status === filterState.filterPayment);
-        }
-
-        // Tìm kiếm Text
-        if (filterState.searchText) {
-            const lowerSearch = filterState.searchText.toLowerCase();
-            result = result.filter(order =>
-                order.order_code.toLowerCase().includes(lowerSearch) ||
-                order.delivery?.phone.includes(lowerSearch) ||
-                order.delivery?.receiver_name.toLowerCase().includes(lowerSearch)
-            );
-        }
-
-        result.sort(() => -1); // Sort demo (Mới nhất)
-        return result;
-    }, [filterState.filterStatus, filterState.filterPayment, filterState.searchText]);
+    }, [
+        paginationState.currentPage,
+        paginationState.pageSize,
+        filterState.filterStatus,
+        filterState.filterPayment,
+        filterState.searchText,
+        t
+    ]);
 
     useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 600);
-        return () => clearTimeout(timer);
-    }, []);
+        fetchOrders();
+    }, [fetchOrders]);
 
     const handleStatusChange = (value) => {
-        setLoading(true);
         filterState.setFilterStatus(value);
         paginationState.resetPage();
-        setTimeout(() => setLoading(false), 400);
     };
 
     const handlePaymentChange = (value) => {
-        setLoading(true);
         filterState.setFilterPayment(value);
         paginationState.resetPage();
-        setTimeout(() => setLoading(false), 400);
     };
 
     const handleSearch = (value) => {
-        setLoading(true);
         filterState.setSearchText(value);
         paginationState.resetPage();
-        setTimeout(() => setLoading(false), 400);
     };
 
-    // 4. Return cấu trúc Object cho UI
     return {
         t,
         loading,
-        data: filteredData,
-
-        // Filter Props
+        data,
         filterStatus: filterState.filterStatus,
         handleStatusChange,
         filterPayment: filterState.filterPayment,
@@ -79,12 +85,11 @@ export const useOrderListLogic = () => {
         searchText: filterState.searchText,
         handleSearch,
 
-        // Table & Pagination Props
         handleTableChange: paginationState.handleTableChange,
         pagination: {
             current: paginationState.currentPage,
             pageSize: paginationState.pageSize,
-            total: filteredData.length,
+            total,
             showSizeChanger: true,
             showTotal: (total, range) => `${t('pagination_show', 'Hiển thị')} ${range[0]}-${range[1]} ${t('pagination_of', 'của')} ${total} ${t('pagination_items', 'đơn hàng')}`
         }

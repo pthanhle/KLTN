@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler'
 import Car from '../../models/carModel.js'
+import Brand from '../../models/brandModel.js'
 import mongoose from 'mongoose'
 import { addImageUploadJob } from '../../queues/imageQueue.js'
 import { getIO } from '../../config/socket.js'
@@ -39,7 +40,11 @@ export const getAllProducts = asyncHandler(async (req, res) => {
   }
 
   if (brand && brand !== 'all' && brand !== 'Tất cả') {
-    matchStage.brandName = { $regex: brand, $options: 'i' };
+    if (mongoose.Types.ObjectId.isValid(brand)) {
+      matchStage.brandId = brand;
+    } else {
+      matchStage.brandName = { $regex: brand, $options: 'i' };
+    }
   }
 
   if (bodyStyle && bodyStyle !== 'all' && bodyStyle !== 'Tất cả') {

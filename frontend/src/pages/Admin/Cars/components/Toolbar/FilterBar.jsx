@@ -3,13 +3,13 @@ import { Search, PlusCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { STATUS_OPTIONS, FILTER_DEFAULT_VALUE } from '../../constants/carsConstants';
 
-const FilterBar = ({ 
+const FilterBar = ({
     brands = [],
     bodyStyles = [],
-    searchTerm, setSearchTerm, 
-    filterBrand, setFilterBrand, 
-    filterBodyStyle, setFilterBodyStyle, 
-    filterStatus, setFilterStatus 
+    searchTerm, setSearchTerm,
+    filterBrand, setFilterBrand,
+    filterBodyStyle, setFilterBodyStyle,
+    filterStatus, setFilterStatus
 }) => {
     const { t } = useTranslation('adminCars');
 
@@ -19,7 +19,7 @@ const FilterBar = ({
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-[#d3c5ac]/60 mb-2 ml-4">
                     {t('searchLabel', 'Tìm kiếm sản phẩm')}
                 </label>
-                <Input 
+                <Input
                     prefix={<Search className="text-slate-400 dark:text-[#d3c5ac]/40" size={16} />}
                     placeholder={t('searchPlaceholder', 'Tên xe hoặc mã SKU...')}
                     value={searchTerm}
@@ -27,12 +27,12 @@ const FilterBar = ({
                     className="h-12 rounded-full"
                 />
             </div>
-            
+
             <div className="w-48">
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-[#d3c5ac]/60 mb-2 ml-4">
                     {t('brandLabel', 'Thương hiệu')}
                 </label>
-                <Select 
+                <Select
                     value={filterBrand}
                     onChange={setFilterBrand}
                     className="w-full h-12"
@@ -42,12 +42,12 @@ const FilterBar = ({
                     ]}
                 />
             </div>
-            
+
             <div className="w-48">
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-[#d3c5ac]/60 mb-2 ml-4">
                     {t('bodyStyleLabel', 'Kiểu dáng')}
                 </label>
-                <Select 
+                <Select
                     value={filterBodyStyle}
                     onChange={setFilterBodyStyle}
                     className="w-full h-12"
@@ -57,12 +57,12 @@ const FilterBar = ({
                     ]}
                 />
             </div>
-            
+
             <div className="w-48">
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 dark:text-[#d3c5ac]/60 mb-2 ml-4">
                     {t('statusLabel', 'Trạng thái')}
                 </label>
-                <Select 
+                <Select
                     value={filterStatus}
                     onChange={setFilterStatus}
                     className="w-full h-12"

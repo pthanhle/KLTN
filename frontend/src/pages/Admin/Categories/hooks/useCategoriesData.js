@@ -24,6 +24,7 @@ export const useCategoriesData = () => {
     const stats = useMemo(() => {
         const totalCategories = categories.length;
         const totalCars = categories.reduce((sum, item) => sum + (item.count || 0), 0);
+        const activeCategories = categories.filter(item => (item.count || 0) > 0).length;
 
         let mostPopular = 'N/A';
         if (totalCategories > 0) {
@@ -33,6 +34,7 @@ export const useCategoriesData = () => {
 
         return {
             totalCategories,
+            activeCategories,
             totalCars,
             mostPopular
         };

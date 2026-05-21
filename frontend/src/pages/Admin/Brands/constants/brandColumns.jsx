@@ -28,13 +28,15 @@ export const getBrandColumns = (t, handleEdit, handleDelete) => [
             </div>
         )
     },
+
     {
-        title: t('adminBrands:colId', 'Mã (ID)'),
-        dataIndex: 'id',
-        key: 'id',
-        render: (text) => (
-            <span className="font-mono text-xs bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-[#9b8f79]/10 text-slate-600 dark:text-slate-300">
-                {text}
+        title: t('adminBrands:colPartnerStatus', 'Loại Thương Hiệu'),
+        dataIndex: 'is_partner',
+        key: 'is_partner',
+        align: 'center',
+        render: (isPartner) => (
+            <span className={`px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider border ${isPartner ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'}`}>
+                {isPartner ? 'ĐỐI TÁC' : 'TIÊU CHUẨN'}
             </span>
         )
     },

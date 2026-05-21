@@ -11,7 +11,13 @@ export const BrandStats = ({ stats, t }) => {
             </div>
             <div className="bg-white dark:bg-white/5 p-6 rounded-xl border border-slate-200 dark:border-[#9b8f79]/10 shadow-sm">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mb-1">
-                    {t('adminBrands:statsProducts', 'Sản Phẩm Trong Kho')}
+                    {t('adminBrands:statsPartner', 'Hãng Đối Tác')}
+                </p>
+                <p className="text-3xl font-black text-blue-500 dark:text-[#adddff]">{stats.partnerBrands}</p>
+            </div>
+            <div className="bg-white dark:bg-white/5 p-6 rounded-xl border border-slate-200 dark:border-[#9b8f79]/10 shadow-sm">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mb-1">
+                    {t('adminBrands:statsProducts', 'Tổng Số Sản Phẩm')}
                 </p>
                 <p className="text-3xl font-black text-emerald-500 dark:text-[#4edea3]">{stats.totalProducts}</p>
             </div>
@@ -19,13 +25,7 @@ export const BrandStats = ({ stats, t }) => {
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mb-1">
                     {t('adminBrands:statsHot', 'Thương Hiệu Lớn Nhất')}
                 </p>
-                <p className="text-3xl font-black text-slate-800 dark:text-white">{stats.hotBrand}</p>
-            </div>
-            <div className="bg-white dark:bg-white/5 p-6 rounded-xl border border-slate-200 dark:border-[#9b8f79]/10 shadow-sm">
-                <p className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mb-1">
-                    {t('adminBrands:statsGrowth', 'Tỉ Lệ Tăng Trưởng')}
-                </p>
-                <p className="text-3xl font-black text-blue-500 dark:text-[#adddff]">+12.5%</p>
+                <p className="text-3xl font-black text-slate-800 dark:text-white truncate">{stats.hotBrand}</p>
             </div>
         </div>
     );

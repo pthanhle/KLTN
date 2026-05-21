@@ -31,7 +31,7 @@ export const useClientBrandsQuery = (isPartner) => {
                 count: b.count || 0
             }));
         },
-        staleTime: 10 * 60 * 1000 // Cache 10 mins
+        staleTime: 10 * 60 * 1000
     });
 };
 

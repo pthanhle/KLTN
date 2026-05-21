@@ -19,28 +19,32 @@ export const getCategoryColumns = (t, handleEdit, handleDelete) => [
         )
     },
     {
-        title: t('adminCategories:colId', 'MÃ HỆ THỐNG'),
-        dataIndex: '_id',
-        key: '_id',
+        title: t('adminCategories:colStatus', 'Trạng Thái'),
+        dataIndex: 'count',
+        key: 'status',
         align: 'center',
-        render: (text, record) => (
-            <span className="font-mono text-xs bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-[#9b8f79]/10 text-slate-600 dark:text-slate-300">
-                {text || record.id}
-            </span>
-        )
+        render: (count) => {
+            const isActive = count > 0;
+            return (
+                <span className={`px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider border ${isActive ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'}`}>
+                    {isActive ? 'ĐANG SỬ DỤNG' : 'CHƯA SỬ DỤNG'}
+                </span>
+            );
+        }
     },
     {
-        title: t('adminCategories:colAssets', 'TÀI SẢN (KHO)'),
+        title: t('adminCategories:colAssets', 'Tài Sản (Kho)'),
         dataIndex: 'count',
         key: 'count',
         align: 'right',
         render: (text) => (
-            <div className={`flex flex-col items-end ${text === 0 ? 'opacity-70' : ''}`}>
-                <div>
-                    <span className="font-bold text-slate-800 dark:text-[#ffd165] text-lg">
-                        {text} <span className="text-sm font-medium text-slate-500 dark:text-[#9b8f79]">{t('adminCategories:txtCar', 'xe')}</span>
-                    </span>
-                </div>
+            <div className={`font-medium ${text === 0 ? 'opacity-70' : ''}`}>
+                <span className={text > 0 ? "text-[#ffd165] dark:text-yellow-500 text-xl font-black" : "text-slate-500 text-xl font-black"}>
+                    {text}
+                </span>
+                <span className="text-[10px] uppercase text-slate-500 ml-1 tracking-widest font-bold">
+                    {t('adminCategories:txtCar', 'xe')}
+                </span>
             </div>
         )
     },

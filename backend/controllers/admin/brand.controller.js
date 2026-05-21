@@ -90,7 +90,7 @@ export const updateBrand = async (req, res) => {
         if (!brand) return res.status(404).json({ message: 'Không tìm thấy thương hiệu' });
 
         if (updates.name && updates.name !== brand.name) {
-            const existing = await Brand.findOne({ 
+            const existing = await Brand.findOne({
                 name: { $regex: new RegExp(`^${updates.name}$`, 'i') },
                 _id: { $ne: id }
             });

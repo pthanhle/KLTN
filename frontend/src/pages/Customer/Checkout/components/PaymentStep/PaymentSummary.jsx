@@ -1,11 +1,23 @@
-import { Button, Image } from 'antd';
-import { ShieldCheck, Headset, ArrowLeft } from 'lucide-react';
+import { Button, Image, Tag } from 'antd';
+import { Headset, ArrowLeft, X } from 'lucide-react';
 import PromoCodeInput from '../Shared/PromoCodeInput';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
-const PaymentSummary = ({ checkedItems, subtotal, isLoading, handleCheckoutSubmit, methods, applyPromoCode, onBack, t }) => {
+const PaymentSummary = ({
+    checkedItems,
+    subtotal,
+    discount = 0,
+    appliedVoucher,
+    removeVoucher,
+    isLoading,
+    handleCheckoutSubmit,
+    methods,
+    applyPromoCode,
+    isValidatingVoucher,
+    onBack,
+    t
+}) => {
     const shippingFee = 0;
-    const discount = 0;
     const tax = subtotal * 0.1;
     const finalTotal = subtotal + shippingFee - discount + tax;
 
@@ -46,7 +58,36 @@ const PaymentSummary = ({ checkedItems, subtotal, isLoading, handleCheckoutSubmi
 
                 <div className="h-px bg-slate-100 dark:bg-white/10 mb-5"></div>
 
-                <PromoCodeInput applyPromoCode={applyPromoCode} t={t} className="mb-5" />
+                {/* Voucher applied */}
+                {appliedVoucher ? (
+                    <div className="mb-5 p-4 rounded-xl bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Tag color="gold" className="m-0 font-bold text-xs">
+                                        {appliedVoucher.code}
+                                    </Tag>
+                                </div>
+                                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">
+                                    {appliedVoucher.title}
+                                </p>
+                            </div>
+                            <button
+                                onClick={removeVoucher}
+                                className="shrink-0 p-1.5 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-500/20 text-slate-500 dark:text-slate-400 transition-colors"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <PromoCodeInput
+                        applyPromoCode={applyPromoCode}
+                        isLoading={isValidatingVoucher}
+                        t={t}
+                        className="mb-5"
+                    />
+                )}
 
                 <div className="h-px bg-slate-100 dark:bg-white/10 mb-5"></div>
 
@@ -61,7 +102,7 @@ const PaymentSummary = ({ checkedItems, subtotal, isLoading, handleCheckoutSubmi
                     </div>
                     {discount > 0 && (
                         <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">
-                            <span>{t('summary_tax')}</span>
+                            <span>{t('summary_discount', 'Giảm giá')}</span>
                             <span className="text-rose-500 font-bold">- {formatVND(discount)}</span>
                         </div>
                     )}

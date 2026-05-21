@@ -1,7 +1,7 @@
 import { Input, Button } from 'antd';
 import { useState } from 'react';
 
-const PromoCodeInput = ({ applyPromoCode, t, className = '' }) => {
+const PromoCodeInput = ({ applyPromoCode, isLoading = false, t, className = '' }) => {
     const [promoCode, setPromoCode] = useState('');
 
     const handleApply = () => {
@@ -23,7 +23,8 @@ const PromoCodeInput = ({ applyPromoCode, t, className = '' }) => {
             <Button
                 htmlType="submit"
                 type="primary"
-                disabled={!promoCode.trim()}
+                loading={isLoading}
+                disabled={!promoCode.trim() || isLoading}
                 className="h-[44px] px-5 sm:px-6 bg-slate-900 border-none dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm hover:!bg-slate-800 dark:hover:!bg-slate-200 transition-all shadow-none shrink-0 disabled:!bg-slate-200 dark:disabled:!bg-white/10 disabled:!text-slate-400"
             >
                 {t('summary_apply', 'Áp dụng')}

@@ -1,12 +1,12 @@
 import express from 'express'
 import {
   getPromotions,
+  getPromotionStats,
   getPromotionById,
   createPromotion,
   updatePromotion,
+  togglePromotionStatus,
   deletePromotion,
-  addProductToPromotion,
-  removeProductFromPromotion,
 } from '../../controllers/admin/promotion.controller.js'
 
 import { protect, admin } from '../../middleware/authMiddleware.js'
@@ -15,6 +15,8 @@ const router = express.Router()
 
 router.use(protect)
 router.use(admin)
+
+router.get('/stats', getPromotionStats)
 
 router.route('/')
   .get(getPromotions)
@@ -25,12 +27,6 @@ router.route('/:id')
   .put(updatePromotion)
   .delete(deletePromotion)
 
-router
-  .route('/:promotionId/products')
-  .post(addProductToPromotion)
-
-router
-  .route('/:promotionId/products/:productId')
-  .delete(removeProductFromPromotion)
+router.patch('/:id/toggle-status', togglePromotionStatus)
 
 export default router

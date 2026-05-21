@@ -9,7 +9,6 @@ import {
     Wrench,
     UserCog,
     TicketPercent,
-    CarFront,
     TrendingUp,
     Tag,
     Settings,
@@ -74,11 +73,6 @@ export const useSiderMenu = (collapsed) => {
             key: '/admin/categories',
             icon: <Layers size={iconSize} />,
             label: t('admin.sider.categories'),
-        },
-        {
-            key: '/admin/tradein-vehicles',
-            icon: <CarFront size={iconSize} />,
-            label: t('admin.sider.tradein-vehicles'),
         },
         {
             key: '/admin/promotions',

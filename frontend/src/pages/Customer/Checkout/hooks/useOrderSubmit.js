@@ -9,7 +9,7 @@ export const useOrderSubmit = (t, setCurrentStep, mockPaymentMethods, mockShippi
     const submitMutation = useSubmitOrder();
     const { message } = App.useApp();
 
-    const handleCheckoutSubmit = (data, paymentMethod, shippingMethod, checkedItems, finalTotal) => {
+    const handleCheckoutSubmit = (data, paymentMethod, shippingMethod, checkedItems, finalTotal, appliedVoucher = null) => {
 
         const payloadInfo = {
             order_code: generateOrderId(),
@@ -43,7 +43,13 @@ export const useOrderSubmit = (t, setCurrentStep, mockPaymentMethods, mockShippi
                 unit_price: item.price,
                 total_price: item.price * item.quantity,
                 selected_options: item.selected_options || {}
-            }))
+            })),
+            voucher: appliedVoucher ? {
+                code: appliedVoucher.code,
+                customer_voucher_id: appliedVoucher._id,
+                discount_type: appliedVoucher.discount_type,
+                discount_value: appliedVoucher.discount_value,
+            } : null
         };
 
         submitMutation.mutate(payloadInfo, {

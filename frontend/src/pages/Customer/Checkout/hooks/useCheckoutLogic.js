@@ -8,6 +8,7 @@ import { useCart } from './useCart';
 import { useDeliveryForm } from './useDeliveryForm';
 import { useOrderSubmit } from './useOrderSubmit';
 import { calculateFinalTotal } from '../utils/calculator';
+import loyaltyApi from '../../../../services/api/loyalty.api';
 
 export const useCheckoutLogic = () => {
     const { t } = useTranslation(['checkout']);
@@ -20,10 +21,11 @@ export const useCheckoutLogic = () => {
         return CHECKOUT_STEPS.CART;
     });
 
+    const [appliedVoucher, setAppliedVoucher] = useState(null);
+    const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
+
     const cart = useCart(t);
-
     const formContext = useDeliveryForm(t);
-
     const orderSubmit = useOrderSubmit(
         t,
         setCurrentStep,
@@ -32,6 +34,63 @@ export const useCheckoutLogic = () => {
     );
 
     const timelineSteps = useMemo(() => getTimelineSteps(t), [t]);
+
+    // Tính discount từ voucher
+    const discount = useMemo(() => {
+        if (!appliedVoucher) return 0;
+
+        const { discount_type, discount_value, max_discount, min_order_value } = appliedVoucher;
+
+        // Kiểm tra đơn tối thiểu
+        if (cart.subtotal < min_order_value) {
+            return 0;
+        }
+
+        if (discount_type === 'PERCENT') {
+            const percentDiscount = (cart.subtotal * discount_value) / 100;
+            return max_discount ? Math.min(percentDiscount, max_discount) : percentDiscount;
+        }
+
+        if (discount_type === 'FIXED') {
+            return Math.min(discount_value, cart.subtotal);
+        }
+
+        return 0;
+    }, [appliedVoucher, cart.subtotal]);
+
+    const applyPromoCode = async (code) => {
+        if (!code || !code.trim()) {
+            message.warning('Vui lòng nhập mã voucher');
+            return;
+        }
+
+        setIsValidatingVoucher(true);
+        try {
+            const response = await loyaltyApi.validateVoucherCode(code.trim().toUpperCase());
+            const voucher = response.voucher || response;
+
+            // Kiểm tra đơn tối thiểu
+            if (voucher.min_order_value > cart.subtotal) {
+                message.warning(
+                    `Đơn hàng tối thiểu ${(voucher.min_order_value / 1000).toLocaleString()}k để sử dụng voucher này`
+                );
+                return;
+            }
+
+            setAppliedVoucher(voucher);
+            message.success(`Đã áp dụng voucher: ${voucher.title}`);
+        } catch (error) {
+            const errorMsg = error?.response?.data?.message || error?.message || 'Mã voucher không hợp lệ';
+            message.error(errorMsg);
+        } finally {
+            setIsValidatingVoucher(false);
+        }
+    };
+
+    const removeVoucher = () => {
+        setAppliedVoucher(null);
+        message.info('Đã gỡ voucher');
+    };
 
     const proceedToPayment = () => {
         if (!cart.hasCheckedItems) {
@@ -58,25 +117,33 @@ export const useCheckoutLogic = () => {
     };
 
     const handleCheckoutSubmitWrapper = (formData) => {
-        const finalTotal = calculateFinalTotal(cart.subtotal, 0, 0);
+        const finalTotal = calculateFinalTotal(cart.subtotal, 0, discount);
 
         orderSubmit.handleCheckoutSubmit(
             formData,
             formContext.paymentMethod,
             formContext.shippingMethod,
             cart.checkedItems,
-            finalTotal
+            finalTotal,
+            appliedVoucher // Truyền voucher để lưu vào order
         );
     };
 
     return {
         t,
-        currentStep, setCurrentStep,
+        currentStep,
+        setCurrentStep,
         timelineSteps,
         ...cart,
         ...formContext,
         ...orderSubmit,
         proceedToPayment,
-        handleCheckoutSubmit: handleCheckoutSubmitWrapper
+        handleCheckoutSubmit: handleCheckoutSubmitWrapper,
+        // Voucher
+        appliedVoucher,
+        discount,
+        applyPromoCode,
+        removeVoucher,
+        isValidatingVoucher,
     };
 };

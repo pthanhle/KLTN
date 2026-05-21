@@ -25,7 +25,7 @@ export const useLoyaltyStoreQuery = () => {
         queryKey: ['loyaltyStoreVouchers'],
         queryFn: () => loyaltyApi.getAvailableVouchers(),
         staleTime: 60000,
-        select: (data) => data?.data || []
+        select: (data) => Array.isArray(data) ? data : (data?.data || [])
     });
 };
 
@@ -42,11 +42,12 @@ export const useVoucherRedeem = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (voucherId) => loyaltyApi.redeemVoucher(voucherId),
+        mutationFn: (promotionId) => loyaltyApi.redeemVoucher(promotionId),
         onSuccess: () => {
-            queryClient.invalidateQueries(['userProfile']);
-            queryClient.invalidateQueries(['loyaltyHistory']);
-            queryClient.invalidateQueries(['myLoyaltyVouchers']);
+            queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+            queryClient.invalidateQueries({ queryKey: ['loyaltyHistory'] });
+            queryClient.invalidateQueries({ queryKey: ['myLoyaltyVouchers'] });
+            queryClient.invalidateQueries({ queryKey: ['loyaltyStoreVouchers'] });
         }
     });
 };

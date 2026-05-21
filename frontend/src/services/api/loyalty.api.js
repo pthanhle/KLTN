@@ -7,15 +7,19 @@ const loyaltyApi = {
     },
 
     getAvailableVouchers: () => {
-        return axiosClient.get('/client/vouchers/available');
+        return axiosClient.get('/client/promotions?is_loyalty=true');
     },
 
     getMyVouchers: () => {
         return axiosClient.get('/client/loyalty/my-vouchers');
     },
 
-    redeemVoucher: (voucherId) => {
-        return axiosClient.post('/client/loyalty/redeem', { voucherId });
+    redeemVoucher: (promotionId) => {
+        return axiosClient.post('/client/loyalty/redeem', { promotionId });
+    },
+
+    validateVoucherCode: (code) => {
+        return axiosClient.post('/client/loyalty/validate-voucher', { code });
     }
 };
 

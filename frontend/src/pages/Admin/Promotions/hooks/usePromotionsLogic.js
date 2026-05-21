@@ -1,7 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { message } from 'antd';
-import { mockPromotionsData, mockPromotionsStats } from '../data/promotions.mock';
+import {
+    useAdminPromotionsQuery,
+    useAdminPromotionStatsQuery,
+    useAdminPromotionMutations,
+} from '../../../../services/queries/promotion.queries';
 import { PROMOTION_STATUS, PROMOTION_CATEGORY } from '../constants/promotions.constants';
 
 export const usePromotionsLogic = () => {
@@ -12,10 +16,18 @@ export const usePromotionsLogic = () => {
     const [filterLoyalty, setFilterLoyalty] = useState(PROMOTION_CATEGORY.ALL);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [loading, setLoading] = useState(false);
 
-    const [data, setData] = useState(mockPromotionsData);
-    const stats = mockPromotionsStats;
+    const { data: apiResponse, isLoading: loading } = useAdminPromotionsQuery();
+    const { data: statsData } = useAdminPromotionStatsQuery();
+    const { toggleStatus, deletePromotion } = useAdminPromotionMutations();
+
+    const allData = useMemo(() => {
+        if (!apiResponse) return [];
+        if (Array.isArray(apiResponse)) return apiResponse;
+        return apiResponse.promotions || [];
+    }, [apiResponse]);
+
+    const stats = statsData || { active_campaigns: 0, total_claimed: 0, points_burned: 0 };
 
     const handleSearch = (value) => {
         setSearchText(value.toLowerCase());
@@ -37,26 +49,32 @@ export const usePromotionsLogic = () => {
         setCurrentPage(1);
     };
 
-    const handleTableChange = (pagination, filters, sorter) => {
+    const handleTableChange = (pagination) => {
         setCurrentPage(pagination.current);
         setPageSize(pagination.pageSize);
     };
 
-    const handleToggleStatus = (id, currentStatus) => {
-        const newStatus = currentStatus === PROMOTION_STATUS.ACTIVE ? PROMOTION_STATUS.INACTIVE : PROMOTION_STATUS.ACTIVE;
-        setData(prevData => prevData.map(item => item._id === id ? { ...item, status: newStatus } : item));
-        message.success(t('msg_status_changed'));
+    const handleToggleStatus = async (id, currentStatus) => {
+        try {
+            await toggleStatus(id);
+            message.success(t('msg_status_changed'));
+        } catch {
+            message.error(t('msg_error') || 'Có lỗi xảy ra');
+        }
     };
 
-    const handleDelete = (id) => {
-        setData(prevData => prevData.filter(item => item._id !== id));
-        message.success('Đã xóa chiến dịch');
+    const handleDelete = async (id) => {
+        try {
+            await deletePromotion(id);
+            message.success('Đã xóa chiến dịch');
+        } catch {
+            message.error(t('msg_error') || 'Có lỗi xảy ra');
+        }
     };
 
-    // FILTER LOGIC
     const filteredData = useMemo(() => {
-        return data.filter(item => {
-            const matchSearch = item.title.toLowerCase().includes(searchText);
+        return allData.filter(item => {
+            const matchSearch = item.title?.toLowerCase().includes(searchText);
             const matchStatus = filterStatus === PROMOTION_STATUS.ALL || item.status === filterStatus;
             const matchType = filterType === 'ALL' || item.discount_type === filterType;
 
@@ -66,7 +84,7 @@ export const usePromotionsLogic = () => {
 
             return matchSearch && matchStatus && matchType && matchLoyalty;
         });
-    }, [data, searchText, filterStatus, filterType, filterLoyalty]);
+    }, [allData, searchText, filterStatus, filterType, filterLoyalty]);
 
     const paginatedData = useMemo(() => {
         const start = (currentPage - 1) * pageSize;
@@ -91,9 +109,9 @@ export const usePromotionsLogic = () => {
         handleTableChange,
         pagination: {
             current: currentPage,
-            pageSize: pageSize,
+            pageSize,
             total: filteredData.length,
-            showSizeChanger: true
-        }
+            showSizeChanger: true,
+        },
     };
 };

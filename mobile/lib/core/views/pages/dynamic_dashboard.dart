@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../roles/auth/controllers/auth_controller.dart';
-import '../../../roles/sales/views/pages/sales_dashboard.dart';
-import '../../../roles/service_advisor/views/pages/advisor_dashboard.dart';
-import '../../../roles/technician/views/pages/tech_dashboard.dart';
-import '../../../roles/warehouse/views/pages/warehouse_dashboard.dart';
+import 'package:ttauto_staff/roles/sales/features/dashboard/sales_dashboard.dart';
+import 'package:ttauto_staff/roles/service_advisor/features/dashboard/advisor_dashboard.dart';
+import 'package:ttauto_staff/roles/technician/features/dashboard/tech_dashboard.dart';
+import '../../../roles/warehouse/features/dashboard/warehouse_dashboard.dart';
 
 class DynamicDashboard extends ConsumerWidget {
   const DynamicDashboard({super.key});

@@ -37,7 +37,12 @@ const cartSlice = createSlice({
             const newItems = action.payload;
             state.items = newItems.map(item => {
                 const existing = state.items.find(i => i.id === item.id);
-                return { ...item, checked: existing ? existing.checked : true };
+                const availableStock = item.inventory?.available_stock ?? item.stock ?? 0;
+                const isOutOfStock = availableStock <= 0;
+
+                const isChecked = isOutOfStock ? false : (existing ? existing.checked : true);
+
+                return { ...item, checked: isChecked };
             });
         },
         updateQuantity: (state, action) => {
@@ -54,7 +59,14 @@ const cartSlice = createSlice({
             });
         },
         toggleAllChecks: (state, action) => {
-            state.items.forEach(i => i.checked = action.payload);
+            const { selectAll, validIds } = action.payload;
+            state.items.forEach(i => {
+                if (selectAll) {
+                    i.checked = validIds?.includes(i.id) || false;
+                } else {
+                    i.checked = false;
+                }
+            });
         }
     }
 });

@@ -1,19 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'router_keys.dart';
 import '../../roles/auth/views/pages/login/login_page.dart';
-import '../../roles/auth/views/pages/profile_page.dart';
-import '../views/pages/dynamic_dashboard.dart';
-import '../views/pages/dynamic_tasks.dart';
-import '../views/pages/main_scaffold.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorDashboardKey = GlobalKey<NavigatorState>(debugLabel: 'shellDashboard');
-final GlobalKey<NavigatorState> _shellNavigatorTasksKey = GlobalKey<NavigatorState>(debugLabel: 'shellTasks');
-final GlobalKey<NavigatorState> _shellNavigatorCalendarKey = GlobalKey<NavigatorState>(debugLabel: 'shellCalendar');
-final GlobalKey<NavigatorState> _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
+import '../../roles/sales/routes/sales_routes.dart';
+import '../../roles/warehouse/routes/warehouse_routes.dart';
+import '../../roles/service_advisor/routes/advisor_routes.dart';
 
 final GoRouter appRouter = GoRouter(
-  navigatorKey: _rootNavigatorKey,
+  navigatorKey: RouterKeys.rootNavigatorKey,
   initialLocation: '/login',
   routes: [
     GoRoute(
@@ -21,54 +15,8 @@ final GoRouter appRouter = GoRouter(
       name: 'login',
       builder: (context, state) => const LoginPage(),
     ),
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return MainScaffold(navigationShell: navigationShell);
-      },
-      branches: [
-        StatefulShellBranch(
-          navigatorKey: _shellNavigatorDashboardKey,
-          routes: [
-            GoRoute(
-              path: '/dashboard',
-              name: 'dashboard',
-              builder: (context, state) => const DynamicDashboard(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          navigatorKey: _shellNavigatorTasksKey,
-          routes: [
-            GoRoute(
-              path: '/tasks',
-              name: 'tasks',
-              builder: (context, state) => const DynamicTasks(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          navigatorKey: _shellNavigatorCalendarKey,
-          routes: [
-            GoRoute(
-              path: '/calendar',
-              name: 'calendar',
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Trang Lịch Trình (Đang phát triển)')),
-              ),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          navigatorKey: _shellNavigatorProfileKey,
-          routes: [
-            GoRoute(
-              path: '/profile',
-              name: 'profile',
-              builder: (context, state) => const ProfilePage(),
-            ),
-          ],
-        ),
-      ],
-    ),
+    salesRoutes,
+    warehouseRoutes,
+    advisorRoutes,
   ],
 );

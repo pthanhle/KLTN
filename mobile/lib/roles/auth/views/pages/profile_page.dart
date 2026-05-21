@@ -46,7 +46,7 @@ class ProfilePage extends ConsumerWidget {
                     const ProfileSettingsCard(),
                     const SizedBox(height: 48),
                     const ProfileLogoutButton(),
-                    const SizedBox(height: 100),
+                    const SizedBox(height: 140),
                   ],
                 ),
               ),

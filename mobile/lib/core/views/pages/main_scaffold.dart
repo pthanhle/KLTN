@@ -28,29 +28,29 @@ class MainScaffold extends StatelessWidget {
       bottomNavigationBar: GlassNavigationBar(
         items: [
           GlassNavItem(
-            icon: CupertinoIcons.square_grid_2x2,
-            activeIcon: CupertinoIcons.square_grid_2x2_fill,
+            icon: CupertinoIcons.house,
+            activeIcon: CupertinoIcons.house,
             label: 'Trang chủ'.tr(),
             isSelected: navigationShell.currentIndex == 0,
             onTap: () => _goBranch(0),
           ),
           GlassNavItem(
             icon: CupertinoIcons.briefcase,
-            activeIcon: CupertinoIcons.briefcase_fill,
+            activeIcon: CupertinoIcons.briefcase,
             label: 'Công việc'.tr(),
             isSelected: navigationShell.currentIndex == 1,
             onTap: () => _goBranch(1),
           ),
           GlassNavItem(
             icon: CupertinoIcons.calendar,
-            activeIcon: CupertinoIcons.calendar_today,
+            activeIcon: CupertinoIcons.calendar,
             label: 'Lịch hẹn'.tr(),
             isSelected: navigationShell.currentIndex == 2,
             onTap: () => _goBranch(2),
           ),
           GlassNavItem(
             icon: CupertinoIcons.person,
-            activeIcon: CupertinoIcons.person_solid,
+            activeIcon: CupertinoIcons.person,
             label: 'Tài khoản'.tr(),
             isSelected: navigationShell.currentIndex == 3,
             onTap: () => _goBranch(3),

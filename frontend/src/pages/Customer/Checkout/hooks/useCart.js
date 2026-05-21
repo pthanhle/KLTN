@@ -51,8 +51,11 @@ export const useCart = (t) => {
                 message.warning(t('no_in_stock_items', 'Không có sản phẩm nào còn hàng để chọn.'));
                 return;
             }
+            const validIds = inStockItems.map(item => item.id);
+            dispatch(toggleAllRedux({ selectAll: true, validIds }));
+        } else {
+            dispatch(toggleAllRedux({ selectAll: false }));
         }
-        dispatch(toggleAllRedux(selectAll));
     };
 
     const updateQuantity = (id, delta) => {

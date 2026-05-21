@@ -38,6 +38,21 @@ export const useCheckoutLogic = () => {
             message.warning(t('cart_empty_warning', "Vui lòng chọn ít nhất 1 sản phẩm để thanh toán"));
             return;
         }
+
+        const invalidItems = cart.checkedItems.filter(item => {
+            const availableStock = item.inventory?.available_stock ?? item.stock ?? 0;
+            return item.quantity > availableStock;
+        });
+
+        if (invalidItems.length > 0) {
+            const item = invalidItems[0];
+            message.error(t('cart_invalid_stock', {
+                defaultValue: `Số lượng sản phẩm "${item.name}" vượt quá tồn kho cho phép. Vui lòng giảm số lượng!`,
+                name: item.name
+            }));
+            return;
+        }
+
         setCurrentStep(CHECKOUT_STEPS.PAYMENT);
         window.scrollTo(0, 0);
     };

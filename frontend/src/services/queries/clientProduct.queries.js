@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getClientProducts, getClientProductById } from '../api/clientProduct.api';
+import { getClientProducts, getClientProductById, getFeaturedProducts } from '../api/clientProduct.api';
 
 export const productKeys = {
     all: ['client-products'],
@@ -26,3 +26,12 @@ export const useClientProductDetailQuery = (id) => {
         enabled: !!id,
     });
 };
+
+export const useFeaturedProductsQuery = () => {
+    return useQuery({
+        queryKey: [...productKeys.all, 'featured'],
+        queryFn: () => getFeaturedProducts(),
+        staleTime: 5 * 60 * 1000,
+    });
+};
+

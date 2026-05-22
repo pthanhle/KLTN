@@ -7,7 +7,7 @@ const FeaturedCars = ({ cars, isLoading, onCarClick }) => {
     return (
         <section className="py-20 lg:py-28 bg-white dark:bg-[#0a0a0b] transition-colors duration-300">
             <div className="container mx-auto px-6 lg:px-10">
-                
+
                 <div className="mb-12 lg:mb-16">
                     <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black tracking-tighter text-slate-900 dark:text-white mb-2 leading-tight">
                         {t('customer.home.featuredCars.title')}
@@ -17,10 +17,13 @@ const FeaturedCars = ({ cars, isLoading, onCarClick }) => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
+                <div className="flex gap-6 overflow-x-auto pb-6 pt-2 
+                    [&::-webkit-scrollbar]:h-[4px] 
+                    [&::-webkit-scrollbar-track]:bg-slate-100 dark:[&::-webkit-scrollbar-track]:bg-[#141416] 
+                    [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-yellow-500">
                     {isLoading
                         ? Array.from({ length: 4 }).map((_, index) => (
-                            <div key={index} className="flex flex-col gap-4">
+                            <div key={index} className="min-w-[280px] w-[280px] sm:min-w-[320px] sm:w-[320px] shrink-0 flex flex-col gap-4">
                                 <Skeleton className="h-[250px] w-full rounded-xl" />
                                 <div className="space-y-2">
                                     <Skeleton className="h-4 w-[200px]" />
@@ -34,7 +37,9 @@ const FeaturedCars = ({ cars, isLoading, onCarClick }) => {
                             </div>
                         ))
                         : cars.map((car) => (
-                            <CarCard key={car.id} car={car} onClick={() => onCarClick(car.id)} />
+                            <div key={car.id} className="min-w-[280px] w-[280px] sm:min-w-[320px] sm:w-[320px] shrink-0">
+                                <CarCard car={car} onClick={() => onCarClick(car.id)} />
+                            </div>
                         ))}
                 </div>
 

@@ -79,6 +79,7 @@ const carSchema = new mongoose.Schema(
     bodyStyle: { type: String },
     isNew: { type: Boolean, default: true },
     isDemoAvailable: { type: Boolean, default: true },
+    isFeatured: { type: Boolean, default: false },
     
     price: { type: Number, required: true, default: 0 },
     salePrice: { type: Number },

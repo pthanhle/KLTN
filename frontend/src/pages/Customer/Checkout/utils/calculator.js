@@ -4,7 +4,7 @@ export const calculateSubtotal = (items) => {
 };
 
 export const calculateTax = (subtotal) => {
-    return subtotal * 0.1; // VAT 10%
+    return subtotal * 0.1; 
 };
 
 export const calculateFinalTotal = (subtotal, shippingFee = 0, discount = 0) => {

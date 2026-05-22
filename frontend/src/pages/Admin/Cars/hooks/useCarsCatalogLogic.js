@@ -60,6 +60,20 @@ export const useCarsCatalogLogic = () => {
         }
     };
 
+    const handleToggleFeatured = async (id) => {
+        const car = carsData.find(c => c.id === id || c._id === id);
+        if (!car) return;
+
+        const newStatus = !car.isFeatured;
+
+        try {
+            await updateProduct({ id, data: { isFeatured: newStatus } });
+        } catch (error) {
+            message.error("Failed to update featured status");
+            console.error(error);
+        }
+    };
+
     return {
         cars: carsData,
         totalCars,
@@ -68,6 +82,7 @@ export const useCarsCatalogLogic = () => {
         ...filterState,
         ...selectionState,
         ...taxonomyState,
-        handleToggleDemo
+        handleToggleDemo,
+        handleToggleFeatured
     };
 };

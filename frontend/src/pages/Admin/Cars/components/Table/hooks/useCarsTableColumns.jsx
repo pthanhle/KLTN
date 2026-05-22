@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { STATUS_COLOR_MAP } from '../../../constants/carsConstants';
 
-export const useCarsTableColumns = (handleToggleDemo) => {
+export const useCarsTableColumns = (handleToggleDemo, handleToggleFeatured) => {
     const { t } = useTranslation('adminCars');
     const navigate = useNavigate();
 
@@ -78,6 +78,19 @@ export const useCarsTableColumns = (handleToggleDemo) => {
                 <Switch
                     checked={record.isDemoAvailable}
                     onChange={() => handleToggleDemo(record.id)}
+                    className="shadow-inner cursor-pointer hover:scale-105 transition-transform"
+                />
+            )
+        },
+        {
+            title: t('isFeaturedColumn', 'Nổi bật'),
+            key: 'featured',
+            align: 'center',
+            width: 140,
+            render: (_, record) => (
+                <Switch
+                    checked={record.isFeatured}
+                    onChange={() => handleToggleFeatured(record.id)}
                     className="shadow-inner cursor-pointer hover:scale-105 transition-transform"
                 />
             )

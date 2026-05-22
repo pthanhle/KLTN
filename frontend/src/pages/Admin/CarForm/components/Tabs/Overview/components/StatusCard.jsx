@@ -35,6 +35,18 @@ const StatusCard = () => {
                     <Switch className="bg-slate-300 dark:bg-[#1c1c1e] scale-110" />
                 </Form.Item>
             </div>
+
+            <div className="h-px bg-slate-100 dark:bg-white/5"></div>
+            
+            <div className="flex items-center justify-between group cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 p-4 -mx-4 rounded-xl transition-colors">
+                <div className="flex flex-col">
+                    <span className="text-base font-black tracking-tight text-slate-900 dark:text-white">{t('isFeaturedLabel', 'Hiển thị Nổi Bật')}</span>
+                    <span className="text-[12px] font-medium text-slate-500 dark:text-slate-400 mt-1">{t('isFeaturedDesc', 'Đưa xe lên mục Nổi Bật trên Trang Chủ')}</span>
+                </div>
+                <Form.Item name="isFeatured" valuePropName="checked" className="mb-0">
+                    <Switch className="bg-slate-300 dark:bg-[#1c1c1e] scale-110" />
+                </Form.Item>
+            </div>
         </div>
     );
 };

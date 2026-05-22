@@ -24,6 +24,7 @@ const CarsCatalog = () => {
         toggleSelection,
         toggleAllSelections,
         handleToggleDemo,
+        handleToggleFeatured,
         isLoading,
         brands,
         bodyStyles,
@@ -82,6 +83,7 @@ const CarsCatalog = () => {
                 toggleSelection={toggleSelection}
                 toggleAllSelections={toggleAllSelections}
                 handleToggleDemo={handleToggleDemo}
+                handleToggleFeatured={handleToggleFeatured}
             />
 
             {/* Floating Action Bar */}

@@ -17,3 +17,8 @@ export const getClientProductById = async (id) => {
     const response = await axiosClient.get(`/client/products/${id}`);
     return response.data;
 };
+
+export const getFeaturedProducts = async () => {
+    return await axiosClient.get('/client/products/featured');
+};
+

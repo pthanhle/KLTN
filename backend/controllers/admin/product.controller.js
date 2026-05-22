@@ -136,7 +136,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   const {
     name, product_name, sku, tagline, description,
     price, stock, isNew, brandId, brandName, year, odo, engine, power, fuel,
-    seats, bodyStyle, isDemoAvailable, status
+    seats, bodyStyle, isDemoAvailable, isFeatured, status
   } = req.body
 
   const versions = safeParse(req.body.versions, []);
@@ -216,6 +216,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     seats,
     bodyStyle,
     isDemoAvailable: isDemoAvailable !== undefined ? isDemoAvailable : true,
+    isFeatured: isFeatured === 'true' || isFeatured === true,
     versions,
     colors,
     gallery: { photos: galleryPhotos, videos: gallery.videos || [] },
@@ -257,7 +258,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
     'name', 'product_name', 'sku', 'status', 'tagline', 'description',
     'price', 'salePrice', 'stock', 'isNew', 'brandId', 'brandName',
     'year', 'odo', 'engine', 'power', 'fuel', 'seats', 'bodyStyle',
-    'isDemoAvailable', 'versions', 'colors', 'gallery', 'features', 'specs',
+    'isDemoAvailable', 'isFeatured', 'versions', 'colors', 'gallery', 'features', 'specs',
     'threeSixty', 'image'
   ]
 
@@ -307,7 +308,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
         car.set(field, parsed);
         car.markModified(field);
       }
-      else if (field === 'isDemoAvailable' || field === 'isNew') {
+      else if (field === 'isDemoAvailable' || field === 'isNew' || field === 'isFeatured') {
         car[field] = req.body[field] === 'true' || req.body[field] === true;
       }
       else if (['price', 'salePrice', 'stock', 'year', 'odo', 'seats'].includes(field)) {

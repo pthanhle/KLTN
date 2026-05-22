@@ -2,9 +2,9 @@ import { Table, Skeleton } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCarsTableColumns } from './hooks/useCarsTableColumns';
 
-const CarsTable = ({ cars, loading, selectedKeys, toggleSelection, toggleAllSelections, handleToggleDemo }) => {
+const CarsTable = ({ cars, loading, selectedKeys, toggleSelection, toggleAllSelections, handleToggleDemo, handleToggleFeatured }) => {
     const { t } = useTranslation('adminCars');
-    const { columns } = useCarsTableColumns(handleToggleDemo);
+    const { columns } = useCarsTableColumns(handleToggleDemo, handleToggleFeatured);
 
     const rowSelection = {
         selectedRowKeys: selectedKeys,
@@ -31,9 +31,9 @@ const CarsTable = ({ cars, loading, selectedKeys, toggleSelection, toggleAllSele
                 dataSource={cars}
                 rowKey="id"
                 scroll={{ x: 1360 }}
-                pagination={{ 
-                    pageSize: 10, 
-                    total: cars.length, 
+                pagination={{
+                    pageSize: 10,
+                    total: cars.length,
                     showSizeChanger: true,
                     pageSizeOptions: ['10', '20', '50', '100'],
                     showTotal: (total, range) => `${t('show', 'Hiển thị')} ${range[0]} - ${range[1]} ${t('of', 'của')} ${total} ${t('cars', 'xe')}`,

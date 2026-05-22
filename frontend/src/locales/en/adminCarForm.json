@@ -46,6 +46,8 @@
     "isNewDesc": "Used product (Pre-owned)",
     "isDemoLabel": "Allow Test Drive",
     "isDemoDesc": "Enable online Test Drive registration",
+    "isFeaturedLabel": "Featured",
+    "isFeaturedDesc": "Feature this vehicle on the home page",
     "coverImageLabel": "Primary Cover Image",
     "pricingTabTitle": "PRICING",
     "basePriceLbl": "List Price",

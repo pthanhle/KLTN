@@ -46,6 +46,8 @@
     "isNewDesc": "Sản phẩm đã qua sử dụng (Pre-owned)",
     "isDemoLabel": "Cho phép Lái Thử",
     "isDemoDesc": "Kích hoạt đăng ký Test Drive trực tuyến",
+    "isFeaturedLabel": "Hiển thị Nổi Bật",
+    "isFeaturedDesc": "Đưa xe lên mục Nổi Bật trên Trang Chủ",
     "coverImageLabel": "Ảnh đại diện chính",
     "pricingTabTitle": "GIÁ TIỀN",
     "basePriceLbl": "Giá Niêm Yết",

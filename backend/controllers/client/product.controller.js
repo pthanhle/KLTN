@@ -150,3 +150,19 @@ export const getProductById = asyncHandler(async (req, res) => {
 export const getProductsByCategory = asyncHandler(async (req, res) => {
   res.json([])
 })
+
+export const getFeaturedProducts = asyncHandler(async (req, res) => {
+  const products = await Car.find({ status: 'Published', isFeatured: true })
+    .sort({ updatedAt: -1 })
+    .limit(8)
+  const formattedProducts = products.map(d => {
+    const carObj = d.toJSON();
+    carObj.id = carObj._id;
+    return carObj;
+  })
+  res.json({
+    success: true,
+    data: formattedProducts
+  })
+})
+

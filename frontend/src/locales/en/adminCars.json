@@ -19,6 +19,7 @@
     "stock": "Stock",
     "lowStock": "(Low Stock)",
     "testDrive": "Test Drive",
+    "isFeaturedColumn": "Featured",
     "status": "Status",
     "action": "Action",
     "show": "Showing",

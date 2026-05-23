@@ -31,21 +31,37 @@ class ServiceOrderGlassCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: ShapeDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.6),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: 0.02)
+              : Colors.white.withValues(alpha: 0.15),
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
               cornerRadius: 24,
               cornerSmoothing: 1.0,
             ),
             side: BorderSide(
-              color: Colors.white.withValues(alpha: 0.4),
-              width: 1.5,
+              color: isUrgent
+                  ? theme.colorScheme.error.withValues(alpha: 0.5)
+                  : Colors.white.withValues(alpha: 0.3),
+              width: isUrgent ? 1.0 : 0.5,
             ),
           ),
           shadows: [
+            if (isUrgent)
+              BoxShadow(
+                color: theme.colorScheme.error.withValues(alpha: 0.15),
+                blurRadius: 20,
+                spreadRadius: 0,
+                offset: const Offset(0, 4),
+              ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 24,
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
@@ -56,44 +72,27 @@ class ServiceOrderGlassCard extends StatelessWidget {
             cornerSmoothing: 1.0,
           ),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-            child: Stack(
-              children: [
-                if (isUrgent)
-                  Positioned(
-                    top: -40,
-                    right: -40,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: theme.colorScheme.error.withValues(alpha: 0.15),
-                      ),
-                    ),
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ServiceOrderCardHeader(
+                    licensePlate: order.customer.licensePlate,
+                    vehicleModel: order.customer.vehicleModel,
+                    priority: order.priority,
                   ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ServiceOrderCardHeader(
-                        licensePlate: order.customer.licensePlate,
-                        vehicleModel: order.customer.vehicleModel,
-                        priority: order.priority,
-                      ),
-                      const SizedBox(height: 16),
-                      ServiceOrderCardTech(
-                        technician: order.assignedTechnician,
-                      ),
-                      const SizedBox(height: 16),
-                      ServiceOrderCardFooter(
-                        totalItems: order.totalItems,
-                      ),
-                    ],
+                  const SizedBox(height: 16),
+                  ServiceOrderCardTech(
+                    technician: order.assignedTechnician,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  ServiceOrderCardFooter(
+                    totalItems: order.totalItems,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

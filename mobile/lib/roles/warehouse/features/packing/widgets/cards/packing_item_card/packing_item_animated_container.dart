@@ -23,11 +23,11 @@ class PackingItemAnimatedContainer extends StatelessWidget {
       curve: Curves.fastLinearToSlowEaseIn,
       builder: (context, value, _) {
         final baseColor = Colors.white.withValues(alpha: isDark ? 0.05 : 0.2);
-        final packedColor = theme.colorScheme.primary.withValues(alpha: 0.15);
+        final packedColor = const Color(0xFF34C759).withValues(alpha: isDark ? 0.12 : 0.10);
         final currentColor = Color.lerp(baseColor, packedColor, value)!;
-        
+
         final baseBorderColor = Colors.white.withValues(alpha: 0.3);
-        final packedBorderColor = theme.colorScheme.primary.withValues(alpha: 0.5);
+        final packedBorderColor = const Color(0xFF34C759).withValues(alpha: isDark ? 0.35 : 0.25);
         final currentBorderColor = Color.lerp(baseBorderColor, packedBorderColor, value)!;
 
         return Container(

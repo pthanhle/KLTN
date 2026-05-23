@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import '../../models/service_order_model.dart';
 
 class ServiceOrderCardTech extends StatelessWidget {
@@ -54,18 +56,26 @@ class ServiceOrderCardTech extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
-          ),
-          child: Text(
-            technician.bayNumber,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.primary,
+        ClipSmoothRect(
+          radius: SmoothBorderRadius(cornerRadius: 10, cornerSmoothing: 1.0),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: ShapeDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(cornerRadius: 10, cornerSmoothing: 1.0),
+                  side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.25), width: 0.5),
+                ),
+              ),
+              child: Text(
+                technician.bayNumber,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
             ),
           ),
         ),

@@ -17,6 +17,7 @@ class LaborSearchModal extends ConsumerWidget {
     final state = ref.watch(laborSearchControllerProvider);
     final notifier = ref.read(laborSearchControllerProvider.notifier);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
@@ -26,17 +27,22 @@ class LaborSearchModal extends ConsumerWidget {
       builder: (context, scrollController) {
         return ClipSmoothRect(
           radius: const SmoothBorderRadius.vertical(
-            top: SmoothRadius(cornerRadius: 32, cornerSmoothing: 1.0),
+            top: SmoothRadius(cornerRadius: 40, cornerSmoothing: 1.0),
           ),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
             child: Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withValues(alpha: 0.7),
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    width: 1,
+              decoration: ShapeDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.04)
+                    : Colors.white.withValues(alpha: 0.65),
+                shape: SmoothRectangleBorder(
+                  borderRadius: const SmoothBorderRadius.vertical(
+                    top: SmoothRadius(cornerRadius: 40, cornerSmoothing: 1.0),
+                  ),
+                  side: BorderSide(
+                    color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.80),
+                    width: 0.5,
                   ),
                 ),
               ),
@@ -48,46 +54,50 @@ class LaborSearchModal extends ConsumerWidget {
                         child: Container(
                           margin: const EdgeInsets.only(top: 12, bottom: 8),
                           width: 48,
-                          height: 6,
+                          height: 5,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.20),
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),
                       ),
-                      
                       const LaborSearchHeader(),
-                      
                       Expanded(
                         child: state.isLoading
                             ? ListView.separated(
                                 controller: scrollController,
-                                padding: const EdgeInsets.fromLTRB(24, 8, 24, 120),
+                                padding: const EdgeInsets.fromLTRB(
+                                    20, 8, 20, 120),
                                 itemCount: 6,
-                                separatorBuilder: (context, index) => const SizedBox(height: 12),
-                                itemBuilder: (context, index) => const LaborItemSkeleton(),
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 10),
+                                itemBuilder: (_, __) =>
+                                    const LaborItemSkeleton(),
                               )
                             : ListView.separated(
                                 controller: scrollController,
-                                padding: const EdgeInsets.fromLTRB(24, 8, 24, 120), // Padding bottom for action island
+                                padding: const EdgeInsets.fromLTRB(
+                                    20, 8, 20, 120),
                                 itemCount: state.items.length,
-                                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 10),
                                 itemBuilder: (context, index) {
                                   final labor = state.items[index];
-                                  final isSelected = state.selectedLaborIds.contains(labor.id);
+                                  final isSelected = state.selectedLaborIds
+                                      .contains(labor.id);
                                   return LaborItemCard(
                                     key: ValueKey(labor.id),
                                     labor: labor,
                                     isSelected: isSelected,
-                                    onTap: () => notifier.toggleSelection(labor.id),
+                                    onTap: () =>
+                                        notifier.toggleSelection(labor.id),
                                   );
                                 },
                               ),
                       ),
                     ],
                   ),
-                  
-                  // Floating Footer (Action Island)
                   const LaborActionIsland(),
                 ],
               ),

@@ -1,6 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 class PartQuantityStepper extends StatelessWidget {
   final int quantity;
@@ -30,37 +32,57 @@ class PartQuantityStepper extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _StepperButton(
-            icon: CupertinoIcons.minus,
-            onTap: _decrement,
-            enabled: quantity > 1,
-            theme: theme,
+      decoration: ShapeDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.black.withValues(alpha: 0.04),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 12,
+            cornerSmoothing: 1.0,
           ),
-          SizedBox(
-            width: 32,
-            child: Text(
-              '$quantity',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.40),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: ClipSmoothRect(
+        radius: SmoothBorderRadius(cornerRadius: 12, cornerSmoothing: 1.0),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _StepperButton(
+                  icon: CupertinoIcons.minus,
+                  onTap: _decrement,
+                  enabled: quantity > 1,
+                  theme: theme,
+                ),
+                SizedBox(
+                  width: 32,
+                  child: Text(
+                    '$quantity',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                ),
+                _StepperButton(
+                  icon: CupertinoIcons.plus,
+                  onTap: _increment,
+                  enabled: quantity < maxStock,
+                  theme: theme,
+                ),
+              ],
             ),
           ),
-          _StepperButton(
-            icon: CupertinoIcons.plus,
-            onTap: _increment,
-            enabled: quantity < maxStock,
-            theme: theme,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -90,10 +112,10 @@ class _StepperButton extends StatelessWidget {
         alignment: Alignment.center,
         child: Icon(
           icon,
-          size: 20,
+          size: 18,
           color: enabled
               ? theme.colorScheme.onSurface
-              : theme.colorScheme.onSurface.withValues(alpha: 0.3),
+              : theme.colorScheme.onSurface.withValues(alpha: 0.25),
         ),
       ),
     );

@@ -1,57 +1,39 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
-import 'dart:ui';
+import 'package:shimmer/shimmer.dart';
 
-class ServiceOrderGlassCardSkeleton extends StatefulWidget {
+class ServiceOrderGlassCardSkeleton extends StatelessWidget {
   const ServiceOrderGlassCardSkeleton({super.key});
-
-  @override
-  State<ServiceOrderGlassCardSkeleton> createState() => _ServiceOrderGlassCardSkeletonState();
-}
-
-class _ServiceOrderGlassCardSkeletonState extends State<ServiceOrderGlassCardSkeleton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = isDark
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
+    final highlightColor = isDark
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.1);
 
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Opacity(
-          opacity: 0.5 + (_controller.value * 0.5),
-          child: child,
-        );
-      },
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: ShapeDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.6),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.02)
+              : Colors.white.withValues(alpha: 0.15),
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
               cornerRadius: 24,
               cornerSmoothing: 1.0,
             ),
             side: BorderSide(
-              color: Colors.white.withValues(alpha: 0.4),
-              width: 1.5,
+              color: Colors.white.withValues(alpha: 0.3),
+              width: 0.5,
             ),
           ),
         ),
@@ -61,13 +43,12 @@ class _ServiceOrderGlassCardSkeletonState extends State<ServiceOrderGlassCardSke
             cornerSmoothing: 1.0,
           ),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header Skeleton
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -75,7 +56,7 @@ class _ServiceOrderGlassCardSkeletonState extends State<ServiceOrderGlassCardSke
                         width: 120,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -83,7 +64,7 @@ class _ServiceOrderGlassCardSkeletonState extends State<ServiceOrderGlassCardSke
                         width: 80,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
@@ -94,20 +75,18 @@ class _ServiceOrderGlassCardSkeletonState extends State<ServiceOrderGlassCardSke
                     width: 180,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
-                  // Tech Skeleton
                   Row(
                     children: [
                       Container(
                         width: 40,
                         height: 40,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -119,7 +98,7 @@ class _ServiceOrderGlassCardSkeletonState extends State<ServiceOrderGlassCardSke
                             width: 140,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -128,7 +107,7 @@ class _ServiceOrderGlassCardSkeletonState extends State<ServiceOrderGlassCardSke
                             width: 100,
                             height: 14,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -137,19 +116,13 @@ class _ServiceOrderGlassCardSkeletonState extends State<ServiceOrderGlassCardSke
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
-                  // Footer Skeleton
-                  Row(
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ],
+                  Container(
+                    width: 120,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                 ],
               ),

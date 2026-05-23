@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 class GlassCloseButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -11,43 +12,49 @@ class GlassCloseButton extends StatelessWidget {
   const GlassCloseButton({
     super.key,
     required this.onPressed,
-    this.size = 36,
+    this.size = 32,
     this.iconSize = 14,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final cornerRadius = size * 0.3125;
 
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
         onPressed();
       },
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.12)
-                  : Colors.black.withValues(alpha: 0.06),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.2)
-                    : Colors.white.withValues(alpha: 0.6),
-                width: 0.5,
-              ),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: ShapeDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.05),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+                cornerRadius: cornerRadius, cornerSmoothing: 1.0),
+            side: BorderSide(
+              color:
+                  Colors.white.withValues(alpha: isDark ? 0.12 : 0.50),
+              width: 0.5,
             ),
-            child: Icon(
-              CupertinoIcons.xmark,
-              size: iconSize,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.85)
-                  : Colors.black.withValues(alpha: 0.6),
+          ),
+        ),
+        child: ClipSmoothRect(
+          radius: SmoothBorderRadius(
+              cornerRadius: cornerRadius, cornerSmoothing: 1.0),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Center(
+              child: Icon(
+                CupertinoIcons.xmark,
+                size: iconSize,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.70),
+              ),
             ),
           ),
         ),

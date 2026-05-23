@@ -1,5 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:ttauto_staff/roles/warehouse/features/shared/models/warehouse_enums.dart';
 
 class ServiceOrderCardHeader extends StatelessWidget {
@@ -34,17 +37,25 @@ class ServiceOrderCardHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                ),
-                child: Text(
-                  vehicleModel,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+              ClipSmoothRect(
+                radius: SmoothBorderRadius(cornerRadius: 8, cornerSmoothing: 1.0),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: ShapeDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
+                      shape: SmoothRectangleBorder(
+                        borderRadius: SmoothBorderRadius(cornerRadius: 8, cornerSmoothing: 1.0),
+                        side: BorderSide(color: Colors.white.withValues(alpha: 0.15), width: 0.5),
+                      ),
+                    ),
+                    child: Text(
+                      vehicleModel,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -52,33 +63,41 @@ class ServiceOrderCardHeader extends StatelessWidget {
           ),
         ),
         if (isUrgent)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.errorContainer,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.2)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.error,
-                    shape: BoxShape.circle,
+          ClipSmoothRect(
+            radius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: ShapeDecoration(
+                  color: theme.colorScheme.error.withValues(alpha: 0.15),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+                    side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.3), width: 0.5),
                   ),
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  'Gấp'.tr(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onErrorContainer,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.error,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Gấp'.tr(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
       ],

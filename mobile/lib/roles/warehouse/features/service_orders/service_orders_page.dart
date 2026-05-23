@@ -97,9 +97,13 @@ class _ServiceOrdersPageState extends ConsumerState<ServiceOrdersPage> {
                   ),
                 )
               else if (orders.isEmpty)
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
-                  child: ServiceEmptyState(),
+                  child: ServiceEmptyState(
+                    type: _currentTabIndex == 0
+                        ? ServiceEmptyStateType.pendingPick
+                        : ServiceEmptyStateType.readyForHandover,
+                  ),
                 )
               else
                 SliverPadding(

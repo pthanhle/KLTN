@@ -74,7 +74,10 @@ class _ServicePackingDetailPageState extends ConsumerState<ServicePackingDetailP
             bottom: false,
             child: Column(
               children: [
-                const PackingGlassHeader(),
+                PackingGlassHeader(
+                  pickedItems: state.pickedCount,
+                  totalItems: order.totalItems,
+                ),
                 
                 Expanded(
                   child: CustomScrollView(
@@ -119,8 +122,13 @@ class _ServicePackingDetailPageState extends ConsumerState<ServicePackingDetailP
               pickedItems: state.pickedCount,
               isSubmitting: state.isSubmitting,
               onHandover: () {
-                showCupertinoModalPopup(
+                showModalBottomSheet(
                   context: context,
+                  useRootNavigator: true,
+                  backgroundColor: Colors.transparent,
+                  barrierColor: Colors.black.withValues(alpha: 0.4),
+                  elevation: 0,
+                  isScrollControlled: true,
                   builder: (context) => PackingHandoverSheet(
                     technician: order.assignedTechnician,
                     licensePlate: order.customer.licensePlate,
@@ -129,9 +137,7 @@ class _ServicePackingDetailPageState extends ConsumerState<ServicePackingDetailP
                       final success = await ref.read(servicePackingProvider.notifier).submitHandover();
                       if (success && context.mounted) {
                         Future.delayed(const Duration(milliseconds: 800), () {
-                          if (context.mounted) {
-                            context.pop();
-                          }
+                          if (context.mounted) context.pop();
                         });
                         return true;
                       }

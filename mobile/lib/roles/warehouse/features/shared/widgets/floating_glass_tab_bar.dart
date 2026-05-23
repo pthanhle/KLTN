@@ -61,7 +61,7 @@ class FloatingGlassTabBar extends StatelessWidget {
                 Expanded(
                   child: GlassNavItem(
                     icon: CupertinoIcons.house,
-                    activeIcon: CupertinoIcons.house_fill,
+                    activeIcon: CupertinoIcons.house,
                     label: 'Trang chủ'.tr(),
                     isSelected: currentIndex == 0,
                     onTap: () {
@@ -72,7 +72,7 @@ class FloatingGlassTabBar extends StatelessWidget {
                 Expanded(
                   child: GlassNavItem(
                     icon: CupertinoIcons.cube_box,
-                    activeIcon: CupertinoIcons.cube_box_fill,
+                    activeIcon: CupertinoIcons.cube_box,
                     label: 'Bán lẻ'.tr(),
                     isSelected: currentIndex == 1,
                     onTap: () {
@@ -119,7 +119,7 @@ class FloatingGlassTabBar extends StatelessWidget {
                 Expanded(
                   child: GlassNavItem(
                     icon: CupertinoIcons.wrench,
-                    activeIcon: CupertinoIcons.wrench_fill,
+                    activeIcon: CupertinoIcons.wrench,
                     label: 'Sửa chữa'.tr(),
                     isSelected: currentIndex == 2,
                     onTap: () {
@@ -130,7 +130,7 @@ class FloatingGlassTabBar extends StatelessWidget {
                 Expanded(
                   child: GlassNavItem(
                     icon: CupertinoIcons.person,
-                    activeIcon: CupertinoIcons.person_fill,
+                    activeIcon: CupertinoIcons.person,
                     label: 'Tài khoản'.tr(),
                     isSelected: currentIndex == 3,
                     onTap: () {

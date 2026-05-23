@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'liquid_progress_bar.dart';
+import 'package:figma_squircle/figma_squircle.dart';
+import 'package:ttauto_staff/shared/widgets/buttons/liquid_button.dart';
 
 class PackingBottomIsland extends StatelessWidget {
   final String orderId;
@@ -23,92 +25,41 @@ class PackingBottomIsland extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final progress = totalItems > 0 ? pickedItems / totalItems : 0.0;
+    final isDark = theme.brightness == Brightness.dark;
     final isReady = pickedItems == totalItems && totalItems > 0;
 
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
+      child: ClipSmoothRect(
+        radius: SmoothBorderRadius(cornerRadius: 36, cornerSmoothing: 1.0),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
           child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Tiến độ nhặt hàng'.tr(),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            '$pickedItems/$totalItems',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      LiquidProgressBar(progress: progress),
-                    ],
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.04)
+                : Colors.white.withValues(alpha: 0.25),
+            padding: const EdgeInsets.all(10),
+            child: LiquidButton(
+              onPressed: isReady && !isSubmitting ? onHandover : null,
+              isLoading: isSubmitting,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Giao cho KTV'.tr(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.4,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    color: isReady ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(24),
-                    onPressed: isReady && !isSubmitting ? onHandover : null,
-                    child: isSubmitting
-                        ? const CupertinoActivityIndicator(color: Colors.white)
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                CupertinoIcons.wrench_fill,
-                                size: 20,
-                                color: isReady ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Giao cho KTV'.tr(),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: isReady ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    CupertinoIcons.checkmark_seal_fill,
+                    size: 18,
+                    color: Colors.white,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

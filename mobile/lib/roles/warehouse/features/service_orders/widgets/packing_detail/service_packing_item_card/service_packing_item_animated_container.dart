@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 class ServicePackingItemAnimatedContainer extends StatelessWidget {
   final bool isPacked;
@@ -12,27 +14,46 @@ class ServicePackingItemAnimatedContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
+      duration: const Duration(milliseconds: 360),
+      curve: Curves.easeOutCubic,
+      decoration: ShapeDecoration(
         color: isPacked
-            ? (isDark 
-                ? Colors.green.withValues(alpha: 0.1) 
-                : Colors.green.withValues(alpha: 0.05))
-            : theme.colorScheme.surface,
-        border: Border.all(
-          color: isPacked
-              ? Colors.green.withValues(alpha: 0.3)
-              : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+            ? (isDark
+                ? const Color(0xFF34C759).withValues(alpha: 0.08)
+                : const Color(0xFF34C759).withValues(alpha: 0.04))
+            : (isDark
+                ? Colors.white.withValues(alpha: 0.02)
+                : Colors.white.withValues(alpha: 0.15)),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(cornerRadius: 20, cornerSmoothing: 1.0),
+          side: BorderSide(
+            color: isPacked
+                ? const Color(0xFF34C759).withValues(alpha: 0.35)
+                : Colors.white.withValues(alpha: 0.3),
+            width: isPacked ? 1.0 : 0.5,
+          ),
         ),
-        borderRadius: BorderRadius.circular(16),
+        shadows: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: child,
+      child: ClipSmoothRect(
+        radius: SmoothBorderRadius(cornerRadius: 20, cornerSmoothing: 1.0),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: child,
+          ),
+        ),
+      ),
     );
   }
 }

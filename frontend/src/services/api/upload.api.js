@@ -1,10 +1,6 @@
 import axiosClient from '../../utils/axiosClient';
 
-/**
- * Upload multiple images to Cloudinary
- * @param {File[]} files - Array of image files
- * @returns {Promise<string[]>} Array of Cloudinary URLs
- */
+
 export const uploadImages = async (files) => {
   const formData = new FormData();
   files.forEach(file => {
@@ -17,14 +13,10 @@ export const uploadImages = async (files) => {
     },
   });
 
-  return response.data.data;
+  return response.data;
 };
 
-/**
- * Upload single image to Cloudinary
- * @param {File} file - Image file
- * @returns {Promise<string>} Cloudinary URL
- */
+
 export const uploadSingleImage = async (file) => {
   const formData = new FormData();
   formData.append('image', file);
@@ -35,5 +27,5 @@ export const uploadSingleImage = async (file) => {
     },
   });
 
-  return response.data.url;
+  return response.url;
 };

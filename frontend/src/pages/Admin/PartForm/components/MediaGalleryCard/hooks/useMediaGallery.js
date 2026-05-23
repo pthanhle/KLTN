@@ -3,7 +3,7 @@ import { message } from 'antd';
 import { KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useState } from 'react';
-import { uploadImages } from '../../../../../services/api/upload.api';
+import { uploadImages } from '../../../../../../services/api/upload.api';
 
 export const useMediaGallery = (control, name, t) => {
     const { field } = useController({ control, name });

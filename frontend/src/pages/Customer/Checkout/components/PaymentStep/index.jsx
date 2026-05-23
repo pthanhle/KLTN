@@ -5,7 +5,7 @@ import PaymentSummary from './PaymentSummary';
 
 const PaymentStep = ({ hookState }) => {
     const {
-        t, checkedItems, subtotal, isLoading,
+        t, checkedItems, subtotal, discount, appliedVoucher, removeVoucher, isValidatingVoucher, isLoading,
         deliveryInfo, updateDeliveryInfo,
         shippingMethod, setShippingMethod,
         paymentMethod, setPaymentMethod,
@@ -24,6 +24,10 @@ const PaymentStep = ({ hookState }) => {
                 <PaymentSummary
                     checkedItems={checkedItems}
                     subtotal={subtotal}
+                    discount={discount}
+                    appliedVoucher={appliedVoucher}
+                    removeVoucher={removeVoucher}
+                    isValidatingVoucher={isValidatingVoucher}
                     isLoading={isLoading}
                     applyPromoCode={applyPromoCode}
                     handleCheckoutSubmit={handleCheckoutSubmit}

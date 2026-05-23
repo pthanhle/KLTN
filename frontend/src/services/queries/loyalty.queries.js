@@ -16,9 +16,9 @@ export const useLoyaltyHistoryQuery = () => {
         queryKey: ['loyaltyHistory'],
         queryFn: () => loyaltyApi.getHistory(),
         staleTime: 60000,
-        select: (data) => data?.data || []
+        select: (data) => Array.isArray(data) ? data : (data?.data || [])
     });
-};
+};  
 
 export const useLoyaltyStoreQuery = () => {
     return useQuery({
@@ -34,7 +34,7 @@ export const useMyVouchersQuery = () => {
         queryKey: ['myLoyaltyVouchers'],
         queryFn: () => loyaltyApi.getMyVouchers(),
         staleTime: 60000,
-        select: (data) => data?.data || []
+        select: (data) => Array.isArray(data) ? data : (data?.data || [])
     });
 };
 

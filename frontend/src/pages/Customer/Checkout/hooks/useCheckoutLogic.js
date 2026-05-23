@@ -35,13 +35,11 @@ export const useCheckoutLogic = () => {
 
     const timelineSteps = useMemo(() => getTimelineSteps(t), [t]);
 
-    // Tính discount từ voucher
     const discount = useMemo(() => {
         if (!appliedVoucher) return 0;
 
         const { discount_type, discount_value, max_discount, min_order_value } = appliedVoucher;
 
-        // Kiểm tra đơn tối thiểu
         if (cart.subtotal < min_order_value) {
             return 0;
         }
@@ -125,7 +123,7 @@ export const useCheckoutLogic = () => {
             formContext.shippingMethod,
             cart.checkedItems,
             finalTotal,
-            appliedVoucher // Truyền voucher để lưu vào order
+            appliedVoucher
         );
     };
 

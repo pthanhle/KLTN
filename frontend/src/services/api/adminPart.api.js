@@ -60,3 +60,4 @@ export const adminPartApi = {
         return response;
     }
 };
+

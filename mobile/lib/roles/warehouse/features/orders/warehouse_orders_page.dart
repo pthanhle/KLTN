@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
-import '../../../../shared/widgets/backgrounds/mesh_background.dart';
 import 'package:ttauto_staff/roles/warehouse/features/orders/controllers/warehouse_orders_controller.dart';
 import 'package:ttauto_staff/roles/warehouse/features/orders/widgets/controls/orders_segmented_control.dart';
 import 'package:ttauto_staff/roles/warehouse/features/orders/widgets/orders_list_view.dart';
@@ -22,9 +21,9 @@ class _WarehouseOrdersPageState extends ConsumerState<WarehouseOrdersPage> {
     final state = ref.watch(warehouseOrdersProvider);
     final controller = ref.read(warehouseOrdersProvider.notifier);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
+    return CupertinoPageScaffold(
+      backgroundColor: theme.colorScheme.surface,
+      child: Stack(
         children: [
           Positioned.fill(
             child: Container(
@@ -45,48 +44,40 @@ class _WarehouseOrdersPageState extends ConsumerState<WarehouseOrdersPage> {
               ),
             ),
           ),
-          
-          SafeArea(
-            bottom: false,
-            child: RefreshIndicator(
-              onRefresh: () => controller.refresh(),
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 16, left: 24, right: 24, bottom: 8),
-                      child: Text(
-                        'Lệnh Kho'.tr(),
-                        style: theme.textTheme.headlineLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.8,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  ),
 
-                  // Sticky Segmented Control
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _SegmentedControlDelegate(
-                      child: OrdersSegmentedControl(
-                        selectedTab: state.currentTab,
-                        onTabChanged: controller.setTab,
-                      ),
-                    ),
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            slivers: [
+              CupertinoSliverNavigationBar(
+                largeTitle: Text(
+                  'Lệnh Kho'.tr(),
+                  style: TextStyle(
+                    fontFamily: 'Hanken Grotesk',
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                    color: theme.colorScheme.onSurface,
                   ),
-
-                  const OrdersListView(),
-                  
-                  // Bottom padding for the tab bar
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: 120),
-                  ),
-                ],
+                ),
+                backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.6),
+                border: null,
               ),
-            ),
+
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _SegmentedControlDelegate(
+                  child: OrdersSegmentedControl(
+                    selectedTab: state.currentTab,
+                    onTabChanged: controller.setTab,
+                  ),
+                ),
+              ),
+
+              const OrdersListView(),
+
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 120),
+              ),
+            ],
           ),
         ],
       ),

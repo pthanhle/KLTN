@@ -1,0 +1,10 @@
+{
+  "Lệnh Sửa Chữa": "Service Orders",
+  "Chờ nhặt hàng": "Pending Pick",
+  "Chờ bàn giao": "Ready for Handover",
+  "Gấp": "Urgent",
+  "Khoang": "Bay",
+  "{count} Món": "{count} Items",
+  "Tuyệt vời!": "Awesome!",
+  "Không có lệnh sửa chữa nào cần xử lý": "No service orders to process"
+}

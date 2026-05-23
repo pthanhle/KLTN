@@ -20,5 +20,9 @@
   "Mã vận đơn": "Tracking Code",
   "Nhập hoặc quét mã vạch": "Enter or scan barcode",
   "Hoàn tất bàn giao": "Complete Handover",
-  "Bàn giao đơn {orderId} thành công!": "Order {orderId} handover successful!"
+  "Bàn giao đơn {orderId} thành công!": "Order {orderId} handover successful!",
+  "Nhặt đủ": "Pack All",
+  "Hoàn tác": "Undo",
+  "Chọn đơn vị vận chuyển": "Select Shipping Provider",
+  "Chọn hãng vận chuyển": "Select Carrier"
 }

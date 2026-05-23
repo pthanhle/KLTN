@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class PackingItemProgress extends StatelessWidget {
@@ -13,43 +14,108 @@ class PackingItemProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isPacked = packedQuantity == totalQuantity;
     final progress = totalQuantity > 0 ? packedQuantity / totalQuantity : 0.0;
+    final isPacked = packedQuantity == totalQuantity;
+    const completedColor = Color(0xFF34C759);
+    final ringColor = isPacked ? completedColor : theme.colorScheme.primary;
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        SizedBox(
-          width: 56,
-          height: 56,
-          child: CircularProgressIndicator(
-            value: progress,
-            strokeWidth: 3,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-            valueColor: AlwaysStoppedAnimation<Color>(
-              isPacked ? theme.colorScheme.primary : theme.colorScheme.secondary,
+    return SizedBox(
+      width: 52,
+      height: 52,
+      child: CustomPaint(
+        painter: _PackingRingPainter(
+          progress: progress,
+          ringColor: ringColor,
+          isPacked: isPacked,
+          theme: theme,
+        ),
+        child: Center(
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            style: TextStyle(
+              fontSize: isPacked ? 10 : 11,
+              fontWeight: FontWeight.w800,
+              color: ringColor,
+              height: 1.0,
+            ),
+            child: Text(
+              '$packedQuantity/$totalQuantity',
+              textAlign: TextAlign.center,
             ),
           ),
         ),
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: isPacked 
-                ? theme.colorScheme.primary 
-                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
-            shape: BoxShape.circle,
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            '$packedQuantity',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: isPacked ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
+}
+
+class _PackingRingPainter extends CustomPainter {
+  final double progress;
+  final Color ringColor;
+  final bool isPacked;
+  final ThemeData theme;
+
+  _PackingRingPainter({
+    required this.progress,
+    required this.ringColor,
+    required this.isPacked,
+    required this.theme,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width / 2) - 4;
+    const strokeWidth = 2.5;
+
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..color = theme.colorScheme.onSurface.withValues(alpha: 0.06)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.butt,
+    );
+
+    if (progress <= 0) return;
+
+    if (isPacked) {
+      canvas.drawCircle(
+        center,
+        radius,
+        Paint()
+          ..color = ringColor.withValues(alpha: 0.20)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth + 3
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+      );
+      canvas.drawCircle(
+        center,
+        radius,
+        Paint()
+          ..color = ringColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.butt,
+      );
+    } else {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        -pi / 2,
+        2 * pi * progress,
+        false,
+        Paint()
+          ..color = ringColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_PackingRingPainter old) =>
+      old.progress != progress || old.isPacked != isPacked;
 }

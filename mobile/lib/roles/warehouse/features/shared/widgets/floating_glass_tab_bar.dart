@@ -73,7 +73,7 @@ class FloatingGlassTabBar extends StatelessWidget {
                   child: GlassNavItem(
                     icon: CupertinoIcons.cube_box,
                     activeIcon: CupertinoIcons.cube_box,
-                    label: 'Lệnh kho'.tr(),
+                    label: 'Bán lẻ'.tr(),
                     isSelected: currentIndex == 1,
                     onTap: () {
                       if (currentIndex != 1) onTabTapped(1);
@@ -118,16 +118,26 @@ class FloatingGlassTabBar extends StatelessWidget {
                 ),
                 Expanded(
                   child: GlassNavItem(
+                    icon: CupertinoIcons.wrench,
+                    activeIcon: CupertinoIcons.wrench,
+                    label: 'Sửa chữa'.tr(),
+                    isSelected: currentIndex == 2,
+                    onTap: () {
+                      if (currentIndex != 2) onTabTapped(2);
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: GlassNavItem(
                     icon: CupertinoIcons.person,
                     activeIcon: CupertinoIcons.person,
                     label: 'Tài khoản'.tr(),
                     isSelected: currentIndex == 3,
                     onTap: () {
-                      if (currentIndex != 3) onTabTapped(2);
+                      if (currentIndex != 3) onTabTapped(3);
                     },
                   ),
                 ),
-                const Expanded(child: SizedBox()),
               ],
             ),
           ),

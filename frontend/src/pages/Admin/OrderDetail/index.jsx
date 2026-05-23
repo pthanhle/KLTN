@@ -9,12 +9,14 @@ import { OrderStepper } from './components/Stepper';
 import { ProductList } from './components/ProductSection';
 import { FinancialSummary } from './components/InfoCards/FinancialSummary';
 import { CustomerInfo } from './components/InfoCards/CustomerInfo';
+import { StaffAssignmentInfo } from './components/StaffAssignmentInfo';
 import { ShippingInfo, VatInfo } from './components/InfoCards/ShippingAndVat';
 import { ExceptionBanner } from './components/Alerts/ExceptionBanner';
 import { ActivityTimeline } from './components/Timeline/ActivityTimeline';
 import { ShippingModal } from './components/Modals/ShippingModal';
 import { CancelModal } from './components/Modals/CancelModal';
 import { PrintModal } from './components/Modals/PrintModal';
+import { ReassignModal } from './components/Modals/ReassignModal';
 
 const AdminOrderDetail = () => {
     const { t } = useTranslation('adminOrderDetail');
@@ -29,7 +31,10 @@ const AdminOrderDetail = () => {
         setIsCancelModalVisible,
         handleCancelSubmit,
         isPrintModalVisible,
-        setIsPrintModalVisible
+        setIsPrintModalVisible,
+        isReassignModalVisible,
+        setIsReassignModalVisible,
+        handleReassignSubmit
     } = useOrderDetailLogic();
 
     return (
@@ -80,6 +85,11 @@ const AdminOrderDetail = () => {
                         ) : (
                             <>
                                 <CustomerInfo delivery={order?.delivery} t={t} />
+                                <StaffAssignmentInfo 
+                                    assignment={order?.assignment} 
+                                    t={t} 
+                                    onReassign={() => handleAction('reassign_staff')} 
+                                />
                                 <div className="h-8"></div>
                                 <ShippingInfo shipping={order?.shipping} status={order?.order_status} t={t} />
                                 <VatInfo vatInfo={order?.vat_info} t={t} />
@@ -113,6 +123,13 @@ const AdminOrderDetail = () => {
                 isOpen={isPrintModalVisible}
                 onCancel={() => setIsPrintModalVisible(false)}
                 order={order}
+            />
+
+            <ReassignModal
+                isOpen={isReassignModalVisible}
+                onCancel={() => setIsReassignModalVisible(false)}
+                onSubmit={handleReassignSubmit}
+                currentStaffId={order?.assignment?.assigned_staff_id}
             />
         </div>
     );

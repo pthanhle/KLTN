@@ -157,19 +157,19 @@ class _SelectedLiquidChip extends StatelessWidget {
       child: Container(
         height: chipH,
         decoration: ShapeDecoration(
-          color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.20 : 0.14),
+          color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.18),
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
             side: BorderSide(
-              color: Colors.white.withValues(alpha: isDark ? 0.50 : 0.85),
+              color: Colors.white.withValues(alpha: isDark ? 0.50 : 0.90),
               width: 1.0,
             ),
           ),
           shadows: [
             BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.22),
+              color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.07),
               blurRadius: 10,
-              offset: const Offset(0, 4),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -227,14 +227,19 @@ class _SelectedLiquidChip extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(icon, size: 15, color: Colors.white),
+                    Icon(icon, size: 15,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.90)
+                            : Colors.black.withValues(alpha: 0.75)),
                     const SizedBox(width: 6),
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.90)
+                            : Colors.black.withValues(alpha: 0.75),
                         letterSpacing: -0.2,
                       ),
                     ),

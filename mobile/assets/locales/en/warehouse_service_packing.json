@@ -1,0 +1,23 @@
+{
+  "Chi tiết Nhặt hàng": "Picking Details",
+  "KTV:": "Tech:",
+  "Khoang": "Bay",
+  "Đã nhặt": "Picked",
+  "Báo lỗi": "Report Issue",
+  "SL": "Qty",
+  "SKU:": "SKU:",
+  "Kệ": "Bin",
+  "Tiến độ nhặt hàng": "Picking Progress",
+  "Giao cho KTV": "Handover to Tech",
+  "Bàn giao vật tư cho KTV": "Handover parts to Tech",
+  "Vuốt để bàn giao tận tay": "Swipe to handover",
+  "Đã bàn giao": "Handed Over",
+  "Bàn giao {count} phụ tùng cho xe {plate}": "Handed over {count} parts for vehicle {plate}",
+  "Thành công": "Success",
+  "Báo lỗi thành công": "Issue reported successfully",
+  "Đã hoàn tất nhặt hàng": "Picking completed",
+  "Giao lệnh thất bại": "Handover failed",
+  "Nhặt đủ": "Pack All",
+  "Hoàn tác": "Undo",
+  "Chi tiết sản phẩm": "Product Details"
+}

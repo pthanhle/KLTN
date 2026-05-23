@@ -33,13 +33,13 @@ class PackingItemCard extends StatelessWidget {
       child: Slidable(
         key: ValueKey(item.partId),
         startActionPane: ActionPane(
-          motion: const StretchMotion(),
-          extentRatio: 0.3,
+          motion: const BehindMotion(),
+          extentRatio: 0.28,
           children: PackingItemActions.buildStartActions(context, onPackAll),
         ),
         endActionPane: ActionPane(
-          motion: const StretchMotion(),
-          extentRatio: 0.25,
+          motion: const BehindMotion(),
+          extentRatio: 0.28,
           children: PackingItemActions.buildEndActions(context, onUndo),
         ),
         child: GestureDetector(

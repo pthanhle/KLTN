@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/quotation_model.dart';
 import '../data/quotation_mock_data.dart';
+import '../../../models/labor_item_model.dart';
 
 class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   @override
@@ -41,6 +42,46 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
         return p;
       }).toList();
       state = AsyncData(state.value!.copyWith(parts: updatedParts));
+    }
+  }
+
+  void addPart(CartPartItem part) {
+    if (state.hasValue && state.value != null) {
+      final currentParts = List<CartPartItem>.from(state.value!.parts);
+      // Check if part already exists
+      final existingIndex = currentParts.indexWhere((p) => p.id == part.id);
+      if (existingIndex >= 0) {
+        // Update quantity
+        final existing = currentParts[existingIndex];
+        currentParts[existingIndex] = CartPartItem(
+          id: existing.id,
+          name: existing.name,
+          price: existing.price,
+          quantity: existing.quantity + part.quantity,
+          isBackorder: existing.isBackorder,
+          expectedDate: existing.expectedDate,
+        );
+      } else {
+        currentParts.add(part);
+      }
+      state = AsyncData(state.value!.copyWith(parts: currentParts));
+    }
+  }
+
+  void addLabor(LaborItemModel labor) {
+    if (state.hasValue && state.value != null) {
+      final currentLabor = List<CartLaborItem>.from(state.value!.labor);
+      
+      final existingIndex = currentLabor.indexWhere((l) => l.id == labor.id);
+      if (existingIndex < 0) {
+        currentLabor.add(CartLaborItem(
+          id: labor.id,
+          name: labor.name,
+          hours: labor.estimatedHours,
+          rate: labor.estimatedHours > 0 ? labor.price / labor.estimatedHours : 0,
+        ));
+        state = AsyncData(state.value!.copyWith(labor: currentLabor));
+      }
     }
   }
 }

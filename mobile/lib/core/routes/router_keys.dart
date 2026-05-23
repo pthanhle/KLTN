@@ -13,6 +13,7 @@ class RouterKeys {
   // Warehouse Role Shell Keys
   static final GlobalKey<NavigatorState> shellWarehouseHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellWarehouseHome');
   static final GlobalKey<NavigatorState> shellWarehouseOrdersKey = GlobalKey<NavigatorState>(debugLabel: 'shellWarehouseOrders');
+  static final GlobalKey<NavigatorState> shellWarehouseServiceOrdersKey = GlobalKey<NavigatorState>(debugLabel: 'shellWarehouseServiceOrders');
   static final GlobalKey<NavigatorState> shellWarehouseProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellWarehouseProfile');
 
   // Service Advisor Role Shell Keys

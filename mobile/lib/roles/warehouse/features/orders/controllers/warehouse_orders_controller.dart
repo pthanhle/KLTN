@@ -11,22 +11,26 @@ class WarehouseOrdersState {
   final bool isLoading;
   final OrderStatus currentTab;
   final List<WarehouseOrderModel> orders;
+  final String currentStaffId;
 
   const WarehouseOrdersState({
     this.isLoading = false,
     this.currentTab = OrderStatus.pendingPick,
     this.orders = const [],
+    this.currentStaffId = 'INV-112',
   });
 
   WarehouseOrdersState copyWith({
     bool? isLoading,
     OrderStatus? currentTab,
     List<WarehouseOrderModel>? orders,
+    String? currentStaffId,
   }) {
     return WarehouseOrdersState(
       isLoading: isLoading ?? this.isLoading,
       currentTab: currentTab ?? this.currentTab,
       orders: orders ?? this.orders,
+      currentStaffId: currentStaffId ?? this.currentStaffId,
     );
   }
 }
@@ -34,7 +38,6 @@ class WarehouseOrdersState {
 class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
   @override
   WarehouseOrdersState build() {
-    // Initial state
     Future.microtask(() => _loadOrders());
     return const WarehouseOrdersState();
   }
@@ -42,7 +45,6 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
   Future<void> _loadOrders() async {
     state = state.copyWith(isLoading: true);
     
-    // Simulate network delay and JSON parsing
     await Future.delayed(const Duration(seconds: 1));
     
     final parsedOrders = mockWarehouseOrdersJson
@@ -59,8 +61,12 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
     state = state.copyWith(currentTab: tab);
   }
 
+  List<WarehouseOrderModel> get myOrders {
+    return state.orders.where((order) => order.assignedStaffId == state.currentStaffId).toList();
+  }
+
   List<WarehouseOrderModel> get filteredOrders {
-    return state.orders.where((order) => order.status == state.currentTab).toList();
+    return myOrders.where((order) => order.status == state.currentTab).toList();
   }
 
   Future<void> refresh() async {

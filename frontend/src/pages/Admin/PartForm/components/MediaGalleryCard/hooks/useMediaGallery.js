@@ -2,23 +2,37 @@ import { useController } from 'react-hook-form';
 import { message } from 'antd';
 import { KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { useState } from 'react';
+import { uploadImages } from '../../../../../services/api/upload.api';
 
 export const useMediaGallery = (control, name, t) => {
     const { field } = useController({ control, name });
     const images = field.value || [];
+    const [isUploading, setIsUploading] = useState(false);
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
     );
 
-    const handleUpload = (info) => {
-        // Tạm thời mock logic lấy file blob để preview
-        // Khi ghép API thực tế, logic call api upload sẽ gọi ở đây (phân tách Backend Request)
-        if (info.file.status === 'done' || info.file.status === 'error' || !info.file.status) {
-            const fakeUrl = URL.createObjectURL(info.file.originFileObj || info.file);
-            field.onChange([...images, fakeUrl]);
+    const handleUpload = async (info) => {
+        try {
+            const files = info.fileList
+                .filter(file => file.originFileObj)
+                .map(file => file.originFileObj);
+
+            if (files.length === 0) return;
+
+            setIsUploading(true);
+            const uploadedUrls = await uploadImages(files);
+
+            field.onChange([...images, ...uploadedUrls]);
             message.success(t('adminPartForm:uploadSuccess'));
+        } catch (error) {
+            console.error('Upload error:', error);
+            message.error(error.message || t('adminPartForm:uploadError', 'Lỗi tải ảnh lên'));
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -42,6 +56,7 @@ export const useMediaGallery = (control, name, t) => {
         sensors,
         handleUpload,
         handleRemove,
-        handleDragEnd
+        handleDragEnd,
+        isUploading
     };
 };

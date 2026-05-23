@@ -114,8 +114,24 @@ export const redeemVoucher = asyncHandler(async (req, res) => {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + validDays);
 
-    const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const voucherCode = `PROMO-${randomSuffix}`;
+    let voucherCode;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+        const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const timePart = Date.now().toString(36).slice(-4).toUpperCase();
+        voucherCode = `PROMO-${randomPart}${timePart}`;
+        const existing = await CustomerVoucher.findOne({ code: voucherCode });
+        if (!existing) break;
+
+        attempts++;
+    }
+
+    if (attempts >= maxAttempts) {
+        res.status(500);
+        throw new Error('Không thể tạo mã voucher unique, vui lòng thử lại');
+    }
 
     const customerVoucher = await CustomerVoucher.create({
         user: req.user._id,

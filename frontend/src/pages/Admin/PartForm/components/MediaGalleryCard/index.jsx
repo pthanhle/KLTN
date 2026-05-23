@@ -1,5 +1,4 @@
-import React from 'react';
-import { Upload } from 'antd';
+import { Upload, Spin } from 'antd';
 import { Image as ImageIcon, CloudUpload } from 'lucide-react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
@@ -14,7 +13,8 @@ const MediaGalleryCard = ({ control, name, t }) => {
         sensors,
         handleUpload,
         handleRemove,
-        handleDragEnd
+        handleDragEnd,
+        isUploading
     } = useMediaGallery(control, name, t);
 
     return (
@@ -26,25 +26,28 @@ const MediaGalleryCard = ({ control, name, t }) => {
                 </h3>
             </div>
 
-            <Dragger
-                multiple={true}
-                showUploadList={false}
-                customRequest={({ file, onSuccess }) => {
-                    setTimeout(() => onSuccess("ok"), 0);
-                }}
-                onChange={handleUpload}
-                className="[&_.ant-upload-drag]:!bg-slate-50 dark:[&_.ant-upload-drag]:!bg-[#1c1c1e] [&_.ant-upload-drag]:!border-2 [&_.ant-upload-drag]:!border-dashed [&_.ant-upload-drag]:!border-slate-300 dark:[&_.ant-upload-drag]:!border-white/20 [&_.ant-upload-drag]:hover:!border-yellow-500"
-            >
-                <div className="py-8 flex flex-col items-center justify-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-yellow-50 dark:bg-yellow-500/10 flex items-center justify-center">
-                        <CloudUpload className="text-yellow-600 dark:text-yellow-500" size={32} />
+            <Spin spinning={isUploading} tip={t('adminPartForm:uploading', 'Đang tải ảnh...')}>
+                <Dragger
+                    multiple={true}
+                    showUploadList={false}
+                    customRequest={({ onSuccess }) => {
+                        setTimeout(() => onSuccess("ok"), 0);
+                    }}
+                    onChange={handleUpload}
+                    disabled={isUploading}
+                    className="[&_.ant-upload-drag]:!bg-slate-50 dark:[&_.ant-upload-drag]:!bg-[#1c1c1e] [&_.ant-upload-drag]:!border-2 [&_.ant-upload-drag]:!border-dashed [&_.ant-upload-drag]:!border-slate-300 dark:[&_.ant-upload-drag]:!border-white/20 [&_.ant-upload-drag]:hover:!border-yellow-500 disabled:[&_.ant-upload-drag]:!opacity-50"
+                >
+                    <div className="py-8 flex flex-col items-center justify-center gap-4">
+                        <div className="w-16 h-16 rounded-full bg-yellow-50 dark:bg-yellow-500/10 flex items-center justify-center">
+                            <CloudUpload className="text-yellow-600 dark:text-yellow-500" size={32} />
+                        </div>
+                        <div className="text-center">
+                            <p className="text-slate-800 dark:text-white font-bold">{t('adminPartForm:dragDrop')}</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('adminPartForm:orClick')} {t('adminPartForm:uploadLimit')}</p>
+                        </div>
                     </div>
-                    <div className="text-center">
-                        <p className="text-slate-800 dark:text-white font-bold">{t('adminPartForm:dragDrop')}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('adminPartForm:orClick')} {t('adminPartForm:uploadLimit')}</p>
-                    </div>
-                </div>
-            </Dragger>
+                </Dragger>
+            </Spin>
 
             {images.length > 0 && (
                 <div className="mt-8">

@@ -3,6 +3,8 @@ import '../../../../core/routes/router_keys.dart';
 import '../warehouse_shell.dart';
 import '../features/dashboard/warehouse_home_page.dart';
 import '../features/orders/warehouse_orders_page.dart';
+import '../features/service_orders/service_orders_page.dart';
+import '../features/service_orders/service_packing_detail_page.dart';
 import '../../auth/views/pages/profile_page.dart';
 
 final StatefulShellRoute warehouseRoutes = StatefulShellRoute.indexedStack(
@@ -27,6 +29,27 @@ final StatefulShellRoute warehouseRoutes = StatefulShellRoute.indexedStack(
           path: '/warehouse/orders',
           name: 'warehouse_orders',
           builder: (context, state) => const WarehouseOrdersPage(),
+        ),
+      ],
+    ),
+    StatefulShellBranch(
+      navigatorKey: RouterKeys.shellWarehouseServiceOrdersKey,
+      routes: [
+        GoRoute(
+          path: '/warehouse/service-orders',
+          name: 'warehouse_service_orders',
+          builder: (context, state) => const ServiceOrdersPage(),
+          routes: [
+            GoRoute(
+              path: ':id',
+              name: 'warehouse_service_packing_detail',
+              parentNavigatorKey: RouterKeys.rootNavigatorKey,
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return ServicePackingDetailPage(orderId: id);
+              },
+            ),
+          ],
         ),
       ],
     ),

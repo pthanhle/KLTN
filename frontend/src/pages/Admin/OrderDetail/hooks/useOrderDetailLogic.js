@@ -13,6 +13,7 @@ export const useOrderDetailLogic = () => {
     const [isShippingModalVisible, setIsShippingModalVisible] = useState(false);
     const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
     const [isPrintModalVisible, setIsPrintModalVisible] = useState(false);
+    const [isReassignModalVisible, setIsReassignModalVisible] = useState(false);
 
     const fetchOrder = useCallback(async () => {
         setLoading(true);
@@ -20,6 +21,13 @@ export const useOrderDetailLogic = () => {
         try {
             const data = await adminOrderApi.getOrderById(id);
             try {
+                if (!data.assignment) {
+                    data.assignment = {
+                        assigned_staff_id: "INV-112",
+                        assigned_at: new Date().toISOString()
+                    };
+                }
+
                 const validatedOrder = orderDetailSchema.parse(data);
                 setOrder(validatedOrder);
             } catch (validationError) {
@@ -73,6 +81,9 @@ export const useOrderDetailLogic = () => {
                     message.success('Đã hoàn tất đơn hàng');
                     await fetchOrder();
                     break;
+                case 'reassign_staff':
+                    setIsReassignModalVisible(true);
+                    break;
                 default:
                     console.log('Unknown action', actionType);
             }
@@ -90,7 +101,7 @@ export const useOrderDetailLogic = () => {
                 tracking_info: {
                     provider: data.provider,
                     tracking_code: data.tracking_code,
-                }, 
+                },
             });
             message.success('Đã cập nhật thông tin vận chuyển');
             setIsShippingModalVisible(false);
@@ -117,6 +128,19 @@ export const useOrderDetailLogic = () => {
         }
     };
 
+    const handleReassignSubmit = async (staffId) => {
+        try {
+            // Placeholder cho API gán lại nhân viên
+            console.log('Reassign to staff:', staffId);
+            message.success('Đã chuyển giao đơn hàng thành công');
+            setIsReassignModalVisible(false);
+            // await fetchOrder();
+        } catch (err) {
+            console.error('Error reassigning staff:', err);
+            message.error('Chuyển giao thất bại');
+        }
+    };
+
     return {
         order,
         loading,
@@ -129,6 +153,9 @@ export const useOrderDetailLogic = () => {
         setIsCancelModalVisible,
         handleCancelSubmit,
         isPrintModalVisible,
-        setIsPrintModalVisible
+        setIsPrintModalVisible,
+        isReassignModalVisible,
+        setIsReassignModalVisible,
+        handleReassignSubmit
     };
 };

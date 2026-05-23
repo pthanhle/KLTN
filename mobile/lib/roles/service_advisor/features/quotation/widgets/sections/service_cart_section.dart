@@ -12,6 +12,8 @@ import '../shared/glass_card.dart';
 import '../components/quotation_part_card.dart';
 import '../components/quotation_labor_card.dart';
 import '../../constants/quotation_constants.dart';
+import '../modals/part_search_modal/part_search_modal.dart';
+import '../modals/labor_search_modal/labor_search_modal.dart';
 
 class ServiceCartSection extends ConsumerWidget {
   final QuotationModel data;
@@ -58,11 +60,15 @@ class ServiceCartSection extends ConsumerWidget {
                   isDark: isDark,
                   icon: CupertinoIcons.wrench_fill,
                   label: 'Phụ tùng'.tr(),
-                  onTap: () => GlassToast.show(
-                    context,
-                    title: 'Đang mở kho phụ tùng...'.tr(),
-                    icon: CupertinoIcons.cube_box,
-                  ),
+                  onTap: () {
+                    HapticFeedback.mediumImpact();
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const PartSearchModal(),
+                    );
+                  },
                   theme: theme,
                 ),
               ),
@@ -72,11 +78,15 @@ class ServiceCartSection extends ConsumerWidget {
                   isDark: isDark,
                   icon: CupertinoIcons.person_fill,
                   label: 'Tiền công'.tr(),
-                  onTap: () => GlassToast.show(
-                    context,
-                    title: 'Đang mở danh sách kỹ thuật...'.tr(),
-                    icon: CupertinoIcons.person_2_fill,
-                  ),
+                  onTap: () {
+                    HapticFeedback.mediumImpact();
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const LaborSearchModal(),
+                    );
+                  },
                   theme: theme,
                 ),
               ),

@@ -61,7 +61,7 @@ class FloatingGlassTabBar extends StatelessWidget {
                 Expanded(
                   child: GlassNavItem(
                     icon: CupertinoIcons.house,
-                    activeIcon: CupertinoIcons.house,
+                    activeIcon: CupertinoIcons.house_fill,
                     label: 'Trang chủ'.tr(),
                     isSelected: currentIndex == 0,
                     onTap: () {
@@ -72,8 +72,8 @@ class FloatingGlassTabBar extends StatelessWidget {
                 Expanded(
                   child: GlassNavItem(
                     icon: CupertinoIcons.cube_box,
-                    activeIcon: CupertinoIcons.cube_box,
-                    label: 'Lệnh kho'.tr(),
+                    activeIcon: CupertinoIcons.cube_box_fill,
+                    label: 'Bán lẻ'.tr(),
                     isSelected: currentIndex == 1,
                     onTap: () {
                       if (currentIndex != 1) onTabTapped(1);
@@ -118,16 +118,26 @@ class FloatingGlassTabBar extends StatelessWidget {
                 ),
                 Expanded(
                   child: GlassNavItem(
-                    icon: CupertinoIcons.person,
-                    activeIcon: CupertinoIcons.person,
-                    label: 'Tài khoản'.tr(),
-                    isSelected: currentIndex == 3,
+                    icon: CupertinoIcons.wrench,
+                    activeIcon: CupertinoIcons.wrench_fill,
+                    label: 'Sửa chữa'.tr(),
+                    isSelected: currentIndex == 2,
                     onTap: () {
-                      if (currentIndex != 3) onTabTapped(2);
+                      if (currentIndex != 2) onTabTapped(2);
                     },
                   ),
                 ),
-                const Expanded(child: SizedBox()),
+                Expanded(
+                  child: GlassNavItem(
+                    icon: CupertinoIcons.person,
+                    activeIcon: CupertinoIcons.person_fill,
+                    label: 'Tài khoản'.tr(),
+                    isSelected: currentIndex == 3,
+                    onTap: () {
+                      if (currentIndex != 3) onTabTapped(3);
+                    },
+                  ),
+                ),
               ],
             ),
           ),

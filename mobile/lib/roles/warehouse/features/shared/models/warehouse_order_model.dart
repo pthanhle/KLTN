@@ -67,6 +67,7 @@ class WarehouseOrderModel {
   final DateTime createdAt;
   final String? shippingProvider;
   final String? trackingCode;
+  final String? assignedStaffId;
   final List<WarehouseOrderItemModel> items;
 
   const WarehouseOrderModel({
@@ -80,6 +81,7 @@ class WarehouseOrderModel {
     required this.createdAt,
     this.shippingProvider,
     this.trackingCode,
+    this.assignedStaffId,
     required this.items,
   });
 
@@ -94,6 +96,7 @@ class WarehouseOrderModel {
     DateTime? createdAt,
     String? shippingProvider,
     String? trackingCode,
+    String? assignedStaffId,
     List<WarehouseOrderItemModel>? items,
   }) {
     return WarehouseOrderModel(
@@ -107,6 +110,7 @@ class WarehouseOrderModel {
       createdAt: createdAt ?? this.createdAt,
       shippingProvider: shippingProvider ?? this.shippingProvider,
       trackingCode: trackingCode ?? this.trackingCode,
+      assignedStaffId: assignedStaffId ?? this.assignedStaffId,
       items: items ?? this.items,
     );
   }
@@ -129,6 +133,7 @@ class WarehouseOrderModel {
       createdAt: DateTime.parse(json['created_at'] as String),
       shippingProvider: json['shipping_provider'] as String?,
       trackingCode: json['tracking_code'] as String?,
+      assignedStaffId: json['assigned_staff_id'] as String?,
       items: (json['items'] as List<dynamic>)
           .map((e) => WarehouseOrderItemModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -147,6 +152,7 @@ class WarehouseOrderModel {
       'created_at': createdAt.toIso8601String(),
       'shipping_provider': shippingProvider,
       'tracking_code': trackingCode,
+      'assigned_staff_id': assignedStaffId,
       'items': items.map((e) => e.toJson()).toList(),
     };
   }

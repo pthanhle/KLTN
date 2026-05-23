@@ -90,5 +90,19 @@
   "print_deliverer": "Người giao hàng",
   "print_receiver_sign": "Người nhận hàng",
   "print_sign_note": "(Ký, ghi rõ họ tên)",
-  "print_btn": "Bấm để In"
+  "print_btn": "Bấm để In",
+  "staff_assigned_title": "Nhân viên phụ trách đóng gói",
+  "reassign_btn": "Phân công lại",
+  "reassign_modal_title": "Chuyển giao công việc",
+  "reassign_modal_subtitle": "Chọn nhân sự để tiếp nhận đơn hàng",
+  "reassign_search_placeholder": "Tìm kiếm tên nhân viên, mã NV...",
+  "reassign_status_free": "Rảnh rỗi",
+  "reassign_status_busy": "Đang xử lý",
+  "reassign_status_overloaded": "Quá tải",
+  "reassign_current_staff": "Đang phụ trách",
+  "reassign_cancel_btn": "Hủy",
+  "reassign_confirm_btn": "Xác nhận chuyển giao",
+  "reassign_empty_state": "Không tìm thấy nhân viên nào",
+  "unknown_staff": "Nhân viên chưa xác định",
+  "department_logistics": "Logistics"
 }

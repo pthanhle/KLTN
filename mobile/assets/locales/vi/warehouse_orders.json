@@ -12,5 +12,14 @@
   "Vừa xong": "Vừa xong",
   "Đóng gói nhanh": "Đóng gói nhanh",
   "Bàn giao ĐVVC": "Bàn giao ĐVVC",
-  "sản phẩm nữa": "sản phẩm nữa"
+  "sản phẩm nữa": "sản phẩm nữa",
+  "Tuyệt vời!": "Tuyệt vời!",
+  "Bạn đã hoàn thành tất cả đơn hàng được giao. Hãy nghỉ ngơi!": "Bạn đã hoàn thành tất cả đơn hàng được giao. Hãy nghỉ ngơi!",
+  "Chưa có đơn cần nhặt": "Chưa có đơn cần nhặt",
+  "Tuyệt vời! Tất cả đơn hàng đã được nhặt xong.": "Tuyệt vời! Tất cả đơn hàng đã được nhặt xong.",
+  "Chưa có đơn chờ giao": "Chưa có đơn chờ giao",
+  "Hãy nhặt hàng để chuyển đơn sang trạng thái chờ giao.": "Hãy nhặt hàng để chuyển đơn sang trạng thái chờ giao.",
+  "Đang làm mới danh sách...": "Đang làm mới danh sách...",
+  "Lệnh kho mới: {orderCode} đã được giao cho bạn": "Lệnh kho mới: {orderCode} đã được giao cho bạn",
+  "Việc của tôi": "Việc của tôi"
 }

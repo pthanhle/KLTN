@@ -66,4 +66,9 @@ export const orderDetailSchema = z.object({
         actor: safeString(),
         note: safeString(),
     })).catch([]),
+
+    assignment: z.object({
+        assigned_staff_id: z.any().nullable().optional(),
+        assigned_at: safeString(),
+    }).nullable().optional().catch(null),
 });

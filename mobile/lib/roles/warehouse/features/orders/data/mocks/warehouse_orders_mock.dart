@@ -6,7 +6,8 @@ final List<Map<String, dynamic>> mockWarehouseOrdersJson = [
     'customer_type': 'b2c',
     'total_items': 12,
     'priority': 'urgent',
-    'status': 'pendingPick',
+    'status': 'PROCESSING',
+    'assigned_staff_id': 'INV-112',
     'created_at': DateTime.now().subtract(const Duration(hours: 1)).toIso8601String(),
     'items': [
       {
@@ -38,7 +39,8 @@ final List<Map<String, dynamic>> mockWarehouseOrdersJson = [
     'customer_type': 'b2b',
     'total_items': 5,
     'priority': 'standard',
-    'status': 'pendingPick',
+    'status': 'PROCESSING',
+    'assigned_staff_id': 'INV-112',
     'created_at': DateTime.now().subtract(const Duration(hours: 2)).toIso8601String(),
     'items': [
       {
@@ -60,7 +62,8 @@ final List<Map<String, dynamic>> mockWarehouseOrdersJson = [
     'customer_type': 'b2b',
     'total_items': 24,
     'priority': 'standard',
-    'status': 'pendingPick',
+    'status': 'PACKED',
+    'assigned_staff_id': 'INV-112',
     'created_at': DateTime.now().subtract(const Duration(hours: 3)).toIso8601String(),
     'items': [
       {
@@ -92,7 +95,8 @@ final List<Map<String, dynamic>> mockWarehouseOrdersJson = [
     'customer_type': 'b2b',
     'total_items': 50,
     'priority': 'urgent',
-    'status': 'pendingDelivery',
+    'status': 'SHIPPING',
+    'assigned_staff_id': 'INV-112',
     'created_at': DateTime.now().subtract(const Duration(hours: 4)).toIso8601String(),
     'items': [
       {
@@ -114,7 +118,8 @@ final List<Map<String, dynamic>> mockWarehouseOrdersJson = [
     'customer_type': 'b2c',
     'total_items': 2,
     'priority': 'standard',
-    'status': 'pendingDelivery',
+    'status': 'SHIPPING',
+    'assigned_staff_id': 'INV-113',
     'created_at': DateTime.now().subtract(const Duration(hours: 5)).toIso8601String(),
     'items': [
       {

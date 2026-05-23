@@ -16,15 +16,12 @@ export const useMediaGallery = (control, name, t) => {
     );
 
     const handleUpload = async (info) => {
+        const { file } = info;
+        if (file.status !== 'done' || !file.originFileObj) return;
+
         try {
-            const files = info.fileList
-                .filter(file => file.originFileObj)
-                .map(file => file.originFileObj);
-
-            if (files.length === 0) return;
-
             setIsUploading(true);
-            const uploadedUrls = await uploadImages(files);
+            const uploadedUrls = await uploadImages([file.originFileObj]);
 
             field.onChange([...images, ...uploadedUrls]);
             message.success(t('adminPartForm:uploadSuccess'));

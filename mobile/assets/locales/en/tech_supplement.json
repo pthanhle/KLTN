@@ -1,0 +1,17 @@
+{
+  "Báo Cáo Lỗi Phát Sinh": "Supplement Request",
+  "Bắt buộc: Chụp/Quay video chứng cứ rõ nét": "Required: Take clear photos/videos as evidence",
+  "Mô tả tình trạng lỗi": "Issue description",
+  "Nhập chi tiết bộ phận hỏng hóc, âm thanh bất thường...": "Enter details of the broken part, unusual sounds...",
+  "Giải pháp đề xuất (vd: Cần rã máy)": "Proposed solution (e.g., Engine teardown)",
+  "Đề xuất hướng xử lý kỹ thuật...": "Propose technical solutions...",
+  "Gửi Báo Cáo & Tạm Dừng Công Việc": "Submit Request & Pause Work",
+  "Vui lòng nhập mô tả lỗi": "Please enter issue description",
+  "Vui lòng nhập giải pháp đề xuất": "Please enter proposed solution",
+  "Vui lòng chụp ít nhất 1 ảnh/video làm chứng cứ": "Please provide at least 1 photo/video as evidence",
+  "Mô tả không được vượt quá": "Description cannot exceed",
+  "Giải pháp không được vượt quá": "Solution cannot exceed",
+  "ký tự": "characters",
+  "Đã gửi báo cáo thành công": "Request submitted successfully",
+  "Huỷ": "Cancel"
+}

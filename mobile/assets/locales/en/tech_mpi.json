@@ -1,0 +1,23 @@
+{
+  "Khám Xe Đa Điểm": "Multi-Point Inspection",
+  "Đạt tất cả": "Pass All",
+  "ghi chú": "note",
+  "ảnh": "photo",
+  "Thêm ảnh": "Add Photo",
+  "Kết luận chuyên môn": "General Conclusion",
+  "Nhập kết luận tổng quan về tình trạng xe...": "Enter a general conclusion about the vehicle's condition...",
+  "Cập nhật chi tiết": "Update Detail",
+  "Ghi chú (bắt buộc nếu lỗi)": "Note (Required if issue found)",
+  "Mô tả chi tiết tình trạng hư hỏng, rò rỉ...": "Detailed description of damages, leaks...",
+  "Ảnh minh chứng (bắt buộc nếu lỗi)": "Photo Evidence (Required if issue found)",
+  "Lưu thông tin": "Save Info",
+  "Hoàn tất chẩn đoán": "Complete Inspection",
+  "Lỗi xảy ra": "An error occurred",
+  "Vui lòng nhập ghi chú hoặc thêm ảnh minh chứng.": "Please provide a note or attach photo evidence.",
+  "Thêm ảnh minh chứng": "Add Photo Evidence",
+  "Chụp ảnh mới": "Take Photo",
+  "Chọn từ thư viện": "Choose from Library",
+  "Hủy": "Cancel",
+  "Không thể truy cập camera hoặc thư viện ảnh.": "Cannot access camera or photo library.",
+  "Khám xe": "Vehicle Inspection"
+}

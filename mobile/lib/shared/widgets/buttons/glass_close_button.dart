@@ -47,13 +47,15 @@ class GlassCloseButton extends StatelessWidget {
         child: ClipSmoothRect(
           radius: SmoothBorderRadius(
               cornerRadius: cornerRadius, cornerSmoothing: 1.0),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Center(
-              child: Icon(
-                CupertinoIcons.xmark,
-                size: iconSize,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.70),
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Center(
+                child: Icon(
+                  CupertinoIcons.xmark,
+                  size: iconSize,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.70),
+                ),
               ),
             ),
           ),

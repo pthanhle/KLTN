@@ -10,7 +10,7 @@ import { OrderStatusChart } from './components/OrderStatusChart';
 import { LowStockAlert } from './components/LowStockAlert';
 import { ServiceAppointmentsWidget } from './components/ServiceAppointmentsWidget';
 import { PageLoader } from '@/components/ui/page-loader';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, ShoppingCart, Users, Box, Settings } from 'lucide-react';
 import dayjs from 'dayjs';
 
 const AdminDashboard = () => {
@@ -103,18 +103,23 @@ const AdminDashboard = () => {
                 {/* Section 6: Quick Action Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                        { label: 'Tạo đơn hàng', link: '/admin/orders', emoji: '🛒', color: 'from-blue-500 to-indigo-600' },
-                        { label: 'Quản lý khách hàng', link: '/admin/customers', emoji: '👥', color: 'from-violet-500 to-purple-600' },
-                        { label: 'Lịch dịch vụ', link: '/admin/service-reception', emoji: '🔧', color: 'from-emerald-500 to-teal-600' },
-                        { label: 'Quản lý kho', link: '/admin/parts', emoji: '📦', color: 'from-amber-500 to-orange-600' },
-                    ].map((action) => (
-                        <a key={action.link} href={action.link}
-                            className={`bg-gradient-to-br ${action.color} p-5 rounded-3xl text-white flex flex-col items-start gap-3 hover:scale-[1.03] hover:shadow-xl transition-all duration-300 group cursor-pointer no-underline`}
-                        >
-                            <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{action.emoji}</span>
-                            <span className="font-bold text-sm leading-tight">{action.label}</span>
-                        </a>
-                    ))}
+                        { label: 'Đơn hàng', link: '/admin/orders', icon: ShoppingCart, gradient: 'from-blue-500 to-blue-600', iconBg: 'bg-blue-100 dark:bg-blue-900/30', iconColor: 'text-blue-600 dark:text-blue-400' },
+                        { label: 'Khách hàng', link: '/admin/customers', icon: Users, gradient: 'from-purple-500 to-purple-600', iconBg: 'bg-purple-100 dark:bg-purple-900/30', iconColor: 'text-purple-600 dark:text-purple-400' },
+                        { label: 'Lịch dịch vụ', link: '/admin/services/reception', icon: Box, gradient: 'from-emerald-500 to-emerald-600', iconBg: 'bg-emerald-100 dark:bg-emerald-900/30', iconColor: 'text-emerald-600 dark:text-emerald-400' },
+                        { label: 'Quản lý kho', link: '/admin/parts', icon: Settings, gradient: 'from-amber-500 to-amber-600', iconBg: 'bg-amber-100 dark:bg-amber-900/30', iconColor: 'text-amber-600 dark:text-amber-400' },
+                    ].map((action) => {
+                        const IconComponent = action.icon;
+                        return (
+                            <a key={action.link} href={action.link}
+                                className="!bg-white dark:!bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer no-underline flex flex-col items-center gap-3"
+                            >
+                                <div className={`${action.iconBg} p-3.5 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
+                                    <IconComponent size={24} strokeWidth={2.5} className={action.iconColor} />
+                                </div>
+                                <span className="font-semibold text-sm text-slate-700 dark:text-slate-200 text-center">{action.label}</span>
+                            </a>
+                        );
+                    })}
                 </div>
 
             </div>

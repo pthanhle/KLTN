@@ -3,6 +3,13 @@ import Order from '../../models/orderModel.js'
 import Part from '../../models/partModel.js'
 import Cart from '../../models/cartModel.js'
 import Notification from '../../models/notificationModel.js'
+import { isVNPayMethod, validatePaymentMethodDetailed } from '../../utils/paymentValidation.js'
+import {
+  logPaymentValidation,
+  logVNPayURL,
+  logPaymentProcessing,
+  logOrderCreation
+} from '../../utils/paymentLogger.js'
 import mongoose from 'mongoose'
 
 const generateOrderCode = () => {
@@ -69,6 +76,12 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new Error('Vui lòng chọn phương thức thanh toán')
   }
 
+  const paymentValidation = validatePaymentMethodDetailed(payment.method)
+  if (!paymentValidation.isValid) {
+    res.status(400)
+    throw new Error(`Phương thức thanh toán không hợp lệ: ${paymentValidation.errors.join(', ')}`)
+  }
+
   const partIds = items.map(i => i.part_id).filter(id => mongoose.Types.ObjectId.isValid(id))
   const dbParts = await Part.find({ _id: { $in: partIds } }).lean()
   const partMap = Object.fromEntries(dbParts.map(p => [p._id.toString(), p]))
@@ -133,8 +146,8 @@ export const createOrder = asyncHandler(async (req, res) => {
       grand_total: final_total
     },
     payment: {
-      method: payment.method,
-      method_name: payment.method_name || '',
+      method: paymentValidation.normalizedMethod || payment.method,
+      method_name: paymentValidation.displayName || payment.method_name || '',
       card_tail: payment.card_tail || '',
       transaction_id: payment.transaction_id || '',
       status: payment.status || 'UNPAID'
@@ -183,6 +196,68 @@ export const createOrder = asyncHandler(async (req, res) => {
     })
   } catch (e) {
     console.error('Lỗi tạo thông báo đơn hàng:', e)
+  }
+
+  if (isVNPayMethod(payment.method)) {
+    try {
+      const { vnpayConfig } = await import('../../config/vnpayConfig.js')
+      const crypto = await import('crypto')
+      const moment = await import('moment')
+
+      let ipAddr = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket?.remoteAddress ||
+        '127.0.0.1'
+
+      if (ipAddr === '::1' || ipAddr === '::ffff:127.0.0.1') {
+        ipAddr = '127.0.0.1'
+      }
+
+      const createDate = moment.default().format('YYYYMMDDHHmmss')
+      const validAmount = Math.floor(Number(final_total))
+
+      let vnp_Params = {}
+      vnp_Params['vnp_Version'] = '2.1.0'
+      vnp_Params['vnp_Command'] = 'pay'
+      vnp_Params['vnp_TmnCode'] = vnpayConfig.vnp_TmnCode
+      vnp_Params['vnp_Locale'] = 'vn'
+      vnp_Params['vnp_CurrCode'] = 'VND'
+      vnp_Params['vnp_TxnRef'] = order._id.toString()
+      vnp_Params['vnp_OrderInfo'] = `Thanh toan don hang ${order.order_code}`
+      vnp_Params['vnp_OrderType'] = 'other'
+      vnp_Params['vnp_Amount'] = validAmount * 100
+      vnp_Params['vnp_ReturnUrl'] = vnpayConfig.vnp_ReturnUrl
+      vnp_Params['vnp_IpAddr'] = ipAddr
+      vnp_Params['vnp_CreateDate'] = createDate
+
+      // Sort params
+      const sortedParams = Object.keys(vnp_Params).sort().reduce((acc, key) => {
+        acc[key] = encodeURIComponent(vnp_Params[key]).replace(/%20/g, '+')
+        return acc
+      }, {})
+
+      const signData = new URLSearchParams(sortedParams).toString()
+      const hmac = crypto.default.createHmac('sha512', vnpayConfig.vnp_HashSecret)
+      const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
+
+      sortedParams['vnp_SecureHash'] = signed
+
+      const paymentUrl = vnpayConfig.vnp_Url + '?' + new URLSearchParams(sortedParams).toString()
+
+      console.log(`VNPay URL generated successfully for order ${order.order_code}, payment method: ${payment.method}`)
+
+      return res.status(201).json({
+        message: 'Tạo đơn hàng thành công',
+        order,
+        payment_url: paymentUrl,
+        requires_redirect: true
+      })
+    } catch (error) {
+      console.error('Lỗi tạo VNPay URL:', error)
+      console.error(`Failed to generate VNPay URL for order ${order.order_code}, payment method: ${payment.method}`)
+      // Fallback: return order without payment URL
+    }
   }
 
   res.status(201).json({

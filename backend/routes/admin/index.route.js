@@ -15,6 +15,7 @@ import tradeinVehicleRoutes from './tradeinVehicle.route.js'
 import revenueReportRoutes from './revenuereport.route.js'
 import supportRoutes from './support.route.js'
 import settingsRoutes from './settings.route.js'
+import customerContractRoutes from './customerContract.route.js'
 
 const router = express.Router()
 
@@ -34,5 +35,6 @@ router.use('/tradein-vehicles', tradeinVehicleRoutes)
 router.use('/revenue-reports', revenueReportRoutes)
 router.use('/support', supportRoutes)
 router.use('/settings', settingsRoutes)
+router.use('/contracts', customerContractRoutes)
 
 export default router

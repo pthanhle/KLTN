@@ -34,7 +34,8 @@ const ensureConfigured = () => {
     cloudinary: cloudinary,
     params: {
       folder: 'carshop/uploads',
-      allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+      allowedFormats: ['jpg', 'png', 'jpeg', 'webp', 'pdf', 'doc', 'docx'],
+      resource_type: 'auto',
       public_id: (req, file) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
         return file.fieldname + '-' + uniqueSuffix

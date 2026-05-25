@@ -13,8 +13,8 @@ const getAvatarUrl = (path) => {
     if (!path) return null;
     if (typeof path !== 'string') return null;
     if (path.startsWith('http')) return path;
-    const baseUrl = import.meta.env.VITE_API_URL 
-        ? import.meta.env.VITE_API_URL.replace('/api', '') 
+    const baseUrl = import.meta.env.VITE_API_URL
+        ? import.meta.env.VITE_API_URL.replace('/api', '')
         : 'http://localhost:5000';
     return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
 };
@@ -38,9 +38,9 @@ export const getCustomerColumns = (t, onViewDetails, onEditDetails) => [
         width: 250,
         render: (_, record) => (
             <div className="flex items-center gap-3 py-1 cursor-pointer group" onClick={() => onViewDetails(record)}>
-                <Avatar 
-                    src={getAvatarUrl(record.avatar)} 
-                    alt="Avatar" 
+                <Avatar
+                    src={getAvatarUrl(record.avatar)}
+                    alt="Avatar"
                     size={42}
                     className="border border-slate-200 dark:border-white/10 object-cover flex-shrink-0 group-hover:scale-105 transition-transform"
                 >
@@ -75,7 +75,7 @@ export const getCustomerColumns = (t, onViewDetails, onEditDetails) => [
         render: (tier, record) => {
             const displayTier = (tier || record.loyalty?.tier || 'BRONZE').toLowerCase();
             const getTierStyle = () => {
-                switch(displayTier) {
+                switch (displayTier) {
                     case 'platinum': return 'bg-yellow-500/10 text-yellow-600 dark:text-premium-gold border-yellow-500/20 shadow-[0_0_15px_rgba(247,190,29,0.2)]';
                     case 'titanium': return 'bg-slate-800 text-white dark:bg-slate-500/10 dark:text-slate-200 border-slate-700 dark:border-slate-500/20';
                     case 'gold': return 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-500/20';
@@ -103,21 +103,7 @@ export const getCustomerColumns = (t, onViewDetails, onEditDetails) => [
             </p>
         )
     },
-    {
-        title: t('adminCustomers:tableDebt', 'CÔNG NỢ'),
-        dataIndex: 'debt',
-        key: 'debt',
-        align: 'right',
-        width: 130,
-        render: (debt) => {
-            if (!debt) return <span className="text-slate-400 dark:text-slate-600 font-medium text-sm">-</span>;
-            return (
-                <p className="font-black text-red-500 text-sm">
-                    {formatVND(debt).replace('₫', '')} <span className="text-[9px] opacity-60 font-medium">₫</span>
-                </p>
-            );
-        }
-    },
+
     {
         title: t('adminCustomers:tableGarage', 'Garage'),
         dataIndex: 'garage',
@@ -194,18 +180,18 @@ export const getCustomerColumns = (t, onViewDetails, onEditDetails) => [
         render: (_, record) => (
             <Dropdown menu={{
                 items: [
-                    { 
-                        key: '1', 
+                    {
+                        key: '1',
                         label: (
                             <div className="flex items-center gap-3 px-2 py-1.5 min-w-[160px] text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                 <Eye size={16} strokeWidth={2.5} />
                                 <span className="text-xs font-bold">{t('adminCustomers:actionView', 'Xem hồ sơ 360')}</span>
                             </div>
-                        ), 
-                        onClick: () => onViewDetails(record) 
+                        ),
+                        onClick: () => onViewDetails(record)
                     },
-                    { 
-                        key: '2', 
+                    {
+                        key: '2',
                         label: (
                             <div className="flex items-center gap-3 px-2 py-1.5 text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-premium-gold transition-colors">
                                 <Edit3 size={16} strokeWidth={2.5} />
@@ -215,8 +201,8 @@ export const getCustomerColumns = (t, onViewDetails, onEditDetails) => [
                         onClick: () => onEditDetails(record)
                     },
                     { type: 'divider', className: 'dark:border-white/10 my-1' },
-                    { 
-                        key: '3', 
+                    {
+                        key: '3',
                         danger: true,
                         label: (
                             <div className="flex items-center gap-3 px-2 py-1.5 text-red-500 hover:text-red-600 transition-colors">

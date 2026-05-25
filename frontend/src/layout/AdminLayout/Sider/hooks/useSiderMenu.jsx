@@ -13,7 +13,8 @@ import {
     Tag,
     Settings,
     Car,
-    CalendarCheck
+    CalendarCheck,
+    FileText
 } from 'lucide-react';
 
 export const useSiderMenu = (collapsed) => {
@@ -38,6 +39,11 @@ export const useSiderMenu = (collapsed) => {
             key: '/admin/orders',
             icon: <ShoppingCart size={iconSize} />,
             label: t('admin.sider.orders'),
+        },
+        {
+            key: '/admin/contracts',
+            icon: <FileText size={iconSize} />,
+            label: t('admin.sider.contracts', 'Hợp Đồng'),
         },
         {
             key: '/admin/test-drive-bookings',

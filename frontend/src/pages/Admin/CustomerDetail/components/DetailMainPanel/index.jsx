@@ -5,6 +5,7 @@ import { CustomerTimeline } from './CustomerTimeline';
 import { CustomerServiceHistory } from './CustomerServiceHistory';
 import { CustomerBookings } from './CustomerBookings';
 import { CustomerLoyalty } from './CustomerLoyalty';
+import { CustomerContractsTab } from './CustomerContractsTab';
 import { getDetailTabs } from '../../constants/detailTabs';
 
 export const DetailMainPanel = ({
@@ -59,6 +60,9 @@ export const DetailMainPanel = ({
                 break;
             case 'LOYALTY':
                 content = <CustomerLoyalty loyaltyData={customer.loyalty} loyaltyHistory={customer.loyalty_history} isLoading={isLoading} t={t} />;
+                break;
+            case 'CONTRACTS':
+                content = <CustomerContractsTab customerId={customer._id} />;
                 break;
             default:
                 content = null;

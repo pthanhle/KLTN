@@ -1,6 +1,8 @@
 import { LLOYALTY_TIERS } from '../../constants/loyalty';
-import { Award } from 'lucide-react';
+import { Award, FileText } from 'lucide-react';
 import { formatVND } from '../../../Customers/utils/format';
+import { useState, useEffect } from 'react';
+import axiosClient from '../../../../../utils/axiosClient';
 
 export const CustomerBentoHighlights = ({ customer, t }) => {
     const tier = customer.loyalty?.tier || 'BRONZE';
@@ -11,31 +13,44 @@ export const CustomerBentoHighlights = ({ customer, t }) => {
     const accumulatedPoints = customer.loyalty?.accumulated_points || 0;
     const pointsNeeded = nextConfig ? Math.max(nextConfig.minPoints - accumulatedPoints, 0) : 0;
 
+    const [contractStats, setContractStats] = useState({ count: 0, totalValue: 0 });
+
+    useEffect(() => {
+        if (!customer._id) return;
+        axiosClient.get(`/admin/contracts?customerId=${customer._id}&limit=100`).then(res => {
+            if (res && res.success && res.data) {
+                const total = res.total || res.data.length;
+                const totalValue = res.data.reduce((sum, c) => sum + (c.total_value || 0), 0);
+                setContractStats({ count: total, totalValue });
+            }
+        }).catch(() => {});
+    }, [customer._id]);
+
     return (
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 bg-slate-50 dark:bg-[#141416] rounded-2xl p-8 border-l-4 border-yellow-500 flex flex-col justify-between h-[200px]">
-                <h4 className="text-[11px] tracking-[0.2em] font-black text-yellow-600 dark:text-premium-gold uppercase mb-6 flex justify-between items-center">
-                    {t('adminCustomers:bentoRecentInvoice', 'Hóa đơn dịch vụ khu vực')}
-                    <span className="text-slate-400 font-bold ml-2">{customer.service_history?.[0]?.invoice_code || '#N/A'}</span>
+            <div className="md:col-span-2 bg-slate-50 dark:bg-[#141416] rounded-2xl p-8 border-l-4 border-blue-500 flex flex-col justify-between h-[200px]">
+                <h4 className="text-[11px] tracking-[0.2em] font-black text-blue-600 dark:text-blue-400 uppercase mb-4 flex justify-between items-center">
+                    Hợp Đồng Khách Hàng
+                    <span className="text-slate-400 font-bold ml-2 text-xs">{contractStats.count} hợp đồng</span>
                 </h4>
 
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-end">
                     <div>
-                        <p className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest leading-none">
-                            {customer.service_history?.[0]?.service_type || 'Chưa phát sinh'}
+                        <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none mb-2">
+                            Tổng giá trị hợp đồng
                         </p>
-                        <p className="text-3xl font-black tracking-tighter mt-2 text-slate-800 dark:text-white">
-                            {formatVND(customer.service_history?.[0]?.price || 0)}
+                        <p className="text-3xl font-black tracking-tighter text-slate-800 dark:text-white">
+                            {formatVND(contractStats.totalValue)}
                         </p>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-500/10 dark:bg-blue-500/20 rounded-xl flex items-center justify-center">
+                        <FileText size={22} className="text-blue-500" />
                     </div>
                 </div>
 
                 <div className="mt-auto flex gap-3">
-                    <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase ${customer.service_history?.[0]?.status === 'PAID' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
-                        {customer.service_history?.[0]?.status === 'PAID' ? t('adminCustomers:statusPaid', 'ĐÃ THANH TOÁN') : t('adminCustomers:statusUnpaid', 'CHƯA THANH TOÁN')}
-                    </span>
-                    <span className="px-3 py-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 rounded-lg text-[10px] font-black tracking-widest uppercase shadow-sm">
-                        {customer.service_history?.[0]?.date ? new Date(customer.service_history[0].date).toLocaleDateString('vi-VN') : '-'}
+                    <span className="px-3 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                        {contractStats.count > 0 ? 'Có hợp đồng' : 'Chưa có hợp đồng'}
                     </span>
                 </div>
             </div>

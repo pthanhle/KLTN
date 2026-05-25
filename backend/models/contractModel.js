@@ -5,7 +5,29 @@ const contractSchema = mongoose.Schema(
     order_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order",
-      required: true,
+    },
+    customer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    vehicle: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Car",
+    },
+    contract_type: {
+      type: String,
+      enum: ["car_purchase", "service", "other"],
+      default: "car_purchase",
+    },
+    total_value: {
+      type: Number,
+    },
+    attachments: {
+      type: [String],
+      default: [],
+    },
+    note: {
+      type: String,
     },
 
     contract_number: {

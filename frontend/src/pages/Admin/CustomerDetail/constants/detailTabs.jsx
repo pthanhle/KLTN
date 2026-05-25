@@ -14,5 +14,9 @@ export const getDetailTabs = (t) => [
     {
         key: 'LOYALTY',
         label: <span className="text-xs tracking-[0.15em] font-black uppercase">{t('adminCustomers:tabLoyalty', 'TÍCH ĐIỂM (LOYALTY)')}</span>
+    },
+    {
+        key: 'CONTRACTS',
+        label: <span className="text-xs tracking-[0.15em] font-black uppercase">{t('adminCustomers:tabContracts', 'HỢP ĐỒNG (CONTRACTS)')}</span>
     }
 ];

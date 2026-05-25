@@ -67,7 +67,7 @@ export const mockShippingMethods = [
 export const mockPaymentMethods = [
     { id: 'credit_card', label: 'Thẻ tín dụng (Visa/Mastercard)', tags: ['VISA', 'MC'] },
     { id: 'bank_transfer', label: 'Chuyển khoản ngân hàng', tags: [] },
-    { id: 'vnpay', label: 'Ví điện tử VNPay (QR)', tags: [] },
+    { id: 'VNPAY', label: 'Ví điện tử VNPay (QR)', tags: [] },
     { id: 'cod', label: 'Thanh toán khi nhận hàng (COD)', tags: [] },
 ];
 

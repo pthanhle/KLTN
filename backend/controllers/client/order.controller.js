@@ -3,6 +3,13 @@ import Order from '../../models/orderModel.js'
 import Part from '../../models/partModel.js'
 import Cart from '../../models/cartModel.js'
 import Notification from '../../models/notificationModel.js'
+import { isVNPayMethod, validatePaymentMethodDetailed } from '../../utils/paymentValidation.js'
+import {
+  logPaymentValidation,
+  logVNPayURL,
+  logPaymentProcessing,
+  logOrderCreation
+} from '../../utils/paymentLogger.js'
 import mongoose from 'mongoose'
 
 const generateOrderCode = () => {
@@ -69,6 +76,12 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new Error('Vui lòng chọn phương thức thanh toán')
   }
 
+  const paymentValidation = validatePaymentMethodDetailed(payment.method)
+  if (!paymentValidation.isValid) {
+    res.status(400)
+    throw new Error(`Phương thức thanh toán không hợp lệ: ${paymentValidation.errors.join(', ')}`)
+  }
+
   const partIds = items.map(i => i.part_id).filter(id => mongoose.Types.ObjectId.isValid(id))
   const dbParts = await Part.find({ _id: { $in: partIds } }).lean()
   const partMap = Object.fromEntries(dbParts.map(p => [p._id.toString(), p]))
@@ -133,8 +146,8 @@ export const createOrder = asyncHandler(async (req, res) => {
       grand_total: final_total
     },
     payment: {
-      method: payment.method,
-      method_name: payment.method_name || '',
+      method: paymentValidation.normalizedMethod || payment.method,
+      method_name: paymentValidation.displayName || payment.method_name || '',
       card_tail: payment.card_tail || '',
       transaction_id: payment.transaction_id || '',
       status: payment.status || 'UNPAID'
@@ -185,8 +198,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     console.error('Lỗi tạo thông báo đơn hàng:', e)
   }
 
-  // If payment method is VNPay, create payment URL
-  if (payment.method === 'VNPAY' || payment.method === 'e_wallet') {
+  if (isVNPayMethod(payment.method)) {
     try {
       const { vnpayConfig } = await import('../../config/vnpayConfig.js')
       const crypto = await import('crypto')
@@ -233,6 +245,8 @@ export const createOrder = asyncHandler(async (req, res) => {
 
       const paymentUrl = vnpayConfig.vnp_Url + '?' + new URLSearchParams(sortedParams).toString()
 
+      console.log(`VNPay URL generated successfully for order ${order.order_code}, payment method: ${payment.method}`)
+
       return res.status(201).json({
         message: 'Tạo đơn hàng thành công',
         order,
@@ -241,6 +255,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       })
     } catch (error) {
       console.error('Lỗi tạo VNPay URL:', error)
+      console.error(`Failed to generate VNPay URL for order ${order.order_code}, payment method: ${payment.method}`)
       // Fallback: return order without payment URL
     }
   }

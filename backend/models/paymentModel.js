@@ -17,7 +17,7 @@ const paymentSchema = mongoose.Schema(
     },
     method: {
       type: String,
-      enum: ['cash', 'card', 'bank_transfer', 'e_wallet'],
+      enum: ['cash', 'card', 'bank_transfer', 'e_wallet', 'vnpay'],
       required: true,
     },
     status: {

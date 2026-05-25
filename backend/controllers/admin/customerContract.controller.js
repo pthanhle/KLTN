@@ -1,5 +1,6 @@
 import Contract from "../../models/contractModel.js";
 import User from "../../models/userModel.js";
+import Car from "../../models/carModel.js";
 
 export const getAllContracts = async (req, res) => {
   try {
@@ -21,9 +22,18 @@ export const getAllContracts = async (req, res) => {
       }).select('_id');
       const userIds = users.map(u => u._id);
 
+      const cars = await Car.find({
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { brandName: { $regex: search, $options: "i" } },
+        ]
+      }).select('_id');
+      const carIds = cars.map(c => c._id);
+
       const searchConditions = [
         { contract_number: { $regex: search, $options: "i" } },
-        { customer: { $in: userIds } }
+        { customer: { $in: userIds } },
+        { vehicle: { $in: carIds } }
       ];
 
       if (customerId) {

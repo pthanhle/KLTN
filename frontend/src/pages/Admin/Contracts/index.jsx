@@ -29,7 +29,7 @@ const AdminContractsPageContent = () => {
         try {
             const orderParam = sorter.order === 'ascend' ? 'asc' : 'desc';
             const sortParam = sorter.field || 'createdAt';
-            
+
             const res = await axiosClient.get(`/admin/contracts?page=${page}&limit=${pagination.pageSize}&search=${search}&sort=${sortParam}&order=${orderParam}`);
             if (res.success) {
                 setData(res.data);
@@ -49,6 +49,13 @@ const AdminContractsPageContent = () => {
     useEffect(() => {
         fetchContracts(1, searchText);
     }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchContracts(1, searchText, sortData);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [searchText]);
 
     const handleSearch = (e) => {
         const value = e.target.value;
@@ -86,7 +93,7 @@ const AdminContractsPageContent = () => {
 
                 <div className="mb-6 flex gap-4 justify-between">
                     <Input
-                        placeholder="Tìm kiếm theo mã hợp đồng..."
+                        placeholder="Tìm kiếm theo mã HĐ, thông tin khách hàng, tên xe..."
                         prefix={<Search size={18} className="text-gray-400" />}
                         value={searchText}
                         onChange={handleSearch}

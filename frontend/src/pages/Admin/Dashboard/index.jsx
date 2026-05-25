@@ -111,7 +111,7 @@ const AdminDashboard = () => {
                         const IconComponent = action.icon;
                         return (
                             <a key={action.link} href={action.link}
-                                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer no-underline flex flex-col items-center gap-3"
+                                className="!bg-white dark:!bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer no-underline flex flex-col items-center gap-3"
                             >
                                 <div className={`${action.iconBg} p-3.5 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
                                     <IconComponent size={24} strokeWidth={2.5} className={action.iconColor} />

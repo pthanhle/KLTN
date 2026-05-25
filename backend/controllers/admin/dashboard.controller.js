@@ -48,6 +48,20 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         { $sort: { _id: 1 } }
     ]);
 
+    const dailyRevenueMap = dailyRevenue.reduce((acc, item) => {
+        acc[item._id] = item.revenue;
+        return acc;
+    }, {});
+
+    const completeDailyRevenue = [];
+    for (let i = 29; i >= 0; i--) {
+        const date = moment().subtract(i, 'days').format('YYYY-MM-DD');
+        completeDailyRevenue.push({
+            _id: date,
+            revenue: dailyRevenueMap[date] || 0
+        });
+    }
+
     const newCustomers = await User.countDocuments({
         role_id: (await Role.findOne({ role_name: { $in: ['customer', 'Customer'] } }))._id,
         createdAt: { $gte: start.toDate(), $lte: end.toDate() },
@@ -125,7 +139,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
             ...acc,
             [stat._id]: stat.count,
         }), {}),
-        dailyRevenue,
+        dailyRevenue: completeDailyRevenue,
         monthlyRevenue,
         recentOrders,
         lowStockParts,

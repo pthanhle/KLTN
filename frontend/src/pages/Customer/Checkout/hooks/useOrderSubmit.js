@@ -54,6 +54,14 @@ export const useOrderSubmit = (t, setCurrentStep, mockPaymentMethods, mockShippi
 
         submitMutation.mutate(payloadInfo, {
             onSuccess: (result) => {
+                // Check if payment requires redirect (VNPay)
+                if (result?.payment_url && result?.requires_redirect) {
+                    // Redirect to VNPay payment page
+                    window.location.href = result.payment_url;
+                    return;
+                }
+
+                // For other payment methods, show success page
                 setOrderSuccessData(result?.order || result);
                 setCurrentStep(CHECKOUT_STEPS.SUCCESS);
                 window.scrollTo(0, 0);

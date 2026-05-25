@@ -4,6 +4,7 @@ import User from '../../models/userModel.js'
 import Part from '../../models/partModel.js'
 import RevenueReport from '../../models/revenueReportModel.js'
 import Booking from '../../models/bookingModel.js'
+import ServiceAppointment from '../../models/serviceAppointmentModel.js'
 import Role from '../../models/roleModel.js'
 import OrderItem from '../../models/orderItemModel.js'
 import moment from 'moment'
@@ -18,21 +19,37 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
     const completedOrders = await Order.aggregate([
         {
             $match: {
-                status: 'delivered',
+                order_status: { $in: ['DELIVERED', 'COMPLETED'] },
                 createdAt: { $gte: start.toDate(), $lte: end.toDate() },
             },
         },
         {
             $group: {
                 _id: null,
-                totalRevenue: { $sum: '$total_amount' },
+                totalRevenue: { $sum: '$financials.grand_total' },
                 orderCount: { $sum: 1 },
             },
         },
     ])
 
+    const dailyRevenue = await Order.aggregate([
+        {
+            $match: {
+                order_status: { $in: ['DELIVERED', 'COMPLETED'] },
+                createdAt: { $gte: moment().subtract(30, 'days').startOf('day').toDate(), $lte: moment().endOf('day').toDate() },
+            },
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                revenue: { $sum: '$financials.grand_total' },
+            },
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
     const newCustomers = await User.countDocuments({
-        role_id: (await Role.findOne({ role_name: 'customer' }))._id,
+        role_id: (await Role.findOne({ role_name: { $in: ['customer', 'Customer'] } }))._id,
         createdAt: { $gte: start.toDate(), $lte: end.toDate() },
     })
 
@@ -40,9 +57,15 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         "inventory.available_stock": { $lt: 5 },
     })
 
-    const bookings = await Booking.countDocuments({
-        createdAt: { $gte: start.toDate(), $lte: end.toDate() },
+    const pendingOrdersCount = await Order.countDocuments({
+        order_status: 'PENDING'
     })
+
+    const pendingAppointmentsCount = await ServiceAppointment.countDocuments({
+        status: 'PENDING'
+    })
+
+    const pendingTestDrivesCount = 0 // testDriveBookingModel not yet complete
 
     const orderStatusStats = await Order.aggregate([
         {
@@ -52,22 +75,61 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         },
         {
             $group: {
-                _id: '$status',
+                _id: '$order_status',
                 count: { $sum: 1 },
             },
         },
     ])
 
+    const recentOrders = await Order.find()
+        .populate('user_id', 'full_name avatar email')
+        .sort({ createdAt: -1 })
+        .limit(8);
+
+    const lowStockParts = await Part.find({
+        "inventory.available_stock": { $lt: 5 },
+    }).select('name sku inventory images').sort({ 'inventory.available_stock': 1 }).limit(5);
+
+    const recentAppointments = await ServiceAppointment.find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .lean();
+
+    // Monthly revenue for the current year (bar chart)
+    const monthlyRevenue = await Order.aggregate([
+        {
+            $match: {
+                order_status: { $in: ['DELIVERED', 'COMPLETED'] },
+                createdAt: { $gte: moment().startOf('year').toDate(), $lte: moment().endOf('day').toDate() },
+            },
+        },
+        {
+            $group: {
+                _id: { $month: '$createdAt' },
+                revenue: { $sum: '$financials.grand_total' },
+                count: { $sum: 1 },
+            },
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
     res.json({
         totalRevenue: completedOrders[0]?.totalRevenue ? parseFloat(completedOrders[0].totalRevenue) : 0,
         orderCount: completedOrders[0]?.orderCount || 0,
+        pendingOrdersCount,
+        pendingAppointmentsCount,
+        pendingTestDrivesCount,
         newCustomers,
         lowStockProducts,
-        bookings,
         orderStatusStats: orderStatusStats.reduce((acc, stat) => ({
             ...acc,
             [stat._id]: stat.count,
         }), {}),
+        dailyRevenue,
+        monthlyRevenue,
+        recentOrders,
+        lowStockParts,
+        recentAppointments,
         dateRange: {
             start: start.toISOString(),
             end: end.toISOString(),

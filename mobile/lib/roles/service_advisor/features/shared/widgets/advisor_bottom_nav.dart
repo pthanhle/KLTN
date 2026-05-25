@@ -80,38 +80,50 @@ class AdvisorBottomNav extends StatelessWidget {
                     },
                   ),
                 ),
-                // Scanner CTA — center pill
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.heavyImpact();
-                    onScannerTapped();
-                  },
-                  child: ClipOval(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                      child: Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.heavyImpact();
+                      onScannerTapped();
+                    },
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: ShapeDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(
+                            cornerRadius: 17,
+                            cornerSmoothing: 1.0,
+                          ),
+                          side: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.45),
                             width: 0.5,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                              blurRadius: 16,
-                              spreadRadius: 0,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
                         ),
-                        child: Icon(
-                          CupertinoIcons.qrcode_viewfinder,
-                          color: theme.colorScheme.primary,
-                          size: 26,
+                        shadows: [
+                          BoxShadow(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipSmoothRect(
+                        radius: SmoothBorderRadius(
+                          cornerRadius: 17,
+                          cornerSmoothing: 1.0,
+                        ),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                          child: Center(
+                            child: Icon(
+                              CupertinoIcons.qrcode_viewfinder,
+                              color: theme.colorScheme.primary,
+                              size: 26,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -122,15 +134,13 @@ class AdvisorBottomNav extends StatelessWidget {
                     icon: CupertinoIcons.person,
                     activeIcon: CupertinoIcons.person,
                     label: 'Tài khoản'.tr(),
-                    // branch 2 → visualIndex 3 (do scanner chiếm slot giữa)
                     isSelected: currentIndex == 3,
                     onTap: () {
                       if (currentIndex != 3) onTabTapped(2);
                     },
                   ),
                 ),
-                // Placeholder to balance the scanner button
-                const Expanded(child: SizedBox()),
+                const SizedBox(width: 68),
               ],
             ),
           ),

@@ -1,8 +1,9 @@
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:ttauto_staff/roles/sales/features/checkin/controllers/checkin_controller.dart';
 
 class CheckInImageSourceSheet extends StatelessWidget {
@@ -13,136 +14,168 @@ class CheckInImageSourceSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Block 1: Options (Glassmorphism)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 0.5,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    // Header
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Chọn ảnh bằng lái'.tr(),
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onSurface,
-                            ),
+    final isDark = theme.brightness == Brightness.dark;
+
+    Widget glassBlock({required Widget child}) {
+      return Container(
+        width: double.infinity,
+        decoration: ShapeDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.white.withValues(alpha: 0.72),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.80),
+              width: 0.5,
+            ),
+          ),
+          shadows: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: ClipSmoothRect(
+          radius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: child,
+          ),
+        ),
+      );
+    }
+
+    return Material(
+      type: MaterialType.transparency,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            glassBlock(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Chọn ảnh bằng lái'.tr(),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.5,
+                            color: theme.colorScheme.onSurface,
                           ),
-                          const SizedBox(height: 6),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Vui lòng chụp ảnh trực tiếp hoặc chọn ảnh mặt trước bằng lái xe của khách hàng từ thư viện.'.tr(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 13,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                  Container(height: 0.5, color: theme.dividerColor.withValues(alpha: 0.15)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.pickDriverLicenseImage(ImageSource.camera);
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 17),
+                      color: Colors.transparent,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.camera, size: 20, color: theme.colorScheme.primary),
+                          const SizedBox(width: 8),
                           Text(
-                            'Vui lòng chụp ảnh trực tiếp hoặc chọn ảnh mặt trước bằng lái xe của khách hàng từ thư viện.'.tr(),
+                            'Chụp ảnh mới'.tr(),
                             textAlign: TextAlign.center,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.3,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Divider(height: 0.5, color: Colors.white10),
-                    // Option 1: Camera
-                    ListTile(
-                      title: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(CupertinoIcons.camera, color: CupertinoColors.activeBlue, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Chụp ảnh mới'.tr(),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: CupertinoColors.activeBlue,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        controller.pickDriverLicenseImage(ImageSource.camera);
-                      },
-                    ),
-                    const Divider(height: 0.5, color: Colors.white10),
-                    // Option 2: Gallery
-                    ListTile(
-                      title: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(CupertinoIcons.photo_on_rectangle, color: CupertinoColors.activeBlue, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Chọn từ thư viện'.tr(),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: CupertinoColors.activeBlue,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        controller.pickDriverLicenseImage(ImageSource.gallery);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Block 2: Cancel (Glassmorphism with destructive red text)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 0.5,
                   ),
-                ),
-                child: ListTile(
-                  title: Center(
-                    child: Text(
-                      'Hủy'.tr(),
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: CupertinoColors.destructiveRed,
-                        fontWeight: FontWeight.bold,
+                  Container(height: 0.5, color: theme.dividerColor.withValues(alpha: 0.15)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.pickDriverLicenseImage(ImageSource.gallery);
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 17),
+                      color: Colors.transparent,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.photo_on_rectangle, size: 20, color: theme.colorScheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Chọn từ thư viện'.tr(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  onTap: () => Navigator.pop(context),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            glassBlock(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 17),
+                  color: Colors.transparent,
+                  child: Text(
+                    'Hủy'.tr(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

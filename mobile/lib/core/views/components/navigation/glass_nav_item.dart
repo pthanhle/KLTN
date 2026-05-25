@@ -26,12 +26,12 @@ class _GlassNavItemState extends State<GlassNavItem> {
   bool _isPressed = false;
 
   void _handleTapDown(TapDownDetails details) {
+    HapticFeedback.selectionClick();
     setState(() => _isPressed = true);
   }
 
   void _handleTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
-    HapticFeedback.selectionClick();
     widget.onTap();
   }
 
@@ -71,9 +71,11 @@ class _GlassNavItemState extends State<GlassNavItem> {
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
+                fontFamily: 'Inter',
                 fontSize: 11,
                 fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: color,
+                letterSpacing: -0.1,
               ),
               child: Text(
                 widget.label,

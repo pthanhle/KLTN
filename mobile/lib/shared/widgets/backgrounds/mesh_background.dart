@@ -72,17 +72,17 @@ class _MeshBackgroundState extends State<MeshBackground>
           ),
         ),
         
-        // Heavy blur to blend the colors (Glass effect)
         Positioned.fill(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
-            child: Container(
-              color: theme.scaffoldBackgroundColor.withOpacity(0.5),
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+              child: Container(
+                color: theme.scaffoldBackgroundColor.withOpacity(0.5),
+              ),
             ),
           ),
         ),
         
-        // The main content on top
         widget.child,
       ],
     );

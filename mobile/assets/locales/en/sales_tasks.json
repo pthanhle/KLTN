@@ -63,5 +63,10 @@
   "sales_tasks_location_home": "Home",
   "sales_tasks_location_showroom": "Showroom",
   "Lái Thử": "Test Drive",
-  "Giao Xe": "Handover"
+  "Giao Xe": "Handover",
+  "Chọn ảnh bằng lái": "Select Driver's License Photo",
+  "Vui lòng chụp ảnh trực tiếp hoặc chọn ảnh mặt trước bằng lái xe của khách hàng từ thư viện.": "Please take a photo or select the front of the customer's driver's license from your library.",
+  "Chụp ảnh mới": "Take Photo",
+  "Chọn từ thư viện": "Choose from Library",
+  "Hủy": "Cancel"
 }

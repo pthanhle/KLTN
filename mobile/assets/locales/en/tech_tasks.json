@@ -1,0 +1,15 @@
+{
+  "Công việc": "Tasks",
+  "Khám xe": "Diagnosis",
+  "Chờ phụ tùng": "Waiting Parts",
+  "Đang thi công": "In Progress",
+  "KHOANG": "BAY",
+  "GIỜ LÀM": "TIME",
+  "VAI TRÒ": "ROLE",
+  "KHẨN CẤP": "URGENT",
+  "TIÊU CHUẨN": "STANDARD",
+  "HOÀN THÀNH": "COMPLETED",
+  "Thợ chính": "Main Tech",
+  "Thợ phụ": "Assistant",
+  "Không có công việc nào": "No tasks in this status."
+}

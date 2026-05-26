@@ -42,7 +42,7 @@ class QuotationPartCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${QuotationUtils.formatCurrency(part.price).replaceAll('\$', '')} x ${part.quantity}',
+                      '\$${QuotationUtils.formatCurrency(part.unitPrice).replaceAll('\$', '')} x ${part.quantity}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

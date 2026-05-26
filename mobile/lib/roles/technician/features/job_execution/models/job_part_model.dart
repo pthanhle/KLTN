@@ -27,6 +27,7 @@ abstract class JobPartModel with _$JobPartModel {
 
   const factory JobPartModel({
     required String id,
+    @JsonKey(name: 'sku') required String sku,
     required String name,
     required int quantity,
     required JobPartIcon icon,

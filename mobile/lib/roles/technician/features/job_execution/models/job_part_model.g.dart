@@ -9,6 +9,7 @@ part of 'job_part_model.dart';
 _JobPartModel _$JobPartModelFromJson(Map<String, dynamic> json) =>
     _JobPartModel(
       id: json['id'] as String,
+      sku: json['sku'] as String,
       name: json['name'] as String,
       quantity: (json['quantity'] as num).toInt(),
       icon: $enumDecode(_$JobPartIconEnumMap, json['icon']),
@@ -23,6 +24,7 @@ _JobPartModel _$JobPartModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$JobPartModelToJson(_JobPartModel instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'sku': instance.sku,
       'name': instance.name,
       'quantity': instance.quantity,
       'icon': _$JobPartIconEnumMap[instance.icon]!,

@@ -31,7 +31,7 @@ export const getLedgerColumns = (t) => [
         )
     },
     {
-        title: t('col_qty', 'Qty/Hrs'),
+        title: t('col_qty', 'Qty'),
         dataIndex: 'quantity',
         key: 'quantity',
         width: '15%',

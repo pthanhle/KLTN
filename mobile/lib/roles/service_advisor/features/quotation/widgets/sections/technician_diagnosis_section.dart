@@ -50,13 +50,15 @@ class TechnicianDiagnosisSection extends ConsumerWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          data.diagnosis.description,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                        if (data.diagnosis.technicianNote != null && data.diagnosis.technicianNote!.isNotEmpty)
+                          const SizedBox(height: 8),
+                        if (data.diagnosis.technicianNote != null && data.diagnosis.technicianNote!.isNotEmpty)
+                          Text(
+                            data.diagnosis.technicianNote!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -82,7 +84,7 @@ class TechnicianDiagnosisSection extends ConsumerWidget {
                         children: [
                           Positioned.fill(
                             child: Image.network(
-                              data.diagnosis.imageUrl,
+                              data.diagnosis.evidenceMediaUrls.isNotEmpty ? data.diagnosis.evidenceMediaUrls.first : '',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => const Center(child: Icon(CupertinoIcons.photo)),
                             ),

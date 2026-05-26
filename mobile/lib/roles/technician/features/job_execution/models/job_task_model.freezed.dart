@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$JobTaskModel {
 
- String get id; String get name; String get description; JobTaskIcon get icon; JobTaskStatus get status; List<String> get mediaUrls; DateTime? get startedAt; DateTime? get completedAt;
+ String get id;@JsonKey(name: 'labor_code') String get laborCode; String get name; String get description; JobTaskIcon get icon; JobTaskStatus get status; List<String> get mediaUrls; DateTime? get startedAt; DateTime? get completedAt;
 /// Create a copy of JobTaskModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $JobTaskModelCopyWith<JobTaskModel> get copyWith => _$JobTaskModelCopyWithImpl<J
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is JobTaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.mediaUrls, mediaUrls)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is JobTaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.laborCode, laborCode) || other.laborCode == laborCode)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.mediaUrls, mediaUrls)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,icon,status,const DeepCollectionEquality().hash(mediaUrls),startedAt,completedAt);
+int get hashCode => Object.hash(runtimeType,id,laborCode,name,description,icon,status,const DeepCollectionEquality().hash(mediaUrls),startedAt,completedAt);
 
 @override
 String toString() {
-  return 'JobTaskModel(id: $id, name: $name, description: $description, icon: $icon, status: $status, mediaUrls: $mediaUrls, startedAt: $startedAt, completedAt: $completedAt)';
+  return 'JobTaskModel(id: $id, laborCode: $laborCode, name: $name, description: $description, icon: $icon, status: $status, mediaUrls: $mediaUrls, startedAt: $startedAt, completedAt: $completedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $JobTaskModelCopyWith<$Res>  {
   factory $JobTaskModelCopyWith(JobTaskModel value, $Res Function(JobTaskModel) _then) = _$JobTaskModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String description, JobTaskIcon icon, JobTaskStatus status, List<String> mediaUrls, DateTime? startedAt, DateTime? completedAt
+ String id,@JsonKey(name: 'labor_code') String laborCode, String name, String description, JobTaskIcon icon, JobTaskStatus status, List<String> mediaUrls, DateTime? startedAt, DateTime? completedAt
 });
 
 
@@ -65,9 +65,10 @@ class _$JobTaskModelCopyWithImpl<$Res>
 
 /// Create a copy of JobTaskModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? icon = null,Object? status = null,Object? mediaUrls = null,Object? startedAt = freezed,Object? completedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? laborCode = null,Object? name = null,Object? description = null,Object? icon = null,Object? status = null,Object? mediaUrls = null,Object? startedAt = freezed,Object? completedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,laborCode: null == laborCode ? _self.laborCode : laborCode // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String description,  JobTaskIcon icon,  JobTaskStatus status,  List<String> mediaUrls,  DateTime? startedAt,  DateTime? completedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'labor_code')  String laborCode,  String name,  String description,  JobTaskIcon icon,  JobTaskStatus status,  List<String> mediaUrls,  DateTime? startedAt,  DateTime? completedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _JobTaskModel() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.icon,_that.status,_that.mediaUrls,_that.startedAt,_that.completedAt);case _:
+return $default(_that.id,_that.laborCode,_that.name,_that.description,_that.icon,_that.status,_that.mediaUrls,_that.startedAt,_that.completedAt);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.id,_that.name,_that.description,_that.icon,_that.status,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String description,  JobTaskIcon icon,  JobTaskStatus status,  List<String> mediaUrls,  DateTime? startedAt,  DateTime? completedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'labor_code')  String laborCode,  String name,  String description,  JobTaskIcon icon,  JobTaskStatus status,  List<String> mediaUrls,  DateTime? startedAt,  DateTime? completedAt)  $default,) {final _that = this;
 switch (_that) {
 case _JobTaskModel():
-return $default(_that.id,_that.name,_that.description,_that.icon,_that.status,_that.mediaUrls,_that.startedAt,_that.completedAt);case _:
+return $default(_that.id,_that.laborCode,_that.name,_that.description,_that.icon,_that.status,_that.mediaUrls,_that.startedAt,_that.completedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.id,_that.name,_that.description,_that.icon,_that.status,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String description,  JobTaskIcon icon,  JobTaskStatus status,  List<String> mediaUrls,  DateTime? startedAt,  DateTime? completedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'labor_code')  String laborCode,  String name,  String description,  JobTaskIcon icon,  JobTaskStatus status,  List<String> mediaUrls,  DateTime? startedAt,  DateTime? completedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _JobTaskModel() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.icon,_that.status,_that.mediaUrls,_that.startedAt,_that.completedAt);case _:
+return $default(_that.id,_that.laborCode,_that.name,_that.description,_that.icon,_that.status,_that.mediaUrls,_that.startedAt,_that.completedAt);case _:
   return null;
 
 }
@@ -216,10 +217,11 @@ return $default(_that.id,_that.name,_that.description,_that.icon,_that.status,_t
 @JsonSerializable()
 
 class _JobTaskModel extends JobTaskModel {
-  const _JobTaskModel({required this.id, required this.name, required this.description, required this.icon, this.status = JobTaskStatus.pending, final  List<String> mediaUrls = const [], this.startedAt, this.completedAt}): _mediaUrls = mediaUrls,super._();
+  const _JobTaskModel({required this.id, @JsonKey(name: 'labor_code') required this.laborCode, required this.name, required this.description, required this.icon, this.status = JobTaskStatus.pending, final  List<String> mediaUrls = const [], this.startedAt, this.completedAt}): _mediaUrls = mediaUrls,super._();
   factory _JobTaskModel.fromJson(Map<String, dynamic> json) => _$JobTaskModelFromJson(json);
 
 @override final  String id;
+@override@JsonKey(name: 'labor_code') final  String laborCode;
 @override final  String name;
 @override final  String description;
 @override final  JobTaskIcon icon;
@@ -247,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _JobTaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._mediaUrls, _mediaUrls)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _JobTaskModel&&(identical(other.id, id) || other.id == id)&&(identical(other.laborCode, laborCode) || other.laborCode == laborCode)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._mediaUrls, _mediaUrls)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,icon,status,const DeepCollectionEquality().hash(_mediaUrls),startedAt,completedAt);
+int get hashCode => Object.hash(runtimeType,id,laborCode,name,description,icon,status,const DeepCollectionEquality().hash(_mediaUrls),startedAt,completedAt);
 
 @override
 String toString() {
-  return 'JobTaskModel(id: $id, name: $name, description: $description, icon: $icon, status: $status, mediaUrls: $mediaUrls, startedAt: $startedAt, completedAt: $completedAt)';
+  return 'JobTaskModel(id: $id, laborCode: $laborCode, name: $name, description: $description, icon: $icon, status: $status, mediaUrls: $mediaUrls, startedAt: $startedAt, completedAt: $completedAt)';
 }
 
 
@@ -267,7 +269,7 @@ abstract mixin class _$JobTaskModelCopyWith<$Res> implements $JobTaskModelCopyWi
   factory _$JobTaskModelCopyWith(_JobTaskModel value, $Res Function(_JobTaskModel) _then) = __$JobTaskModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String description, JobTaskIcon icon, JobTaskStatus status, List<String> mediaUrls, DateTime? startedAt, DateTime? completedAt
+ String id,@JsonKey(name: 'labor_code') String laborCode, String name, String description, JobTaskIcon icon, JobTaskStatus status, List<String> mediaUrls, DateTime? startedAt, DateTime? completedAt
 });
 
 
@@ -284,9 +286,10 @@ class __$JobTaskModelCopyWithImpl<$Res>
 
 /// Create a copy of JobTaskModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? icon = null,Object? status = null,Object? mediaUrls = null,Object? startedAt = freezed,Object? completedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? laborCode = null,Object? name = null,Object? description = null,Object? icon = null,Object? status = null,Object? mediaUrls = null,Object? startedAt = freezed,Object? completedAt = freezed,}) {
   return _then(_JobTaskModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,laborCode: null == laborCode ? _self.laborCode : laborCode // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable

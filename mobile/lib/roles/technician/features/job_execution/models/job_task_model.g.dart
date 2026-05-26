@@ -9,6 +9,7 @@ part of 'job_task_model.dart';
 _JobTaskModel _$JobTaskModelFromJson(Map<String, dynamic> json) =>
     _JobTaskModel(
       id: json['id'] as String,
+      laborCode: json['labor_code'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
       icon: $enumDecode(_$JobTaskIconEnumMap, json['icon']),
@@ -31,6 +32,7 @@ _JobTaskModel _$JobTaskModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$JobTaskModelToJson(_JobTaskModel instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'labor_code': instance.laborCode,
       'name': instance.name,
       'description': instance.description,
       'icon': _$JobTaskIconEnumMap[instance.icon]!,

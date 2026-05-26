@@ -50,26 +50,26 @@ export const useSettlementLogic = () => {
         const invoice = fetchInvoiceData(selectedBookingCode);
         const qc = fetchQcData(selectedBookingCode);
 
-        const mappedInvoiceItems = invoice?.items?.map(i => ({
+        const mappedInvoiceItems = invoice?.line_items?.map(i => ({
             id: i.id || Math.random().toString(),
             name: i.name,
-            qty: i.qty || 1,
-            unitPrice: i.unitPrice || 0,
-            total: i.total || 0
+            quantity: i.quantity || 1,
+            unit_price: i.unit_price || 0,
+            total_price: i.total_price || 0
         })) || (selectedBooking.selected_services || []).map((s, i) => ({
             id: s.service_id || `item_${i + 1}`,
             name: s.name,
-            qty: 1,
-            unitPrice: s.price || 0,
-            total: s.price || 0
+            quantity: 1,
+            unit_price: s.price || 0,
+            total_price: s.price || 0
         }));
 
         const financials = invoice?.financials || {
-            subtotal: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total, 0),
+            subtotal: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total_price, 0),
             vatRate: 10,
-            vat: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total, 0) * 0.1,
+            vat: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total_price, 0) * 0.1,
             deposit: 0,
-            finalBalance: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total, 0) * 1.1
+            finalBalance: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total_price, 0) * 1.1
         };
 
         const isPaid = localPaymentStatus[selectedBookingCode] || (invoice?.status === 'COMPLETED');

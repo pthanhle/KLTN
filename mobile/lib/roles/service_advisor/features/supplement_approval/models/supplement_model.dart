@@ -1,14 +1,18 @@
+import 'supplement_part_model.dart';
+import 'supplement_labor_model.dart';
+
 class SupplementModel {
   final String id;
-  final String orderId;
+  final String bookingCode;
   final String issueTitle;
-  final String issueDescription;
-  final String proposedFix;
+  final String technicianNote;
+  final String actionRequired;
   final String mechanicName;
   final String mechanicRole;
   final List<String> evidenceMediaUrls;
   final double oldCost;
-  final double newCost;
+  final List<SupplementPartModel> addedParts;
+  final List<SupplementLaborModel> addedLabors;
   final DateTime oldDeliveryTime;
   final DateTime newDeliveryTime;
   final String delayReason;
@@ -16,15 +20,16 @@ class SupplementModel {
 
   SupplementModel({
     required this.id,
-    required this.orderId,
+    required this.bookingCode,
     required this.issueTitle,
-    required this.issueDescription,
-    required this.proposedFix,
+    required this.technicianNote,
+    required this.actionRequired,
     required this.mechanicName,
     required this.mechanicRole,
     required this.evidenceMediaUrls,
     required this.oldCost,
-    required this.newCost,
+    this.addedParts = const [],
+    this.addedLabors = const [],
     required this.oldDeliveryTime,
     required this.newDeliveryTime,
     required this.delayReason,
@@ -34,15 +39,22 @@ class SupplementModel {
   factory SupplementModel.fromJson(Map<String, dynamic> json) {
     return SupplementModel(
       id: json['id'] ?? '',
-      orderId: json['order_id'] ?? '',
+      bookingCode: json['booking_code'] ?? '',
       issueTitle: json['issue_title'] ?? '',
-      issueDescription: json['issue_description'] ?? '',
-      proposedFix: json['proposed_fix'] ?? '',
+      technicianNote: json['technician_note'] ?? '',
+      actionRequired: json['action_required'] ?? '',
       mechanicName: json['mechanic_name'] ?? '',
       mechanicRole: json['mechanic_role'] ?? '',
       evidenceMediaUrls: List<String>.from(json['evidence_media_urls'] ?? []),
       oldCost: (json['old_cost'] ?? 0).toDouble(),
-      newCost: (json['new_cost'] ?? 0).toDouble(),
+      addedParts: (json['added_parts'] as List<dynamic>?)
+              ?.map((e) => SupplementPartModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      addedLabors: (json['added_labors'] as List<dynamic>?)
+              ?.map((e) => SupplementLaborModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       oldDeliveryTime: DateTime.parse(json['old_delivery_time']),
       newDeliveryTime: DateTime.parse(json['new_delivery_time']),
       delayReason: json['delay_reason'] ?? '',
@@ -56,24 +68,54 @@ class SupplementModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'order_id': orderId,
+      'booking_code': bookingCode,
       'issue_title': issueTitle,
-      'issue_description': issueDescription,
-      'proposed_fix': proposedFix,
+      'technician_note': technicianNote,
+      'action_required': actionRequired,
       'mechanic_name': mechanicName,
       'mechanic_role': mechanicRole,
       'evidence_media_urls': evidenceMediaUrls,
       'old_cost': oldCost,
-      'new_cost': newCost,
+      'added_parts': addedParts.map((e) => e.toJson()).toList(),
+      'added_labors': addedLabors.map((e) => e.toJson()).toList(),
       'old_delivery_time': oldDeliveryTime.toIso8601String(),
       'new_delivery_time': newDeliveryTime.toIso8601String(),
       'delay_reason': delayReason,
-      'status': status.name.toUpperCase(),
+      'status': status.name,
+      'total_price': costDifference,
     };
   }
 
-  double get costDifference => newCost - oldCost;
+  double get partsTotal => addedParts.fold(0, (sum, item) => sum + item.total);
+  double get laborsTotal => addedLabors.fold(0, (sum, item) => sum + item.total);
+  double get calculatedNewCost => oldCost + partsTotal + laborsTotal;
+
+  double get costDifference => calculatedNewCost - oldCost;
   Duration get timeDifference => newDeliveryTime.difference(oldDeliveryTime);
+
+  SupplementModel copyWith({
+    List<SupplementPartModel>? addedParts,
+    List<SupplementLaborModel>? addedLabors,
+    SupplementStatus? status,
+  }) {
+    return SupplementModel(
+      id: id,
+      bookingCode: bookingCode,
+      issueTitle: issueTitle,
+      technicianNote: technicianNote,
+      actionRequired: actionRequired,
+      mechanicName: mechanicName,
+      mechanicRole: mechanicRole,
+      evidenceMediaUrls: evidenceMediaUrls,
+      oldCost: oldCost,
+      addedParts: addedParts ?? this.addedParts,
+      addedLabors: addedLabors ?? this.addedLabors,
+      oldDeliveryTime: oldDeliveryTime,
+      newDeliveryTime: newDeliveryTime,
+      delayReason: delayReason,
+      status: status ?? this.status,
+    );
+  }
 }
 
 enum SupplementStatus {

@@ -16,8 +16,8 @@ const QuotationItemsTable = ({ parts, labors, t }) => {
         },
         {
             title: t('quote_col_code', 'Mã Phụ Tùng'),
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'sku',
+            key: 'sku',
             width: 120,
             render: (text) => <span className="font-semibold text-slate-800 dark:text-white uppercase">{text}</span>,
         },
@@ -45,12 +45,13 @@ const QuotationItemsTable = ({ parts, labors, t }) => {
         },
         {
             title: t('quote_col_total', 'Thành Tiền'),
-            key: 'total',
+            dataIndex: 'total_price',
+            key: 'total_price',
             align: 'right',
             width: 140,
-            render: (_, record) => (
+            render: (val) => (
                 <span className="font-semibold text-slate-800 dark:text-white">
-                    {formatCurrency(record.quantity * record.unit_price)}
+                    {formatCurrency(val)}
                 </span>
             ),
         },
@@ -66,34 +67,35 @@ const QuotationItemsTable = ({ parts, labors, t }) => {
         },
         {
             title: t('quote_col_task', 'Nội dung công việc'),
-            dataIndex: 'description',
-            key: 'description',
+            dataIndex: 'name',
+            key: 'name',
             render: (text) => <span className="font-medium text-slate-800 dark:text-white">{text}</span>,
         },
         {
             title: t('quote_col_hours', 'Giờ Công'),
-            dataIndex: 'hours',
-            key: 'hours',
+            dataIndex: 'quantity',
+            key: 'quantity',
             align: 'center',
             width: 100,
             render: (text) => <span className="font-medium text-slate-800 dark:text-white">{text}</span>,
         },
         {
             title: t('quote_col_rate', 'Đơn Giá / Giờ'),
-            dataIndex: 'rate',
-            key: 'rate',
+            dataIndex: 'unit_price',
+            key: 'unit_price',
             align: 'right',
             width: 150,
             render: (val) => <span className="font-medium text-slate-800 dark:text-white">{formatCurrency(val)}</span>,
         },
         {
             title: t('quote_col_total', 'Thành Tiền'),
-            key: 'total',
+            dataIndex: 'total_price',
+            key: 'total_price',
             align: 'right',
             width: 160,
-            render: (_, record) => (
+            render: (val) => (
                 <span className="font-semibold text-slate-800 dark:text-white">
-                    {formatCurrency(record.hours * record.rate)}
+                    {formatCurrency(val)}
                 </span>
             ),
         },
@@ -106,7 +108,7 @@ const QuotationItemsTable = ({ parts, labors, t }) => {
                     {t('quote_table_parts', 'I. PHỤ TÙNG & VẬT TƯ')}
                 </h3>
                 <div className="min-w-[600px] rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                    <Table 
+                    <Table
                         dataSource={parts}
                         columns={partsColumns}
                         rowKey="id"
@@ -115,13 +117,13 @@ const QuotationItemsTable = ({ parts, labors, t }) => {
                     />
                 </div>
             </section>
-            
+
             <section className="mb-10 w-full overflow-x-auto" data-purpose="labor-services-list">
                 <h3 className="text-sm font-bold flex items-center gap-2 mb-4 border-l-4 border-yellow-500 dark:border-[#d4af37] pl-3 text-slate-800 dark:text-[#d4af37] uppercase">
                     {t('quote_table_labor', 'II. TIỀN CÔNG DỊCH VỤ')}
                 </h3>
                 <div className="min-w-[600px] rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                    <Table 
+                    <Table
                         dataSource={labors}
                         columns={laborColumns}
                         rowKey="id"

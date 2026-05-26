@@ -9,6 +9,7 @@ class LaborSearchState {
   final String selectedCategory;
   final Set<String> selectedLaborIds;
   final bool isLoading;
+  final void Function(List<LaborItemModel>)? onConfirmOverride;
 
   const LaborSearchState({
     this.items = const [],
@@ -16,6 +17,7 @@ class LaborSearchState {
     this.selectedCategory = 'Tất cả',
     this.selectedLaborIds = const {},
     this.isLoading = false,
+    this.onConfirmOverride,
   });
 
   LaborSearchState copyWith({
@@ -24,6 +26,7 @@ class LaborSearchState {
     String? selectedCategory,
     Set<String>? selectedLaborIds,
     bool? isLoading,
+    void Function(List<LaborItemModel>)? onConfirmOverride,
   }) {
     return LaborSearchState(
       items: items ?? this.items,
@@ -31,6 +34,7 @@ class LaborSearchState {
       selectedCategory: selectedCategory ?? this.selectedCategory,
       selectedLaborIds: selectedLaborIds ?? this.selectedLaborIds,
       isLoading: isLoading ?? this.isLoading,
+      onConfirmOverride: onConfirmOverride ?? this.onConfirmOverride,
     );
   }
 }
@@ -81,7 +85,7 @@ class LaborSearchController extends Notifier<LaborSearchState> {
       final matchCategory = category == 'Tất cả' || labor.category == category;
       final matchQuery = query.isEmpty ||
           labor.name.toLowerCase().contains(lowerQuery) ||
-          labor.id.toLowerCase().contains(lowerQuery);
+          labor.laborCode.toLowerCase().contains(lowerQuery);
       return matchCategory && matchQuery;
     }).toList();
 
@@ -95,20 +99,28 @@ class LaborSearchController extends Notifier<LaborSearchState> {
   }
 
   void confirmSelection() {
-    final quotationController = ref.read(quotationControllerProvider.notifier);
-    
-    // Find all selected labor models
     final selectedLabors = mockLaborMasterData
-        .where((labor) => state.selectedLaborIds.contains(labor.id))
+        .where((labor) => state.selectedLaborIds.contains(labor.laborCode))
         .toList();
 
-    // Add them to the quotation
+    // If an override callback is set (e.g. from Supplement context), use it
+    if (state.onConfirmOverride != null) {
+      state.onConfirmOverride!(selectedLabors);
+      state = state.copyWith(selectedLaborIds: const {});
+      return;
+    }
+
+    // Default: dispatch to quotation controller
+    final quotationController = ref.read(quotationControllerProvider.notifier);
     for (final labor in selectedLabors) {
       quotationController.addLabor(labor);
     }
-    
-    // Clear selection after confirming
     state = state.copyWith(selectedLaborIds: const {});
+  }
+
+  /// Called by Supplement page to redirect confirms into supplementController
+  void setConfirmOverride(void Function(List<LaborItemModel>)? fn) {
+    state = state.copyWith(onConfirmOverride: fn);
   }
 }
 

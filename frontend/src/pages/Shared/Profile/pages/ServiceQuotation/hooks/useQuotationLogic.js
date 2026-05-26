@@ -9,7 +9,7 @@ export const useQuotationLogic = (bookingCode) => {
         if (!quotation) return null;
 
         const partsTotal = quotation.parts.reduce((sum, part) => sum + (part.quantity * part.unit_price), 0);
-        const laborTotal = quotation.labors.reduce((sum, labor) => sum + (labor.hours * labor.rate), 0);
+        const laborTotal = quotation.labors.reduce((sum, labor) => sum + (labor.quantity * labor.unit_price), 0);
         const subtotal = partsTotal + laborTotal;
         const vatAmount = subtotal * quotation.vat_rate;
         const totalAmount = subtotal + vatAmount;

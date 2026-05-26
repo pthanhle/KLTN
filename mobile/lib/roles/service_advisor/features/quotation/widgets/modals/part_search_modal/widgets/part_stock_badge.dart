@@ -35,7 +35,15 @@ class PartStockBadge extends StatelessWidget {
           Container(
             width: 7,
             height: 7,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            decoration: ShapeDecoration(
+              color: color,
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 3.5,
+                  cornerSmoothing: 1.0,
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: 5),
           Text(

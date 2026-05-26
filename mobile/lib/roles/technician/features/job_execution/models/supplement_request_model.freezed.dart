@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SupplementRequestModel {
 
- String get orderId; String get taskId; List<String> get evidenceUrls; String get description; String get proposedSolution; String get status;
+@JsonKey(name: 'booking_code') String get bookingCode;@JsonKey(name: 'task_id') String get taskId;@JsonKey(name: 'issue_title') String get issueTitle;@JsonKey(name: 'technician_note') String get technicianNote;@JsonKey(name: 'action_required') String get actionRequired;@JsonKey(name: 'evidence_media_urls') List<String> get evidenceMediaUrls; String get status;
 /// Create a copy of SupplementRequestModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $SupplementRequestModelCopyWith<SupplementRequestModel> get copyWith => _$Supple
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SupplementRequestModel&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.taskId, taskId) || other.taskId == taskId)&&const DeepCollectionEquality().equals(other.evidenceUrls, evidenceUrls)&&(identical(other.description, description) || other.description == description)&&(identical(other.proposedSolution, proposedSolution) || other.proposedSolution == proposedSolution)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SupplementRequestModel&&(identical(other.bookingCode, bookingCode) || other.bookingCode == bookingCode)&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.issueTitle, issueTitle) || other.issueTitle == issueTitle)&&(identical(other.technicianNote, technicianNote) || other.technicianNote == technicianNote)&&(identical(other.actionRequired, actionRequired) || other.actionRequired == actionRequired)&&const DeepCollectionEquality().equals(other.evidenceMediaUrls, evidenceMediaUrls)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,orderId,taskId,const DeepCollectionEquality().hash(evidenceUrls),description,proposedSolution,status);
+int get hashCode => Object.hash(runtimeType,bookingCode,taskId,issueTitle,technicianNote,actionRequired,const DeepCollectionEquality().hash(evidenceMediaUrls),status);
 
 @override
 String toString() {
-  return 'SupplementRequestModel(orderId: $orderId, taskId: $taskId, evidenceUrls: $evidenceUrls, description: $description, proposedSolution: $proposedSolution, status: $status)';
+  return 'SupplementRequestModel(bookingCode: $bookingCode, taskId: $taskId, issueTitle: $issueTitle, technicianNote: $technicianNote, actionRequired: $actionRequired, evidenceMediaUrls: $evidenceMediaUrls, status: $status)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $SupplementRequestModelCopyWith<$Res>  {
   factory $SupplementRequestModelCopyWith(SupplementRequestModel value, $Res Function(SupplementRequestModel) _then) = _$SupplementRequestModelCopyWithImpl;
 @useResult
 $Res call({
- String orderId, String taskId, List<String> evidenceUrls, String description, String proposedSolution, String status
+@JsonKey(name: 'booking_code') String bookingCode,@JsonKey(name: 'task_id') String taskId,@JsonKey(name: 'issue_title') String issueTitle,@JsonKey(name: 'technician_note') String technicianNote,@JsonKey(name: 'action_required') String actionRequired,@JsonKey(name: 'evidence_media_urls') List<String> evidenceMediaUrls, String status
 });
 
 
@@ -65,14 +65,15 @@ class _$SupplementRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of SupplementRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? orderId = null,Object? taskId = null,Object? evidenceUrls = null,Object? description = null,Object? proposedSolution = null,Object? status = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? bookingCode = null,Object? taskId = null,Object? issueTitle = null,Object? technicianNote = null,Object? actionRequired = null,Object? evidenceMediaUrls = null,Object? status = null,}) {
   return _then(_self.copyWith(
-orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
+bookingCode: null == bookingCode ? _self.bookingCode : bookingCode // ignore: cast_nullable_to_non_nullable
 as String,taskId: null == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
-as String,evidenceUrls: null == evidenceUrls ? _self.evidenceUrls : evidenceUrls // ignore: cast_nullable_to_non_nullable
-as List<String>,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,proposedSolution: null == proposedSolution ? _self.proposedSolution : proposedSolution // ignore: cast_nullable_to_non_nullable
-as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,issueTitle: null == issueTitle ? _self.issueTitle : issueTitle // ignore: cast_nullable_to_non_nullable
+as String,technicianNote: null == technicianNote ? _self.technicianNote : technicianNote // ignore: cast_nullable_to_non_nullable
+as String,actionRequired: null == actionRequired ? _self.actionRequired : actionRequired // ignore: cast_nullable_to_non_nullable
+as String,evidenceMediaUrls: null == evidenceMediaUrls ? _self.evidenceMediaUrls : evidenceMediaUrls // ignore: cast_nullable_to_non_nullable
+as List<String>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -158,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String orderId,  String taskId,  List<String> evidenceUrls,  String description,  String proposedSolution,  String status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'booking_code')  String bookingCode, @JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'issue_title')  String issueTitle, @JsonKey(name: 'technician_note')  String technicianNote, @JsonKey(name: 'action_required')  String actionRequired, @JsonKey(name: 'evidence_media_urls')  List<String> evidenceMediaUrls,  String status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SupplementRequestModel() when $default != null:
-return $default(_that.orderId,_that.taskId,_that.evidenceUrls,_that.description,_that.proposedSolution,_that.status);case _:
+return $default(_that.bookingCode,_that.taskId,_that.issueTitle,_that.technicianNote,_that.actionRequired,_that.evidenceMediaUrls,_that.status);case _:
   return orElse();
 
 }
@@ -179,10 +180,10 @@ return $default(_that.orderId,_that.taskId,_that.evidenceUrls,_that.description,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String orderId,  String taskId,  List<String> evidenceUrls,  String description,  String proposedSolution,  String status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'booking_code')  String bookingCode, @JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'issue_title')  String issueTitle, @JsonKey(name: 'technician_note')  String technicianNote, @JsonKey(name: 'action_required')  String actionRequired, @JsonKey(name: 'evidence_media_urls')  List<String> evidenceMediaUrls,  String status)  $default,) {final _that = this;
 switch (_that) {
 case _SupplementRequestModel():
-return $default(_that.orderId,_that.taskId,_that.evidenceUrls,_that.description,_that.proposedSolution,_that.status);case _:
+return $default(_that.bookingCode,_that.taskId,_that.issueTitle,_that.technicianNote,_that.actionRequired,_that.evidenceMediaUrls,_that.status);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +200,10 @@ return $default(_that.orderId,_that.taskId,_that.evidenceUrls,_that.description,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String orderId,  String taskId,  List<String> evidenceUrls,  String description,  String proposedSolution,  String status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'booking_code')  String bookingCode, @JsonKey(name: 'task_id')  String taskId, @JsonKey(name: 'issue_title')  String issueTitle, @JsonKey(name: 'technician_note')  String technicianNote, @JsonKey(name: 'action_required')  String actionRequired, @JsonKey(name: 'evidence_media_urls')  List<String> evidenceMediaUrls,  String status)?  $default,) {final _that = this;
 switch (_that) {
 case _SupplementRequestModel() when $default != null:
-return $default(_that.orderId,_that.taskId,_that.evidenceUrls,_that.description,_that.proposedSolution,_that.status);case _:
+return $default(_that.bookingCode,_that.taskId,_that.issueTitle,_that.technicianNote,_that.actionRequired,_that.evidenceMediaUrls,_that.status);case _:
   return null;
 
 }
@@ -214,20 +215,21 @@ return $default(_that.orderId,_that.taskId,_that.evidenceUrls,_that.description,
 @JsonSerializable()
 
 class _SupplementRequestModel extends SupplementRequestModel {
-  const _SupplementRequestModel({required this.orderId, required this.taskId, final  List<String> evidenceUrls = const [], required this.description, required this.proposedSolution, this.status = 'PENDING'}): _evidenceUrls = evidenceUrls,super._();
+  const _SupplementRequestModel({@JsonKey(name: 'booking_code') required this.bookingCode, @JsonKey(name: 'task_id') required this.taskId, @JsonKey(name: 'issue_title') required this.issueTitle, @JsonKey(name: 'technician_note') required this.technicianNote, @JsonKey(name: 'action_required') required this.actionRequired, @JsonKey(name: 'evidence_media_urls') final  List<String> evidenceMediaUrls = const [], this.status = 'PENDING'}): _evidenceMediaUrls = evidenceMediaUrls,super._();
   factory _SupplementRequestModel.fromJson(Map<String, dynamic> json) => _$SupplementRequestModelFromJson(json);
 
-@override final  String orderId;
-@override final  String taskId;
- final  List<String> _evidenceUrls;
-@override@JsonKey() List<String> get evidenceUrls {
-  if (_evidenceUrls is EqualUnmodifiableListView) return _evidenceUrls;
+@override@JsonKey(name: 'booking_code') final  String bookingCode;
+@override@JsonKey(name: 'task_id') final  String taskId;
+@override@JsonKey(name: 'issue_title') final  String issueTitle;
+@override@JsonKey(name: 'technician_note') final  String technicianNote;
+@override@JsonKey(name: 'action_required') final  String actionRequired;
+ final  List<String> _evidenceMediaUrls;
+@override@JsonKey(name: 'evidence_media_urls') List<String> get evidenceMediaUrls {
+  if (_evidenceMediaUrls is EqualUnmodifiableListView) return _evidenceMediaUrls;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_evidenceUrls);
+  return EqualUnmodifiableListView(_evidenceMediaUrls);
 }
 
-@override final  String description;
-@override final  String proposedSolution;
 @override@JsonKey() final  String status;
 
 /// Create a copy of SupplementRequestModel
@@ -243,16 +245,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SupplementRequestModel&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.taskId, taskId) || other.taskId == taskId)&&const DeepCollectionEquality().equals(other._evidenceUrls, _evidenceUrls)&&(identical(other.description, description) || other.description == description)&&(identical(other.proposedSolution, proposedSolution) || other.proposedSolution == proposedSolution)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SupplementRequestModel&&(identical(other.bookingCode, bookingCode) || other.bookingCode == bookingCode)&&(identical(other.taskId, taskId) || other.taskId == taskId)&&(identical(other.issueTitle, issueTitle) || other.issueTitle == issueTitle)&&(identical(other.technicianNote, technicianNote) || other.technicianNote == technicianNote)&&(identical(other.actionRequired, actionRequired) || other.actionRequired == actionRequired)&&const DeepCollectionEquality().equals(other._evidenceMediaUrls, _evidenceMediaUrls)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,orderId,taskId,const DeepCollectionEquality().hash(_evidenceUrls),description,proposedSolution,status);
+int get hashCode => Object.hash(runtimeType,bookingCode,taskId,issueTitle,technicianNote,actionRequired,const DeepCollectionEquality().hash(_evidenceMediaUrls),status);
 
 @override
 String toString() {
-  return 'SupplementRequestModel(orderId: $orderId, taskId: $taskId, evidenceUrls: $evidenceUrls, description: $description, proposedSolution: $proposedSolution, status: $status)';
+  return 'SupplementRequestModel(bookingCode: $bookingCode, taskId: $taskId, issueTitle: $issueTitle, technicianNote: $technicianNote, actionRequired: $actionRequired, evidenceMediaUrls: $evidenceMediaUrls, status: $status)';
 }
 
 
@@ -263,7 +265,7 @@ abstract mixin class _$SupplementRequestModelCopyWith<$Res> implements $Suppleme
   factory _$SupplementRequestModelCopyWith(_SupplementRequestModel value, $Res Function(_SupplementRequestModel) _then) = __$SupplementRequestModelCopyWithImpl;
 @override @useResult
 $Res call({
- String orderId, String taskId, List<String> evidenceUrls, String description, String proposedSolution, String status
+@JsonKey(name: 'booking_code') String bookingCode,@JsonKey(name: 'task_id') String taskId,@JsonKey(name: 'issue_title') String issueTitle,@JsonKey(name: 'technician_note') String technicianNote,@JsonKey(name: 'action_required') String actionRequired,@JsonKey(name: 'evidence_media_urls') List<String> evidenceMediaUrls, String status
 });
 
 
@@ -280,14 +282,15 @@ class __$SupplementRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of SupplementRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? orderId = null,Object? taskId = null,Object? evidenceUrls = null,Object? description = null,Object? proposedSolution = null,Object? status = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? bookingCode = null,Object? taskId = null,Object? issueTitle = null,Object? technicianNote = null,Object? actionRequired = null,Object? evidenceMediaUrls = null,Object? status = null,}) {
   return _then(_SupplementRequestModel(
-orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
+bookingCode: null == bookingCode ? _self.bookingCode : bookingCode // ignore: cast_nullable_to_non_nullable
 as String,taskId: null == taskId ? _self.taskId : taskId // ignore: cast_nullable_to_non_nullable
-as String,evidenceUrls: null == evidenceUrls ? _self._evidenceUrls : evidenceUrls // ignore: cast_nullable_to_non_nullable
-as List<String>,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,proposedSolution: null == proposedSolution ? _self.proposedSolution : proposedSolution // ignore: cast_nullable_to_non_nullable
-as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,issueTitle: null == issueTitle ? _self.issueTitle : issueTitle // ignore: cast_nullable_to_non_nullable
+as String,technicianNote: null == technicianNote ? _self.technicianNote : technicianNote // ignore: cast_nullable_to_non_nullable
+as String,actionRequired: null == actionRequired ? _self.actionRequired : actionRequired // ignore: cast_nullable_to_non_nullable
+as String,evidenceMediaUrls: null == evidenceMediaUrls ? _self._evidenceMediaUrls : evidenceMediaUrls // ignore: cast_nullable_to_non_nullable
+as List<String>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

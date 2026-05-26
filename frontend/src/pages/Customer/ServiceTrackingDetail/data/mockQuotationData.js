@@ -4,13 +4,13 @@ const quotationDatabase = {
     'SRV-2026-B77P': {
         booking_code: 'SRV-2026-B77P',
         parts: [
-            { id: 'PT-BRK-01', name: 'Bộ má phanh gốm cường độ cao (Trước)', quantity: 1, unit_price: 11000000 },
-            { id: 'PT-BUSH-A', name: 'Bộ bọc cao su càng A', quantity: 2, unit_price: 4500000 },
-            { id: 'PT-OIL-0W40', name: 'Dầu hộp số tổng hợp cao cấp', quantity: 1, unit_price: 2500000 }
+            { id: 'PT-BRK-01', sku: 'BRK-01', name: 'Bộ má phanh gốm cường độ cao (Trước)', quantity: 1, unit_price: 11000000, total_price: 11000000 },
+            { id: 'PT-BUSH-A', sku: 'BUSH-A', name: 'Bộ bọc cao su càng A', quantity: 2, unit_price: 4500000, total_price: 9000000 },
+            { id: 'PT-OIL-0W40', sku: 'OIL-0W40', name: 'Dầu hộp số tổng hợp cao cấp', quantity: 1, unit_price: 2500000, total_price: 2500000 }
         ],
         labors: [
-            { id: 'LB-01', description: 'Công ép cao su càng A và cân chỉnh thước lái 3D', hours: 2, rate: 800000 },
-            { id: 'LB-02', description: 'Công thay má phanh và chạy phần mềm Reset', hours: 1, rate: 900000 }
+            { id: 'LB-01', labor_code: 'SVC-01', name: 'Công ép cao su càng A và cân chỉnh thước lái 3D', quantity: 2, unit_price: 800000, total_price: 1600000 },
+            { id: 'LB-02', labor_code: 'SVC-02', name: 'Công thay má phanh và chạy phần mềm Reset', quantity: 1, unit_price: 900000, total_price: 900000 }
         ],
         vat_rate: 0.10,
         currency: 'VNĐ',

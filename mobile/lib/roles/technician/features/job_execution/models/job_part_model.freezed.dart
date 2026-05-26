@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$JobPartModel {
 
- String get id; String get name; int get quantity; JobPartIcon get icon; JobPartStatus get status; DateTime? get etaTime;
+ String get id;@JsonKey(name: 'sku') String get sku; String get name; int get quantity; JobPartIcon get icon; JobPartStatus get status; DateTime? get etaTime;
 /// Create a copy of JobPartModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $JobPartModelCopyWith<JobPartModel> get copyWith => _$JobPartModelCopyWithImpl<J
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is JobPartModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.status, status) || other.status == status)&&(identical(other.etaTime, etaTime) || other.etaTime == etaTime));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is JobPartModel&&(identical(other.id, id) || other.id == id)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.name, name) || other.name == name)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.status, status) || other.status == status)&&(identical(other.etaTime, etaTime) || other.etaTime == etaTime));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,quantity,icon,status,etaTime);
+int get hashCode => Object.hash(runtimeType,id,sku,name,quantity,icon,status,etaTime);
 
 @override
 String toString() {
-  return 'JobPartModel(id: $id, name: $name, quantity: $quantity, icon: $icon, status: $status, etaTime: $etaTime)';
+  return 'JobPartModel(id: $id, sku: $sku, name: $name, quantity: $quantity, icon: $icon, status: $status, etaTime: $etaTime)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $JobPartModelCopyWith<$Res>  {
   factory $JobPartModelCopyWith(JobPartModel value, $Res Function(JobPartModel) _then) = _$JobPartModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, int quantity, JobPartIcon icon, JobPartStatus status, DateTime? etaTime
+ String id,@JsonKey(name: 'sku') String sku, String name, int quantity, JobPartIcon icon, JobPartStatus status, DateTime? etaTime
 });
 
 
@@ -65,9 +65,10 @@ class _$JobPartModelCopyWithImpl<$Res>
 
 /// Create a copy of JobPartModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? quantity = null,Object? icon = null,Object? status = null,Object? etaTime = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sku = null,Object? name = null,Object? quantity = null,Object? icon = null,Object? status = null,Object? etaTime = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,sku: null == sku ? _self.sku : sku // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as int,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
@@ -158,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  int quantity,  JobPartIcon icon,  JobPartStatus status,  DateTime? etaTime)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'sku')  String sku,  String name,  int quantity,  JobPartIcon icon,  JobPartStatus status,  DateTime? etaTime)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _JobPartModel() when $default != null:
-return $default(_that.id,_that.name,_that.quantity,_that.icon,_that.status,_that.etaTime);case _:
+return $default(_that.id,_that.sku,_that.name,_that.quantity,_that.icon,_that.status,_that.etaTime);case _:
   return orElse();
 
 }
@@ -179,10 +180,10 @@ return $default(_that.id,_that.name,_that.quantity,_that.icon,_that.status,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  int quantity,  JobPartIcon icon,  JobPartStatus status,  DateTime? etaTime)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'sku')  String sku,  String name,  int quantity,  JobPartIcon icon,  JobPartStatus status,  DateTime? etaTime)  $default,) {final _that = this;
 switch (_that) {
 case _JobPartModel():
-return $default(_that.id,_that.name,_that.quantity,_that.icon,_that.status,_that.etaTime);case _:
+return $default(_that.id,_that.sku,_that.name,_that.quantity,_that.icon,_that.status,_that.etaTime);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +200,10 @@ return $default(_that.id,_that.name,_that.quantity,_that.icon,_that.status,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  int quantity,  JobPartIcon icon,  JobPartStatus status,  DateTime? etaTime)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'sku')  String sku,  String name,  int quantity,  JobPartIcon icon,  JobPartStatus status,  DateTime? etaTime)?  $default,) {final _that = this;
 switch (_that) {
 case _JobPartModel() when $default != null:
-return $default(_that.id,_that.name,_that.quantity,_that.icon,_that.status,_that.etaTime);case _:
+return $default(_that.id,_that.sku,_that.name,_that.quantity,_that.icon,_that.status,_that.etaTime);case _:
   return null;
 
 }
@@ -214,10 +215,11 @@ return $default(_that.id,_that.name,_that.quantity,_that.icon,_that.status,_that
 @JsonSerializable()
 
 class _JobPartModel extends JobPartModel {
-  const _JobPartModel({required this.id, required this.name, required this.quantity, required this.icon, this.status = JobPartStatus.pending, this.etaTime}): super._();
+  const _JobPartModel({required this.id, @JsonKey(name: 'sku') required this.sku, required this.name, required this.quantity, required this.icon, this.status = JobPartStatus.pending, this.etaTime}): super._();
   factory _JobPartModel.fromJson(Map<String, dynamic> json) => _$JobPartModelFromJson(json);
 
 @override final  String id;
+@override@JsonKey(name: 'sku') final  String sku;
 @override final  String name;
 @override final  int quantity;
 @override final  JobPartIcon icon;
@@ -237,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _JobPartModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.status, status) || other.status == status)&&(identical(other.etaTime, etaTime) || other.etaTime == etaTime));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _JobPartModel&&(identical(other.id, id) || other.id == id)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.name, name) || other.name == name)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.status, status) || other.status == status)&&(identical(other.etaTime, etaTime) || other.etaTime == etaTime));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,quantity,icon,status,etaTime);
+int get hashCode => Object.hash(runtimeType,id,sku,name,quantity,icon,status,etaTime);
 
 @override
 String toString() {
-  return 'JobPartModel(id: $id, name: $name, quantity: $quantity, icon: $icon, status: $status, etaTime: $etaTime)';
+  return 'JobPartModel(id: $id, sku: $sku, name: $name, quantity: $quantity, icon: $icon, status: $status, etaTime: $etaTime)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$JobPartModelCopyWith<$Res> implements $JobPartModelCopyWi
   factory _$JobPartModelCopyWith(_JobPartModel value, $Res Function(_JobPartModel) _then) = __$JobPartModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, int quantity, JobPartIcon icon, JobPartStatus status, DateTime? etaTime
+ String id,@JsonKey(name: 'sku') String sku, String name, int quantity, JobPartIcon icon, JobPartStatus status, DateTime? etaTime
 });
 
 
@@ -274,9 +276,10 @@ class __$JobPartModelCopyWithImpl<$Res>
 
 /// Create a copy of JobPartModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? quantity = null,Object? icon = null,Object? status = null,Object? etaTime = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? sku = null,Object? name = null,Object? quantity = null,Object? icon = null,Object? status = null,Object? etaTime = freezed,}) {
   return _then(_JobPartModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,sku: null == sku ? _self.sku : sku // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as int,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable

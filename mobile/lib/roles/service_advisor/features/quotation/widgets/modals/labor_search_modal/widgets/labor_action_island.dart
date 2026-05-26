@@ -23,8 +23,8 @@ class LaborActionIsland extends ConsumerWidget {
 
     double totalPrice = 0;
     for (final id in state.selectedLaborIds) {
-      final labor = mockLaborMasterData.firstWhere((l) => l.id == id);
-      totalPrice += labor.price;
+      final labor = mockLaborMasterData.firstWhere((l) => l.laborCode == id);
+      totalPrice += labor.basePrice;
     }
 
     return Positioned(

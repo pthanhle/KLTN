@@ -1,41 +1,41 @@
 class DiagnosticItem {
   final String title;
-  final String description;
-  final String imageUrl;
+  final String? technicianNote;
+  final List<String> evidenceMediaUrls;
 
   const DiagnosticItem({
     required this.title,
-    required this.description,
-    required this.imageUrl,
+    this.technicianNote,
+    this.evidenceMediaUrls = const [],
   });
 
   factory DiagnosticItem.fromJson(Map<String, dynamic> json) {
     return DiagnosticItem(
       title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      imageUrl: json['image_url'] ?? '',
+      technicianNote: json['technician_note'],
+      evidenceMediaUrls: List<String>.from(json['evidence_media_urls'] ?? []),
     );
   }
 
   Map<String, dynamic> toJson() => {
     'title': title,
-    'description': description,
-    'image_url': imageUrl,
+    'technician_note': technicianNote,
+    'evidence_media_urls': evidenceMediaUrls,
   };
 }
 
 class CartPartItem {
-  final String id;
+  final String sku;
   final String name;
-  final double price;
+  final double unitPrice;
   final int quantity;
   final bool isBackorder;
   final String? expectedDate;
 
   const CartPartItem({
-    required this.id,
+    required this.sku,
     required this.name,
-    required this.price,
+    required this.unitPrice,
     required this.quantity,
     this.isBackorder = false,
     this.expectedDate,
@@ -43,9 +43,9 @@ class CartPartItem {
 
   factory CartPartItem.fromJson(Map<String, dynamic> json) {
     return CartPartItem(
-      id: json['id'] ?? '',
+      sku: json['sku'] ?? '',
       name: json['name'] ?? '',
-      price: (json['price'] ?? 0).toDouble(),
+      unitPrice: (json['unit_price'] ?? 0).toDouble(),
       quantity: json['quantity'] ?? 1,
       isBackorder: json['is_backorder'] ?? false,
       expectedDate: json['expected_date'],
@@ -53,9 +53,10 @@ class CartPartItem {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
+    'sku': sku,
     'name': name,
-    'price': price,
+    'unit_price': unitPrice,
+    'total_price': unitPrice * quantity,
     'quantity': quantity,
     'is_backorder': isBackorder,
     'expected_date': expectedDate,
@@ -63,34 +64,35 @@ class CartPartItem {
 }
 
 class CartLaborItem {
-  final String id;
+  final String laborCode;
   final String name;
-  final double hours;
-  final double rate;
+  final double quantity;
+  final double unitPrice;
 
   const CartLaborItem({
-    required this.id,
+    required this.laborCode,
     required this.name,
-    required this.hours,
-    required this.rate,
+    required this.quantity,
+    required this.unitPrice,
   });
 
-  double get total => hours * rate;
+  double get total => quantity * unitPrice;
 
   factory CartLaborItem.fromJson(Map<String, dynamic> json) {
     return CartLaborItem(
-      id: json['id'] ?? '',
+      laborCode: json['labor_code'] ?? '',
       name: json['name'] ?? '',
-      hours: (json['hours'] ?? 0).toDouble(),
-      rate: (json['rate'] ?? 0).toDouble(),
+      quantity: (json['quantity'] ?? 0).toDouble(),
+      unitPrice: (json['unit_price'] ?? 0).toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
+    'labor_code': laborCode,
     'name': name,
-    'hours': hours,
-    'rate': rate,
+    'quantity': quantity,
+    'unit_price': unitPrice,
+    'total_price': total,
   };
 }
 
@@ -113,7 +115,7 @@ class QuotationModel {
     this.depositRequired = 0.0,
   });
 
-  double get partsTotal => parts.fold(0, (sum, part) => sum + (part.price * part.quantity));
+  double get partsTotal => parts.fold(0, (sum, part) => sum + (part.unitPrice * part.quantity));
   double get laborTotal => labor.fold(0, (sum, item) => sum + item.total);
   double get discountAmount => promoCode.isNotEmpty ? (partsTotal + laborTotal) * 0.1 : 0.0; // Mock 10% discount
   double get vatAmount => (partsTotal + laborTotal - discountAmount) * 0.1; // 10% VAT

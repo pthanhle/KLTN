@@ -1,26 +1,29 @@
 import React from 'react';
 import { PackageX, AlertTriangle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Image } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 export const LowStockAlert = ({ parts }) => {
+    const { t } = useTranslation('adminDashboard');
+
     return (
-        <div className="bg-white dark:bg-[#141416] rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm h-full flex flex-col">
-            <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
+        <section className="bg-white dark:bg-[#141416] rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm h-full flex flex-col">
+            <header className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
                 <div>
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">Tồn kho thấp</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Sản phẩm cần nhập thêm</p>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">{t('widget_stock_title')}</h3>
                 </div>
                 <div className="p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-2xl">
                     <PackageX size={20} className="text-rose-500" />
                 </div>
-            </div>
+            </header>
 
-            <div className="flex-1 overflow-auto p-4 space-y-2">
+            <article className="flex-1 overflow-auto p-4 space-y-2">
                 {parts && parts.length > 0 ? parts.map((part, idx) => (
                     <div key={part._id || idx} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
                         <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center overflow-hidden flex-shrink-0">
                             {part.images?.[0] ? (
-                                <img src={part.images[0]} alt={part.name} className="w-full h-full object-cover rounded-xl" />
+                                <Image src={part.images[0]} alt={part.name} preview={false} className="w-full h-full object-cover rounded-xl" />
                             ) : (
                                 <PackageX size={18} className="text-slate-400" />
                             )}
@@ -36,23 +39,23 @@ export const LowStockAlert = ({ parts }) => {
                                     : 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'
                             }`}>
                                 <AlertTriangle size={11} />
-                                {part.inventory?.available_stock || 0} sp
+                                {part.inventory?.available_stock || 0}
                             </div>
                         </div>
                     </div>
                 )) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-slate-400 space-y-2 min-h-[120px]">
                         <PackageX size={28} className="opacity-20" />
-                        <span className="text-sm">Tất cả đều đủ hàng 👍</span>
+                        <span className="text-sm">{t('widget_stock_empty')}</span>
                     </div>
                 )}
-            </div>
+            </article>
 
-            <div className="p-4 border-t border-slate-100 dark:border-white/5 text-center">
+            <footer className="p-4 border-t border-slate-100 dark:border-white/5 text-center">
                 <Link to="/admin/parts" className="inline-flex items-center gap-1 text-sm font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 transition-colors">
-                    Quản lý kho hàng <ArrowRight size={14} />
+                    {t('widget_stock_view_all')} <ArrowRight size={14} />
                 </Link>
-            </div>
-        </div>
+            </footer>
+        </section>
     );
 };

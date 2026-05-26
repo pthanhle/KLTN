@@ -1,9 +1,18 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { formatVND } from '../../Customers/utils/format';
+import { useTranslation } from 'react-i18next';
+import { formatVND } from '../../../Customers/utils/format';
 import dayjs from 'dayjs';
 
 export const RevenueChart = ({ data }) => {
+    const { t } = useTranslation('adminDashboard');
+
+    const [isMounted, setIsMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     const chartData = data?.map(item => ({
         date: dayjs(item._id).format('DD/MM'),
         revenue: item.revenue
@@ -12,7 +21,7 @@ export const RevenueChart = ({ data }) => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-100 dark:border-white/10">
+                <div className="bg-white dark:bg-[#141416] p-4 rounded-xl shadow-lg border border-slate-100 dark:border-white/10">
                     <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">{label}</p>
                     <p className="text-lg font-black text-indigo-600 dark:text-indigo-400">
                         {formatVND(payload[0].value)}
@@ -24,21 +33,21 @@ export const RevenueChart = ({ data }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-[#141416] p-6 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm h-full min-h-[400px] flex flex-col">
-            <div className="mb-6 flex justify-between items-center">
+        <section className="bg-white dark:bg-[#141416] p-6 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm h-full min-h-[400px] flex flex-col">
+            <header className="mb-6 flex justify-between items-center">
                 <div>
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">Doanh thu 30 ngày qua</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Tổng giá trị đơn hàng đã hoàn thành</p>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">{t('chart_revenue_title')}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{t('chart_revenue_subtitle')}</p>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full">
                     <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
                     VNĐ
                 </div>
-            </div>
+            </header>
 
-            <div className="flex-1 w-full min-h-[300px]">
-                {chartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
+            <article className="flex-1 w-full h-[300px] min-h-[300px]">
+                {isMounted && chartData.length > 0 ? (
+                    <ResponsiveContainer width="99%" height="100%" minWidth={100} minHeight={100}>
                         <AreaChart
                             data={chartData}
                             margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
@@ -65,7 +74,7 @@ export const RevenueChart = ({ data }) => {
                                 tickFormatter={(value) => value >= 1000000 ? `${(value / 1000000).toFixed(0)}M` : value}
                                 dx={-15}
                             />
-                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '5 5' }} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(148, 163, 184, 0.4)', strokeWidth: 1, strokeDasharray: '5 5' }} />
                             <Area
                                 type="monotone"
                                 dataKey="revenue"
@@ -77,12 +86,12 @@ export const RevenueChart = ({ data }) => {
                             />
                         </AreaChart>
                     </ResponsiveContainer>
-                ) : (
+                ) : isMounted ? (
                     <div className="w-full h-full flex items-center justify-center text-slate-400">
-                        Chưa có dữ liệu doanh thu
+                        {t('chart_status_empty')}
                     </div>
-                )}
-            </div>
-        </div>
+                ) : null}
+            </article>
+        </section>
     );
 };

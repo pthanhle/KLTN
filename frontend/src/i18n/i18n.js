@@ -72,6 +72,8 @@ import enAdminOrderDetail from '../locales/en/adminOrderDetail.json';
 import viAdminOrderDetail from '../locales/vi/adminOrderDetail.json';
 import enLoyalty from '../locales/en/loyalty.json';
 import viLoyalty from '../locales/vi/loyalty.json';
+import enAdminDashboard from '../locales/en/adminDashboard.json';
+import viAdminDashboard from '../locales/vi/adminDashboard.json';
 
 i18n
     .use(initReactI18next)
@@ -114,6 +116,7 @@ i18n
                 adminRODetail: enAdminRODetail,
                 adminOrderDetail: enAdminOrderDetail,
                 loyalty: enLoyalty,
+                adminDashboard: enAdminDashboard,
             },
             vi: {
                 translation: viTranslation,
@@ -152,6 +155,7 @@ i18n
                 adminRODetail: viAdminRODetail,
                 adminOrderDetail: viAdminOrderDetail,
                 loyalty: viLoyalty,
+                adminDashboard: viAdminDashboard,
             },
         },
         lng: 'vi',

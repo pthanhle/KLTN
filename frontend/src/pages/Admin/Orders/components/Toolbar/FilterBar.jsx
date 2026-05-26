@@ -38,7 +38,7 @@ export const FilterBar = ({
                         value={filterDateRange}
                         onChange={setFilterDateRange}
                         className="w-full h-12 rounded-full"
-                        popupClassName="dark:bg-[#141416] dark:text-white"
+                        classNames={{ popup: { root: "dark:bg-[#141416] dark:text-white" } }}
                         format="DD/MM/YYYY"
                         placeholder={['Từ ngày', 'Đến ngày']}
                     />

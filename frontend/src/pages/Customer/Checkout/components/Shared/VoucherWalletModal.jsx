@@ -1,16 +1,19 @@
-import { Modal, Tag } from 'antd';
+import { Modal, Tag, App } from 'antd';
 import { Ticket, SearchX } from 'lucide-react';
 import { useMyVouchersQuery } from '@/services/queries/loyalty.queries';
 import { formatVND } from '@/pages/Customer/Cars/utils/formatters';
 
 const VoucherWalletModal = ({ isOpen, onClose, onSelect, currentSubtotal }) => {
+    const { message } = App.useApp();
     const { data: vouchers, isLoading } = useMyVouchersQuery();
 
     const validVouchers = vouchers?.filter(v => v.status === 'UNUSED' && new Date(v.expires_at) > new Date()) || [];
 
     const handleSelect = (voucher) => {
-        const info = voucher.promotion || voucher.voucher;
-        if (info.min_order_value > currentSubtotal) {
+        const info = voucher.promotion || voucher.voucher || {};
+        const minOrder = info.min_order_value || 0;
+        if (minOrder > currentSubtotal) {
+            message.warning(`Đơn hàng chưa đạt tối thiểu ${formatVND(minOrder)}`);
             return;
         }
         onSelect(voucher.code);
@@ -36,23 +39,30 @@ const VoucherWalletModal = ({ isOpen, onClose, onSelect, currentSubtotal }) => {
                     </div>
                 ) : (
                     validVouchers.map(v => {
-                        const info = v.promotion || v.voucher;
-                        const isEligible = currentSubtotal >= info.min_order_value;
+                        const info = v.promotion || v.voucher || {};
+                        const minOrder = info.min_order_value || 0;
+                        const isEligible = currentSubtotal >= minOrder;
 
                         return (
                             <div
                                 key={v._id}
-                                onClick={() => isEligible && handleSelect(v)}
-                                className={`p-4 rounded-xl border-2 transition-all ${isEligible ? 'border-yellow-200 hover:border-yellow-500 cursor-pointer bg-white dark:bg-slate-800' : 'border-slate-100 opacity-50 bg-slate-50 cursor-not-allowed'}`}
+                                onClick={() => {
+                                    if (isEligible) {
+                                        handleSelect(v);
+                                    } else {
+                                        message.warning(`Đơn hàng cần đạt tối thiểu ${formatVND(minOrder)} để sử dụng voucher này`);
+                                    }
+                                }}
+                                className={`p-4 rounded-xl border-2 transition-all ${isEligible ? 'border-yellow-200 hover:border-yellow-500 cursor-pointer bg-white dark:bg-slate-800' : 'border-slate-100 opacity-50 bg-slate-50 cursor-pointer'}`}
                             >
                                 <div className="flex justify-between items-start gap-2">
-                                    <div>
+                                    <div className={!isEligible ? 'opacity-50' : ''}>
                                         <Tag color="gold" className="font-bold mb-1">{v.code}</Tag>
                                         <h4 className="font-bold text-slate-900 dark:text-white text-sm">{info.title}</h4>
                                         <p className="text-xs text-slate-500 mt-1">{info.description}</p>
 
                                         <div className="mt-2 text-[11px] font-semibold text-slate-400">
-                                            Đơn tối thiểu: {formatVND(info.min_order_value)}
+                                            Đơn tối thiểu: {formatVND(minOrder)}
                                         </div>
                                     </div>
                                 </div>

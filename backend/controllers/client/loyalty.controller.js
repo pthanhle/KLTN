@@ -22,7 +22,6 @@ export const getMyVouchers = asyncHandler(async (req, res) => {
 });
 
 
-// Validate voucher code (nhập mã hoặc chọn từ danh sách)
 export const validateVoucherCode = asyncHandler(async (req, res) => {
     const { code } = req.body;
 
@@ -31,48 +30,77 @@ export const validateVoucherCode = asyncHandler(async (req, res) => {
         throw new Error('Vui lòng nhập mã voucher');
     }
 
-    // Tìm CustomerVoucher của user với code này
+    const upperCode = code.trim().toUpperCase();
+
     const customerVoucher = await CustomerVoucher.findOne({
         user: req.user._id,
-        code: code.trim().toUpperCase(),
+        code: upperCode,
         status: 'UNUSED',
     })
         .populate('promotion', 'title description discount_type discount_value max_discount min_order_value')
         .populate('voucher', 'title description discount_type discount_value max_discount_amount min_order_value');
 
-    if (!customerVoucher) {
-        res.status(404);
-        throw new Error('Mã voucher không hợp lệ hoặc đã được sử dụng');
+    if (customerVoucher) {
+        if (new Date() > new Date(customerVoucher.expires_at)) {
+            customerVoucher.status = 'EXPIRED';
+            await customerVoucher.save();
+            res.status(400);
+            throw new Error('Mã voucher đã hết hạn');
+        }
+
+        const info = customerVoucher.promotion || customerVoucher.voucher;
+        return res.json({
+            message: 'Mã voucher hợp lệ',
+            voucher: {
+                _id: customerVoucher._id,
+                code: customerVoucher.code,
+                title: info?.title || 'Voucher',
+                description: info?.description || '',
+                discount_type: info?.discount_type || 'FIXED',
+                discount_value: info?.discount_value || 0,
+                max_discount: info?.max_discount || info?.max_discount_amount || null,
+                min_order_value: info?.min_order_value || 0,
+                expires_at: customerVoucher.expires_at,
+            },
+        });
     }
 
-    // Kiểm tra hết hạn
-    if (new Date() > new Date(customerVoucher.expires_at)) {
-        customerVoucher.status = 'EXPIRED';
-        await customerVoucher.save();
-        res.status(400);
-        throw new Error('Mã voucher đã hết hạn');
-    }
-
-    const info = customerVoucher.promotion || customerVoucher.voucher;
-
-    res.json({
-        message: 'Mã voucher hợp lệ',
-        voucher: {
-            _id: customerVoucher._id,
-            code: customerVoucher.code,
-            title: info?.title || 'Voucher',
-            description: info?.description || '',
-            discount_type: info?.discount_type || 'FIXED',
-            discount_value: info?.discount_value || 0,
-            max_discount: info?.max_discount || info?.max_discount_amount || null,
-            min_order_value: info?.min_order_value || 0,
-            expires_at: customerVoucher.expires_at,
-        },
+    const publicPromo = await Promotion.findOne({
+        code: upperCode,
+        status: 'ACTIVE'
     });
+
+    if (publicPromo) {
+        if (publicPromo.end_date && new Date() > new Date(publicPromo.end_date)) {
+            res.status(400);
+            throw new Error('Mã giảm giá đã hết hạn');
+        }
+        if (publicPromo.start_date && new Date() < new Date(publicPromo.start_date)) {
+            res.status(400);
+            throw new Error('Mã giảm giá chưa đến thời gian áp dụng');
+        }
+
+        return res.json({
+            message: 'Mã giảm giá hợp lệ',
+            voucher: {
+                _id: publicPromo._id,
+                code: publicPromo.code,
+                title: publicPromo.title,
+                description: publicPromo.description,
+                discount_type: publicPromo.discount_type,
+                discount_value: publicPromo.discount_value,
+                max_discount: publicPromo.max_discount,
+                min_order_value: publicPromo.min_order_value,
+                expires_at: publicPromo.end_date,
+            },
+        });
+    }
+
+    res.status(404);
+    throw new Error('Mã giảm giá không hợp lệ hoặc đã được sử dụng');
 });
 
 
-// Đổi điểm lấy voucher từ Promotion (is_loyalty = true)
 export const redeemVoucher = asyncHandler(async (req, res) => {
     const { promotionId } = req.body;
 

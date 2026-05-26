@@ -1,14 +1,12 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
-import '../../../../../../shared/widgets/toast/glass_toast.dart';
+import '../../../../../../shared/widgets/buttons/add_catalog_button.dart';
 import '../../controllers/quotation_controller.dart';
 import '../../models/quotation_model.dart';
-import '../shared/glass_card.dart';
 import '../components/quotation_part_card.dart';
 import '../components/quotation_labor_card.dart';
 import '../../constants/quotation_constants.dart';
@@ -16,14 +14,17 @@ import '../modals/part_search_modal/part_search_modal.dart';
 import '../modals/labor_search_modal/labor_search_modal.dart';
 
 class ServiceCartSection extends ConsumerWidget {
-  final QuotationModel data;
-
-  const ServiceCartSection({super.key, required this.data});
+  const ServiceCartSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final asyncData = ref.watch(quotationControllerProvider);
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+
+    final data = asyncData.value;
+    final parts = data?.parts ?? const <CartPartItem>[];
+    final labor = data?.labor ?? const <CartLaborItem>[];
+    final totalItems = parts.length + labor.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,33 +32,46 @@ class ServiceCartSection extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.symmetric(
               horizontal: QuotationConstants.paddingHorizontal),
-          child: Text(
-            'Giỏ hàng dịch vụ'.tr(),
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.3,
-            ),
+          child: Row(
+            children: [
+              Text(
+                'Giỏ hàng dịch vụ'.tr(),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              if (totalItems > 0) ...[
+                const SizedBox(width: 8),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: _CountBadge(
+                    key: ValueKey(totalItems),
+                    count: totalItems,
+                    theme: theme,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
         const SizedBox(height: 16),
 
-        if (data.parts.isNotEmpty)
-          ...data.parts.map((part) => QuotationPartCard(part: part)),
+        if (parts.isNotEmpty)
+          ...parts.map((part) => QuotationPartCard(part: part)),
 
-        if (data.labor.isNotEmpty)
-          ...data.labor.map((labor) => QuotationLaborCard(labor: labor)),
+        if (labor.isNotEmpty)
+          ...labor.map((l) => QuotationLaborCard(labor: l)),
 
         const SizedBox(height: 8),
 
-        // 2 nút Thêm — Liquid Glass tinted
         Padding(
           padding: const EdgeInsets.symmetric(
               horizontal: QuotationConstants.paddingHorizontal),
           child: Row(
             children: [
               Expanded(
-                child: _AddButton(
-                  isDark: isDark,
+                child: AddCatalogButton(
                   icon: CupertinoIcons.wrench_fill,
                   label: 'Phụ tùng'.tr(),
                   onTap: () {
@@ -65,17 +79,17 @@ class ServiceCartSection extends ConsumerWidget {
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
+                      useRootNavigator: true,
                       backgroundColor: Colors.transparent,
+                      barrierColor: Colors.black.withValues(alpha: 0.4),
                       builder: (context) => const PartSearchModal(),
                     );
                   },
-                  theme: theme,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _AddButton(
-                  isDark: isDark,
+                child: AddCatalogButton(
                   icon: CupertinoIcons.person_fill,
                   label: 'Tiền công'.tr(),
                   onTap: () {
@@ -83,11 +97,12 @@ class ServiceCartSection extends ConsumerWidget {
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
+                      useRootNavigator: true,
                       backgroundColor: Colors.transparent,
+                      barrierColor: Colors.black.withValues(alpha: 0.4),
                       builder: (context) => const LaborSearchModal(),
                     );
                   },
-                  theme: theme,
                 ),
               ),
             ],
@@ -98,90 +113,29 @@ class ServiceCartSection extends ConsumerWidget {
   }
 }
 
-/// Nút "Thêm +" theo chuẩn §2: glass tinted với primary color
-class _AddButton extends StatefulWidget {
-  final bool isDark;
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
+class _CountBadge extends StatelessWidget {
+  final int count;
   final ThemeData theme;
 
-  const _AddButton({
-    required this.isDark,
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    required this.theme,
-  });
-
-  @override
-  State<_AddButton> createState() => _AddButtonState();
-}
-
-class _AddButtonState extends State<_AddButton> {
-  bool _pressed = false;
+  const _CountBadge({super.key, required this.count, required this.theme});
 
   @override
   Widget build(BuildContext context) {
-    final primary = widget.theme.colorScheme.primary;
-
-    return GestureDetector(
-      onTapDown: (_) {
-        HapticFeedback.selectionClick();
-        setState(() => _pressed = true);
-      },
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedScale(
-        scale: _pressed ? 0.95 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOutCubic,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: ShapeDecoration(
-            // Tinted glass: primary alpha tint
-            color: primary.withValues(alpha: widget.isDark ? 0.12 : 0.08),
-            shape: SmoothRectangleBorder(
-              borderRadius: SmoothBorderRadius(
-                cornerRadius: 16,
-                cornerSmoothing: 1.0,
-              ),
-              side: BorderSide(
-                color: primary.withValues(alpha: widget.isDark ? 0.35 : 0.25),
-                width: 0.5,
-              ),
-            ),
-          ),
-          child: ClipSmoothRect(
-            radius: SmoothBorderRadius(
-              cornerRadius: 16,
-              cornerSmoothing: 1.0,
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(widget.icon, color: primary, size: 16),
-                  const SizedBox(width: 6),
-                  Icon(CupertinoIcons.add, color: primary, size: 14),
-                  const SizedBox(width: 6),
-                  Text(
-                    widget.label,
-                    style: widget.theme.textTheme.bodyMedium?.copyWith(
-                      color: primary,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.1,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+    final primary = theme.colorScheme.primary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: ShapeDecoration(
+        color: primary.withValues(alpha: 0.12),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(cornerRadius: 8, cornerSmoothing: 1.0),
+          side: BorderSide(color: primary.withValues(alpha: 0.25), width: 0.5),
+        ),
+      ),
+      child: Text(
+        '$count',
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: primary,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

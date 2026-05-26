@@ -68,7 +68,7 @@ class LaborItemCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          labor.id,
+                          labor.laborCode,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant
                                 .withValues(alpha: 0.70),
@@ -116,7 +116,7 @@ class LaborItemCard extends StatelessWidget {
                             Text(
                               NumberFormat.currency(
                                       locale: 'vi_VN', symbol: 'đ')
-                                  .format(labor.price),
+                                  .format(labor.basePrice),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: isSelected

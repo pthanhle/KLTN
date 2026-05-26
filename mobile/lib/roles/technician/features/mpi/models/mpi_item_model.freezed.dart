@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MpiItemModel {
 
- String get id; String get name; MpiItemStatus get status; String? get note; List<String> get mediaUrls;
+ String get id; String get name; MpiItemStatus get status;@JsonKey(name: 'action_required') String? get note;@JsonKey(name: 'evidence_media_urls') List<String> get mediaUrls;
 /// Create a copy of MpiItemModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $MpiItemModelCopyWith<$Res>  {
   factory $MpiItemModelCopyWith(MpiItemModel value, $Res Function(MpiItemModel) _then) = _$MpiItemModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, MpiItemStatus status, String? note, List<String> mediaUrls
+ String id, String name, MpiItemStatus status,@JsonKey(name: 'action_required') String? note,@JsonKey(name: 'evidence_media_urls') List<String> mediaUrls
 });
 
 
@@ -157,7 +157,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  MpiItemStatus status,  String? note,  List<String> mediaUrls)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  MpiItemStatus status, @JsonKey(name: 'action_required')  String? note, @JsonKey(name: 'evidence_media_urls')  List<String> mediaUrls)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MpiItemModel() when $default != null:
 return $default(_that.id,_that.name,_that.status,_that.note,_that.mediaUrls);case _:
@@ -178,7 +178,7 @@ return $default(_that.id,_that.name,_that.status,_that.note,_that.mediaUrls);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  MpiItemStatus status,  String? note,  List<String> mediaUrls)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  MpiItemStatus status, @JsonKey(name: 'action_required')  String? note, @JsonKey(name: 'evidence_media_urls')  List<String> mediaUrls)  $default,) {final _that = this;
 switch (_that) {
 case _MpiItemModel():
 return $default(_that.id,_that.name,_that.status,_that.note,_that.mediaUrls);case _:
@@ -198,7 +198,7 @@ return $default(_that.id,_that.name,_that.status,_that.note,_that.mediaUrls);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  MpiItemStatus status,  String? note,  List<String> mediaUrls)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  MpiItemStatus status, @JsonKey(name: 'action_required')  String? note, @JsonKey(name: 'evidence_media_urls')  List<String> mediaUrls)?  $default,) {final _that = this;
 switch (_that) {
 case _MpiItemModel() when $default != null:
 return $default(_that.id,_that.name,_that.status,_that.note,_that.mediaUrls);case _:
@@ -213,15 +213,15 @@ return $default(_that.id,_that.name,_that.status,_that.note,_that.mediaUrls);cas
 @JsonSerializable()
 
 class _MpiItemModel extends MpiItemModel {
-  const _MpiItemModel({required this.id, required this.name, this.status = MpiItemStatus.unchecked, this.note, final  List<String> mediaUrls = const []}): _mediaUrls = mediaUrls,super._();
+  const _MpiItemModel({required this.id, required this.name, this.status = MpiItemStatus.unchecked, @JsonKey(name: 'action_required') this.note, @JsonKey(name: 'evidence_media_urls') final  List<String> mediaUrls = const []}): _mediaUrls = mediaUrls,super._();
   factory _MpiItemModel.fromJson(Map<String, dynamic> json) => _$MpiItemModelFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override@JsonKey() final  MpiItemStatus status;
-@override final  String? note;
+@override@JsonKey(name: 'action_required') final  String? note;
  final  List<String> _mediaUrls;
-@override@JsonKey() List<String> get mediaUrls {
+@override@JsonKey(name: 'evidence_media_urls') List<String> get mediaUrls {
   if (_mediaUrls is EqualUnmodifiableListView) return _mediaUrls;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_mediaUrls);
@@ -261,7 +261,7 @@ abstract mixin class _$MpiItemModelCopyWith<$Res> implements $MpiItemModelCopyWi
   factory _$MpiItemModelCopyWith(_MpiItemModel value, $Res Function(_MpiItemModel) _then) = __$MpiItemModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, MpiItemStatus status, String? note, List<String> mediaUrls
+ String id, String name, MpiItemStatus status,@JsonKey(name: 'action_required') String? note,@JsonKey(name: 'evidence_media_urls') List<String> mediaUrls
 });
 
 

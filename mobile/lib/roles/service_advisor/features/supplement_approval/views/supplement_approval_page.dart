@@ -12,7 +12,10 @@ import '../controllers/supplement_controller.dart';
 import '../widgets/shared/supplement_skeleton.dart';
 import '../widgets/shared/glass_warning_banner.dart';
 import '../widgets/sections/supplement_issue_section.dart';
-import '../widgets/sections/financial_impact_section.dart';
+import '../widgets/sections/supplement_cart/supplement_cart_section.dart';
+import '../widgets/sections/supplement_summary/supplement_summary_section.dart';
+import '../widgets/sections/supplement_actions/supplement_add_part_button.dart';
+import '../widgets/sections/supplement_actions/supplement_add_labor_button.dart';
 import '../widgets/sections/timeline_impact_section.dart';
 import '../constants/supplement_constants.dart';
 import '../widgets/shared/vibrant_liquid_button.dart';
@@ -94,17 +97,24 @@ class SupplementApprovalPage extends ConsumerWidget {
                         const SizedBox(height: SupplementConstants.sectionSpacing),
                         SupplementIssueSection(
                           title: data.issueTitle,
-                          description: data.issueDescription,
-                          proposedFix: data.proposedFix,
+                          description: data.technicianNote,
+                          proposedFix: data.actionRequired,
                           mechanicName: data.mechanicName,
                           mechanicRole: data.mechanicRole,
                           imageUrls: data.evidenceMediaUrls,
                         ),
                         const SizedBox(height: SupplementConstants.sectionSpacing),
-                        FinancialImpactSection(
-                          oldCost: data.oldCost,
-                          newCost: data.newCost,
+                        const SupplementCartSection(),
+                        const SizedBox(height: SupplementConstants.sectionSpacing),
+                        const Row(
+                          children: [
+                            Expanded(child: SupplementAddPartButton()),
+                            const SizedBox(width: 12),
+                            Expanded(child: SupplementAddLaborButton()),
+                          ],
                         ),
+                        const SizedBox(height: SupplementConstants.sectionSpacing),
+                        const SupplementSummarySection(),
                         const SizedBox(height: SupplementConstants.sectionSpacing),
                         TimelineImpactSection(
                           oldTime: data.oldDeliveryTime,

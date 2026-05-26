@@ -88,7 +88,7 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
     final updatedOrders = state.orders.map((order) {
       if (order.id == id) {
         return order.copyWith(
-          status: OrderStatus.completed,
+          status: OrderStatus.shipping,
           shippingProvider: provider,
           trackingCode: trackingCode,
         );

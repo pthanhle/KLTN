@@ -11,10 +11,10 @@ export const QuotationPartsTable = ({ parts, formatCurrency, t }) => {
         },
         {
             title: t('quote_col_code', 'Mã Phụ Tùng'),
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'sku',
+            key: 'sku',
             width: 120,
-            render: (text) => <span className="font-mono text-[10px] text-slate-500">{text}</span>,
+            render: (text) => <span className="font-mono text-[10px] text-slate-500 uppercase">{text}</span>,
         },
         {
             title: t('quote_col_name', 'Tên Sản Phẩm'),
@@ -39,12 +39,13 @@ export const QuotationPartsTable = ({ parts, formatCurrency, t }) => {
         },
         {
             title: t('quote_col_total', 'Thành Tiền'),
-            key: 'total',
+            dataIndex: 'total_price',
+            key: 'total_price',
             align: 'right',
             width: 140,
-            render: (_, record) => (
+            render: (val) => (
                 <span className="font-semibold text-slate-700 dark:text-slate-200">
-                    {formatCurrency(record.quantity * record.unit_price)}
+                    {formatCurrency(val)}
                 </span>
             ),
         },

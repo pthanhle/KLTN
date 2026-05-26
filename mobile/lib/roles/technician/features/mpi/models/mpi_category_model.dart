@@ -10,7 +10,8 @@ abstract class MpiCategoryModel with _$MpiCategoryModel {
 
   const factory MpiCategoryModel({
     required String id,
-    required String name,
+    @JsonKey(name: 'title') required String name,
+    @JsonKey(name: 'technician_note') String? technicianNote,
     required List<MpiItemModel> items,
   }) = _MpiCategoryModel;
 

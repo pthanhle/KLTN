@@ -15,16 +15,19 @@ const ApprovalRequestCard = ({ request }) => {
                 <AlertTriangle className="text-red-500 shrink-0 mt-1" size={24} />
                 <div className="flex-1">
                     <p className="text-slate-800 dark:text-white leading-relaxed font-semibold text-sm mb-1">
-                        {request.title}
+                        {request.issue_title}
                     </p>
-                    <p className="text-slate-600 dark:text-[#a0a0a0] leading-relaxed text-[13px] mb-5">
-                        {request.description}
+                    <p className="text-slate-600 dark:text-[#a0a0a0] leading-relaxed text-[13px] mb-2">
+                        {request.technician_note}
+                    </p>
+                    <p className="text-slate-800 dark:text-white leading-relaxed text-[13px] font-medium mb-5">
+                        <span className="font-bold text-red-500">{t('prog_action_required', 'Đề xuất')}: </span>{request.action_required}
                     </p>
                     
                     {request.status === 'pending' && (
                         <div className="flex flex-col sm:flex-row gap-3 pt-2">
                             <button className="flex-1 py-3 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold text-xs uppercase tracking-widest rounded-full shadow-[0_5px_15px_rgba(239,68,68,0.3)] hover:scale-105 active:scale-95 transition-all">
-                                {t('prog_btn_approve_price', 'Phê duyệt')}: {formatCurrency(request.price)}
+                                {t('prog_btn_approve_price', 'Phê duyệt')}: {formatCurrency(request.total_price)}
                             </button>
                             <button className="px-6 py-3 border border-red-500/40 text-red-600 dark:text-red-400 font-bold text-xs uppercase tracking-widest rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 active:scale-95 transition-all">
                                 {t('prog_btn_reject', 'Từ chối')}

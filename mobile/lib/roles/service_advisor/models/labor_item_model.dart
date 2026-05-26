@@ -1,34 +1,34 @@
 class LaborItemModel {
-  final String id;
+  final String laborCode;
   final String category;
   final String name;
-  final double price;
+  final double basePrice;
   final double estimatedHours;
 
   const LaborItemModel({
-    required this.id,
+    required this.laborCode,
     required this.category,
     required this.name,
-    required this.price,
+    required this.basePrice,
     required this.estimatedHours,
   });
 
   factory LaborItemModel.fromJson(Map<String, dynamic> json) {
     return LaborItemModel(
-      id: json['id'] as String,
+      laborCode: json['labor_code'] as String? ?? json['id'] as String,
       category: json['category'] as String,
       name: json['name'] as String,
-      price: (json['price'] as num).toDouble(),
+      basePrice: (json['base_price'] ?? json['price'] as num).toDouble(),
       estimatedHours: (json['estimated_hours'] as num).toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'labor_code': laborCode,
       'category': category,
       'name': name,
-      'price': price,
+      'base_price': basePrice,
       'estimated_hours': estimatedHours,
     };
   }

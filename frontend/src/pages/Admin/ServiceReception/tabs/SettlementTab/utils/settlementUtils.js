@@ -4,7 +4,7 @@ export const calculateSettlement = (quotationData) => {
     const { parts = [], labors = [], vat_rate = 0.1, payment_terms = {} } = quotationData;
 
     const partsTotal = parts.reduce((sum, item) => sum + ((item.quantity || 0) * (item.unit_price || 0)), 0);
-    const laborsTotal = labors.reduce((sum, item) => sum + ((item.hours || 0) * (item.rate || 0)), 0);
+    const laborsTotal = labors.reduce((sum, item) => sum + ((item.quantity || 0) * (item.unit_price || 0)), 0);
 
     const subtotal = partsTotal + laborsTotal;
 

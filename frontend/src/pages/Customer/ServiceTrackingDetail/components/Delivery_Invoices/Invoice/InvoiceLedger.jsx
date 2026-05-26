@@ -49,10 +49,10 @@ const InvoiceLedger = ({ data }) => {
                         <tbody className="text-sm divide-y divide-slate-100 dark:divide-white/5">
                             {data.items.map((item) => (
                                 <tr key={item.id}>
-                                    <td className="py-6 font-mono text-xs text-slate-500 dark:text-[#a0a0a0]">{item.code}</td>
+                                    <td className="py-6 font-mono text-xs text-slate-500 dark:text-[#a0a0a0]">{item.sku || item.labor_code}</td>
                                     <td className="py-6 font-semibold text-slate-800 dark:text-white">{item.name}</td>
-                                    <td className="py-6 text-center font-medium text-slate-600 dark:text-slate-300">{item.qty}</td>
-                                    <td className="py-6 text-right font-bold text-slate-800 dark:text-white">{formatCurrency(item.total)}</td>
+                                    <td className="py-6 text-center font-medium text-slate-600 dark:text-slate-300">{item.quantity}</td>
+                                    <td className="py-6 text-right font-bold text-slate-800 dark:text-white">{formatCurrency(item.total_price)}</td>
                                 </tr>
                             ))}
                         </tbody>

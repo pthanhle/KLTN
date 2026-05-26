@@ -27,8 +27,8 @@ export const useRODetailLogic = () => {
                     const labors = quotation.labors || [];
                     const vat_rate = quotation.vat_rate || 0.1;
 
-                    const partItems = parts.map(p => ({ ...p, type: 'part', total_price: p.quantity * p.unit_price }));
-                    const laborItems = labors.map(l => ({ ...l, name: l.description, type: 'labor', quantity: l.hours, total_price: l.hours * l.rate }));
+                    const partItems = parts.map(p => ({ ...p, type: 'part', total_price: p.total_price || (p.quantity * p.unit_price) }));
+                    const laborItems = labors.map(l => ({ ...l, name: l.name, type: 'labor', quantity: l.quantity, total_price: l.total_price || (l.quantity * l.unit_price) }));
                     const items = [...partItems, ...laborItems];
 
                     const subtotal = items.reduce((sum, item) => sum + item.total_price, 0);

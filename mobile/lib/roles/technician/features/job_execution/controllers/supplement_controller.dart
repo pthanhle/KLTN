@@ -31,11 +31,12 @@ class SupplementController extends AsyncNotifier<SupplementRequestModel?> {
       await Future.delayed(const Duration(seconds: 1));
 
       final request = SupplementRequestModel(
-        orderId: orderId,
+        bookingCode: orderId,
         taskId: taskId,
-        description: description,
-        proposedSolution: proposedSolution,
-        evidenceUrls: evidenceUrls,
+        issueTitle: 'Phát sinh từ KTV',
+        technicianNote: description,
+        actionRequired: proposedSolution,
+        evidenceMediaUrls: evidenceUrls,
         status: 'PAUSED_FOR_SUPPLEMENT',
       );
 

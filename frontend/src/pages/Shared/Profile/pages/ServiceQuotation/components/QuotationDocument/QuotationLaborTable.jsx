@@ -11,33 +11,34 @@ export const QuotationLaborTable = ({ labors, formatCurrency, t }) => {
         },
         {
             title: t('quote_col_task', 'Nội dung công việc'),
-            dataIndex: 'description',
-            key: 'description',
+            dataIndex: 'name',
+            key: 'name',
             render: (text) => <span className="font-medium text-slate-900 dark:text-slate-100">{text}</span>,
         },
         {
-            title: t('quote_col_hours', 'Giờ Công'),
-            dataIndex: 'hours',
-            key: 'hours',
+            title: t('quote_col_qty', 'Giờ Công'),
+            dataIndex: 'quantity',
+            key: 'quantity',
             align: 'center',
             width: 100,
         },
         {
-            title: t('quote_col_rate', 'Đơn Giá / Giờ'),
-            dataIndex: 'rate',
-            key: 'rate',
+            title: t('quote_col_price', 'Đơn Giá / Giờ'),
+            dataIndex: 'unit_price',
+            key: 'unit_price',
             align: 'right',
             width: 150,
             render: (val) => formatCurrency(val),
         },
         {
             title: t('quote_col_total', 'Thành Tiền'),
-            key: 'total',
+            dataIndex: 'total_price',
+            key: 'total_price',
             align: 'right',
             width: 160,
-            render: (_, record) => (
+            render: (val) => (
                 <span className="font-semibold text-slate-700 dark:text-slate-200">
-                    {formatCurrency(record.hours * record.rate)}
+                    {formatCurrency(val)}
                 </span>
             ),
         },

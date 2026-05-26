@@ -8,13 +8,13 @@ export const InvoiceRow = ({ item }) => {
                 {item.name}
             </span>
             <span className="w-16 text-right text-slate-500 dark:text-slate-400 font-medium">
-                {item.qty}
+                {item.quantity}
             </span>
             <span className="w-28 text-right font-mono text-slate-700 dark:text-slate-300">
-                {formatCurrency(item.unitPrice)}
+                {formatCurrency(item.unit_price)}
             </span>
             <span className="w-32 text-right font-mono font-medium text-slate-900 dark:text-white">
-                {formatCurrency(item.total)}
+                {formatCurrency(item.total_price)}
             </span>
         </div>
     );

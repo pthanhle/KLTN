@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MpiCategoryModel {
 
- String get id; String get name; List<MpiItemModel> get items;
+ String get id;@JsonKey(name: 'title') String get name;@JsonKey(name: 'technician_note') String? get technicianNote; List<MpiItemModel> get items;
 /// Create a copy of MpiCategoryModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $MpiCategoryModelCopyWith<MpiCategoryModel> get copyWith => _$MpiCategoryModelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MpiCategoryModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.items, items));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MpiCategoryModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.technicianNote, technicianNote) || other.technicianNote == technicianNote)&&const DeepCollectionEquality().equals(other.items, items));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,const DeepCollectionEquality().hash(items));
+int get hashCode => Object.hash(runtimeType,id,name,technicianNote,const DeepCollectionEquality().hash(items));
 
 @override
 String toString() {
-  return 'MpiCategoryModel(id: $id, name: $name, items: $items)';
+  return 'MpiCategoryModel(id: $id, name: $name, technicianNote: $technicianNote, items: $items)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $MpiCategoryModelCopyWith<$Res>  {
   factory $MpiCategoryModelCopyWith(MpiCategoryModel value, $Res Function(MpiCategoryModel) _then) = _$MpiCategoryModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, List<MpiItemModel> items
+ String id,@JsonKey(name: 'title') String name,@JsonKey(name: 'technician_note') String? technicianNote, List<MpiItemModel> items
 });
 
 
@@ -65,11 +65,12 @@ class _$MpiCategoryModelCopyWithImpl<$Res>
 
 /// Create a copy of MpiCategoryModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? items = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? technicianNote = freezed,Object? items = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
+as String,technicianNote: freezed == technicianNote ? _self.technicianNote : technicianNote // ignore: cast_nullable_to_non_nullable
+as String?,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
 as List<MpiItemModel>,
   ));
 }
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  List<MpiItemModel> items)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'title')  String name, @JsonKey(name: 'technician_note')  String? technicianNote,  List<MpiItemModel> items)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MpiCategoryModel() when $default != null:
-return $default(_that.id,_that.name,_that.items);case _:
+return $default(_that.id,_that.name,_that.technicianNote,_that.items);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.id,_that.name,_that.items);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  List<MpiItemModel> items)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'title')  String name, @JsonKey(name: 'technician_note')  String? technicianNote,  List<MpiItemModel> items)  $default,) {final _that = this;
 switch (_that) {
 case _MpiCategoryModel():
-return $default(_that.id,_that.name,_that.items);case _:
+return $default(_that.id,_that.name,_that.technicianNote,_that.items);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.id,_that.name,_that.items);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  List<MpiItemModel> items)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'title')  String name, @JsonKey(name: 'technician_note')  String? technicianNote,  List<MpiItemModel> items)?  $default,) {final _that = this;
 switch (_that) {
 case _MpiCategoryModel() when $default != null:
-return $default(_that.id,_that.name,_that.items);case _:
+return $default(_that.id,_that.name,_that.technicianNote,_that.items);case _:
   return null;
 
 }
@@ -211,11 +212,12 @@ return $default(_that.id,_that.name,_that.items);case _:
 @JsonSerializable()
 
 class _MpiCategoryModel extends MpiCategoryModel {
-  const _MpiCategoryModel({required this.id, required this.name, required final  List<MpiItemModel> items}): _items = items,super._();
+  const _MpiCategoryModel({required this.id, @JsonKey(name: 'title') required this.name, @JsonKey(name: 'technician_note') this.technicianNote, required final  List<MpiItemModel> items}): _items = items,super._();
   factory _MpiCategoryModel.fromJson(Map<String, dynamic> json) => _$MpiCategoryModelFromJson(json);
 
 @override final  String id;
-@override final  String name;
+@override@JsonKey(name: 'title') final  String name;
+@override@JsonKey(name: 'technician_note') final  String? technicianNote;
  final  List<MpiItemModel> _items;
 @override List<MpiItemModel> get items {
   if (_items is EqualUnmodifiableListView) return _items;
@@ -237,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MpiCategoryModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other._items, _items));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MpiCategoryModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.technicianNote, technicianNote) || other.technicianNote == technicianNote)&&const DeepCollectionEquality().equals(other._items, _items));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,const DeepCollectionEquality().hash(_items));
+int get hashCode => Object.hash(runtimeType,id,name,technicianNote,const DeepCollectionEquality().hash(_items));
 
 @override
 String toString() {
-  return 'MpiCategoryModel(id: $id, name: $name, items: $items)';
+  return 'MpiCategoryModel(id: $id, name: $name, technicianNote: $technicianNote, items: $items)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$MpiCategoryModelCopyWith<$Res> implements $MpiCategoryMod
   factory _$MpiCategoryModelCopyWith(_MpiCategoryModel value, $Res Function(_MpiCategoryModel) _then) = __$MpiCategoryModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, List<MpiItemModel> items
+ String id,@JsonKey(name: 'title') String name,@JsonKey(name: 'technician_note') String? technicianNote, List<MpiItemModel> items
 });
 
 
@@ -274,11 +276,12 @@ class __$MpiCategoryModelCopyWithImpl<$Res>
 
 /// Create a copy of MpiCategoryModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? items = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? technicianNote = freezed,Object? items = null,}) {
   return _then(_MpiCategoryModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as String,technicianNote: freezed == technicianNote ? _self.technicianNote : technicianNote // ignore: cast_nullable_to_non_nullable
+as String?,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
 as List<MpiItemModel>,
   ));
 }

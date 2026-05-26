@@ -80,9 +80,9 @@ export const PrintableInvoice = ({ activeTerminalData }) => {
                     {invoiceItems.map(item => (
                         <tr key={item.id}>
                             <td className="py-2">{item.name}</td>
-                            <td className="text-right py-2">{item.qty}</td>
-                            <td className="text-right py-2">{formatCurrency(item.unitPrice)}</td>
-                            <td className="text-right py-2">{formatCurrency(item.total)}</td>
+                            <td className="text-right py-2">{item.quantity}</td>
+                            <td className="text-right py-2">{formatCurrency(item.unit_price)}</td>
+                            <td className="text-right py-2">{formatCurrency(item.total_price)}</td>
                         </tr>
                     ))}
                 </tbody>

@@ -8,22 +8,26 @@ class PartSearchState {
   final List<PartItemModel> items;
   final String searchQuery;
   final bool isLoading;
+  final void Function(PartItemModel, int, {String? expectedDate})? onAddOverride;
 
   const PartSearchState({
     this.items = const [],
     this.searchQuery = '',
     this.isLoading = false,
+    this.onAddOverride,
   });
 
   PartSearchState copyWith({
     List<PartItemModel>? items,
     String? searchQuery,
     bool? isLoading,
+    void Function(PartItemModel, int, {String? expectedDate})? onAddOverride,
   }) {
     return PartSearchState(
       items: items ?? this.items,
       searchQuery: searchQuery ?? this.searchQuery,
       isLoading: isLoading ?? this.isLoading,
+      onAddOverride: onAddOverride ?? this.onAddOverride,
     );
   }
 }
@@ -62,18 +66,29 @@ class PartSearchController extends Notifier<PartSearchState> {
   }
 
   void addPartToQuotation(PartItemModel part, int quantity, {String? expectedDate}) {
+    // If an override callback is set (e.g. from Supplement context), use it
+    if (state.onAddOverride != null) {
+      state.onAddOverride!(part, quantity, expectedDate: expectedDate);
+      return;
+    }
+    // Default: dispatch to quotation controller
     final quotationCtrl = ref.read(quotationControllerProvider.notifier);
     
     final cartItem = CartPartItem(
-      id: part.id,
+      sku: part.sku,
       name: part.name,
-      price: part.price,
+      unitPrice: part.price,
       quantity: quantity,
       isBackorder: part.availableStock == 0,
       expectedDate: expectedDate,
     );
 
     quotationCtrl.addPart(cartItem);
+  }
+
+  /// Called by Supplement page to redirect adds into supplementController
+  void setAddOverride(void Function(PartItemModel, int, {String? expectedDate})? fn) {
+    state = state.copyWith(onAddOverride: fn);
   }
 }
 

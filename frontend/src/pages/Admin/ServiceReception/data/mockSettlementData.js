@@ -2,9 +2,9 @@ export const MOCK_INVOICES = {
     'SRV-2026-X11A': {
         invoice_id: 'INV-2026-0001',
         status: 'PENDING',
-        items: [
-            { id: 'item_1', name: 'Sơn dặm cản trước', type: 'SERVICE', qty: 1, unitPrice: 800000, total: 800000 },
-            { id: 'item_2', name: 'Đánh bóng toàn xe', type: 'SERVICE', qty: 1, unitPrice: 1500000, total: 1500000 },
+        line_items: [
+            { id: 'item_1', name: 'Sơn dặm cản trước', type: 'SERVICE', quantity: 1, unit_price: 800000, total_price: 800000 },
+            { id: 'item_2', name: 'Đánh bóng toàn xe', type: 'SERVICE', quantity: 1, unit_price: 1500000, total_price: 1500000 },
         ],
         financials: {
             subtotal: 2300000,
@@ -17,10 +17,10 @@ export const MOCK_INVOICES = {
     'SRV-2026-R11': {
         invoice_id: 'INV-2026-0002',
         status: 'COMPLETED',
-        items: [
-            { id: 'item_1', name: 'Kiểm tra gầm', type: 'SERVICE', qty: 1, unitPrice: 300000, total: 300000 },
-            { id: 'item_2', name: 'Thay thế cao su càng A', type: 'PART', qty: 2, unitPrice: 850000, total: 1700000 },
-            { id: 'item_3', name: 'Công thợ thay thế', type: 'LABOR', qty: 1.5, unitPrice: 200000, total: 300000 },
+        line_items: [
+            { id: 'item_1', name: 'Kiểm tra gầm', type: 'SERVICE', quantity: 1, unit_price: 300000, total_price: 300000 },
+            { id: 'item_2', name: 'Thay thế cao su càng A', type: 'PART', sku: 'PT-BUSH-A', quantity: 2, unit_price: 850000, total_price: 1700000 },
+            { id: 'item_3', name: 'Công thợ thay thế', type: 'LABOR', labor_code: 'LB-REPLACE', quantity: 1.5, unit_price: 200000, total_price: 300000 },
         ],
         financials: {
             subtotal: 2300000,
@@ -33,26 +33,27 @@ export const MOCK_INVOICES = {
     'SRV-2026-B77P': {
         invoice_id: 'INV-2026-0003',
         status: 'PENDING',
-        items: [
-            { id: 'PT-BRK-01', name: 'Bộ má phanh gốm cường độ cao (Trước)', type: 'PART', qty: 1, unitPrice: 11000000, total: 11000000 },
-            { id: 'PT-BUSH-A', name: 'Bộ bọc cao su càng A', type: 'PART', qty: 2, unitPrice: 4500000, total: 9000000 },
-            { id: 'PT-OIL-0W40', name: 'Dầu hộp số tổng hợp cao cấp', type: 'PART', qty: 1, unitPrice: 2500000, total: 2500000 },
-            { id: 'LB-01', name: 'Công ép cao su càng A và cân chỉnh thước lái 3D', type: 'LABOR', qty: 2, unitPrice: 800000, total: 1600000 },
-            { id: 'LB-02', name: 'Công thay má phanh và chạy phần mềm Reset', type: 'LABOR', qty: 1, unitPrice: 900000, total: 900000 }
+        line_items: [
+            { id: 'item_1', name: 'Bộ má phanh gốm cường độ cao (Trước)', type: 'PART', sku: 'PT-BRK-01', quantity: 1, unit_price: 11000000, total_price: 11000000 },
+            { id: 'item_2', name: 'Bộ bọc cao su càng A', type: 'PART', sku: 'PT-BUSH-A', quantity: 2, unit_price: 4500000, total_price: 9000000 },
+            { id: 'item_3', name: 'Dầu hộp số tổng hợp cao cấp', type: 'PART', sku: 'PT-OIL-0W40', quantity: 1, unit_price: 2500000, total_price: 2500000 },
+            { id: 'item_4', name: 'Công ép cao su càng A và cân chỉnh thước lái 3D', type: 'LABOR', labor_code: 'LB-01', quantity: 2, unit_price: 800000, total_price: 1600000 },
+            { id: 'item_5', name: 'Công thay má phanh và chạy phần mềm Reset', type: 'LABOR', labor_code: 'LB-02', quantity: 1, unit_price: 900000, total_price: 900000 },
+            { id: 'item_6', name: 'Phát sinh: Cặp đĩa phanh tản nhiệt', type: 'PART', sku: 'PT-BRK-DSC', quantity: 1, unit_price: 15000000, total_price: 15000000 }
         ],
         financials: {
-            subtotal: 25000000,
+            subtotal: 40000000,
             vatRate: 10,
-            vat: 2500000,
+            vat: 4000000,
             deposit: 10000000,
-            finalBalance: 17500000
+            finalBalance: 34000000
         }
     },
     'SRV-2026-X99R': {
         invoice_id: 'INV-2026-0004',
         status: 'PENDING',
-        items: [
-            { id: 'item_1', name: 'Phủ Ceramic toàn xe', type: 'SERVICE', qty: 1, unitPrice: 15000000, total: 15000000 },
+        line_items: [
+            { id: 'item_1', name: 'Phủ Ceramic toàn xe', type: 'SERVICE', quantity: 1, unit_price: 15000000, total_price: 15000000 },
         ],
         financials: {
             subtotal: 15000000,
@@ -65,8 +66,8 @@ export const MOCK_INVOICES = {
     'SRV-2026-M01': {
         invoice_id: 'INV-2026-0005',
         status: 'COMPLETED',
-        items: [
-            { id: 'item_1', name: 'Bảo dưỡng cấp trung bình', type: 'SERVICE', qty: 1, unitPrice: 4500000, total: 4500000 },
+        line_items: [
+            { id: 'item_1', name: 'Bảo dưỡng cấp trung bình', type: 'SERVICE', quantity: 1, unit_price: 4500000, total_price: 4500000 },
         ],
         financials: {
             subtotal: 4500000,
@@ -79,8 +80,8 @@ export const MOCK_INVOICES = {
     'SRV-2026-M02': {
         invoice_id: 'INV-2026-0006',
         status: 'PENDING',
-        items: [
-            { id: 'item_1', name: 'Thay má phanh và cân chỉnh thước lái', type: 'SERVICE', qty: 1, unitPrice: 12500000, total: 12500000 },
+        line_items: [
+            { id: 'item_1', name: 'Thay má phanh và cân chỉnh thước lái', type: 'SERVICE', quantity: 1, unit_price: 12500000, total_price: 12500000 },
         ],
         financials: {
             subtotal: 12500000,

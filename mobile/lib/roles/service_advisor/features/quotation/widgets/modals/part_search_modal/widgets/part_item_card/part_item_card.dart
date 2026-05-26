@@ -26,6 +26,7 @@ class PartItemCard extends ConsumerStatefulWidget {
 class _PartItemCardState extends ConsumerState<PartItemCard> {
   int _quantity = 1;
   bool _isExpanded = false;
+  bool _added = false;
   DateTime? _expectedDate;
 
   void _onAdd() {
@@ -35,6 +36,10 @@ class _PartItemCardState extends ConsumerState<PartItemCard> {
           _quantity,
           expectedDate: _expectedDate?.toIso8601String(),
         );
+    setState(() => _added = true);
+    Future.delayed(const Duration(milliseconds: 900), () {
+      if (mounted) setState(() => _added = false);
+    });
     if (_isExpanded) setState(() => _isExpanded = false);
   }
 
@@ -118,7 +123,10 @@ class _PartItemCardState extends ConsumerState<PartItemCard> {
                                 setState(() => _quantity = val),
                           ),
                           const SizedBox(width: 10),
-                          PartItemAddButton(onTap: _onAdd),
+                          PartItemAddButton(
+                            onTap: _onAdd,
+                            isAdded: _added,
+                          ),
                         ],
                       ),
                       secondChild: PartItemBackorderButton(

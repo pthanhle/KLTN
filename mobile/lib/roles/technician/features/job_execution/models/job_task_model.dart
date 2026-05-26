@@ -27,6 +27,7 @@ abstract class JobTaskModel with _$JobTaskModel {
 
   const factory JobTaskModel({
     required String id,
+    @JsonKey(name: 'labor_code') required String laborCode,
     required String name,
     required String description,
     required JobTaskIcon icon,

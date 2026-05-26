@@ -31,10 +31,10 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   void updateExpectedDate(String partId, String date) {
     if (state.hasValue && state.value != null) {
       final updatedParts = state.value!.parts.map((p) {
-        if (p.id == partId) return CartPartItem(
-          id: p.id,
+        if (p.sku == partId) return CartPartItem(
+          sku: p.sku,
           name: p.name,
-          price: p.price,
+          unitPrice: p.unitPrice,
           quantity: p.quantity,
           isBackorder: p.isBackorder,
           expectedDate: date,
@@ -49,14 +49,14 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
     if (state.hasValue && state.value != null) {
       final currentParts = List<CartPartItem>.from(state.value!.parts);
       // Check if part already exists
-      final existingIndex = currentParts.indexWhere((p) => p.id == part.id);
+      final existingIndex = currentParts.indexWhere((p) => p.sku == part.sku);
       if (existingIndex >= 0) {
         // Update quantity
         final existing = currentParts[existingIndex];
         currentParts[existingIndex] = CartPartItem(
-          id: existing.id,
+          sku: existing.sku,
           name: existing.name,
-          price: existing.price,
+          unitPrice: existing.unitPrice,
           quantity: existing.quantity + part.quantity,
           isBackorder: existing.isBackorder,
           expectedDate: existing.expectedDate,
@@ -72,13 +72,13 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
     if (state.hasValue && state.value != null) {
       final currentLabor = List<CartLaborItem>.from(state.value!.labor);
       
-      final existingIndex = currentLabor.indexWhere((l) => l.id == labor.id);
+      final existingIndex = currentLabor.indexWhere((l) => l.laborCode == labor.laborCode);
       if (existingIndex < 0) {
         currentLabor.add(CartLaborItem(
-          id: labor.id,
+          laborCode: labor.laborCode,
           name: labor.name,
-          hours: labor.estimatedHours,
-          rate: labor.estimatedHours > 0 ? labor.price / labor.estimatedHours : 0,
+          quantity: labor.estimatedHours ?? 1.0,
+          unitPrice: (labor.estimatedHours ?? 1.0) > 0 ? labor.basePrice / (labor.estimatedHours ?? 1.0) : 0,
         ));
         state = AsyncData(state.value!.copyWith(labor: currentLabor));
       }

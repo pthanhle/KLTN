@@ -13,9 +13,9 @@ _MpiItemModel _$MpiItemModelFromJson(Map<String, dynamic> json) =>
       status:
           $enumDecodeNullable(_$MpiItemStatusEnumMap, json['status']) ??
           MpiItemStatus.unchecked,
-      note: json['note'] as String?,
+      note: json['action_required'] as String?,
       mediaUrls:
-          (json['mediaUrls'] as List<dynamic>?)
+          (json['evidence_media_urls'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],
@@ -26,13 +26,13 @@ Map<String, dynamic> _$MpiItemModelToJson(_MpiItemModel instance) =>
       'id': instance.id,
       'name': instance.name,
       'status': _$MpiItemStatusEnumMap[instance.status]!,
-      'note': instance.note,
-      'mediaUrls': instance.mediaUrls,
+      'action_required': instance.note,
+      'evidence_media_urls': instance.mediaUrls,
     };
 
 const _$MpiItemStatusEnumMap = {
   MpiItemStatus.unchecked: 'UNCHECKED',
-  MpiItemStatus.pass: 'PASS',
-  MpiItemStatus.monitor: 'MONITOR',
-  MpiItemStatus.fail: 'FAIL',
+  MpiItemStatus.pass: 'normal',
+  MpiItemStatus.monitor: 'warning',
+  MpiItemStatus.fail: 'critical',
 };

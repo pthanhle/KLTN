@@ -27,15 +27,15 @@ class WarehouseOrderItemModel {
 
   factory WarehouseOrderItemModel.fromJson(Map<String, dynamic> json) {
     return WarehouseOrderItemModel(
-      partId: json['part_id'] as String,
-      sku: json['sku'] as String,
-      name: json['name'] as String,
+      partId: json['part_id'] as String? ?? json['_id'] as String? ?? '',
+      sku: json['sku'] as String? ?? '',
+      name: json['name'] as String? ?? '',
       image: json['image'] as String?,
       properties: json['properties'] as String?,
-      quantity: json['quantity'] as int,
+      quantity: json['quantity'] as int? ?? 1,
       originalPrice: json['original_price'] != null ? (json['original_price'] as num).toDouble() : null,
-      unitPrice: (json['unit_price'] as num).toDouble(),
-      totalPrice: (json['total_price'] as num).toDouble(),
+      unitPrice: (json['unit_price'] as num?)?.toDouble() ?? 0.0,
+      totalPrice: (json['total_price'] as num?)?.toDouble() ?? 0.0,
       selectedOptions: json['selected_options'] as Map<String, dynamic>?,
     );
   }
@@ -116,27 +116,68 @@ class WarehouseOrderModel {
   }
 
   factory WarehouseOrderModel.fromJson(Map<String, dynamic> json) {
+    final delivery = json['delivery'] as Map<String, dynamic>? ?? {};
+    final shipping = json['shipping'] as Map<String, dynamic>? ?? {};
+    final itemsList = (json['items'] as List<dynamic>?) ?? [];
+
+    final rawStatus = (json['order_status'] ?? json['status'] ?? 'PENDING').toString().toUpperCase();
+    OrderStatus mappedStatus;
+    switch (rawStatus) {
+      case 'CONFIRMED':
+      case 'PROCESSING':
+        mappedStatus = OrderStatus.pendingPick;
+        break;
+      case 'PACKED':
+        mappedStatus = OrderStatus.pendingDelivery;
+        break;
+      case 'SHIPPING':
+        mappedStatus = OrderStatus.shipping;
+        break;
+      case 'COMPLETED':
+        mappedStatus = OrderStatus.completed;
+        break;
+      case 'CANCELLED':
+        mappedStatus = OrderStatus.cancelled;
+        break;
+      default:
+        mappedStatus = OrderStatus.pendingPick;
+    }
+
+    DateTime parsedDate;
+    final dateStr = json['order_date'] ?? json['created_at'] ?? '';
+    try {
+      if (dateStr.contains('/')) {
+        final parts = dateStr.split(' ')[0].split('/');
+        if (parts.length >= 3) {
+          parsedDate = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+        } else {
+          parsedDate = DateTime.now();
+        }
+      } else {
+        parsedDate = DateTime.parse(dateStr);
+      }
+    } catch (_) {
+      parsedDate = DateTime.now();
+    }
+
+    int calculatedTotalItems = 0;
+    for (var item in itemsList) {
+      calculatedTotalItems += (item['quantity'] as int?) ?? 1;
+    }
+
     return WarehouseOrderModel(
-      id: json['id'] as String,
-      code: json['code'] as String,
-      customerName: json['customer_name'] as String,
-      customerType: CustomerType.values.firstWhere((e) => e.name == json['customer_type']),
-      totalItems: json['total_items'] as int,
-      priority: OrderPriority.values.firstWhere(
-        (e) => e.toString() == 'OrderPriority.${json['priority']}',
-        orElse: () => OrderPriority.standard,
-      ),
-      status: OrderStatus.values.firstWhere(
-        (e) => e.toString() == 'OrderStatus.${json['status']}',
-        orElse: () => OrderStatus.pendingPick,
-      ),
-      createdAt: DateTime.parse(json['created_at'] as String),
-      shippingProvider: json['shipping_provider'] as String?,
-      trackingCode: json['tracking_code'] as String?,
-      assignedStaffId: json['assigned_staff_id'] as String?,
-      items: (json['items'] as List<dynamic>)
-          .map((e) => WarehouseOrderItemModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      id: json['order_code'] as String? ?? json['id'] as String? ?? '',
+      code: json['order_code'] as String? ?? json['code'] as String? ?? '',
+      customerName: delivery['receiver_name'] as String? ?? json['customer_name'] as String? ?? 'Khách hàng',
+      customerType: CustomerType.b2c,
+      totalItems: calculatedTotalItems > 0 ? calculatedTotalItems : (json['total_items'] as int? ?? 0),
+      priority: OrderPriority.standard,
+      status: mappedStatus,
+      createdAt: parsedDate,
+      shippingProvider: shipping['provider'] as String? ?? json['shipping_provider'] as String?,
+      trackingCode: shipping['tracking_code'] as String? ?? json['tracking_code'] as String?,
+      assignedStaffId: json['handled_by'] as String? ?? json['assigned_staff_id'] as String?,
+      items: itemsList.map((e) => WarehouseOrderItemModel.fromJson(e as Map<String, dynamic>)).toList(),
     );
   }
 

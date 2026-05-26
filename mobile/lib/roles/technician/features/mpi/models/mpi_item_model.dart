@@ -6,11 +6,11 @@ part 'mpi_item_model.g.dart';
 enum MpiItemStatus {
   @JsonValue('UNCHECKED')
   unchecked,
-  @JsonValue('PASS')
+  @JsonValue('normal')
   pass,
-  @JsonValue('MONITOR')
+  @JsonValue('warning')
   monitor,
-  @JsonValue('FAIL')
+  @JsonValue('critical')
   fail,
 }
 
@@ -22,8 +22,8 @@ abstract class MpiItemModel with _$MpiItemModel {
     required String id,
     required String name,
     @Default(MpiItemStatus.unchecked) MpiItemStatus status,
-    String? note,
-    @Default([]) List<String> mediaUrls,
+    @JsonKey(name: 'action_required') String? note,
+    @JsonKey(name: 'evidence_media_urls') @Default([]) List<String> mediaUrls,
   }) = _MpiItemModel;
 
   factory MpiItemModel.fromJson(Map<String, dynamic> json) =>

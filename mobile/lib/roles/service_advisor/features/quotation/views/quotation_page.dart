@@ -79,13 +79,11 @@ class QuotationPage extends ConsumerWidget {
                       const SizedBox(height: 24),
                       TechnicianDiagnosisSection(data: data),
                       const SizedBox(height: 32),
-                      ServiceCartSection(data: data),
+                      ServiceCartSection(),
                       const SizedBox(height: 32),
                       PromotionsSection(data: data),
                       const SizedBox(height: 32),
-                      // Inline summary + CTA — cuộn cùng content
                       QuotationSummaryCard(data: data),
-                      // Bottom safe area padding
                       const SizedBox(height: 32),
                     ],
                   ),

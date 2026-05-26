@@ -3,7 +3,7 @@ import { useOrderHistoryLogic } from './hooks/useOrderHistoryLogic';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const OrderHistory = () => {
-    const { t, TABS, activeTab, setActiveTab, filteredOrders, isLoading } = useOrderHistoryLogic();
+    const { t, TABS, activeTab, setActiveTab, filteredOrders, isLoading, handleCancelOrder, handleConfirmReceipt } = useOrderHistoryLogic();
 
     return (
         <section className="w-full">
@@ -57,7 +57,13 @@ const OrderHistory = () => {
                 ) : (
                     filteredOrders.length > 0 ? (
                         filteredOrders.map(order => (
-                            <OrderCard key={order.order_code} order={order} t={t} />
+                            <OrderCard 
+                                key={order.order_code} 
+                                order={order} 
+                                t={t} 
+                                handleCancelOrder={() => handleCancelOrder(order._id)}
+                                handleConfirmReceipt={() => handleConfirmReceipt(order._id)}
+                            />
                         ))
                     ) : (
                         <div className="py-20 text-center">

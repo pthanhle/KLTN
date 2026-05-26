@@ -23,11 +23,17 @@ export const useOrderSubmit = (t, setCurrentStep, mockPaymentMethods, mockShippi
         }
     }, [orderData]);
 
-    const handleCheckoutSubmit = (data, paymentMethod, shippingMethod, checkedItems, finalTotal, appliedVoucher = null) => {
+    const handleCheckoutSubmit = (data, paymentMethod, shippingMethod, checkedItems, finalTotal, appliedVoucher = null, shippingFee = 0, discount = 0) => {
+
+        const subtotal = checkedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
         const payloadInfo = {
             order_code: generateOrderId(),
             financials: {
+                subtotal,
+                shipping_fee: shippingFee,
+                discount,
+                vat: 0,
                 grand_total: finalTotal
             },
             payment: {

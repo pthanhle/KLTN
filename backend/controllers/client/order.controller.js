@@ -43,8 +43,8 @@ export const getMyOrders = asyncHandler(async (req, res) => {
 
 export const getOrderById = asyncHandler(async (req, res) => {
   const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id)
-  
-  const query = isObjectId 
+
+  const query = isObjectId
     ? { _id: req.params.id }
     : { order_code: req.params.id }
 
@@ -129,9 +129,10 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   const order_code_gen = generateOrderCode()
 
-  const final_total = financials?.grand_total && typeof financials.grand_total === 'number'
-    ? financials.grand_total
-    : computedSubtotal
+  // Always use server-computed subtotal as source of truth
+  const clientShippingFee = typeof financials?.shipping_fee === 'number' ? financials.shipping_fee : 0
+  const clientDiscount   = typeof financials?.discount === 'number' ? financials.discount : 0
+  const serverGrandTotal = computedSubtotal + clientShippingFee - clientDiscount
 
   const order = await Order.create({
     order_code: order_code_gen,
@@ -140,11 +141,11 @@ export const createOrder = asyncHandler(async (req, res) => {
     order_status: 'PENDING',
     cancel_reason: cancel_reason || null,
     financials: {
-      subtotal: financials?.subtotal || computedSubtotal,
-      shipping_fee: financials?.shipping_fee || 0,
-      discount: financials?.discount || 0,
+      subtotal: computedSubtotal,
+      shipping_fee: clientShippingFee,
+      discount: clientDiscount,
       vat: financials?.vat || 0,
-      grand_total: final_total
+      grand_total: serverGrandTotal
     },
     payment: {
       method: paymentValidation.normalizedMethod || payment.method,
@@ -242,7 +243,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
       const sortedParams = Object.keys(vnp_Params).sort().reduce((acc, key) => {
         acc[key] = encodeURIComponent(vnp_Params[key]).replace(/%20/g, '+')
-        return acc  
+        return acc
       }, {})
 
       const signData = Object.keys(sortedParams).map(key => key + '=' + sortedParams[key]).join('&')
@@ -276,12 +277,10 @@ export const createOrder = asyncHandler(async (req, res) => {
 
 
 export const cancelOrder = asyncHandler(async (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    res.status(400)
-    throw new Error('Order ID không hợp lệ')
-  }
+  const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id)
+  const query = isObjectId ? { _id: req.params.id } : { order_code: req.params.id }
 
-  const order = await Order.findById(req.params.id)
+  const order = await Order.findOne(query)
   if (!order) {
     res.status(404)
     throw new Error('Không tìm thấy đơn hàng')
@@ -328,6 +327,48 @@ export const cancelOrder = asyncHandler(async (req, res) => {
   }
 
   res.json({ message: 'Hủy đơn hàng thành công', order })
+})
+
+
+export const confirmReceipt = asyncHandler(async (req, res) => {
+  const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id)
+  const query = isObjectId ? { _id: req.params.id } : { order_code: req.params.id }
+
+  const order = await Order.findOne(query)
+  if (!order) {
+    res.status(404)
+    throw new Error('Không tìm thấy đơn hàng')
+  }
+
+  if (order.user_id.toString() !== req.user._id.toString()) {
+    res.status(403)
+    throw new Error('Không có quyền thao tác trên đơn hàng này')
+  }
+
+  if (!['DELIVERED', 'SHIPPING'].includes(order.order_status)) {
+    res.status(400)
+    throw new Error('Đơn hàng chưa được giao, không thể xác nhận nhận hàng')
+  }
+
+  order.order_status = 'COMPLETED'
+  if (order.payment && order.payment.status === 'UNPAID' && order.payment.method === 'COD') {
+    order.payment.status = 'PAID'
+  }
+  await order.save()
+
+  try {
+    await Notification.create({
+      user_id: req.user._id,
+      title: 'Đã nhận hàng',
+      message: `Cảm ơn bạn đã xác nhận nhận đơn hàng ${order.order_code}. Chúc bạn có trải nghiệm tuyệt vời!`,
+      type: 'ORDER',
+      link: `/profile/orders/${order.order_code}`,
+    })
+  } catch (error) {
+    console.error('Lỗi khi tạo notification:', error)
+  }
+
+  res.json({ message: 'Xác nhận nhận hàng thành công', order })
 })
 
 

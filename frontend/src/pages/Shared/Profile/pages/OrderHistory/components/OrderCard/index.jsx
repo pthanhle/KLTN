@@ -4,7 +4,7 @@ import { useOrderCard } from '../../hooks/useOrderCard';
 import OrderItemList from './OrderItemList';
 import { Link } from 'react-router-dom';
 
-const OrderCard = ({ order, t }) => {
+const OrderCard = ({ order, t, handleCancelOrder, handleConfirmReceipt }) => {
     const { statusConfig, formatCurrency, isPending, isShipping, isPaid, isUnpaid } = useOrderCard(order, t);
 
     return (
@@ -17,7 +17,9 @@ const OrderCard = ({ order, t }) => {
                     </span>
                     <p className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{order.order_code}</p>
                     <p className="text-sm text-slate-500 font-medium mt-1">
-                        {t('order_date_lbl', 'Ngày đặt')}: {order.order_date}
+                        {t('order_date_lbl', 'Ngày đặt')}: {order.order_date
+                            ? new Date(order.order_date).toLocaleDateString('vi-VN')
+                            : new Date(order.createdAt).toLocaleDateString('vi-VN')}
                     </p>
                 </div>
                 <Tag color={statusConfig.color} className="flex items-center px-3 py-1.5 rounded-full text-xs font-bold border-0 shadow-sm m-0">
@@ -52,6 +54,7 @@ const OrderCard = ({ order, t }) => {
                         <Tooltip title={t('order_btn_invoice', 'Xuất Hóa đơn VAT')}>
                             <Button
                                 type="text"
+                                onClick={() => window.open(order.invoice_url, '_blank')}
                                 className="!h-10 !w-10 !px-0 !rounded-full !text-slate-400 hover:!text-yellow-600 hover:!bg-yellow-50 dark:hover:!bg-yellow-500/10 transition-colors"
                             >
                                 <Download size={18} />
@@ -72,6 +75,7 @@ const OrderCard = ({ order, t }) => {
 
                     {isPending && (
                         <Button
+                            onClick={handleCancelOrder}
                             className="!h-10 !px-6 !rounded-full !border-slate-200 dark:!border-white/10 !text-sm !font-bold !text-slate-600 dark:!text-slate-300 hover:!bg-slate-50 hover:dark:!bg-white/5 transition-colors shadow-none"
                         >
                             {t('order_btn_cancel', 'Hủy đơn')}
@@ -91,13 +95,14 @@ const OrderCard = ({ order, t }) => {
                         >
                             {t('order_btn_pay', 'Thanh toán ngay')}
                         </Button>
-                    ) : (
+                    ) : (isShipping || order.order_status === 'DELIVERED') ? (
                         <Button
+                            onClick={handleConfirmReceipt}
                             className="!h-10 !px-6 !rounded-full !bg-slate-900 dark:!bg-white !text-white dark:!text-slate-900 !text-sm !font-bold hover:opacity-90 border-0 transition-colors shadow-none mx-[-2]"
                         >
-                            {t('order_btn_track', 'Theo dõi đơn')}
+                            {t('order_btn_confirm_receipt', 'Đã nhận hàng')}
                         </Button>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </div>

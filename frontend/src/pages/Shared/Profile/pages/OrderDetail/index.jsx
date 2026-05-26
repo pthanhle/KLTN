@@ -25,6 +25,7 @@ const OrderDetail = () => {
         handleCancelOrder,
         handleConfirmReceipt,
         handleReview,
+        handleReorder,
         isLoading
     } = useOrderDetailLogic(id);
 
@@ -49,7 +50,7 @@ const OrderDetail = () => {
                 <OrderStepper status={orderDetail.order_status} steps={steps} currentStepIndex={currentStepIndex} />
                 <OrderMetaInfo orderDetail={orderDetail} handleCopy={handleCopy} isCancelled={isCancelled} t={t} />
                 <OrderItemsList items={orderDetail.items} isCompleted={isCompleted} handleReview={handleReview} formatCurrency={formatCurrency} t={t} />
-                <OrderSummary financials={orderDetail.financials} isPending={isPending} isShipping={isShipping} handleCancelOrder={handleCancelOrder} handleConfirmReceipt={handleConfirmReceipt} formatCurrency={formatCurrency} t={t} />
+                <OrderSummary financials={orderDetail.financials} isPending={isPending} isShipping={isShipping} handleCancelOrder={handleCancelOrder} handleConfirmReceipt={handleConfirmReceipt} handleReorder={handleReorder} formatCurrency={formatCurrency} t={t} />
             </main>
         </div>
     );

@@ -1,12 +1,12 @@
 import { RefreshCw, PackageCheck, Ban } from 'lucide-react';
 import { Button } from 'antd';
 
-export const OrderSummary = ({ financials, isPending, isShipping, handleCancelOrder, handleConfirmReceipt, formatCurrency, t }) => {
+export const OrderSummary = ({ financials, isPending, isShipping, handleCancelOrder, handleConfirmReceipt, handleReorder, formatCurrency, t }) => {
     return (
         <section className="flex flex-col md:flex-row gap-8 items-start justify-between" data-purpose="footer-summary">
             {/* Re-order Actions */}
             <div className="w-full md:flex-grow flex flex-col sm:flex-row flex-wrap md:flex-col lg:flex-row items-stretch sm:items-start h-full pt-2 sm:pt-4 gap-4">
-                <Button className="w-full md:w-auto !h-auto !py-3.5 !px-8 !bg-yellow-500 !text-slate-900 !font-extrabold !rounded-2xl !shadow-[0_8px_20px_rgba(234,179,8,0.25)] hover:!bg-yellow-400 hover:!scale-[1.02] active:!scale-95 transition-all flex items-center justify-center gap-2 border-0">
+                <Button onClick={handleReorder} className="w-full md:w-auto !h-auto !py-3.5 !px-8 !bg-yellow-500 !text-slate-900 !font-extrabold !rounded-2xl !shadow-[0_8px_20px_rgba(234,179,8,0.25)] hover:!bg-yellow-400 hover:!scale-[1.02] active:!scale-95 transition-all flex items-center justify-center gap-2 border-0">
                     <RefreshCw className="w-5 h-5" /> 
                     {t('order_dtl_reorder', 'Mua lại Đơn Hàng này')}
                 </Button>

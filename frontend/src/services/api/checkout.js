@@ -26,13 +26,28 @@ export const CheckoutAPI = {
         return data || null;
     },
 
+    getMyOrders: async (params = {}) => {
+        const response = await axiosClient.get('/client/orders', { params });
+        return response;
+    },
+
     getOrderById: async (id) => {
         const data = await axiosClient.get(`/client/orders/${id}`);
-        return data?.order || data || null;
+        return data || null;
     },
 
     createVNPayPayment: async (orderId, amount) => {
         const data = await axiosClient.post('/client/payments/vnpay', { order_id: orderId, amount });
         return data || null;
+    },
+
+    cancelOrder: async (id) => {
+        const data = await axiosClient.put(`/client/orders/${id}/cancel`);
+        return data;
+    },
+
+    confirmReceipt: async (id) => {
+        const data = await axiosClient.put(`/client/orders/${id}/confirm-receipt`);
+        return data;
     }
 };

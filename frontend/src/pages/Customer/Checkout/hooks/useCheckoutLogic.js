@@ -132,7 +132,8 @@ export const useCheckoutLogic = () => {
             cart.checkedItems,
             finalTotal,
             appliedVoucher,
-            shippingFee
+            shippingFee,
+            discount
         );
     };
 

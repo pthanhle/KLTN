@@ -3,10 +3,12 @@ import StepIndicator from './components/Shared/StepIndicator';
 import CartStep from './components/CartStep';
 import PaymentStep from './components/PaymentStep';
 import SuccessStep from './components/SuccessStep';
+import FailedStep from './components/FailedStep';
 
 const CheckoutFlow = () => {
     const hookState = useCheckoutLogic();
     const { currentStep, t, isLoadingCart, cartItems } = hookState;
+    const isFailedPath = window.location.pathname.includes('/payment/failed');
 
     return (
         <div className="bg-[#f8fafc] dark:bg-[#0a0a0b] min-h-screen flex flex-col font-sans transition-colors">
@@ -17,10 +19,11 @@ const CheckoutFlow = () => {
                 {currentStep === 1 && <CartStep hookState={hookState} />}
                 {currentStep === 2 && <PaymentStep hookState={hookState} />}
 
-                {currentStep === 3 && <SuccessStep hookState={hookState} />}
+                {currentStep === 3 && !isFailedPath && <SuccessStep hookState={hookState} />}
+                {currentStep === 3 && isFailedPath && <FailedStep hookState={hookState} />}
             </main>
         </div>
     );
-};
+};  
 
 export default CheckoutFlow;

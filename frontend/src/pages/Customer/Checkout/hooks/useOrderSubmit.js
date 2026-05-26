@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { App } from 'antd';
-import { useSubmitOrder } from '../../../../services/queries/checkoutQueries';
+import { useSubmitOrder, useGetOrderById } from '../../../../services/queries/checkoutQueries';
 import { maskEmailAddress, generateOrderId } from '../utils/stringFormatter';
 import { CHECKOUT_STEPS } from '../constants/checkoutConfig';
 
@@ -8,6 +8,20 @@ export const useOrderSubmit = (t, setCurrentStep, mockPaymentMethods, mockShippi
     const [orderSuccessData, setOrderSuccessData] = useState(null);
     const submitMutation = useSubmitOrder();
     const { message } = App.useApp();
+
+    const orderIdParam = new URLSearchParams(window.location.search).get('order_id');
+    const isSuccessOrFailed = window.location.pathname.includes('/payment/success') || 
+                              window.location.pathname.includes('/payment/failed');
+
+    const { data: orderData, isLoading: isLoadingOrder } = useGetOrderById(
+        isSuccessOrFailed && orderIdParam ? orderIdParam : null
+    );
+
+    useEffect(() => {
+        if (orderData) {
+            setOrderSuccessData(orderData);
+        }
+    }, [orderData]);
 
     const handleCheckoutSubmit = (data, paymentMethod, shippingMethod, checkedItems, finalTotal, appliedVoucher = null) => {
 
@@ -80,7 +94,9 @@ export const useOrderSubmit = (t, setCurrentStep, mockPaymentMethods, mockShippi
     };
 
     return {
-        isLoading: submitMutation.isPending,
+        isLoading: submitMutation.isPending || isLoadingOrder,
+        isLoadingOrder,
+        isSuccessOrFailed,
         orderSuccessData,
         handleCheckoutSubmit,
         handleCopyOrderId

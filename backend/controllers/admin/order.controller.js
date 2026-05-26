@@ -33,6 +33,18 @@ export const getOrders = asyncHandler(async (req, res) => {
         ]
     }
 
+    const startDate = req.query.startDate
+    const endDate = req.query.endDate
+    if (startDate || endDate) {
+        query.createdAt = {}
+        if (startDate) query.createdAt.$gte = new Date(startDate)
+        if (endDate) {
+            const end = new Date(endDate)
+            end.setHours(23, 59, 59, 999)
+            query.createdAt.$lte = end
+        }
+    }
+
     const total = await Order.countDocuments(query)
     const orders = await Order.find(query)
         .populate('user_id', 'full_name email phone')

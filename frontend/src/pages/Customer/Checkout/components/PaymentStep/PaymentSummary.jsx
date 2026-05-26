@@ -7,6 +7,7 @@ const PaymentSummary = ({
     checkedItems,
     subtotal,
     discount = 0,
+    shippingFee = 0,
     appliedVoucher,
     removeVoucher,
     isLoading,
@@ -17,7 +18,6 @@ const PaymentSummary = ({
     onBack,
     t
 }) => {
-    const shippingFee = 0;
     const tax = subtotal * 0.1;
     const finalTotal = subtotal + shippingFee - discount + tax;
 
@@ -85,6 +85,7 @@ const PaymentSummary = ({
                         applyPromoCode={applyPromoCode}
                         isLoading={isValidatingVoucher}
                         t={t}
+                        subtotal={subtotal}
                         className="mb-5"
                     />
                 )}
@@ -98,7 +99,11 @@ const PaymentSummary = ({
                     </div>
                     <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">
                         <span>{t('summary_shipping')}</span>
-                        <span className="text-emerald-500 font-bold">{t('summary_shipping_free')}</span>
+                        {shippingFee === 0 ? (
+                            <span className="text-emerald-500 font-bold">{t('summary_shipping_free', 'Miễn phí')}</span>
+                        ) : (
+                            <span className="text-slate-900 dark:text-white font-bold">{formatVND(shippingFee)}</span>
+                        )}
                     </div>
                     {discount > 0 && (
                         <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">

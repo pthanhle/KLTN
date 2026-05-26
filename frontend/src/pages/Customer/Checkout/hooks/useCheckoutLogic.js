@@ -16,6 +16,10 @@ export const useCheckoutLogic = () => {
     const [searchParams] = useSearchParams();
 
     const [currentStep, setCurrentStep] = useState(() => {
+        const pathname = window.location.pathname;
+        if (pathname.includes('/payment/success') || pathname.includes('/payment/failed')) {
+            return CHECKOUT_STEPS.SUCCESS;
+        }
         const stepParam = searchParams.get('step');
         if (stepParam === 'payment' || stepParam === 'delivery') return CHECKOUT_STEPS.PAYMENT;
         return CHECKOUT_STEPS.CART;
@@ -67,7 +71,6 @@ export const useCheckoutLogic = () => {
             const response = await loyaltyApi.validateVoucherCode(code.trim().toUpperCase());
             const voucher = response.voucher || response;
 
-            // Kiểm tra đơn tối thiểu
             if (voucher.min_order_value > cart.subtotal) {
                 message.warning(
                     `Đơn hàng tối thiểu ${(voucher.min_order_value / 1000).toLocaleString()}k để sử dụng voucher này`
@@ -114,8 +117,13 @@ export const useCheckoutLogic = () => {
         window.scrollTo(0, 0);
     };
 
+    const shippingFee = useMemo(() => {
+        const method = formContext.mockShippingMethods.find(m => m.id === formContext.shippingMethod);
+        return method ? method.price : 0;
+    }, [formContext.shippingMethod, formContext.mockShippingMethods]);
+
     const handleCheckoutSubmitWrapper = (formData) => {
-        const finalTotal = calculateFinalTotal(cart.subtotal, 0, discount);
+        const finalTotal = calculateFinalTotal(cart.subtotal, shippingFee, discount);
 
         orderSubmit.handleCheckoutSubmit(
             formData,
@@ -123,7 +131,8 @@ export const useCheckoutLogic = () => {
             formContext.shippingMethod,
             cart.checkedItems,
             finalTotal,
-            appliedVoucher
+            appliedVoucher,
+            shippingFee
         );
     };
 
@@ -137,11 +146,11 @@ export const useCheckoutLogic = () => {
         ...orderSubmit,
         proceedToPayment,
         handleCheckoutSubmit: handleCheckoutSubmitWrapper,
-        // Voucher
         appliedVoucher,
         discount,
         applyPromoCode,
         removeVoucher,
         isValidatingVoucher,
+        shippingFee,
     };
 };

@@ -5,7 +5,8 @@ export const useToolbarFilter = () => {
     const [filterConfig, setFilterConfig] = useState({
         status: 'all',
         tier: 'all',
-        search: ''
+        search: '',
+        dateRange: null
     });
 
     const [filterOptions, setFilterOptions] = useState({

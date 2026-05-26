@@ -42,12 +42,13 @@ export const getMyOrders = asyncHandler(async (req, res) => {
 })
 
 export const getOrderById = asyncHandler(async (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    res.status(400)
-    throw new Error('Order ID không hợp lệ')
-  }
+  const isObjectId = mongoose.Types.ObjectId.isValid(req.params.id)
+  
+  const query = isObjectId 
+    ? { _id: req.params.id }
+    : { order_code: req.params.id }
 
-  const order = await Order.findById(req.params.id).lean()
+  const order = await Order.findOne(query).lean()
   if (!order) {
     res.status(404)
     throw new Error('Không tìm thấy đơn hàng')
@@ -217,13 +218,21 @@ export const createOrder = asyncHandler(async (req, res) => {
       const createDate = moment.default().format('YYYYMMDDHHmmss')
       const validAmount = Math.floor(Number(final_total))
 
+      const Payment = (await import('../../models/paymentModel.js')).default
+      const paymentDoc = await Payment.create({
+        order_id: order._id,
+        amount: validAmount,
+        method: paymentValidation.normalizedMethod || 'vnpay',
+        status: 'pending',
+      })
+
       let vnp_Params = {}
       vnp_Params['vnp_Version'] = '2.1.0'
       vnp_Params['vnp_Command'] = 'pay'
       vnp_Params['vnp_TmnCode'] = vnpayConfig.vnp_TmnCode
       vnp_Params['vnp_Locale'] = 'vn'
       vnp_Params['vnp_CurrCode'] = 'VND'
-      vnp_Params['vnp_TxnRef'] = order._id.toString()
+      vnp_Params['vnp_TxnRef'] = paymentDoc._id.toString()
       vnp_Params['vnp_OrderInfo'] = `Thanh toan don hang ${order.order_code}`
       vnp_Params['vnp_OrderType'] = 'other'
       vnp_Params['vnp_Amount'] = validAmount * 100
@@ -231,19 +240,18 @@ export const createOrder = asyncHandler(async (req, res) => {
       vnp_Params['vnp_IpAddr'] = ipAddr
       vnp_Params['vnp_CreateDate'] = createDate
 
-      // Sort params
       const sortedParams = Object.keys(vnp_Params).sort().reduce((acc, key) => {
         acc[key] = encodeURIComponent(vnp_Params[key]).replace(/%20/g, '+')
-        return acc
+        return acc  
       }, {})
 
-      const signData = new URLSearchParams(sortedParams).toString()
-      const hmac = crypto.default.createHmac('sha512', vnpayConfig.vnp_HashSecret)
+      const signData = Object.keys(sortedParams).map(key => key + '=' + sortedParams[key]).join('&')
+      const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
       const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
 
       sortedParams['vnp_SecureHash'] = signed
 
-      const paymentUrl = vnpayConfig.vnp_Url + '?' + new URLSearchParams(sortedParams).toString()
+      const paymentUrl = vnpayConfig.vnp_Url + '?' + Object.keys(sortedParams).map(key => key + '=' + sortedParams[key]).join('&')
 
       console.log(`VNPay URL generated successfully for order ${order.order_code}, payment method: ${payment.method}`)
 

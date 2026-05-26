@@ -1,22 +1,11 @@
-import { useState, useEffect } from 'react';
-import { mockOrders } from '../../OrderHistory/data/mockOrderData';
 import { useTranslation } from 'react-i18next';
 import { ClipboardList, ShieldCheck, Truck, Package } from 'lucide-react';
+import { useGetOrderById } from '@/services/queries/checkoutQueries';
 
 export const useOrderDetailLogic = (orderId) => {
     const { t } = useTranslation('profile');
-    const [orderDetail, setOrderDetail] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-            const foundOrder = mockOrders.find(o => o.order_code === orderId);
-            setOrderDetail(foundOrder || null);
-            setIsLoading(false);
-        }, 600);
-        return () => clearTimeout(timer);
-    }, [orderId]);
+    const { data: orderDetail, isLoading } = useGetOrderById(orderId);
 
     const formatCurrency = (amount) => {
         if (!amount) return '0 đ';

@@ -1,5 +1,7 @@
 import React from 'react';
-import { Select } from 'antd';
+import { Select, DatePicker } from 'antd';
+
+const { RangePicker } = DatePicker;
 
 export const FilterSelects = ({ t, filterConfig, filterOptions, onFilterChange }) => {
     
@@ -22,6 +24,15 @@ export const FilterSelects = ({ t, filterConfig, filterOptions, onFilterChange }
 
     return (
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            <RangePicker 
+                value={filterConfig.dateRange}
+                onChange={(dates) => onFilterChange('dateRange', dates)}
+                className="w-full sm:w-64 styled-custom-select py-1.5"
+                popupClassName="dark:bg-[#141416] dark:text-white"
+                format="DD/MM/YYYY"
+                placeholder={[t('adminCustomers:fromDate', 'Từ ngày'), t('adminCustomers:toDate', 'Đến ngày')]}
+            />
+
             <Select 
                 value={filterConfig.status}
                 onChange={(value) => onFilterChange('status', value)}

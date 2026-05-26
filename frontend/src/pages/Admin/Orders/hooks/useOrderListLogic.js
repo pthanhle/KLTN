@@ -35,6 +35,14 @@ export const useOrderListLogic = () => {
                 params.search = filterState.searchText;
             }
 
+            if (filterState.filterDateRange?.[0]) {
+                params.startDate = filterState.filterDateRange[0].toISOString();
+            }
+
+            if (filterState.filterDateRange?.[1]) {
+                params.endDate = filterState.filterDateRange[1].toISOString();
+            }
+
             const response = await adminOrderApi.getOrders(params);
             setData(response.orders || []);
             setTotal(response.pagination?.total || 0);
@@ -52,6 +60,7 @@ export const useOrderListLogic = () => {
         filterState.filterStatus,
         filterState.filterPayment,
         filterState.searchText,
+        filterState.filterDateRange,
         t
     ]);
 
@@ -74,6 +83,11 @@ export const useOrderListLogic = () => {
         paginationState.resetPage();
     };
 
+    const handleDateRangeChange = (dates) => {
+        filterState.setFilterDateRange(dates);
+        paginationState.resetPage();
+    };
+
     return {
         t,
         loading,
@@ -84,6 +98,8 @@ export const useOrderListLogic = () => {
         handlePaymentChange,
         searchText: filterState.searchText,
         handleSearch,
+        filterDateRange: filterState.filterDateRange,
+        handleDateRangeChange,
 
         handleTableChange: paginationState.handleTableChange,
         pagination: {

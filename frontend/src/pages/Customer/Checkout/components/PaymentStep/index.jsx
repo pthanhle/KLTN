@@ -24,6 +24,7 @@ const PaymentStep = ({ hookState }) => {
                 <PaymentSummary
                     checkedItems={checkedItems}
                     subtotal={subtotal}
+                    shippingFee={hookState.shippingFee}
                     discount={discount}
                     appliedVoucher={appliedVoucher}
                     removeVoucher={removeVoucher}

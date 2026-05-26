@@ -1,4 +1,5 @@
 import asyncHandler from 'express-async-handler'
+import mongoose from 'mongoose'
 import Payment from '../../models/paymentModel.js'
 import Order from '../../models/orderModel.js'
 import { vnpayConfig } from '../../config/vnpayConfig.js'
@@ -10,7 +11,6 @@ import moment from 'moment'
 export const createVNPayPayment = asyncHandler(async (req, res) => {
   const { order_id, amount } = req.body
 
-  // Log incoming payment request
   console.log(`VNPay payment request received:`, {
     orderId: order_id,
     amount: amount,
@@ -39,10 +39,8 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
       throw new Error('Số tiền phải từ 5,000đ đến dưới 1 tỷ đồng')
     }
 
-    // Use normalized payment method for consistency
     const paymentValidation = validatePaymentMethodDetailed('vnpay')
 
-    // Log payment method validation results
     console.log(`Payment method validation for VNPay:`, {
       originalMethod: 'vnpay',
       isValid: paymentValidation.isValid,
@@ -81,7 +79,6 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
 
     const createDate = moment().format('YYYYMMDDHHmmss')
 
-    // Validate VNPay configuration
     if (!vnpayConfig.vnp_TmnCode || !vnpayConfig.vnp_HashSecret || !vnpayConfig.vnp_Url) {
       console.error(`VNPay payment failed: Missing VNPay configuration`, {
         orderId: order_id,
@@ -91,7 +88,6 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
         hasUrl: !!vnpayConfig.vnp_Url
       })
 
-      // Update payment status to failed
       payment.status = 'failed'
       await payment.save()
 
@@ -115,21 +111,19 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
 
     vnp_Params = sortObject(vnp_Params)
 
-    const signData = new URLSearchParams(vnp_Params).toString()
+    const signData = Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
 
     try {
       const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
       const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
       vnp_Params['vnp_SecureHash'] = signed
 
-      const paymentUrl = vnpayConfig.vnp_Url + '?' + new URLSearchParams(vnp_Params).toString()
+      const paymentUrl = vnpayConfig.vnp_Url + '?' + Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
 
-      // Validate generated URL
       if (!paymentUrl || paymentUrl.length < 100) {
         throw new Error('Generated VNPay URL is invalid')
       }
 
-      // Log VNPay URL generation success
       console.log(`VNPay payment URL created successfully for order ${order_id}`, {
         paymentId: payment._id,
         orderId: order._id,
@@ -154,7 +148,6 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
         signData: signData
       })
 
-      // Update payment status to failed
       payment.status = 'failed'
       await payment.save()
 
@@ -163,7 +156,6 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
     }
 
   } catch (error) {
-    // Enhanced error logging for VNPay-specific issues
     console.error(`VNPay payment creation failed:`, {
       orderId: order_id,
       amount: amount,
@@ -172,7 +164,6 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
       timestamp: new Date().toISOString()
     })
 
-    // If it's a validation error, provide specific guidance
     if (error.message.includes('Không tìm thấy đơn hàng')) {
       res.status(404).json({
         success: false,
@@ -213,7 +204,6 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
       return
     }
 
-    // Generic error response
     res.status(500).json({
       success: false,
       message: 'Có lỗi xảy ra khi tạo thanh toán VNPay.',
@@ -227,96 +217,135 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
 export const vnpayReturn = asyncHandler(async (req, res) => {
   const frontendUrl = process.env.CLIENT_URL || 'http://localhost:3000'
 
-  // Log VNPay return callback
   console.log(`VNPay return callback received:`, {
     queryParams: req.query,
     timestamp: new Date().toISOString(),
     userAgent: req.headers['user-agent'],
     referer: req.headers['referer']
   })
+  
+  import('fs').then(fs => {
+    fs.appendFileSync('vnpay_debug.log', JSON.stringify({
+      time: new Date().toISOString(),
+      event: 'vnpayReturn',
+      query: req.query
+    }) + '\n');
+  }).catch(console.error);
 
-  let vnp_Params = req.query
-  const secureHash = vnp_Params['vnp_SecureHash']
+  try {
+    let vnp_Params = { ...req.query }
+    const secureHash = vnp_Params['vnp_SecureHash']
+    const paymentId = vnp_Params['vnp_TxnRef']
+    const rspCode = vnp_Params['vnp_ResponseCode']
+    const transactionNo = vnp_Params['vnp_TransactionNo']
+    const vnpAmount = vnp_Params['vnp_Amount']
 
-  delete vnp_Params['vnp_SecureHash']
-  delete vnp_Params['vnp_SecureHashType']
+    delete vnp_Params['vnp_SecureHash']
+    delete vnp_Params['vnp_SecureHashType']
 
-  vnp_Params = sortObject(vnp_Params)
+    vnp_Params = sortObject(vnp_Params)
 
-  const signData = new URLSearchParams(vnp_Params).toString()
+    const signData = Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
 
-  const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
-  const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
+    const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
 
-  if (secureHash !== signed) {
-    console.error('VNPay return: Invalid signature', {
-      expectedSignature: signed,
-      receivedSignature: secureHash,
-      signData: signData,
-      params: vnp_Params
-    })
-    return res.redirect(`${frontendUrl}/payment/failed?reason=invalid_signature`)
-  }
+    import('fs').then(fs => {
+      fs.appendFileSync('vnpay_debug.log', JSON.stringify({
+        event: 'vnpayReturn_signature',
+        signData,
+        expectedHash: secureHash,
+        actualHash: signed
+      }) + '\n');
+    }).catch(console.error);
 
-  const paymentId = vnp_Params['vnp_TxnRef']
-  const rspCode = vnp_Params['vnp_ResponseCode']
-
-  console.log(`VNPay return processing:`, {
-    paymentId: paymentId,
-    responseCode: rspCode,
-    transactionNo: vnp_Params['vnp_TransactionNo'],
-    amount: vnp_Params['vnp_Amount']
-  })
-
-  const payment = await Payment.findById(paymentId)
-  if (!payment) {
-    console.error(`VNPay return: Payment not found for ID ${paymentId}`, {
-      paymentId: paymentId,
-      responseCode: rspCode
-    })
-    return res.redirect(`${frontendUrl}/payment/failed?reason=payment_not_found`)
-  }
-
-  const order = await Order.findById(payment.order_id)
-
-  if (rspCode === '00') {
-    payment.status = 'completed'
-    payment.transaction_id = vnp_Params['vnp_TransactionNo']
-    await payment.save()
-
-    if (order) {
-      order.status = 'processing'
-      // Use normalized payment method
-      const paymentValidation = validatePaymentMethodDetailed('vnpay')
-      order.payment_method = paymentValidation.normalizedMethod
-      await order.save()
+    if (secureHash !== signed) {
+      console.error('VNPay return: Invalid signature', {
+        expectedSignature: signed,
+        receivedSignature: secureHash,
+        signData: signData
+      })
+      return res.redirect(`${frontendUrl}/payment/failed?reason=invalid_signature`)
     }
 
-    console.log(`VNPay payment completed successfully for order ${order?._id}`, {
-      paymentId: payment._id,
-      orderId: order?._id,
-      transactionId: vnp_Params['vnp_TransactionNo'],
-      amount: vnp_Params['vnp_Amount'],
-      paymentMethod: order?.payment_method
+    console.log(`VNPay return processing:`, {
+      paymentId, responseCode: rspCode, transactionNo, amount: vnpAmount
     })
 
-    return res.redirect(
-      `${frontendUrl}/payment/success?order_id=${order?._id}&payment_id=${payment._id}`
-    )
-  } else {
-    payment.status = 'failed'
-    await payment.save()
+    let payment = null
+    let order = null
 
-    console.error(`VNPay payment failed for order ${order?._id}`, {
-      paymentId: payment._id,
-      orderId: order?._id,
-      responseCode: rspCode,
-      errorMessage: getVNPayErrorMessage(rspCode)
-    })
+    if (mongoose.Types.ObjectId.isValid(paymentId)) {
+      payment = await Payment.findById(paymentId)
+    }
 
-    return res.redirect(
-      `${frontendUrl}/payment/failed?reason=payment_failed&code=${rspCode}`
-    )
+    if (payment) {
+      order = await Order.findById(payment.order_id)
+    } else {
+      if (mongoose.Types.ObjectId.isValid(paymentId)) {
+        order = await Order.findById(paymentId)
+        if (order) {
+          payment = await Payment.findOne({ order_id: order._id })
+          if (!payment) {
+            payment = await Payment.create({
+              order_id: order._id,
+              amount: order.financials?.grand_total || 0,
+              method: 'vnpay',
+              status: 'pending',
+            })
+          }
+        }
+      }
+    }
+
+    if (!payment || !order) {
+      console.error(`VNPay return: Payment/Order not found`, {
+        paymentId, rspCode, paymentFound: !!payment, orderFound: !!order
+      })
+      return res.redirect(`${frontendUrl}/payment/failed?reason=payment_not_found&order_id=${paymentId}`)
+    }
+
+    if (rspCode === '00') {
+      payment.status = 'completed'
+      await payment.save()
+
+      order.order_status = 'CONFIRMED'
+      if (!order.payment) order.payment = {}
+      order.payment.status = 'PAID'
+      order.payment.transaction_id = transactionNo || ''
+      const paymentValidation = validatePaymentMethodDetailed('vnpay')
+      order.payment.method = paymentValidation.normalizedMethod
+      order.payment.method_name = paymentValidation.displayName
+      await order.save()
+
+      console.log(`VNPay payment completed successfully`, {
+        paymentId: payment._id,
+        orderId: order._id,
+        orderCode: order.order_code,
+        transactionNo, amount: vnpAmount
+      })
+
+      return res.redirect(
+        `${frontendUrl}/payment/success?order_id=${order._id}&payment_id=${payment._id}`
+      )
+    } else {
+      payment.status = 'failed'
+      await payment.save()
+
+      console.error(`VNPay payment failed`, {
+        paymentId: payment._id,
+        orderId: order._id,
+        responseCode: rspCode,
+        errorMessage: getVNPayErrorMessage(rspCode)
+      })
+
+      return res.redirect(
+        `${frontendUrl}/payment/failed?reason=payment_failed&code=${rspCode}&order_id=${order._id}`
+      )
+    }
+  } catch (error) {
+    console.error('VNPay return handler error:', error)
+    return res.redirect(`${frontendUrl}/payment/failed?reason=server_error`)
   }
 })
 

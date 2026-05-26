@@ -53,11 +53,26 @@ export const getCustomers = asyncHandler(async (req, res) => {
 
     const query = {
         role_id: { $in: await getCustomerRoleIds() },
-        $or: [
+    }
+
+    if (search) {
+        query.$or = [
             { full_name: { $regex: search, $options: 'i' } },
             { email: { $regex: search, $options: 'i' } },
             { phone: { $regex: search, $options: 'i' } },
-        ],
+        ]
+    }
+
+    const startDate = req.query.startDate
+    const endDate = req.query.endDate
+    if (startDate || endDate) {
+        query.createdAt = {}
+        if (startDate) query.createdAt.$gte = new Date(startDate)
+        if (endDate) {
+            const end = new Date(endDate)
+            end.setHours(23, 59, 59, 999)
+            query.createdAt.$lte = end
+        }
     }
 
     const total = await User.countDocuments(query)

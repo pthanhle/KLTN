@@ -24,5 +24,15 @@ export const CheckoutAPI = {
     getUserProfile: async () => {
         const data = await axiosClient.get('/client/profile');
         return data || null;
+    },
+
+    getOrderById: async (id) => {
+        const data = await axiosClient.get(`/client/orders/${id}`);
+        return data?.order || data || null;
+    },
+
+    createVNPayPayment: async (orderId, amount) => {
+        const data = await axiosClient.post('/client/payments/vnpay', { order_id: orderId, amount });
+        return data || null;
     }
 };

@@ -24,8 +24,10 @@ export const isVNPayMethod = (method) => {
   }
 
   // Supported VNPay identifiers (case-insensitive)
+  // Supported VNPay identifiers (case-insensitive)
   // Includes 'VNPAY', 'vnpay', and 'e_wallet' for backward compatibility
-  const vnpayMethods = ['vnpay', 'e_wallet']
+  // Added 'credit_card' and 'bank_transfer' to redirect to VNPay Sandbox
+  const vnpayMethods = ['vnpay', 'e_wallet', 'credit_card', 'bank_transfer']
   const normalizedMethod = method.toLowerCase()
 
   return vnpayMethods.includes(normalizedMethod)
@@ -135,7 +137,6 @@ export const validatePaymentMethodDetailed = (method) => {
   return result
 }
 
-// Default export for backward compatibility
 export default {
   isVNPayMethod,
   isValidPaymentMethod,

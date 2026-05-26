@@ -47,3 +47,13 @@ export const useGetCheckoutProfile = (options = {}) => {
         ...options
     });
 };
+
+export const useGetOrderById = (id, options = {}) => {
+    return useQuery({
+        queryKey: ['order', id],
+        queryFn: () => CheckoutAPI.getOrderById(id),
+        enabled: !!id,
+        staleTime: 5 * 60 * 1000,
+        ...options
+    });
+};

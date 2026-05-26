@@ -5,6 +5,7 @@ export const useOrderFilters = () => {
     const [filterStatus, setFilterStatus] = useState(FILTER_DEFAULT_VALUE);
     const [filterPayment, setFilterPayment] = useState(FILTER_DEFAULT_VALUE);
     const [searchText, setSearchText] = useState('');
+    const [filterDateRange, setFilterDateRange] = useState(null);
 
     return {
         filterStatus,
@@ -12,6 +13,8 @@ export const useOrderFilters = () => {
         filterPayment,
         setFilterPayment,
         searchText,
-        setSearchText
+        setSearchText,
+        filterDateRange,
+        setFilterDateRange
     };
 };

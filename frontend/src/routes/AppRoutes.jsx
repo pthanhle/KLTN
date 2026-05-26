@@ -109,6 +109,8 @@ const AppRoutes = () => {
                         <Route path="/profile/notifications" element={<ProfilePage />} />
                         <Route path="/profile/loyalty" element={<ProfilePage />} />
                         <Route path="/cart" element={<CheckoutFlow />} />
+                        <Route path="/payment/success" element={<CheckoutFlow />} />
+                        <Route path="/payment/failed" element={<CheckoutFlow />} />
                         <Route path="/wishlist" element={<WishlistPage />} />
                     </Route>
                 </Route>

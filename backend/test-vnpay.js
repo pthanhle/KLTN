@@ -41,12 +41,10 @@ function testVNPayURLGeneration() {
 
   console.log('VNPay parameters before sorting:', vnp_Params)
 
-  // Sort parameters
   vnp_Params = sortObject(vnp_Params)
   console.log('VNPay parameters after sorting:', vnp_Params)
 
-  // Generate signature
-  const signData = new URLSearchParams(vnp_Params).toString()
+  const signData = Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
   console.log('Sign data:', signData)
 
   const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
@@ -55,8 +53,7 @@ function testVNPayURLGeneration() {
 
   vnp_Params['vnp_SecureHash'] = signed
 
-  // Generate final URL
-  const paymentUrl = vnpayConfig.vnp_Url + '?' + new URLSearchParams(vnp_Params).toString()
+  const paymentUrl = vnpayConfig.vnp_Url + '?' + Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
 
   console.log('=== Test Results ===')
   console.log('Payment method is valid:', paymentValidation.isValid)
@@ -66,7 +63,6 @@ function testVNPayURLGeneration() {
   console.log('Generated VNPay URL length:', paymentUrl.length)
   console.log('VNPay URL:', paymentUrl)
 
-  // Validate URL structure
   const url = new URL(paymentUrl)
   const params = new URLSearchParams(url.search)
 

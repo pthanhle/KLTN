@@ -18,7 +18,7 @@ export const useCustomers = () => {
     const [stats, setStats] = useState({});
     const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const [filters, setFilters] = useState({ search: '', status: 'all', tier: 'all' });
+    const [filters, setFilters] = useState({ search: '', status: 'all', tier: 'all', dateRange: null });
     const [refetchTrigger, setRefetchTrigger] = useState(0);
 
     const searchTimerRef = useRef(null);
@@ -32,6 +32,8 @@ export const useCustomers = () => {
                 ...(currentFilters.search && { search: currentFilters.search }),
                 ...(currentFilters.status !== 'all' && { status: currentFilters.status }),
                 ...(currentFilters.tier !== 'all' && { tier: currentFilters.tier }),
+                ...(currentFilters.dateRange?.[0] && { startDate: currentFilters.dateRange[0].toISOString() }),
+                ...(currentFilters.dateRange?.[1] && { endDate: currentFilters.dateRange[1].toISOString() }),
             };
             const response = await adminCustomerApi.getCustomers(params);
             const resData = response?.data || response;

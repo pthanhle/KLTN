@@ -46,7 +46,7 @@ const OrderDetail = () => {
         <div className="w-full flex-col flex animate-fadeIn transition-colors mb-20">
             <main className="w-full max-w-5xl mx-auto space-y-6">
                 <OrderHeader orderDetail={orderDetail} t={t} />
-                <OrderStepper status={orderDetail.status} steps={steps} currentStepIndex={currentStepIndex} />
+                <OrderStepper status={orderDetail.order_status} steps={steps} currentStepIndex={currentStepIndex} />
                 <OrderMetaInfo orderDetail={orderDetail} handleCopy={handleCopy} isCancelled={isCancelled} t={t} />
                 <OrderItemsList items={orderDetail.items} isCompleted={isCompleted} handleReview={handleReview} formatCurrency={formatCurrency} t={t} />
                 <OrderSummary financials={orderDetail.financials} isPending={isPending} isShipping={isShipping} handleCancelOrder={handleCancelOrder} handleConfirmReceipt={handleConfirmReceipt} formatCurrency={formatCurrency} t={t} />

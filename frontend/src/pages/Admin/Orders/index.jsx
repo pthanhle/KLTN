@@ -21,7 +21,9 @@ const AdminOrdersPageContent = () => {
         badges,
         pagination,
         handleTableChange,
-        loading
+        loading,
+        filterDateRange,
+        handleDateRangeChange
     } = useOrderListLogic();
 
     const columns = getOrderColumns(t);
@@ -49,6 +51,8 @@ const AdminOrdersPageContent = () => {
                     setFilterStatus={handleStatusChange}
                     filterPayment={filterPayment}
                     setFilterPayment={handlePaymentChange}
+                    filterDateRange={filterDateRange}
+                    setFilterDateRange={handleDateRangeChange}
                     t={t}
                 />
 

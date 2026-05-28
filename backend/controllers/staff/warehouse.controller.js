@@ -1,6 +1,6 @@
 import asyncHandler from 'express-async-handler'
-import RepairProgress from '../../../models/repairprogressModel.js'
-import Part from '../../../models/partModel.js'
+import RepairProgress from '../../models/repairprogressModel.js'
+import Part from '../../models/partModel.js'
 
 export const getPickLists = asyncHandler(async (req, res) => {
     const progresses = await RepairProgress.find({

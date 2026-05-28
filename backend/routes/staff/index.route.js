@@ -10,9 +10,11 @@ import serviceAppointmentRoutes from './service/appointment.route.js'
 import serviceRepairRoutes from './service/repair.route.js'
 import serviceBayRoutes from './service/serviceBay.route.js'
 import warehouseRoutes from './warehouse.route.js'
+import authRoutes from './auth.route.js'
 
 const router = express.Router()
 
+router.use('/auth', authRoutes)
 router.use('/warehouse', warehouseRoutes)
 router.use('/inventory/categories', categoryRoutes)
 router.use('/inventory/items', itemRoutes)

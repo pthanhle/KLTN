@@ -72,19 +72,22 @@ export const staffLogin = asyncHandler(async (req, res) => {
 
   res.json({
     id: user._id,
-    employeeId: staffDoc ? staffDoc.employeeId : (employeeDoc ? employeeDoc.position : 'EMP-000'),
+    employeeId: staffDoc ? staffDoc.employeeId : 'EMP-000',
     fullName: user.full_name,
     email: user.email,
     phone: user.phone,
     avatarUrl: user.avatar || "https://randomuser.me/api/portraits/lego/1.jpg",
     role: user.role_id?.role_name || (staffDoc ? staffDoc.roleName : 'STAFF'),
-    department: staffDoc ? staffDoc.department : 'General',
+    department: staffDoc ? staffDoc.department : (employeeDoc ? employeeDoc.position : 'General'),
     status: user.status.toUpperCase(),
-    baseSalary: staffDoc ? staffDoc.baseSalary : (employeeDoc ? employeeDoc.salary : 0),
+    joinDate: staffDoc
+      ? staffDoc.createdAt?.toISOString()
+      : (employeeDoc ? employeeDoc.hired_date?.toISOString() : null),
+    baseSalary: staffDoc ? staffDoc.baseSalary : (employeeDoc ? parseFloat(employeeDoc.salary) : 0),
     kpiType: staffDoc ? staffDoc.kpiType : 'SALARY_ONLY',
     kpiValue: staffDoc ? staffDoc.kpiValue : 0,
     isOvertimeEligible: staffDoc ? staffDoc.isOvertimeEligible : false,
-    accessLevel: "STANDARD_USER",
+    accessLevel: staffDoc ? staffDoc.accessLevel : 'STANDARD_USER',
     lastLogin: new Date().toISOString(),
     accessToken: accessToken,
     performance: formattedPerformance

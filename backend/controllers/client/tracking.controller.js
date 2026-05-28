@@ -1,6 +1,9 @@
 import RepairProgress from '../../models/repairprogressModel.js'
 import Booking from '../../models/bookingModel.js'
 import asyncHandler from 'express-async-handler'
+import crypto from 'crypto'
+import moment from 'moment'
+import { vnpayConfig } from '../../config/vnpayConfig.js'
 
 
 export const getMyProgressList = asyncHandler(async (req, res) => {
@@ -137,22 +140,77 @@ export const approveQuotation = asyncHandler(async (req, res) => {
         throw new Error('Không tìm thấy tiến độ')
     }
 
-    progress.quotation.status = 'APPROVED'
-    progress.quotation.approved_at = Date.now()
-
-    if (progress.current_step === 'QUOTING') {
-        progress.current_step = 'IN_PROGRESS'
+    if (progress.quotation.status === 'APPROVED') {
+        res.status(400)
+        throw new Error('Báo giá này đã được duyệt')
     }
 
-    progress.system_logs.push({
-        time: Date.now(),
-        type: 'INF',
-        message: 'Khách hàng đã phê duyệt báo giá. Hệ thống đang tiến hành sửa chữa.'
+    const partsTotal = progress.quotation.parts.reduce((sum, p) => sum + (p.quantity * p.unit_price), 0)
+    const laborsTotal = progress.quotation.labors.reduce((sum, l) => sum + (l.hours * l.rate), 0)
+    const subtotal = partsTotal + laborsTotal
+    const vat = subtotal * (progress.quotation.vat_rate || 0.1)
+    const total = subtotal + vat
+
+    const depositAmount = progress.quotation.deposit_amount > 0 ? progress.quotation.deposit_amount : total
+
+    const validAmount = Math.floor(Number(depositAmount))
+
+    if (validAmount < 5000 || validAmount >= 1000000000) {
+        res.status(400)
+        throw new Error('Số tiền thanh toán phải từ 5,000đ đến dưới 1 tỷ đồng')
+    }
+
+    let ipAddr = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '127.0.0.1'
+    if (ipAddr === '::1' || ipAddr === '::ffff:127.0.0.1') {
+        ipAddr = '127.0.0.1'
+    }
+    const createDate = moment().format('YYYYMMDDHHmmss')
+
+    if (!vnpayConfig.vnp_TmnCode || !vnpayConfig.vnp_HashSecret || !vnpayConfig.vnp_Url) {
+        res.status(500)
+        throw new Error('Cấu hình VNPay không hợp lệ. Vui lòng thử lại sau.')
+    }
+
+    let vnp_Params = {}
+    vnp_Params['vnp_Version'] = '2.1.0'
+    vnp_Params['vnp_Command'] = 'pay'
+    vnp_Params['vnp_TmnCode'] = vnpayConfig.vnp_TmnCode
+    vnp_Params['vnp_Locale'] = 'vn'
+    vnp_Params['vnp_CurrCode'] = 'VND'
+    vnp_Params['vnp_TxnRef'] = progress._id.toString() // Dùng progress._id thay cho order_id
+    vnp_Params['vnp_OrderInfo'] = 'Thanh toan dat coc bao gia ' + bookingCode
+    vnp_Params['vnp_OrderType'] = 'other'
+    vnp_Params['vnp_Amount'] = validAmount * 100
+    vnp_Params['vnp_ReturnUrl'] = vnpayConfig.vnp_ReturnUrl
+    vnp_Params['vnp_IpAddr'] = ipAddr
+    vnp_Params['vnp_CreateDate'] = createDate
+
+    // Sort params
+    let sorted = {}
+    let str = []
+    for (let key in vnp_Params) {
+        if (vnp_Params.hasOwnProperty(key)) {
+            str.push(encodeURIComponent(key))
+        }
+    }
+    str.sort()
+    for (let key = 0; key < str.length; key++) {
+        sorted[str[key]] = encodeURIComponent(vnp_Params[str[key]]).replace(/%20/g, '+')
+    }
+    vnp_Params = sorted
+
+    const signData = Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
+    const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
+    vnp_Params['vnp_SecureHash'] = signed
+
+    const paymentUrl = vnpayConfig.vnp_Url + '?' + Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
+
+    res.status(200).json({
+        message: 'Tạo URL thanh toán VNPay thành công. Vui lòng thanh toán để duyệt báo giá.',
+        url: paymentUrl,
+        progressId: progress._id
     })
-
-    await progress.save()
-
-    res.json({ message: 'Đã phê duyệt báo giá thành công', progress })
 })
 
 export const rejectQuotation = asyncHandler(async (req, res) => {

@@ -116,7 +116,7 @@ class PackingDetailController extends Notifier<PackingDetailState> {
     if (state.order == null) return false;
     if (!state.isAllPacked) return false;
     
-    ref.read(warehouseOrdersProvider.notifier).quickPack(state.order!.id);
+    await ref.read(warehouseOrdersProvider.notifier).quickPack(state.order!.id);
     
     // Clear cache for this order upon completion
     _progressCache.remove(state.order!.id);

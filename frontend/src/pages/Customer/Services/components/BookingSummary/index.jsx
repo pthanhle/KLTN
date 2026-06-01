@@ -5,17 +5,15 @@ import { Image } from 'antd';
 const BookingSummary = ({ bookingData, currentStep, t }) => {
     return (
         <div className="w-full lg:w-[350px] xl:w-[400px] shrink-0 sticky top-[120px] flex flex-col gap-6">
-            {/* Summary Card - Switches based on step */}
             {currentStep < 3 ? (
                 <div className="w-full bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/10 rounded-[28px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.06)] dark:shadow-none">
-                    {/* Car Image Header */}
                     <div className="w-full h-[180px] md:h-[200px] relative bg-black">
-                        <Image 
-                            src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=800" 
-                            alt="Booking Summary" 
+                        <Image
+                            src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=800"
+                            alt="Booking Summary"
                             width="100%"
                             height="100%"
-                            className="object-cover opacity-60" 
+                            className="object-cover opacity-60"
                             preview={false}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
@@ -28,7 +26,6 @@ const BookingSummary = ({ bookingData, currentStep, t }) => {
                     </div>
 
                     <div className="p-6 md:p-8 flex flex-col gap-8">
-                        {/* Vehicle Node */}
                         <div className="flex gap-4 items-start">
                             <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 dark:bg-white/5 dark:border-white/10 flex items-center justify-center shrink-0">
                                 <Car size={18} className="text-slate-500" />
@@ -42,7 +39,6 @@ const BookingSummary = ({ bookingData, currentStep, t }) => {
                             </div>
                         </div>
 
-                        {/* Appointment Node */}
                         <div className="flex gap-4 items-start">
                             <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 dark:bg-white/5 dark:border-white/10 flex items-center justify-center shrink-0">
                                 <Calendar size={18} className="text-slate-500" />
@@ -57,7 +53,6 @@ const BookingSummary = ({ bookingData, currentStep, t }) => {
 
                         <div className="w-full h-px bg-slate-200 dark:bg-white/10 my-1"></div>
 
-                        {/* Estimate Node */}
                         <div className="flex gap-4 items-start">
                             <div className="w-10 h-10 rounded-xl bg-yellow-50 border border-yellow-200/50 dark:bg-yellow-500/10 dark:border-yellow-500/20 flex items-center justify-center shrink-0">
                                 <FileText size={18} className="text-yellow-600 dark:text-yellow-500" />
@@ -80,16 +75,29 @@ const BookingSummary = ({ bookingData, currentStep, t }) => {
                     </p>
 
                     <div className="flex flex-col gap-5 mb-8">
-                        <div className="flex justify-between items-center text-[15px] font-medium border-b border-white/5 pb-4">
-                            <span className="text-slate-400">{t('services:base_service_fee')}</span>
-                            <span className="text-white font-bold">{t('services:contact')}</span>
-                        </div>
+                        {bookingData.selected_services && bookingData.selected_services.length > 0 ? (
+                            bookingData.selected_services.map(srv => {
+                                let priceDisplay = t('services:contact');
+                                if (srv.priceType === 'FIXED') {
+                                    priceDisplay = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(srv.basePrice || 0);
+                                } else if (srv.priceType === 'STARTING_AT') {
+                                    priceDisplay = `${t('services:price_starting_at', 'TỪ')} ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(srv.basePrice || 0)}`;
+                                }
+                                return (
+                                    <div key={srv._id} className="flex justify-between items-center text-[15px] font-medium border-b border-white/5 pb-4">
+                                        <span className="text-slate-400">{srv.serviceName}</span>
+                                        <span className="text-white font-bold">{priceDisplay}</span>
+                                    </div>
+                                )
+                            })
+                        ) : (
+                            <div className="flex justify-between items-center text-[15px] font-medium border-b border-white/5 pb-4">
+                                <span className="text-slate-400">Kiểm tra & Báo giá</span>
+                                <span className="text-white font-bold">{t('services:contact')}</span>
+                            </div>
+                        )}
                         <div className="flex justify-between items-center text-[15px] font-medium border-b border-white/5 pb-4">
                             <span className="text-slate-400">{t('services:parts_and_materials')}</span>
-                            <span className="text-white font-bold">---</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[15px] font-medium border-b border-white/5 pb-4">
-                            <span className="text-slate-400">{t('services:environmental_tax')}</span>
                             <span className="text-white font-bold">---</span>
                         </div>
                     </div>
@@ -97,7 +105,15 @@ const BookingSummary = ({ bookingData, currentStep, t }) => {
                     <div className="mb-8">
                         <p className="text-[12px] font-bold text-slate-400 tracking-widest uppercase mb-2">{t('services:estimated_total')}</p>
                         <p className="text-[32px] font-black tracking-tighter text-yellow-500">
-                            {t('services:contact')}
+                            {(() => {
+                                const total = bookingData.selected_services?.reduce((sum, s) => {
+                                    if (s.priceType === 'FIXED' || s.priceType === 'STARTING_AT') return sum + (s.basePrice || 0);
+                                    return sum;
+                                }, 0) || 0;
+                                const hasContact = bookingData.selected_services?.some(s => s.priceType === 'CONTACT_FOR_PRICE');
+                                if (bookingData.selected_services?.length === 0 || hasContact) return t('services:contact');
+                                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total);
+                            })()}
                         </p>
                         <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mt-1">{t('services:taxes_included')}</p>
                     </div>
@@ -122,7 +138,6 @@ const BookingSummary = ({ bookingData, currentStep, t }) => {
                 </div>
             )}
 
-            {/* Help Card */}
             <div className="w-full bg-[#141416] rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-yellow-500/20 blur-3xl rounded-full pointer-events-none"></div>
                 <h4 className="text-white font-bold mb-2">{t('services:need_help', 'Need Help?')}</h4>

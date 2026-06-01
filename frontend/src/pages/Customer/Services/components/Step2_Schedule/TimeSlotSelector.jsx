@@ -6,15 +6,19 @@ const TimeSlotSelector = ({ timeSlots, bookingData, updateBookingData, t }) => {
             <h4 className="text-[18px] font-bold text-slate-900 dark:text-white mb-6">
                 {t('services:available_time_slots', 'Available Time Slots')}
             </h4>
-            
+
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {timeSlots.map((slot, index) => {
+                {timeSlots.map((slotObj, index) => {
+                    const slot = typeof slotObj === 'string' ? slotObj : slotObj.time_slot;
+                    const isBooked = typeof slotObj === 'object' ? slotObj.isFull : false;
+                    const currentCount = typeof slotObj === 'object' ? slotObj.currentCount : 0;
+                    const maxCapacity = typeof slotObj === 'object' ? slotObj.maxCapacity : 5;
+
                     const isSelected = bookingData.time_slot === slot;
-                    const isRecommended = index === 0; // Just mock first slot as recommended
-                    const isBooked = index === 2; // Mock third slot as booked
+                    const isRecommended = index === 0;
 
                     let btnClass = "relative flex flex-col items-center justify-center p-5 rounded-[20px] transition-all duration-300 border-2 ";
-                    
+
                     if (isBooked) {
                         btnClass += "bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60 ";
                     } else if (isSelected) {
@@ -31,16 +35,22 @@ const TimeSlotSelector = ({ timeSlots, bookingData, updateBookingData, t }) => {
                             className={btnClass}
                         >
                             <span className="text-[15px] font-bold mb-1">{slot}</span>
-                            
+
                             {isRecommended && !isBooked && (
                                 <span className={`text-[9px] font-bold tracking-widest uppercase mt-1 ${isSelected ? 'text-yellow-600 dark:text-yellow-500' : 'text-yellow-500'}`}>
                                     {t('services:recommended', 'RECOMMENDED')}
                                 </span>
                             )}
-                            
+
                             {isBooked && (
                                 <span className="text-[9px] font-bold tracking-widest uppercase mt-1 text-slate-400">
-                                    {t('services:booked', 'BOOKED')}
+                                    {t('services:booked', 'ĐÃ KÍN')}
+                                </span>
+                            )}
+
+                            {!isBooked && typeof slotObj === 'object' && (
+                                <span className="text-[9px] font-medium tracking-widest mt-1 text-slate-400">
+                                    Còn {maxCapacity - currentCount} chỗ
                                 </span>
                             )}
                         </button>

@@ -6,13 +6,18 @@ export const getStep1Schema = (t) => {
         vehicle_model: z.string().min(1, t?.('services:error_model_required') || 'Vui lòng nhập dòng xe'),
         license_plate: z.string().min(1, t?.('services:error_license_required') || 'Vui lòng nhập biển số xe'),
         vehicle_condition: z.string().optional(),
+        contact_phone: z.string().optional(),
         selected_services: z.array(
             z.object({
                 _id: z.string(),
                 serviceName: z.string(),
                 basePrice: z.number().optional(),
+                priceType: z.string().optional(),
             })
-        ).min(1, t?.('services:error_service_required') || 'Vui lòng chọn ít nhất một dịch vụ')
+        ).optional().default([])
+    }).refine(data => data.selected_services.length > 0 || (data.vehicle_condition && data.vehicle_condition.trim().length > 0), {
+        message: t?.('services:error_service_or_condition_required') || "Vui lòng chọn dịch vụ hoặc mô tả triệu chứng xe",
+        path: ["vehicle_condition"]
     });
 };
 

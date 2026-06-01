@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ttauto_staff/core/constants/api_constants.dart';
 
 class WarehouseApiService {
-  static const String _baseUrl = '${ApiConstants.baseUrl}/api/staff/warehouse';
+  static String get _baseUrl => '${ApiConstants.baseUrl}/api/staff/warehouse';
 
   static Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();

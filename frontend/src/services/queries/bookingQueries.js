@@ -37,11 +37,28 @@ export const useCancelTestDrive = () => {
     });
 };
 
+export const useAvailableTimeSlotsQuery = (date) => {
+    return useQuery({
+        queryKey: ['availableTimeSlots', date],
+        queryFn: () => BookingAPI.getAvailableTimeSlots(date),
+        enabled: !!date,
+        staleTime: 1 * 60 * 1000
+    });
+};
+
 export const useSubmitServiceBooking = () => {
     return useMutation({
         mutationFn: (payload) => BookingAPI.submitServiceBooking(payload),
         onError: (error) => {
             console.error('[Mutation Submit Service Booking Error]:', error);
         }
+    });
+};
+
+export const useGetServiceBookingsQuery = (params = {}) => {
+    return useQuery({
+        queryKey: ['serviceBookings', params],
+        queryFn: () => BookingAPI.getServiceBookingList(params),
+        staleTime: 1 * 60 * 1000
     });
 };

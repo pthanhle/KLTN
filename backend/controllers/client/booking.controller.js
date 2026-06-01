@@ -68,6 +68,7 @@ export const createBooking = asyncHandler(async (req, res) => {
         test_drive_type, delivery_address,
         service_type, services,
         customer_note,
+        contact_phone,
     } = req.body
 
     if (!booking_date || !time_slot) {
@@ -82,7 +83,7 @@ export const createBooking = asyncHandler(async (req, res) => {
 
     const customer_info = {
         full_name: req.user.full_name,
-        contact_phone: req.user.phone,
+        contact_phone: contact_phone || req.user.phone,
         email: req.user.email,
     }
 
@@ -240,3 +241,54 @@ export const rateBooking = asyncHandler(async (req, res) => {
 
     res.json({ message: 'Đánh giá thành công', rating })
 })
+
+
+export const getAvailableTimeSlots = asyncHandler(async (req, res) => {
+    const { date } = req.query;
+
+    if (!date) {
+        res.status(400);
+        throw new Error('Vui lòng cung cấp ngày cần kiểm tra');
+    }
+
+    const queryDate = new Date(date);
+    queryDate.setHours(0, 0, 0, 0);
+
+    const nextDate = new Date(queryDate);
+    nextDate.setDate(queryDate.getDate() + 1);
+
+    const TIME_SLOTS = [
+        '08:00-10:00',
+        '10:00-12:00',
+        '13:00-15:00',
+        '15:00-17:00'
+    ];
+    const MAX_CAPACITY = 5;
+
+    const bookings = await Booking.find({
+        booking_date: {
+            $gte: queryDate,
+            $lt: nextDate
+        },
+        booking_status: { $ne: 'CANCELLED' }
+    });
+
+    const bookedSlotsCount = bookings.reduce((acc, b) => {
+        if (b.time_slot) {
+            acc[b.time_slot] = (acc[b.time_slot] || 0) + 1;
+        }
+        return acc;
+    }, {});
+
+    const availableSlots = TIME_SLOTS.map(slot => {
+        const count = bookedSlotsCount[slot] || 0;
+        return {
+            time_slot: slot,
+            isFull: count >= MAX_CAPACITY,
+            currentCount: count,
+            maxCapacity: MAX_CAPACITY
+        };
+    });
+
+    res.json(availableSlots);
+});

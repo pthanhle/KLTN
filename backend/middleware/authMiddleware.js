@@ -20,7 +20,7 @@ const protect = asyncHandler(async (req, res, next) => {
         console.error('User not found in database')
         res.status(401)
         throw new Error('User not found')
-      }
+      } 
 
       next()
     } catch (error) {
@@ -35,7 +35,6 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 })
 
-// ✅ Sửa admin middleware - thêm optional chaining
 export const admin = (req, res, next) => {
   if (req.user && (
     req.user.isAdmin ||
@@ -49,7 +48,11 @@ export const admin = (req, res, next) => {
 }
 
 export const inventoryStaff = (req, res, next) => {
-  if (req.user && req.user.role_id?.role_name?.toLowerCase() === 'inventory') {
+  if (req.user && (
+    req.user.role_id?.role_name?.toLowerCase() === 'inventory' ||
+    req.user.isAdmin ||
+    req.user.role_id?.role_name?.toLowerCase() === 'admin'
+  )) {
     next()
   } else {
     res.status(403)
@@ -58,7 +61,11 @@ export const inventoryStaff = (req, res, next) => {
 }
 
 export const serviceStaff = (req, res, next) => {
-  if (req.user && req.user.role_id?.role_name?.toLowerCase() === 'service') {
+  if (req.user && (
+    req.user.role_id?.role_name?.toLowerCase() === 'service' ||
+    req.user.isAdmin ||
+    req.user.role_id?.role_name?.toLowerCase() === 'admin'
+  )) {
     next()
   } else {
     res.status(403)
@@ -67,7 +74,11 @@ export const serviceStaff = (req, res, next) => {
 }
 
 export const saleStaff = (req, res, next) => {
-  if (req.user && req.user.role_id?.role_name?.toLowerCase() === 'sale') {
+  if (req.user && (
+    req.user.role_id?.role_name?.toLowerCase() === 'sale' ||
+    req.user.isAdmin ||
+    req.user.role_id?.role_name?.toLowerCase() === 'admin'
+  )) {
     next()
   } else {
     res.status(403)
@@ -85,7 +96,6 @@ export const anyStaff = (req, res, next) => {
   }
 }
 
-// Admin hoặc bất kỳ Staff nào
 export const adminOrStaff = (req, res, next) => {
   const roleName = req.user?.role_id?.role_name?.toLowerCase()
 
@@ -101,7 +111,6 @@ export const adminOrStaff = (req, res, next) => {
   }
 }
 
-// Customer middleware đã đúng rồi
 export const customer = (req, res, next) => {
   if (req.user && (
     req.user.role_id?.role_name?.toLowerCase() === 'customer' ||

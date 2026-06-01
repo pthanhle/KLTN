@@ -55,7 +55,7 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
           id: json['progress_id'] ?? '',
           code: json['booking_code'] ?? 'N/A',
           customerName: json['customer_name'] ?? 'Khách hàng',
-          customerType: CustomerType.retail,
+          customerType: CustomerType.b2c,
           totalItems: partsList.length,
           priority: OrderPriority.standard,
           status: OrderStatus.pendingPick,

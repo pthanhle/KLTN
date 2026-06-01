@@ -3,12 +3,12 @@ import axiosClient from '../../utils/axiosClient';
 export const BookingAPI = {
     getTestDriveList: async (params) => {
         const response = await axiosClient.get('/client/bookings', { params: { booking_type: 'test_drive', ...params } });
-        return response.data?.bookings || [];
+        return response?.bookings || [];
     },
 
     getTestDriveById: async (id) => {
         const response = await axiosClient.get(`/client/bookings/${id}`);
-        return response.data;
+        return response;
     },
 
     submitTestDrive: async (payload) => {
@@ -22,8 +22,18 @@ export const BookingAPI = {
     },
 
     getServiceBookingList: async (params) => {
-        const response = await axiosClient.get('/client/bookings', { params: { booking_type: 'service', ...params } });
-        return response.data?.bookings || [];
+        const [serviceRes, maintenanceRes] = await Promise.all([
+            axiosClient.get('/client/bookings', { params: { booking_type: 'service', ...params } }),
+            axiosClient.get('/client/bookings', { params: { booking_type: 'maintenance', ...params } }),
+        ]);
+        const serviceBookings = serviceRes?.bookings || [];
+        const maintenanceBookings = maintenanceRes?.bookings || [];
+        return [...serviceBookings, ...maintenanceBookings].sort((a, b) => new Date(b.booking_date) - new Date(a.booking_date));
+    },
+
+    getAvailableTimeSlots: async (date) => {
+        const response = await axiosClient.get('/client/bookings/available-slots', { params: { date } });
+        return response || [];
     },
 
     submitServiceBooking: async (payload) => {

@@ -56,6 +56,8 @@ const timelineStepSchema = new mongoose.Schema(
     parts_usage: [
       {
         name: String,
+        sku: String,
+        quantity: { type: Number, default: 1 },
         progress: { type: Number, default: 0 },
         status: { type: String, enum: ['WAITING', 'IN_PROGRESS', 'COMPLETED'], default: 'WAITING' },
         eta: Date

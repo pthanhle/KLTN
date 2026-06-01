@@ -131,7 +131,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   // Always use server-computed subtotal as source of truth
   const clientShippingFee = typeof financials?.shipping_fee === 'number' ? financials.shipping_fee : 0
-  const clientDiscount   = typeof financials?.discount === 'number' ? financials.discount : 0
+  const clientDiscount = typeof financials?.discount === 'number' ? financials.discount : 0
   const serverGrandTotal = computedSubtotal + clientShippingFee - clientDiscount
 
   const order = await Order.create({
@@ -217,7 +217,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       }
 
       const createDate = moment.default().format('YYYYMMDDHHmmss')
-      const validAmount = Math.floor(Number(final_total))
+      const validAmount = Math.floor(Number(serverGrandTotal))
 
       const Payment = (await import('../../models/paymentModel.js')).default
       const paymentDoc = await Payment.create({
@@ -265,7 +265,6 @@ export const createOrder = asyncHandler(async (req, res) => {
     } catch (error) {
       console.error('Lỗi tạo VNPay URL:', error)
       console.error(`Failed to generate VNPay URL for order ${order.order_code}, payment method: ${payment.method}`)
-      // Fallback: return order without payment URL
     }
   }
 

@@ -11,8 +11,8 @@ export const getAppointments = asyncHandler(async (req, res) => {
     const status = req.query.status || ''
     const search = req.query.search || ''
 
-    const query = { booking_type: 'service' }
-    if (status) query.status = status
+    const query = { booking_type: { $in: ['service', 'maintenance'] } }
+    if (status) query.booking_status = status.toUpperCase()
 
     const startDate = req.query.startDate ? new Date(req.query.startDate) : null
     const endDate = req.query.endDate ? new Date(req.query.endDate) : null
@@ -41,17 +41,12 @@ export const getAppointments = asyncHandler(async (req, res) => {
     const total = await Booking.countDocuments(query)
     const appointmentsData = await Booking.find(query)
         .populate('user_id', 'full_name email phone')
-        .populate('service_id', 'service_name price duration')
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ booking_date: 1 })
 
     const appointments = appointmentsData.map(app => {
-        const appObj = app.toObject();
-        if (appObj.price !== undefined && appObj.price !== null) {
-            if (appObj.service_id) appObj.service_id.price = appObj.price;
-        }
-        return appObj;
+        return app.toObject();
     });
 
     res.json({
@@ -69,9 +64,8 @@ export const getAppointments = asyncHandler(async (req, res) => {
 export const getAppointmentById = asyncHandler(async (req, res) => {
     const appointment = await Booking.findById(req.params.id)
         .populate('user_id', 'full_name email phone')
-        .populate('service_id', 'service_name price duration')
 
-    if (!appointment || appointment.booking_type !== 'service') {
+    if (!appointment || !['service', 'maintenance'].includes(appointment.booking_type)) {
         res.status(404)
         throw new Error('Lịch hẹn không tồn tại hoặc không phải lịch dịch vụ')
     }
@@ -84,42 +78,42 @@ export const updateAppointment = asyncHandler(async (req, res) => {
     const { status } = req.body
 
     const appointment = await Booking.findById(req.params.id)
-    if (!appointment || appointment.booking_type !== 'service') {
+    if (!appointment || !['service', 'maintenance'].includes(appointment.booking_type)) {
         res.status(404)
         throw new Error('Lịch hẹn không tồn tại hoặc không phải lịch dịch vụ')
     }
 
-    if (!['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'].includes(status)) {
+    const validStatuses = ['pending', 'confirmed', 'received', 'in_progress', 'completed', 'cancelled']
+    if (!validStatuses.includes(status?.toLowerCase())) {
         res.status(400)
         throw new Error('Trạng thái không hợp lệ')
     }
 
-    appointment.status = status
+    const newStatus = status.toUpperCase()
+    appointment.booking_status = newStatus
     if (req.body.note) {
-        appointment.note = req.body.note
+        appointment.customer_note = req.body.note
     }
 
     const updated = await appointment.save()
 
-    if (status === 'cancelled') {
-        const message = `Lịch hẹn dịch vụ ngày ${new Date(appointment.booking_date).toLocaleDateString("vi-VN")} đã bị hủy.${req.body.note ? ` Lý do: ${req.body.note}` : ''}`;
-
+    if (newStatus === 'CANCELLED') {
+        const dateStr = new Date(appointment.booking_date).toLocaleDateString('vi-VN')
         await Notification.create({
             user_id: appointment.user_id,
             title: 'Hủy lịch hẹn dịch vụ',
-            message: message,
+            message: `Lịch hẹn dịch vụ ngày ${dateStr} đã bị từ chối.${req.body.note ? ` Lý do: ${req.body.note}` : ''}`,
             type: 'BOOKING',
             reference_id: appointment.booking_code,
             reference_link: '/profile/services',
             is_read: false,
         })
-    }
-    else if (status === 'confirmed') {
-        const message = `Lịch hẹn dịch vụ ngày ${new Date(appointment.booking_date).toLocaleDateString("vi-VN")} đã được tiếp nhận. Xin vui lòng đến đúng giờ.`;
+    } else if (newStatus === 'CONFIRMED') {
+        const dateStr = new Date(appointment.booking_date).toLocaleDateString('vi-VN')
         await Notification.create({
             user_id: appointment.user_id,
             title: 'Xác nhận lịch hẹn dịch vụ',
-            message: message,
+            message: `Lịch hẹn dịch vụ ngày ${dateStr} đã được xác nhận. Xin vui lòng đến đúng giờ.`,
             type: 'BOOKING',
             reference_id: appointment.booking_code,
             reference_link: '/profile/services',
@@ -130,7 +124,6 @@ export const updateAppointment = asyncHandler(async (req, res) => {
     res.json({
         message: 'Cập nhật lịch hẹn thành công',
         appointment: await Booking.findById(updated._id)
-            .populate('user_id', 'full_name email phone')
-            .populate('service_id', 'service_name price duration'),
+            .populate('user_id', 'full_name email phone'),
     })
 })

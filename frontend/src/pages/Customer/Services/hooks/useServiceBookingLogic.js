@@ -4,16 +4,18 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getServiceBookingSchema } from '../schemas/servicesSchema';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-import { VEHICLE_BRANDS, SERVICE_CATEGORIES, TIME_SLOTS } from '../constants/bookingConstants';
-import { MOCK_SERVICES_DATA } from '../data/services.mock';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { SERVICE_CATEGORIES, TIME_SLOTS } from '../constants/bookingConstants';
 import { useClientServiceItemsQuery } from '../../../../services/queries/serviceItemQueries';
 import { useClientServiceCategoriesQuery } from '../../../../services/queries/serviceCategoryQueries';
+import { useSubmitServiceBooking, useAvailableTimeSlotsQuery } from '../../../../services/queries/bookingQueries';
+import { useClientBrandsQuery } from '../../../../services/queries/brandQueries';
 
 export const useServiceBookingLogic = () => {
     const { message } = App.useApp();
     const { t } = useTranslation(['services']);
     const location = useLocation();
+    const navigate = useNavigate();
 
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,6 +30,7 @@ export const useServiceBookingLogic = () => {
             vehicle_model: '',
             license_plate: '',
             vehicle_condition: '',
+            contact_phone: '',
             booking_date: '',
             time_slot: ''
         }
@@ -39,8 +42,16 @@ export const useServiceBookingLogic = () => {
 
     const { data: serviceItemsData, isLoading: isServicesLoading } = useClientServiceItemsQuery();
     const { data: categoriesData } = useClientServiceCategoriesQuery();
+    const { data: brandsData } = useClientBrandsQuery();
+    const { data: availableTimeSlotsData, isLoading: isTimeSlotsLoading } = useAvailableTimeSlotsQuery(bookingData.booking_date);
 
     const servicesFromApi = serviceItemsData?.services || [];
+    const dynamicBrands = useMemo(() => {
+        if (!brandsData) return [];
+        const brands = brandsData.map(b => ({ label: b.name, value: b.name }));
+        brands.push({ label: 'Khác (Other)', value: 'Other' });
+        return brands;
+    }, [brandsData]);
 
     const dynamicCategories = useMemo(() => {
         if (!categoriesData || categoriesData.length === 0) return SERVICE_CATEGORIES;
@@ -100,22 +111,41 @@ export const useServiceBookingLogic = () => {
         bookingData.vehicle_brand &&
         bookingData.vehicle_model &&
         bookingData.license_plate &&
-        bookingData.selected_services.length > 0
+        (bookingData.selected_services.length > 0 || bookingData.vehicle_condition?.trim())
     );
     const isStep2Valid = Boolean(bookingData.booking_date && bookingData.time_slot);
 
-    // 5. Logic Core - Fake API
+    const { mutateAsync: submitServiceBooking } = useSubmitServiceBooking();
+
     const handleSubmitBooking = async (t) => {
         setIsSubmitting(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            console.log("Dữ liệu gửi lên BE: ", bookingData);
+            const payload = {
+                booking_type: 'service',
+                vehicle_info: {
+                    brand: bookingData.vehicle_brand,
+                    model: bookingData.vehicle_model,
+                    license_plate: bookingData.license_plate,
+                },
+                booking_date: bookingData.booking_date,
+                time_slot: bookingData.time_slot,
+                contact_phone: bookingData.contact_phone,
+                service_type: bookingData.selected_services.length > 0 ? 'MAINTENANCE' : 'OTHER',
+                services: bookingData.selected_services.map(s => ({
+                    service_id: s._id,
+                    service_name: s.serviceName,
+                    price: s.basePrice
+                })),
+                customer_note: bookingData.vehicle_condition
+            };
+
+            await submitServiceBooking(payload);
 
             message.success({
                 content: t ? t('services:booking_success', 'Booking successful! We will contact you soon.') : 'Booking successful!',
                 style: { marginTop: '10vh' },
             });
-            // Tương lai: redirect sang trang OrderSuccess báo thành công
+            navigate('/profile/services');
         } catch (error) {
             message.error("Lỗi hệ thống");
         } finally {
@@ -123,13 +153,21 @@ export const useServiceBookingLogic = () => {
         }
     };
 
+    const defaultTimeSlots = TIME_SLOTS.map(slot => ({
+        time_slot: slot,
+        isFull: false,
+        currentCount: 0,
+        maxCapacity: 5
+    }));
+
     return {
         methods,
         currentStep,
         services: servicesFromApi,
         categories: dynamicCategories,
-        vehicleBrands: VEHICLE_BRANDS,
-        timeSlots: TIME_SLOTS,
+        vehicleBrands: dynamicBrands,
+        timeSlots: availableTimeSlotsData || defaultTimeSlots,
+        isTimeSlotsLoading,
         filteredServices,
         selectedCategory,
         setSelectedCategory,

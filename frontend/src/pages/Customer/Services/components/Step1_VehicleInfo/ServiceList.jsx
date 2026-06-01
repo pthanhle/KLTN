@@ -41,15 +41,29 @@ const ServiceList = ({ filteredServices, bookingData, handleServiceToggle, isSer
                                     <Settings size={22} />
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className={`font-bold text-[15px] leading-tight mb-2 ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200'}`}>
-                                        {srv.serviceName}
-                                    </h4>
-                                    <p className="text-[13px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <h4 className={`font-bold text-[15px] leading-tight ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200'}`}>
+                                            {srv.serviceName}
+                                        </h4>
+                                        {srv.isCombo && (
+                                            <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-500/30">
+                                                Combo
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-[13px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-3">
                                         {srv.description}
                                     </p>
-                                    <p className="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 uppercase tracking-widest">
-                                        {t('services:estimated_price', 'GIÁ DỰ KIẾN:')} {priceDisplay}
-                                    </p>
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 uppercase tracking-widest">
+                                            {t('services:estimated_price', 'GIÁ DỰ KIẾN:')} {priceDisplay}
+                                        </p>
+                                        {srv.sku && (
+                                            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase">
+                                                Mã: {srv.sku}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className={`w-6 h-6 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'bg-yellow-500 border-yellow-500' : 'border-slate-300 dark:border-white/20'}`}>
                                     {isSelected && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}

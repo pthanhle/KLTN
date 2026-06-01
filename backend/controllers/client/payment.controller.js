@@ -2,6 +2,8 @@ import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
 import Payment from '../../models/paymentModel.js'
 import Order from '../../models/orderModel.js'
+import RepairProgress from '../../models/repairprogressModel.js'
+import Part from '../../models/partModel.js'
 import { vnpayConfig } from '../../config/vnpayConfig.js'
 import { isVNPayMethod, validatePaymentMethodDetailed } from '../../utils/paymentValidation.js'
 import crypto from 'crypto'
@@ -223,7 +225,7 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
     userAgent: req.headers['user-agent'],
     referer: req.headers['referer']
   })
-  
+
   import('fs').then(fs => {
     fs.appendFileSync('vnpay_debug.log', JSON.stringify({
       time: new Date().toISOString(),
@@ -274,14 +276,19 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
 
     let payment = null
     let order = null
+    let repairProgress = null
 
     if (mongoose.Types.ObjectId.isValid(paymentId)) {
       payment = await Payment.findById(paymentId)
+
+      if (!payment) {
+        repairProgress = await RepairProgress.findById(paymentId).populate('booking_id')
+      }
     }
 
     if (payment) {
       order = await Order.findById(payment.order_id)
-    } else {
+    } else if (!repairProgress) {
       if (mongoose.Types.ObjectId.isValid(paymentId)) {
         order = await Order.findById(paymentId)
         if (order) {
@@ -298,12 +305,81 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
       }
     }
 
-    if (!payment || !order) {
-      console.error(`VNPay return: Payment/Order not found`, {
-        paymentId, rspCode, paymentFound: !!payment, orderFound: !!order
+    if (!payment && !order && !repairProgress) {
+      console.error(`VNPay return: Payment/Order/Quotation not found`, {
+        paymentId, rspCode, paymentFound: !!payment, orderFound: !!order, progressFound: !!repairProgress
       })
       return res.redirect(`${frontendUrl}/payment/failed?reason=payment_not_found&order_id=${paymentId}`)
     }
+
+    if (repairProgress) {
+      if (rspCode === '00') {
+        repairProgress.quotation.status = 'APPROVED'
+        repairProgress.quotation.approved_at = Date.now()
+
+        if (repairProgress.current_step === 'QUOTING') {
+          repairProgress.current_step = 'IN_PROGRESS'
+        }
+
+        repairProgress.system_logs.push({
+          time: Date.now(),
+          type: 'INF',
+          message: 'Khách hàng đã thanh toán và phê duyệt báo giá. Hệ thống đã tạo lệnh xuất kho.'
+        })
+
+
+        for (const qPart of repairProgress.quotation.parts) {
+          const partDB = await Part.findOne({ sku: qPart.sku });
+          let isBackordered = false;
+
+          if (partDB) {
+            if (partDB.inventory.available_stock < qPart.quantity) {
+              isBackordered = true;
+            }
+
+            partDB.inventory.allocated += qPart.quantity;
+            partDB.inventory.available_stock -= qPart.quantity;
+            await partDB.save();
+          } else {
+            isBackordered = true;
+          }
+
+          const etaDate = isBackordered ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) : new Date();
+
+          repairProgress.parts_usage.push({
+            name: qPart.name,
+            sku: qPart.sku,
+            quantity: qPart.quantity,
+            progress: 0,
+            status: 'WAITING',
+            eta: etaDate
+          });
+        }
+
+        await repairProgress.save();
+
+        console.log(`VNPay quotation payment completed successfully`, {
+          progressId: repairProgress._id,
+          transactionNo, amount: vnpAmount
+        })
+
+        return res.redirect(
+          `${frontendUrl}/payment/success?order_id=${repairProgress._id}&type=quotation`
+        )
+      } else {
+        repairProgress.system_logs.push({
+          time: Date.now(),
+          type: 'ERR',
+          message: 'Thanh toán báo giá thất bại. Vui lòng thử lại.'
+        })
+        await repairProgress.save()
+
+        return res.redirect(
+          `${frontendUrl}/payment/failed?reason=payment_failed&code=${rspCode}&order_id=${repairProgress._id}&type=quotation`
+        )
+      }
+    }
+
 
     if (rspCode === '00') {
       payment.status = 'completed'

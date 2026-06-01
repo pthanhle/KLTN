@@ -6,9 +6,10 @@ import '../models/kpi_model.dart';
 import '../models/kanban_model.dart';
 import '../models/task_model.dart';
 import 'auth_repository.dart';
+import 'auth_api_repository.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthMock();
+  return AuthApiRepository();
 });
 
 class AuthMock implements AuthRepository {
@@ -19,7 +20,7 @@ class AuthMock implements AuthRepository {
     if (request.employeeId.isEmpty || request.password.isEmpty) {
       throw Exception("Vui lòng nhập đầy đủ thông tin");
     }
-    
+
     if (request.password != "123456") {
       throw Exception("Mật khẩu không chính xác");
     }
@@ -63,8 +64,8 @@ class AuthMock implements AuthRepository {
           )
         )
       );
-    } 
-    
+    }
+
     // 2. SERVICE ADVISOR MOCK
     else if (emailLower.contains("advisor") || emailLower == "quantm@ttvelocity.com") {
       return const UserModel(
@@ -111,7 +112,7 @@ class AuthMock implements AuthRepository {
         phone: "+84 905291502",
         joinDate: "2019-02-07",
         avatarUrl: "https://randomuser.me/api/portraits/men/78.jpg",
-        role: "LEAD_TECHNICIAN", 
+        role: "LEAD_TECHNICIAN",
         department: "Repair Workshop",
         status: "ACTIVE",
         baseSalary: 15000000,

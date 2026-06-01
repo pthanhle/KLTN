@@ -6,12 +6,15 @@ import {
     cancelBooking,
     rescheduleBooking,
     rateBooking,
+    getAvailableTimeSlots,
 } from '../../controllers/client/booking.controller.js'
 import { protect, customer } from '../../middleware/authMiddleware.js'
 
 const router = express.Router()
 
 router.use(protect, customer)
+
+router.get('/available-slots', getAvailableTimeSlots)
 
 router.route('/')
     .get(getBookings)

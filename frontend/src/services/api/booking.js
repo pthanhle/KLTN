@@ -1,35 +1,43 @@
-import { GLOBAL_TEST_DRIVES } from '../mock/globalTestDrive.mock';
+import axiosClient from '../../utils/axiosClient';
 
 export const BookingAPI = {
-    getTestDriveList: async () => {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        return GLOBAL_TEST_DRIVES;
+    getTestDriveList: async (params) => {
+        const response = await axiosClient.get('/client/bookings', { params: { booking_type: 'test_drive', ...params } });
+        return response?.bookings || [];
     },
 
     getTestDriveById: async (id) => {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        const drive = GLOBAL_TEST_DRIVES.find(d => d._id === id);
-        if (!drive) throw new Error('Booking not found');
-        return drive;
+        const response = await axiosClient.get(`/client/bookings/${id}`);
+        return response;
     },
 
     submitTestDrive: async (payload) => {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        console.log('[API Global Service] => Đã gửi Request:', payload);
-
-        return {
-            status: 200,
-            success: true,
-            data: payload
-        };
+        const response = await axiosClient.post('/client/bookings', payload);
+        return response;
     },
 
     cancelTestDrive: async (id) => {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        console.log('[API Global Service] => Đã gửi lệnh Hủy vé ID:', id);
-        return {
-            status: 200,
-            success: true
-        };
+        const response = await axiosClient.put(`/client/bookings/${id}/cancel`);
+        return response;
+    },
+
+    getServiceBookingList: async (params) => {
+        const [serviceRes, maintenanceRes] = await Promise.all([
+            axiosClient.get('/client/bookings', { params: { booking_type: 'service', ...params } }),
+            axiosClient.get('/client/bookings', { params: { booking_type: 'maintenance', ...params } }),
+        ]);
+        const serviceBookings = serviceRes?.bookings || [];
+        const maintenanceBookings = maintenanceRes?.bookings || [];
+        return [...serviceBookings, ...maintenanceBookings].sort((a, b) => new Date(b.booking_date) - new Date(a.booking_date));
+    },
+
+    getAvailableTimeSlots: async (date) => {
+        const response = await axiosClient.get('/client/bookings/available-slots', { params: { date } });
+        return response || [];
+    },
+
+    submitServiceBooking: async (payload) => {
+        const response = await axiosClient.post('/client/bookings', payload);
+        return response;
     }
 };

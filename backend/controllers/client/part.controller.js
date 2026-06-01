@@ -1,26 +1,21 @@
 import asyncHandler from 'express-async-handler';
 import Part from '../../models/partModel.js';
 
-/**
- * @desc    Get all active parts with Filtering, Sorting, and Pagination
- * @route   GET /api/v1/client/parts
- * @access  Public
- */
+
 export const getActiveParts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.current || req.query.page) || 1;
-  const limit = parseInt(req.query.pageSize || req.query.limit) || 9; // 9 for grid
+  const limit = parseInt(req.query.pageSize || req.query.limit) || 9;
   const search = req.query.search || '';
   const sortState = req.query.sortBy || 'newest';
 
   const categoryFilter = req.query.category || 'all';
-  const brandFilter = req.query.brand || 'all'; // can be comma separated
+  const brandFilter = req.query.brand || 'all';
   const includeUniversal = req.query.includeUniversal === 'true';
   const minPrice = parseInt(req.query.minPrice) || 0;
   const maxPrice = parseInt(req.query.maxPrice) || 999999999;
 
   const pipeline = [];
 
-  // ONLY ACTIVE
   const matchFilters = { status: 'active' };
 
   if (categoryFilter !== 'all') {
@@ -36,14 +31,12 @@ export const getActiveParts = asyncHandler(async (req, res) => {
 
   pipeline.push({ $match: matchFilters });
 
-  // Handle Price Range
   pipeline.push({
     $match: {
       price: { $gte: minPrice, $lte: maxPrice }
     }
   });
 
-  // Handle Brands and Universal
   if (brandFilter !== 'all' && brandFilter) {
     const selectedBrands = brandFilter.split(',').map(b => b.trim());
     pipeline.push({
@@ -55,7 +48,6 @@ export const getActiveParts = asyncHandler(async (req, res) => {
       }
     });
   } else if (!includeUniversal) {
-    // If no specific brand selected but user unticked universal, only show parts with AT LEAST ONE brand
     pipeline.push({
       $match: {
         "compatible_brands.0": { $exists: true }
@@ -63,7 +55,6 @@ export const getActiveParts = asyncHandler(async (req, res) => {
     });
   }
 
-  // Lookup Master Data Condition
   pipeline.push({
     $lookup: {
       from: 'partconditions',
@@ -73,7 +64,6 @@ export const getActiveParts = asyncHandler(async (req, res) => {
     }
   });
 
-  // Formatting identical to admin
   pipeline.push({
     $addFields: {
       id: "$_id",
@@ -88,7 +78,6 @@ export const getActiveParts = asyncHandler(async (req, res) => {
     $project: { condition_data: 0 }
   });
 
-  // Sorting
   let sortObj = { createdAt: -1 };
   if (sortState === 'price_asc') sortObj = { price: 1 };
   if (sortState === 'price_desc') sortObj = { price: -1 };
@@ -120,11 +109,6 @@ export const getActiveParts = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get single part by Slug
- * @route   GET /api/v1/client/parts/:slug
- * @access  Public
- */
 export const getPartBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
 
@@ -142,13 +126,10 @@ export const getPartBySlug = asyncHandler(async (req, res) => {
     throw new Error('Không tìm thấy phụ tùng');
   }
 
-  // Calculate stock dynamically for the client response
   const partObj = part.toJSON();
   partObj.stock = part.inventory?.available_stock || 0;
 
-  // Fetch approved feedback (reviews) and map to UI schema
-  const mongoose = await import('mongoose'); // Ensure we can use mongoose models dynamically
-  // If PartReview model might not be initialized elsewhere yet, do a dynamic import
+  const mongoose = await import('mongoose');
   import('../../models/partReviewModel.js');
   const PartReview = mongoose.model('PartReview');
 

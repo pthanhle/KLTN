@@ -9,6 +9,7 @@ import { VEHICLE_BRANDS, SERVICE_CATEGORIES, TIME_SLOTS } from '../constants/boo
 import { MOCK_SERVICES_DATA } from '../data/services.mock';
 import { useClientServiceItemsQuery } from '../../../../services/queries/serviceItemQueries';
 import { useClientServiceCategoriesQuery } from '../../../../services/queries/serviceCategoryQueries';
+import { useSubmitServiceBooking } from '../../../../services/queries/bookingQueries';
 
 export const useServiceBookingLogic = () => {
     const { message } = App.useApp();
@@ -104,18 +105,36 @@ export const useServiceBookingLogic = () => {
     );
     const isStep2Valid = Boolean(bookingData.booking_date && bookingData.time_slot);
 
+    const { mutateAsync: submitServiceBooking } = useSubmitServiceBooking();
+
     // 5. Logic Core - Fake API
     const handleSubmitBooking = async (t) => {
         setIsSubmitting(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            console.log("Dữ liệu gửi lên BE: ", bookingData);
+            const payload = {
+                booking_type: 'service',
+                vehicle_info: {
+                    brand: bookingData.vehicle_brand,
+                    model: bookingData.vehicle_model,
+                    license_plate: bookingData.license_plate,
+                },
+                booking_date: bookingData.booking_date,
+                time_slot: bookingData.time_slot,
+                service_type: bookingData.selected_services.length > 0 ? 'MAINTENANCE' : 'OTHER',
+                services: bookingData.selected_services.map(s => ({
+                    service_id: s._id,
+                    service_name: s.serviceName,
+                    price: s.basePrice
+                })),
+                customer_note: bookingData.vehicle_condition
+            };
+
+            await submitServiceBooking(payload);
 
             message.success({
                 content: t ? t('services:booking_success', 'Booking successful! We will contact you soon.') : 'Booking successful!',
                 style: { marginTop: '10vh' },
             });
-            // Tương lai: redirect sang trang OrderSuccess báo thành công
         } catch (error) {
             message.error("Lỗi hệ thống");
         } finally {

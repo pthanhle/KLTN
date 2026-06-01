@@ -217,7 +217,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       }
 
       const createDate = moment.default().format('YYYYMMDDHHmmss')
-      const validAmount = Math.floor(Number(final_total))
+      const validAmount = Math.floor(Number(serverGrandTotal))
 
       const Payment = (await import('../../models/paymentModel.js')).default
       const paymentDoc = await Payment.create({
@@ -265,7 +265,6 @@ export const createOrder = asyncHandler(async (req, res) => {
     } catch (error) {
       console.error('Lỗi tạo VNPay URL:', error)
       console.error(`Failed to generate VNPay URL for order ${order.order_code}, payment method: ${payment.method}`)
-      // Fallback: return order without payment URL
     }
   }
 

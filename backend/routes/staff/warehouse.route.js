@@ -1,6 +1,6 @@
 import express from 'express'
 import { getPickLists, dispatchParts } from '../../controllers/staff/warehouse.controller.js'
-import { protect, staff } from '../../middleware/authMiddleware.js'
+import { protect, anyStaff as staff } from '../../middleware/authMiddleware.js'
 
 const router = express.Router()
 

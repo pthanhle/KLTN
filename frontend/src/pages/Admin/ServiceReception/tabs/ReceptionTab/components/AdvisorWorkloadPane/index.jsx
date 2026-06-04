@@ -11,7 +11,10 @@ const AdvisorWorkloadPane = ({ advisors, bookings, isLoading, onReschedule, onNo
                 ))
             ) : (
                 advisors.map(advisor => {
-                    const assignedBookings = bookings.filter(b => b.advisor_id === advisor._id);
+                    const assignedBookings = bookings.filter(b => {
+                        const bAdvisorId = b.advisor_id ? (b.advisor_id._id || b.advisor_id).toString() : null;
+                        return bAdvisorId === advisor._id.toString();
+                    });
                     return (
                         <AdvisorColumn
                             key={advisor._id} 

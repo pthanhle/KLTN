@@ -2,6 +2,9 @@ import Booking from '../../../models/bookingModel.js'
 import ServiceItem from '../../../models/serviceItemModel.js'
 import User from '../../../models/userModel.js'
 import Notification from '../../../models/notificationModel.js'
+import RepairProgress from '../../../models/repairprogressModel.js'
+import emailQueue from '../../../queues/emailQueue.js'
+import { serviceTrackingEmail } from '../../../utils/emailTemplates.js'
 import asyncHandler from 'express-async-handler'
 
 
@@ -12,7 +15,13 @@ export const getAppointments = asyncHandler(async (req, res) => {
     const search = req.query.search || ''
 
     const query = { booking_type: { $in: ['service', 'maintenance'] } }
-    if (status) query.booking_status = status.toUpperCase()
+    if (status) {
+        if (status.includes(',')) {
+            query.booking_status = { $in: status.split(',').map(s => s.trim().toUpperCase()) }
+        } else {
+            query.booking_status = status.toUpperCase()
+        }
+    }
 
     const startDate = req.query.startDate ? new Date(req.query.startDate) : null
     const endDate = req.query.endDate ? new Date(req.query.endDate) : null
@@ -95,7 +104,48 @@ export const updateAppointment = asyncHandler(async (req, res) => {
         appointment.customer_note = req.body.note
     }
 
+    let isNewAssignment = false
+    if (req.body.advisor_id && appointment.advisor_id?.toString() !== req.body.advisor_id) {
+        appointment.advisor_id = req.body.advisor_id
+        isNewAssignment = true
+    }
+
     const updated = await appointment.save()
+
+    if (isNewAssignment) {
+        // Create RepairProgress if assigned
+        let repairProgress = await RepairProgress.findOne({ booking_id: updated._id })
+        if (!repairProgress) {
+            await RepairProgress.create({
+                booking_id: updated._id,
+                advisor_id: updated.advisor_id,
+                status: 'RECEIVED',
+                current_step: 'RECEIVED',
+                timeline: [{
+                    step: 'RECEIVED',
+                    status: 'IN_PROGRESS',
+                    time: new Date(),
+                    note: 'Tiếp nhận xe từ khách hàng'
+                }]
+            })
+        } else {
+            repairProgress.advisor_id = updated.advisor_id
+            await repairProgress.save()
+        }
+
+        // Send email
+        const user = await User.findById(updated.user_id)
+        if (user && user.email) {
+            const trackingUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/tracking`
+            const licensePlate = updated.vehicle_info?.license_plate || '';
+            const template = serviceTrackingEmail(user.full_name, updated.booking_code, trackingUrl, licensePlate)
+
+            await emailQueue.add('sendEmail', {
+                to: user.email,
+                ...template,
+            })
+        }
+    }
 
     if (newStatus === 'CANCELLED') {
         const dateStr = new Date(appointment.booking_date).toLocaleDateString('vi-VN')

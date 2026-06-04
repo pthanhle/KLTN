@@ -143,3 +143,38 @@ export const resetPasswordEmail = (fullName, resetUrl) => ({
         </div>
     `,
 })
+
+export const serviceTrackingEmail = (fullName, trackingCode, trackingUrl, licensePlate) => ({
+    subject: 'Thông tin dịch vụ & Theo dõi tiến độ',
+    html: `
+        <div style="${BASE_STYLE}">
+            <h2 style="color: #1e293b; text-align: center;">Theo dõi tiến độ dịch vụ</h2>
+            <p>Xin chào <strong>${fullName}</strong>,</p>
+            <p>Yêu cầu dịch vụ của bạn đã được điều phối và đang được xử lý.</p>
+            
+            <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center;">
+                <p style="margin: 0; color: #475569; font-size: 14px;">Mã dịch vụ của bạn (Tracking Code):</p>
+                <p style="margin: 5px 0 0 0; font-family: monospace; font-size: 24px; font-weight: bold; color: #0f172a; letter-spacing: 2px;">
+                    ${trackingCode}
+                </p>
+                ${licensePlate ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #64748b;">Biển số xe: <strong style="color: #0f172a;">${licensePlate}</strong></p>` : ''}
+            </div>
+
+            <p>Bạn có thể theo dõi tiến độ dịch vụ trực tiếp qua liên kết dưới đây:</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="${trackingUrl}"
+                   style="background-color: #eab308; color: white; padding: 12px 30px;
+                          text-decoration: none; border-radius: 5px; display: inline-block;">
+                    Theo dõi tiến độ
+                </a>
+            </div>
+            
+            <hr style="${HR_STYLE}">
+            <p style="color: #999; font-size: 12px;">
+                Hoặc truy cập trực tiếp link này:<br>
+                <span style="word-break: break-all;">${trackingUrl}</span>
+            </p>
+            <p style="${FOOTER_STYLE}">Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+        </div>
+    `,
+})

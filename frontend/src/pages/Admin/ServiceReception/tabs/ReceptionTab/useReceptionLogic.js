@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AdminAppointmentAPI } from '../../../../../services/api/adminAppointment.api';
+import { AdminStaffAPI } from '../../../../../services/api/adminStaff.api';
 import { message } from 'antd';
 
 export const useReceptionLogic = (selectedDate) => {
@@ -13,13 +14,11 @@ export const useReceptionLogic = (selectedDate) => {
     const dateStr = selectedDate ? selectedDate.format('YYYY-MM-DD') : null;
 
     const { data, isLoading } = useQuery({
-        queryKey: ['admin-appointments', { status: 'CONFIRMED', date: dateStr }],
+        queryKey: ['admin-appointments', { status: 'CONFIRMED,RECEIVED' }],
         queryFn: () => AdminAppointmentAPI.getAppointments({
-            status: 'CONFIRMED',
-            date: dateStr,
+            status: 'CONFIRMED,RECEIVED',
             limit: 50,
         }),
-        enabled: !!dateStr,
         staleTime: 30 * 1000,
     });
 
@@ -40,22 +39,70 @@ export const useReceptionLogic = (selectedDate) => {
             vehicle_condition: b.customer_note || '',
             selected_services: (b.services || []).map(s => ({ name: s.service_name })),
             status: b.booking_status,
-            advisor_id: b.advisor_id || null,
+            // Normalize advisor_id to string whether it's a populated object or raw ID
+            advisor_id: b.advisor_id ? (b.advisor_id._id || b.advisor_id).toString() : null,
         }));
     }, [data]);
 
-    const advisors = [];
+    const { data: staffData } = useQuery({
+        queryKey: ['admin-staff-advisors'],
+        queryFn: () => AdminStaffAPI.getStaff({ limit: 100 }),
+        staleTime: 60 * 1000,
+    });
+
+    const advisors = useMemo(() => {
+        const allStaff = staffData?.staff || [];
+        return allStaff
+            .filter(s => s.role_id?.role_name === 'advisor' && s.status === 'active')
+            .map(s => ({
+                _id: s._id.toString(),
+                // Use fullName & avatarUrl to match what AdvisorColumn expects
+                fullName: s.full_name,
+                avatarUrl: s.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(s.full_name)}&background=random`,
+                role: 'advisor',
+                status: 'Sẵn sàng',
+                workload: 0,
+            }));
+    }, [staffData]);
 
     const handleDragStart = (event) => {
         const { active } = event;
         setActiveId(active.id);
     };
 
-    const handleDragEnd = (event) => {
+    const QUERY_KEY = ['admin-appointments', { status: 'CONFIRMED,RECEIVED' }];
+
+    const handleDragEnd = useCallback(async (event) => {
         const { active, over } = event;
         setActiveId(null);
         if (!over) return;
-    };
+
+        const bookingId = active.id;
+        const advisorId = over.id.toString();
+
+        const booking = bookings.find(b => b._id === bookingId);
+        if (!booking || booking.advisor_id === advisorId) return;
+
+        queryClient.setQueryData(QUERY_KEY, (old) => {
+            if (!old) return old;
+            const updated = (old.appointments || []).map(b =>
+                b._id === bookingId ? { ...b, advisor_id: advisorId } : b
+            );
+            return { ...old, appointments: updated };
+        });
+
+        try {
+            await AdminAppointmentAPI.updateAppointment(bookingId, {
+                advisor_id: advisorId,
+                status: 'RECEIVED'
+            });
+            message.success('Đã điều phối đơn thành công!');
+            queryClient.invalidateQueries({ queryKey: ['admin-appointments'] });
+        } catch (error) {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+            message.error('Lỗi khi điều phối đơn: ' + (error.response?.data?.message || error.message));
+        }
+    }, [bookings, queryClient]);
 
     const unassignedBookings = bookings.filter(b => !b.advisor_id);
     const activeBooking = activeId ? bookings.find(b => b._id === activeId) : null;

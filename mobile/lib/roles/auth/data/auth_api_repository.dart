@@ -34,7 +34,16 @@ class AuthApiRepository implements AuthRepository {
 
       return UserModel.fromJson(data);
     } on DioException catch (e) {
-      final serverMessage = e.response?.data?['message'] as String?;
+      String? serverMessage;
+      if (e.response?.data is Map) {
+        serverMessage = e.response?.data['message']?.toString();
+      } else if (e.response?.data is List && (e.response?.data as List).isNotEmpty) {
+        final firstError = (e.response?.data as List).first;
+        if (firstError is Map) {
+          serverMessage = firstError['message']?.toString();
+        }
+      }
+
       if (serverMessage != null && serverMessage.isNotEmpty) {
         throw Exception(serverMessage);
       }

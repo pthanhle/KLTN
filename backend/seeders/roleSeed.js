@@ -5,7 +5,7 @@ const seedRoles = async () => {
   try {
     console.log('Checking roles in database...'.cyan)
 
-    const requiredRoles = ['admin', 'customer', 'inventory', 'service', 'sale']
+    const requiredRoles = ['admin', 'customer', 'inventory', 'service', 'sale', 'advisor']
 
     for (const roleName of requiredRoles) {
       const existingRole = await Role.findOne({ role_name: roleName })

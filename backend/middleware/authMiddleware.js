@@ -20,7 +20,7 @@ const protect = asyncHandler(async (req, res, next) => {
         console.error('User not found in database')
         res.status(401)
         throw new Error('User not found')
-      } 
+      }
 
       next()
     } catch (error) {
@@ -63,6 +63,7 @@ export const inventoryStaff = (req, res, next) => {
 export const serviceStaff = (req, res, next) => {
   if (req.user && (
     req.user.role_id?.role_name?.toLowerCase() === 'service' ||
+    req.user.role_id?.role_name?.toLowerCase() === 'advisor' ||
     req.user.isAdmin ||
     req.user.role_id?.role_name?.toLowerCase() === 'admin'
   )) {
@@ -88,7 +89,7 @@ export const saleStaff = (req, res, next) => {
 
 export const anyStaff = (req, res, next) => {
   const roleName = req.user?.role_id?.role_name?.toLowerCase()
-  if (req.user && ['inventory', 'service', 'sale'].includes(roleName)) {
+  if (req.user && ['inventory', 'service', 'sale', 'advisor'].includes(roleName)) {
     next()
   } else {
     res.status(403)
@@ -102,7 +103,7 @@ export const adminOrStaff = (req, res, next) => {
   if (req.user && (
     req.user.isAdmin ||
     roleName === 'admin' ||
-    ['inventory', 'service', 'sale'].includes(roleName)
+    ['inventory', 'service', 'sale', 'advisor'].includes(roleName)
   )) {
     next()
   } else {

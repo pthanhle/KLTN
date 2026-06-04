@@ -63,8 +63,12 @@ export const staffLogin = asyncHandler(async (req, res) => {
     formattedPerformance = {
       kpis: {
         ...(perf.kpis ? (perf.kpis.toObject ? perf.kpis.toObject() : perf.kpis) : {}),
-        inventoryAccuracy: perf.kpis?.inventoryAccuracy || 0,
-        avgSla: perf.kpis?.avgSla || 0,
+        inventoryAccuracy: typeof perf.kpis?.inventoryAccuracy === 'object' && perf.kpis?.inventoryAccuracy !== null
+          ? perf.kpis.inventoryAccuracy
+          : { score: Number(perf.kpis?.inventoryAccuracy) || 0, target: 100 },
+        avgSla: typeof perf.kpis?.avgSla === 'object' && perf.kpis?.avgSla !== null
+          ? perf.kpis.avgSla
+          : { time: Number(perf.kpis?.avgSla) || 0, unit: 'h' },
       },
       kanban: { tasks }
     }

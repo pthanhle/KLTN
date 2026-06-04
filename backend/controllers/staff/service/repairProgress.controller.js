@@ -30,6 +30,12 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
         query.booking_id = { $in: bookings.map(b => b._id) }
     }
 
+    if (req.user.role_id?.role_name === 'advisor') {
+        query.advisor_id = req.user._id
+    } else if (req.user.role_id?.role_name === 'service') {
+        query.mechanic_id = req.user._id 
+    }
+
     const total = await RepairProgress.countDocuments(query)
     const progresses = await RepairProgress.find(query)
         .populate({
@@ -40,18 +46,21 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
             ],
         })
         .populate({
-            path: 'staff_id',
+            path: 'advisor_id',
+            select: 'full_name',
+            match: { _id: { $exists: true } },
+        })
+        .populate({
+            path: 'mechanic_id',
             select: 'full_name',
             match: { _id: { $exists: true } },
         })
 
     progresses.forEach(p => {
         const rawProgress = p.toObject();
-        if (!p.staff_id) {
+        if (!p.advisor_id && !p.mechanic_id) {
             console.error(
-                `Populate lỗi: staff_id không tìm thấy cho repairProgress ${p._id}. ` +
-                `Kiểm tra users collection với _id: ${rawProgress.staff_id}. ` +
-                `Raw staff_id in DB: ${mongoose.Types.ObjectId.isValid(rawProgress.staff_id) ? rawProgress.staff_id : 'Invalid or Undefined'}`
+                `Populate lỗi: advisor_id/mechanic_id không tìm thấy cho repairProgress ${p._id}. `
             );
         }
         if (!p.booking_id) {
@@ -116,7 +125,7 @@ export const createRepairProgress = asyncHandler(async (req, res) => {
 
     const progress = await RepairProgress.create({
         booking_id,
-        staff_id: req.user._id,
+        advisor_id: req.user._id,
         status,
         notes: notes || '',
         estimated_completion: estimated_completion ? new Date(estimated_completion) : null,
@@ -132,7 +141,8 @@ export const createRepairProgress = asyncHandler(async (req, res) => {
                     { path: 'service_id', select: 'service_name price duration' },
                 ],
             })
-            .populate('staff_id', 'full_name'),
+            .populate('advisor_id', 'full_name')
+            .populate('mechanic_id', 'full_name'),
     })
 })
 
@@ -146,7 +156,7 @@ export const updateRepairProgress = asyncHandler(async (req, res) => {
         throw new Error('Tiến độ sửa chữa không tồn tại')
     }
 
-    if (progress.staff_id.toString() !== req.user._id.toString()) {
+    if (progress.advisor_id?.toString() !== req.user._id.toString() && progress.mechanic_id?.toString() !== req.user._id.toString()) {
         res.status(403)
         throw new Error('Không có quyền cập nhật tiến độ này')
     }
@@ -231,7 +241,8 @@ export const updateRepairProgress = asyncHandler(async (req, res) => {
                     { path: 'service_id', select: 'service_name price duration' },
                 ],
             })
-            .populate('staff_id', 'full_name'),
+            .populate('advisor_id', 'full_name')
+            .populate('mechanic_id', 'full_name'),
     })
 })
 
@@ -243,7 +254,7 @@ export const deleteRepairProgress = asyncHandler(async (req, res) => {
         throw new Error('Tiến độ sửa chữa không tồn tại')
     }
 
-    if (progress.staff_id.toString() !== req.user._id.toString()) {
+    if (progress.advisor_id?.toString() !== req.user._id.toString() && progress.mechanic_id?.toString() !== req.user._id.toString()) {
         res.status(403)
         throw new Error('Không có quyền xóa tiến độ này')
     }

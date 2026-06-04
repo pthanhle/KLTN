@@ -21,12 +21,12 @@ class LoginPage extends ConsumerWidget {
   void _showAppleErrorAlert(BuildContext context, String message) {
     HapticFeedback.heavyImpact();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      barrierColor: Colors.black.withValues(alpha: 0.25), 
+      barrierColor: Colors.black.withValues(alpha: 0.25),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return Center(
@@ -36,13 +36,13 @@ class LoginPage extends ConsumerWidget {
               clipper: ShapeBorderClipper(
                 shape: SmoothRectangleBorder(
                   borderRadius: SmoothBorderRadius(
-                    cornerRadius: 28, 
+                    cornerRadius: 28,
                     cornerSmoothing: 1.0,
                   ),
                 ),
               ),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30), 
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                 child: Container(
                   width: 320,
                   decoration: ShapeDecoration(
@@ -63,8 +63,8 @@ class LoginPage extends ConsumerWidget {
                     children: [
                       const SizedBox(height: 32),
                       Icon(
-                        CupertinoIcons.exclamationmark_triangle_fill, 
-                        color: isDark ? Colors.redAccent.shade100 : Colors.redAccent, 
+                        CupertinoIcons.exclamationmark_triangle_fill,
+                        color: isDark ? Colors.redAccent.shade100 : Colors.redAccent,
                         size: 48
                       ),
                       const SizedBox(height: 16),
@@ -102,7 +102,7 @@ class LoginPage extends ConsumerWidget {
                             'Đóng'.tr(),
                             style: TextStyle(
                               fontSize: 17,
-                              fontWeight: FontWeight.w600, 
+                              fontWeight: FontWeight.w600,
                               color: isDark ? Colors.blueAccent.shade100 : CupertinoColors.activeBlue,
                             ),
                           ),
@@ -143,13 +143,15 @@ class LoginPage extends ConsumerWidget {
       if (!next.isLoading && next.hasError) {
         _showAppleErrorAlert(context, next.error.toString().replaceAll("Exception: ", ""));
       } else if (!next.isLoading && next.hasValue && next.value != null) {
-        final role = next.value!.role;
-        if (role == 'INVENTORY_MGR' || role == 'WAREHOUSE_MANAGER') {
+        final role = next.value!.role.toLowerCase();
+        if (role == 'inventory_mgr' || role == 'warehouse_manager' || role == 'inventory') {
           context.go('/warehouse');
-        } else if (role == 'SERVICE_ADVISOR') {
+        } else if (role == 'service_advisor' || role == 'advisor') {
           context.go('/advisor');
-        } else if (role == 'TECHNICIAN' || role == 'LEAD_TECHNICIAN') {
+        } else if (role == 'technician' || role == 'lead_technician' || role == 'service') {
           context.go('/technician');
+        } else if (role == 'sales_executive' || role == 'sale') {
+          context.go('/sales');
         } else {
           context.go('/dashboard');
         }
@@ -168,7 +170,7 @@ class LoginPage extends ConsumerWidget {
                 children: [
                   const LoginHeader(),
                   const SizedBox(height: 48),
-                  
+
                   GlassCard(
                     child: const Column(
                       mainAxisSize: MainAxisSize.min,

@@ -14,12 +14,12 @@ export const getStaff = asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit) || 10
     const search = req.query.search || ''
 
-    const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale'] } })
+    const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale', 'advisor'] } })
     const staffRoleIds = staffRoles.map(role => role._id)
 
     if (!staffRoles.length) {
         res.status(404)
-        throw new Error('Chưa có role nhân viên (inventory, service, sale) nào trong hệ thống')
+        throw new Error('Chưa có role nhân viên (inventory, service, sale, advisor) nào trong hệ thống')
     }
 
     const query = {
@@ -75,7 +75,7 @@ export const getStaffById = asyncHandler(async (req, res) => {
         throw new Error('Nhân viên không tồn tại')
     }
 
-    const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale'] } })
+    const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale', 'advisor'] } })
     const staffRoleIds = staffRoles.map(role => role._id.toString())
 
     if (!staffRoleIds.includes(user.role_id._id.toString())) {
@@ -199,7 +199,7 @@ export const updateStaff = asyncHandler(async (req, res) => {
         throw new Error('Nhân viên không tồn tại')
     }
 
-    const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale'] } })
+    const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale', 'advisor'] } })
     const staffRoleIds = staffRoles.map(role => role._id.toString())
 
     if (!staffRoleIds.includes(user.role_id.toString())) {
@@ -254,7 +254,7 @@ export const deleteStaff = asyncHandler(async (req, res) => {
         throw new Error('Nhân viên không tồn tại')
     }
 
-    const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale'] } })
+    const staffRoles = await Role.find({ role_name: { $in: ['inventory', 'service', 'sale', 'advisor'] } })
     const staffRoleIds = staffRoles.map(role => role._id.toString())
 
     if (!staffRoleIds.includes(user.role_id.toString())) {

@@ -2,7 +2,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiConfig {
-  static const int _port = 3000;
+  static const int _port = 5000;
 
   static String get baseUrl {
     if (kIsWeb) {

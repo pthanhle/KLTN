@@ -46,10 +46,12 @@ const OverviewVisualWalkaround = ({ imageUrl, hotspots }) => {
                     {/* Render Dynamic Hotspots */}
                     {hotspots.map((spot) => (
                         <div key={spot.id} className="absolute" style={{ top: spot.top, right: spot.right, left: spot.left, bottom: spot.bottom }}>
-                            <div className="relative flex items-center justify-center">
+                            <div className="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
                                 {/* Pulse Effect */}
                                 <span className="absolute inline-flex h-8 w-8 rounded-full bg-red-400 dark:bg-[#ffb4ab]/40 animate-pulse"></span>
-                                <span className="relative inline-flex rounded-full h-4 w-4 bg-red-600 dark:bg-[#ffb4ab] shadow-[0_0_15px_rgba(255,180,171,0.8)]"></span>
+                                <span className="relative inline-flex rounded-full h-6 w-6 bg-red-600 dark:bg-red-500 shadow-[0_0_15px_rgba(255,180,171,0.8)] flex items-center justify-center border-2 border-white dark:border-[#0A0A0B]">
+                                    <span className="text-white text-[10px] font-black leading-none">{spot.id}</span>
+                                </span>
                             </div>
                             <div className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-[#191f31]/90 backdrop-blur-md border border-red-500/30 px-3 py-1.5 rounded-full whitespace-nowrap shadow-xl z-10">
                                 <span className="text-[9px] font-bold text-red-600 dark:text-[#ffb4ab] uppercase tracking-wider">

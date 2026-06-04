@@ -41,8 +41,7 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
         .populate({
             path: 'booking_id',
             populate: [
-                { path: 'user_id', select: 'full_name email phone' },
-                { path: 'service_id', select: 'service_name price duration' },
+                { path: 'user_id', select: 'full_name email phone' }
             ],
         })
         .populate({

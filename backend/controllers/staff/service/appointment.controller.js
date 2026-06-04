@@ -105,9 +105,13 @@ export const updateAppointment = asyncHandler(async (req, res) => {
     }
 
     let isNewAssignment = false
-    if (req.body.advisor_id && appointment.advisor_id?.toString() !== req.body.advisor_id) {
-        appointment.advisor_id = req.body.advisor_id
-        isNewAssignment = true
+    if (req.body.advisor_id !== undefined && appointment.advisor_id?.toString() !== req.body.advisor_id) {
+        if (req.body.advisor_id === 'unassigned') {
+            appointment.advisor_id = null
+        } else {
+            appointment.advisor_id = req.body.advisor_id
+            isNewAssignment = true
+        }
     }
 
     const updated = await appointment.save()

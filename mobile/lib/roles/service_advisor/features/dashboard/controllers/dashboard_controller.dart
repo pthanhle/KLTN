@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/repair_order_model.dart';
-import '../data/advisor_mock_data.dart';
+import '../data/advisor_api_repository.dart';
 
 class AdvisorDashboardState {
   final bool isLoading;
@@ -34,6 +34,8 @@ class AdvisorDashboardState {
 }
 
 class AdvisorDashboardController extends Notifier<AdvisorDashboardState> {
+  final _repository = AdvisorApiRepository();
+
   @override
   AdvisorDashboardState build() {
     Future.microtask(_loadDashboardData);
@@ -43,14 +45,16 @@ class AdvisorDashboardController extends Notifier<AdvisorDashboardState> {
   Future<void> _loadDashboardData() async {
     state = state.copyWith(isLoading: true);
     
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 800));
-    
-    state = state.copyWith(
-      isLoading: false,
-      advisorName: 'Nguyễn Hoàng Nam',
-      allRepairOrders: mockRepairOrders,
-    );
+    try {
+      final repairOrders = await _repository.getRepairOrders();
+      state = state.copyWith(
+        isLoading: false,
+        allRepairOrders: repairOrders,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
+      print('Error loading dashboard data: $e');
+    }
   }
 
   void selectStage(ROStage stage) {

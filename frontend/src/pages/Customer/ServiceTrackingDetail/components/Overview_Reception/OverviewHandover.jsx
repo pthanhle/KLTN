@@ -55,26 +55,33 @@ const OverviewHandover = ({ signatures }) => {
                             {t('label_customer_auth', 'Customer Auth')}
                         </span>
                         
-                        {/* Animated SVG Path for Signature */}
-                        <svg className="w-40 h-auto opacity-80" viewBox="0 0 200 80">
-                            <style>
-                                {`
-                                    .signature-path-customer {
-                                        stroke-dasharray: 1000;
-                                        stroke-dashoffset: 1000;
-                                        animation: dash 4s ease-out forwards 0.5s;
-                                    }
-                                `}
-                            </style>
-                            <path 
-                                className="signature-path-customer" 
-                                d={signatures.customer.svgPath} 
-                                fill="none" 
-                                stroke="#4edea3" 
-                                strokeLinecap="round" 
-                                strokeWidth="2.5"
-                            ></path>
-                        </svg>
+                        {signatures.customer.isImage ? (
+                            <img 
+                                src={signatures.customer.url} 
+                                alt="Customer Signature" 
+                                className="w-full h-full object-contain p-2 filter dark:invert" 
+                            />
+                        ) : (
+                            <svg className="w-40 h-auto opacity-80" viewBox="0 0 200 80">
+                                <style>
+                                    {`
+                                        .signature-path-customer {
+                                            stroke-dasharray: 1000;
+                                            stroke-dashoffset: 1000;
+                                            animation: dash 4s ease-out forwards 0.5s;
+                                        }
+                                    `}
+                                </style>
+                                <path 
+                                    className="signature-path-customer" 
+                                    d={signatures.customer.svgPath} 
+                                    fill="none" 
+                                    stroke="#4edea3" 
+                                    strokeLinecap="round" 
+                                    strokeWidth="2.5"
+                                ></path>
+                            </svg>
+                        )}
                     </div>
                     <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-[#d3c5ac]">
                         {signatures.customer.name}

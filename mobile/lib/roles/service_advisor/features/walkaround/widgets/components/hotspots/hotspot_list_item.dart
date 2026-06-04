@@ -8,11 +8,13 @@ import '../../../models/hotspot_model.dart';
 class HotspotListItem extends StatelessWidget {
   final HotspotModel hotspot;
   final VoidCallback onRemove;
+  final int index;
 
   const HotspotListItem({
     super.key,
     required this.hotspot,
     required this.onRemove,
+    required this.index,
   });
 
   @override
@@ -50,12 +52,22 @@ class HotspotListItem extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 10,
-                  height: 10,
-                  decoration: ShapeDecoration(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
                     color: theme.colorScheme.error,
-                    shape: SmoothRectangleBorder(
-                      borderRadius: SmoothBorderRadius(cornerRadius: 5, cornerSmoothing: 1.0),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$index',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        height: 1,
+                      ),
                     ),
                   ),
                 ),

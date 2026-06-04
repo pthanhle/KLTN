@@ -73,7 +73,6 @@ export const getTrackingDetail = asyncHandler(async (req, res) => {
 
 export const lookupTracking = asyncHandler(async (req, res) => {
     const { booking_code, license_plate } = req.body
-    const userId = req.user._id
 
     if (!booking_code || !license_plate) {
         res.status(400)
@@ -82,8 +81,7 @@ export const lookupTracking = asyncHandler(async (req, res) => {
 
     const booking = await Booking.findOne({
         booking_code: booking_code,
-        'vehicle_info.license_plate': license_plate,
-        user_id: userId
+        'vehicle_info.license_plate': license_plate
     })
 
     if (!booking) {

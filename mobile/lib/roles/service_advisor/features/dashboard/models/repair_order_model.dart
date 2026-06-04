@@ -70,6 +70,7 @@ enum ROStage {
 
 class RepairOrderModel {
   final String id;
+  final String bookingId;
   final VehicleInfo vehicleInfo;
   final CustomerInfo customerInfo;
   final String serviceType;
@@ -83,6 +84,7 @@ class RepairOrderModel {
 
   RepairOrderModel({
     required this.id,
+    required this.bookingId,
     required this.vehicleInfo,
     required this.customerInfo,
     required this.serviceType,

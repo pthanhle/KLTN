@@ -3,7 +3,7 @@ import Booking from '../../../../models/bookingModel.js'
 import asyncHandler from 'express-async-handler'
 
 export const processReception = asyncHandler(async (req, res) => {
-    const { booking_id, odometer, fuel_level, customer_notes, damage_map, belongings } = req.body
+    const { booking_id, odometer, fuel_level, customer_notes, damage_map, belongings, signature_data } = req.body
 
     if (!booking_id) {
         res.status(400)
@@ -34,6 +34,15 @@ export const processReception = asyncHandler(async (req, res) => {
             damage_map: damage_map || [],
             belongings: belongings || []
         }
+        if (signature_data) {
+            progress.signatures = {
+                ...progress.signatures,
+                customer: {
+                    name: 'Khách hàng',
+                    signature_url: signature_data
+                }
+            }
+        }
         progress.current_step = 'RECEIVED'
         progress.status = 'RECEIVED'
     } else {
@@ -49,6 +58,12 @@ export const processReception = asyncHandler(async (req, res) => {
                 damage_map: damage_map || [],
                 belongings: belongings || []
             },
+            signatures: signature_data ? {
+                customer: {
+                    name: 'Khách hàng',
+                    signature_url: signature_data
+                }
+            } : undefined,
             timeline: [{
                 step: 'RECEIVED',
                 status: 'COMPLETED',

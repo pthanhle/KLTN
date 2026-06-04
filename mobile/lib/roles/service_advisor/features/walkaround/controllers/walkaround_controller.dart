@@ -1,37 +1,51 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart';
 import '../models/walkaround_model.dart';
 import '../models/service_package_model.dart';
 import '../models/hotspot_model.dart';
 import '../models/checklist_item_model.dart';
 import '../data/walkaround_mock_data.dart';
-import '../../dashboard/data/advisor_mock_data.dart';
+import '../data/walkaround_api_repository.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
 
 class WalkaroundState {
   final WalkaroundModel data;
   final int currentStep;
   final bool isLoading;
+  final String? bookingId;
+  final String? submitError;
+  final bool submitSuccess;
 
   WalkaroundState({
     required this.data,
     this.currentStep = 0,
     this.isLoading = false,
+    this.bookingId,
+    this.submitError,
+    this.submitSuccess = false,
   });
 
   WalkaroundState copyWith({
     WalkaroundModel? data,
     int? currentStep,
     bool? isLoading,
+    String? bookingId,
+    String? submitError,
+    bool? submitSuccess,
   }) {
     return WalkaroundState(
       data: data ?? this.data,
       currentStep: currentStep ?? this.currentStep,
       isLoading: isLoading ?? this.isLoading,
+      bookingId: bookingId ?? this.bookingId,
+      submitError: submitError ?? this.submitError,
+      submitSuccess: submitSuccess ?? this.submitSuccess,
     );
   }
 }
 
 class WalkaroundController extends Notifier<WalkaroundState> {
+  final _api = WalkaroundApiRepository();
+
   @override
   WalkaroundState build() {
     return WalkaroundState(
@@ -41,16 +55,23 @@ class WalkaroundController extends Notifier<WalkaroundState> {
 
   void init(String orderId) {
     try {
-      final order = mockRepairOrders.firstWhere((o) => o.id == orderId);
+      final dashboardState = ref.read(advisorDashboardProvider);
+      final order = dashboardState.allRepairOrders.firstWhere((o) => o.id == orderId);
       state = state.copyWith(
+        bookingId: order.bookingId,
         data: state.data.copyWith(
           orderId: order.id,
           selectedPackages: order.selectedServices,
-          imageUrl: order.vehicleInfo.imageUrl ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0', // Fallback for mock if not provided
+          imageUrl: order.vehicleInfo.imageUrl ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0',
         ),
       );
     } catch (e) {
-      // Fallback
+      state = state.copyWith(
+        data: state.data.copyWith(
+          orderId: orderId,
+          imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0',
+        ),
+      );
     }
   }
 
@@ -124,15 +145,33 @@ class WalkaroundController extends Notifier<WalkaroundState> {
   }
 
   bool canSubmit() {
-    return state.data.signatureData != null && 
-           state.data.signatureData!.isNotEmpty && 
+    return state.data.signatureData != null &&
+           state.data.signatureData!.isNotEmpty &&
            state.data.odometer > 0;
   }
 
-  Future<void> submit() async {
-    state = state.copyWith(isLoading: true);
-    await Future.delayed(const Duration(seconds: 1));
-    state = state.copyWith(isLoading: false);
+  Future<bool> submit() async {
+    final bookingId = state.bookingId;
+    if (bookingId == null || bookingId.isEmpty) {
+      state = state.copyWith(submitError: 'Không tìm thấy mã đặt lịch. Vui lòng thử lại.');
+      return false;
+    }
+
+    state = state.copyWith(isLoading: true, submitError: null, submitSuccess: false);
+    try {
+      await _api.submitReception(
+        bookingId: bookingId,
+        data: state.data,
+      );
+      state = state.copyWith(isLoading: false, submitSuccess: true);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        submitError: e.toString().replaceFirst('Exception: ', ''),
+      );
+      return false;
+    }
   }
 }
 

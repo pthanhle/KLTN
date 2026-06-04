@@ -66,11 +66,14 @@ class HotspotImageBoard extends StatelessWidget {
                   ),
                 ),
 
-                ...hotspots.map((hotspot) {
+                ...hotspots.asMap().entries.map((entry) {
+                  final idx = entry.key;
+                  final hotspot = entry.value;
                   return Positioned(
-                    left: hotspot.x * constraints.maxWidth - 12,
-                    top: hotspot.y * constraints.maxHeight - 12,
+                    left: hotspot.x * constraints.maxWidth - 14,
+                    top: hotspot.y * constraints.maxHeight - 14,
                     child: HotspotPin(
+                      index: idx + 1,
                       onTap: () => onRemoveHotspot(hotspot.id),
                     ),
                   );

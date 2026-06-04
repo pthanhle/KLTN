@@ -1,7 +1,7 @@
 import { Terminal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatTimeHHMM } from '../../../../../utils/trackingDataUtils';
-import { LOG_TYPE_COLORS, LOG_TYPE_LABELS } from '../../../../../constants/progressConstants';
+import { formatTimeHHMM } from '../../../utils/trackingDataUtils';
+import { LOG_TYPE_COLORS, LOG_TYPE_LABELS } from '../../../constants/progressConstants';
 
 const SystemActivityLog = ({ logs }) => {
     const { t } = useTranslation('tracking');

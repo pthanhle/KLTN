@@ -7,12 +7,14 @@ class AdvisorDashboardState {
   final String advisorName;
   final List<RepairOrderModel> allRepairOrders;
   final ROStage selectedStage;
+  final bool sessionExpired;
   
   AdvisorDashboardState({
     this.isLoading = true,
     this.advisorName = '',
     this.allRepairOrders = const [],
     this.selectedStage = ROStage.pending,
+    this.sessionExpired = false,
   });
 
   List<RepairOrderModel> get filteredOrders => 
@@ -23,12 +25,14 @@ class AdvisorDashboardState {
     String? advisorName,
     List<RepairOrderModel>? allRepairOrders,
     ROStage? selectedStage,
+    bool? sessionExpired,
   }) {
     return AdvisorDashboardState(
       isLoading: isLoading ?? this.isLoading,
       advisorName: advisorName ?? this.advisorName,
       allRepairOrders: allRepairOrders ?? this.allRepairOrders,
       selectedStage: selectedStage ?? this.selectedStage,
+      sessionExpired: sessionExpired ?? this.sessionExpired,
     );
   }
 }
@@ -43,7 +47,7 @@ class AdvisorDashboardController extends Notifier<AdvisorDashboardState> {
   }
 
   Future<void> _loadDashboardData() async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, sessionExpired: false);
     
     try {
       final repairOrders = await _repository.getRepairOrders();
@@ -52,8 +56,12 @@ class AdvisorDashboardController extends Notifier<AdvisorDashboardState> {
         allRepairOrders: repairOrders,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false);
-      print('Error loading dashboard data: $e');
+      if (e.toString().contains('SESSION_EXPIRED')) {
+        state = state.copyWith(isLoading: false, sessionExpired: true);
+      } else {
+        state = state.copyWith(isLoading: false);
+        print('Error loading dashboard data: $e');
+      }
     }
   }
 

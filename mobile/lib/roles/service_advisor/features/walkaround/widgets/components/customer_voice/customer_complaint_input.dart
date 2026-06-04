@@ -47,9 +47,9 @@ class CustomerComplaintInput extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: CupertinoTextField(
-            controller: TextEditingController(text: initialValue)
-              ..selection = TextSelection.collapsed(offset: initialValue.length),
+            controller: TextEditingController(text: initialValue),
             maxLines: 4,
+            readOnly: true,
             onChanged: onChanged,
             style: theme.textTheme.bodyLarge?.copyWith(
               height: 1.5,

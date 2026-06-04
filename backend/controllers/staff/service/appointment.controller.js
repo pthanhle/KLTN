@@ -142,7 +142,8 @@ export const updateAppointment = asyncHandler(async (req, res) => {
         if (user && user.email) {
             const trackingUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/tracking`
             const licensePlate = updated.vehicle_info?.license_plate || '';
-            const template = serviceTrackingEmail(user.full_name, updated.booking_code, trackingUrl, licensePlate)
+            const serviceItems = updated.services || [];
+            const template = serviceTrackingEmail(user.full_name, updated.booking_code, trackingUrl, licensePlate, serviceItems)
 
             await emailQueue.add('sendEmail', {
                 to: user.email,

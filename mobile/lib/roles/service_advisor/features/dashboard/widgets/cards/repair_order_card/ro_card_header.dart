@@ -5,11 +5,13 @@ import '../../../models/repair_order_model.dart';
 class ROCardHeader extends StatelessWidget {
   final VehicleInfo vehicleInfo;
   final String serviceType;
+  final String bookingCode;
 
   const ROCardHeader({
     super.key,
     required this.vehicleInfo,
     required this.serviceType,
+    this.bookingCode = '',
   });
 
   @override
@@ -39,6 +41,17 @@ class ROCardHeader extends StatelessWidget {
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
+              if (bookingCode.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  bookingCode,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ],
           ),
         ),

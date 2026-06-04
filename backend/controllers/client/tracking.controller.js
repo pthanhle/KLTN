@@ -272,15 +272,14 @@ export const confirmPayment = asyncHandler(async (req, res) => {
 })
 
 export const getTrackingStats = asyncHandler(async (req, res) => {
-    const activeOrdersStatus = ['RECEIVED', 'IN_PROGRESS', 'QC_TESTING']
-    const activeOrders = await Booking.countDocuments({
-        booking_status: { $in: activeOrdersStatus }
-    })
+    const realCompleted = await Booking.countDocuments({ booking_status: 'COMPLETED' })
 
-    const avgSpeed = "4.2"
+    const baseNumber = 1250
+    const totalServiced = realCompleted + baseNumber
 
     res.json({
-        active_orders: activeOrders,
-        avg_speed: avgSpeed
+        total_serviced: totalServiced,
+        years_experience: 5,
+        service_standard: 'Chính hãng'
     })
 })

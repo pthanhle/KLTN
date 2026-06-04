@@ -21,8 +21,8 @@ class AdvisorApiRepository {
   Future<List<RepairOrderModel>> getRepairOrders() async {
     final url = '${ApiConfig.baseUrl}/staff/service/repair-progress';
     final token = await _getToken();
-    
-    if (token == null) throw Exception('Vui lòng đăng nhập lại.');
+
+    if (token == null) throw Exception('SESSION_EXPIRED');
 
     try {
       final response = await _dio.get(
@@ -37,6 +37,11 @@ class AdvisorApiRepository {
       }
       return [];
     } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('access_token');
+        throw Exception('SESSION_EXPIRED');
+      }
       throw Exception('Không thể tải dữ liệu: ${e.message}');
     } catch (e) {
       throw Exception('Đã xảy ra lỗi: $e');
@@ -51,6 +56,7 @@ class AdvisorApiRepository {
 
     ROStage parseStage(String status) {
       switch (status) {
+        case 'QUOTING':
         case 'QUOTATION': return ROStage.quotation;
         case 'IN_PROGRESS': return ROStage.inProgress;
         case 'QC': return ROStage.qc;
@@ -62,32 +68,34 @@ class AdvisorApiRepository {
     }
 
     return RepairOrderModel(
-      id: json['_id'] ?? '',
-      bookingId: (booking['_id'] ?? '').toString(),
+      id: json['_id']?.toString() ?? '',
+      bookingId: booking['_id']?.toString() ?? '',
+      bookingCode: booking['booking_code']?.toString() ?? '',
+      customerNote: booking['customer_note']?.toString() ?? '',
       vehicleInfo: VehicleInfo(
-        licensePlate: vehicle['license_plate'] ?? '',
-        model: vehicle['model'] ?? vehicle['brand'] ?? '',
-        color: vehicle['color'] ?? '',
+        licensePlate: vehicle['license_plate']?.toString() ?? '',
+        model: vehicle['model']?.toString() ?? vehicle['brand']?.toString() ?? '',
+        color: vehicle['color']?.toString() ?? '',
       ),
       customerInfo: CustomerInfo(
-        name: customer['full_name'] ?? '',
-        phone: customer['phone'] ?? '',
+        name: customer['full_name']?.toString() ?? '',
+        phone: customer['phone']?.toString() ?? '',
       ),
-      serviceType: service['service_name'] ?? booking['service_type'] ?? '',
+      serviceType: (service is Map ? service['service_name']?.toString() : null) ?? booking['service_type']?.toString() ?? '',
       isWaitingInLounge: false,
       stage: parseStage(json['status'] ?? 'PENDING'),
-      scheduledArrivalTime: booking['booking_date'] != null 
-          ? DateTime.parse(booking['booking_date']) 
+      scheduledArrivalTime: booking['booking_date'] != null
+          ? DateTime.parse(booking['booking_date'])
           : DateTime.now(),
       actualArrivalTime: null,
-      expectedDeliveryTime: json['expected_delivery_time'] != null 
-          ? DateTime.parse(json['expected_delivery_time']) 
+      expectedDeliveryTime: json['expected_delivery_time'] != null
+          ? DateTime.parse(json['expected_delivery_time'].toString())
           : null,
-      assignedTechnician: json['mechanic_id'] != null 
+      assignedTechnician: json['mechanic_id'] != null && json['mechanic_id'] is Map
           ? AssignedTechnician(
-              id: json['mechanic_id']['_id'] ?? '',
-              name: json['mechanic_id']['full_name'] ?? '',
-              avatarUrl: json['mechanic_id']['avatar'] ?? '',
+              id: json['mechanic_id']['_id']?.toString() ?? '',
+              name: json['mechanic_id']['full_name']?.toString() ?? '',
+              avatarUrl: json['mechanic_id']['avatar']?.toString() ?? '',
             )
           : null,
     );

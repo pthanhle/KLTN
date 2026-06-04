@@ -71,6 +71,8 @@ enum ROStage {
 class RepairOrderModel {
   final String id;
   final String bookingId;
+  final String bookingCode;
+  final String customerNote;
   final VehicleInfo vehicleInfo;
   final CustomerInfo customerInfo;
   final String serviceType;
@@ -85,6 +87,8 @@ class RepairOrderModel {
   RepairOrderModel({
     required this.id,
     required this.bookingId,
+    this.bookingCode = '',
+    this.customerNote = '',
     required this.vehicleInfo,
     required this.customerInfo,
     required this.serviceType,
@@ -111,6 +115,9 @@ class RepairOrderModel {
 
     return RepairOrderModel(
       id: json['id'] ?? '',
+      bookingId: json['bookingId'] ?? '',
+      bookingCode: json['bookingCode'] ?? '',
+      customerNote: json['customerNote'] ?? '',
       vehicleInfo: VehicleInfo.fromJson(json['vehicle_info'] ?? {}),
       customerInfo: CustomerInfo.fromJson(json['customer_info'] ?? {}),
       serviceType: json['service_type'] ?? '',

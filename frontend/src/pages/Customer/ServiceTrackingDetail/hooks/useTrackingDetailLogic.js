@@ -5,7 +5,7 @@ import { getDiagnosticData } from '../data/mockDiagnosticData';
 import { getQcData } from '../data/mockQcData';
 import { getOverviewData } from '../data/mockOverviewData';
 import { getQuotationData } from '../data/mockQuotationData';
-import trackingApi from '../../../services/api/tracking.api';
+import trackingApi from '../../../../services/api/tracking.api';
 import { useSelector } from 'react-redux';
 
 export const useTrackingDetailLogic = () => {
@@ -48,23 +48,25 @@ export const useTrackingDetailLogic = () => {
                 const quotation = getQuotationData(id || 'SRV-2026-B77P');
 
                 let overview = mockOverview;
-                if (realProgress && realProgress.reception_info) {
-                    const ri = realProgress.reception_info;
+                if (realProgress && realProgress.timeline) {
+                    const receivedStep = realProgress.timeline.find(t => t.step === 'RECEIVED');
+                    const ri = receivedStep?.reception_info || realProgress.reception_info;
+                    if (ri) {
                     overview = {
                         booking_code: realProgress.booking_id?.booking_code || id,
-                        customer_note: ri.customer_notes || mockOverview.customer_note,
+                        customer_note: ri.customer_notes || '',
                         status: realProgress.status,
                         reception_notes: realProgress.note || 'Không có ghi chú thêm',
                         health_hud: {
-                            odometer: ri.odometer || mockOverview.health_hud.odometer,
-                            fuel_level: ri.fuel_level ? (ri.fuel_level / 100) * 100 : mockOverview.health_hud.fuel_level
+                            odometer: ri.odometer || 0,
+                            fuel_level: ri.fuel_level ?? 0
                         },
-                        vehicle_image: realProgress.images?.[0] || mockOverview.vehicle_image,
+                        vehicle_image: realProgress.images?.[0] || 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0',
                         hotspots: (ri.damage_map || []).map((h, idx) => ({
                             id: idx + 1,
                             top: `${h.y * 100}%`,
                             left: `${h.x * 100}%`,
-                            label: h.description
+                            label: h.description || `Điểm ${idx + 1}`
                         })),
                         checklist: (ri.belongings || []).map((b, idx) => ({
                             id: idx + 1,
@@ -73,9 +75,9 @@ export const useTrackingDetailLogic = () => {
                         })),
                         signatures: {
                             advisor: { name: 'CỐ VẤN DỊCH VỤ', svgPath: '' },
-                            customer: realProgress.signatures?.customer?.signature_url ?
-                                { name: 'KHÁCH HÀNG', isImage: true, url: realProgress.signatures.customer.signature_url } :
-                                mockOverview.signatures.customer
+                            customer: receivedStep?.signatures?.customer?.signature_url ?
+                                { name: 'KHÁCH HÀNG', isImage: true, url: receivedStep.signatures.customer.signature_url } :
+                                { name: 'KHÁCH HÀNG', svgPath: '' }
                         }
                     };
                 }

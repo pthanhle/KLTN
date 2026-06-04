@@ -4,11 +4,10 @@ import { protect } from '../../middleware/authMiddleware.js'
 
 const router = express.Router()
 
+router.get('/stats', getTrackingStats)
 router.post('/lookup', lookupTracking)
 
 router.use(protect)
-
-router.get('/stats', getTrackingStats)
 router.get('/', getMyProgressList)
 router.get('/:bookingCode', getTrackingDetail)
 

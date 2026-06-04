@@ -61,6 +61,7 @@ class WalkaroundController extends Notifier<WalkaroundState> {
         bookingId: order.bookingId,
         data: state.data.copyWith(
           orderId: order.id,
+          customerComplaint: order.customerNote,
           selectedPackages: order.selectedServices,
           imageUrl: order.vehicleInfo.imageUrl ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0',
         ),

@@ -144,7 +144,7 @@ export const resetPasswordEmail = (fullName, resetUrl) => ({
     `,
 })
 
-export const serviceTrackingEmail = (fullName, trackingCode, trackingUrl, licensePlate) => ({
+export const serviceTrackingEmail = (fullName, trackingCode, trackingUrl, licensePlate, serviceItems = []) => ({
     subject: 'Thông tin dịch vụ & Theo dõi tiến độ',
     html: `
         <div style="${BASE_STYLE}">
@@ -159,6 +159,20 @@ export const serviceTrackingEmail = (fullName, trackingCode, trackingUrl, licens
                 </p>
                 ${licensePlate ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #64748b;">Biển số xe: <strong style="color: #0f172a;">${licensePlate}</strong></p>` : ''}
             </div>
+
+            ${serviceItems.length > 0 ? `
+            <div style="margin: 20px 0;">
+                <p style="font-weight: 700; color: #1e293b; margin-bottom: 10px;">Hạng mục dịch vụ đã đăng ký:</p>
+                <ul style="margin: 0; padding-left: 20px; border-left: 3px solid #eab308;">
+                    ${serviceItems.map(s => `
+                        <li style="margin: 8px 0; font-size: 14px; color: #0f172a;">
+                            <strong>${s.service_name || s.name || 'Dịch vụ'}</strong>
+                            ${(s.price && s.price > 0) ? `<span style="color: #64748b; margin-left: 8px;">(${Number(s.price).toLocaleString('vi-VN')} ₫)</span>` : ''}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+            ` : ''}
 
             <p>Bạn có thể theo dõi tiến độ dịch vụ trực tiếp qua liên kết dưới đây:</p>
             <div style="text-align: center; margin: 30px 0;">

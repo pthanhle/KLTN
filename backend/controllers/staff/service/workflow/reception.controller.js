@@ -26,49 +26,73 @@ export const processReception = asyncHandler(async (req, res) => {
 
     let progress = await RepairProgress.findOne({ booking_id })
 
-    if (progress) {
-        progress.reception_info = {
-            odometer,
-            fuel_level,
-            customer_notes,
-            damage_map: damage_map || [],
-            belongings: belongings || []
+    const receptionInfoData = {
+        odometer,
+        fuel_level,
+        customer_notes,
+        damage_map: damage_map || [],
+        belongings: belongings || []
+    }
+
+    const signaturesData = signature_data ? {
+        customer: {
+            name: 'Khách hàng',
+            signature_url: signature_data
         }
-        if (signature_data) {
-            progress.signatures = {
-                ...progress.signatures,
-                customer: {
-                    name: 'Khách hàng',
-                    signature_url: signature_data
+    } : {}
+
+    if (progress) {
+        progress.current_step = 'QUOTING'
+        progress.status = 'QUOTING'
+
+        const receivedStepIndex = progress.timeline.findIndex(t => t.step === 'RECEIVED')
+        if (receivedStepIndex !== -1) {
+            progress.timeline[receivedStepIndex].status = 'COMPLETED'
+            progress.timeline[receivedStepIndex].reception_info = receptionInfoData
+            if (signature_data) {
+                progress.timeline[receivedStepIndex].signatures = {
+                    ...progress.timeline[receivedStepIndex].signatures,
+                    ...signaturesData
                 }
             }
+        } else {
+            progress.timeline.push({
+                step: 'RECEIVED',
+                status: 'COMPLETED',
+                time: new Date(),
+                note: 'Đã tiếp nhận xe',
+                reception_info: receptionInfoData,
+                signatures: signaturesData
+            })
         }
-        progress.current_step = 'RECEIVED'
-        progress.status = 'RECEIVED'
+
+        const quotationStepExists = progress.timeline.some(t => t.step === 'QUOTING')
+        if (!quotationStepExists) {
+            progress.timeline.push({
+                step: 'QUOTING',
+                status: 'IN_PROGRESS',
+                time: new Date(),
+                note: 'Chờ lên báo giá'
+            })
+        }
     } else {
         progress = new RepairProgress({
             booking_id,
             advisor_id: req.user._id,
-            current_step: 'RECEIVED',
-            status: 'RECEIVED',
-            reception_info: {
-                odometer,
-                fuel_level,
-                customer_notes,
-                damage_map: damage_map || [],
-                belongings: belongings || []
-            },
-            signatures: signature_data ? {
-                customer: {
-                    name: 'Khách hàng',
-                    signature_url: signature_data
-                }
-            } : undefined,
+            current_step: 'QUOTING',
+            status: 'QUOTING',
             timeline: [{
                 step: 'RECEIVED',
                 status: 'COMPLETED',
                 time: new Date(),
-                note: 'Đã tiếp nhận xe'
+                note: 'Đã tiếp nhận xe',
+                reception_info: receptionInfoData,
+                signatures: signaturesData
+            }, {
+                step: 'QUOTING',
+                status: 'IN_PROGRESS',
+                time: new Date(),
+                note: 'Chờ lên báo giá'
             }]
         })
     }

@@ -113,6 +113,7 @@ class _RepairOrderCardState extends State<RepairOrderCard>
                       ROCardHeader(
                         vehicleInfo: order.vehicleInfo,
                         serviceType: order.serviceType,
+                        bookingCode: order.bookingCode,
                       ),
                       const SizedBox(height: 16),
                       Divider(
@@ -127,6 +128,32 @@ class _RepairOrderCardState extends State<RepairOrderCard>
                         isWaitingInLounge: order.isWaitingInLounge,
                         showWaitingTag: order.stage != ROStage.pending,
                       ),
+                      if (order.customerNote.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.format_quote_rounded,
+                              size: 14,
+                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                order.customerNote,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontStyle: FontStyle.italic,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       ROCardTimeline(
                         scheduledTime: order.scheduledArrivalTime,

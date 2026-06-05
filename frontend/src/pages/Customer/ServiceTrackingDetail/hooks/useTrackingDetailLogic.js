@@ -5,6 +5,7 @@ import { getDiagnosticData } from '../data/mockDiagnosticData';
 import { getQcData } from '../data/mockQcData';
 import { getOverviewData } from '../data/mockOverviewData';
 import { getQuotationData } from '../data/mockQuotationData';
+import { normalizeSignatureDataUrl } from '../utils/trackingDataUtils';
 import trackingApi from '../../../../services/api/tracking.api';
 import { useSelector } from 'react-redux';
 
@@ -42,15 +43,19 @@ export const useTrackingDetailLogic = () => {
                     }
                 }
 
-                const data = getDiagnosticData(id || 'SRV-2026-B77P');
-                const qc = getQcData(id || 'SRV-2026-B77P');
-                const mockOverview = getOverviewData(id || 'SRV-2026-B77P');
-                const quotation = getQuotationData(id || 'SRV-2026-B77P');
+                const fallbackCode = id || 'SRV-2026-B77P';
+                const data = getDiagnosticData(fallbackCode);
+                const qc = getQcData(fallbackCode);
+                const mockOverview = getOverviewData(fallbackCode);
+                let quotation = getQuotationData(fallbackCode);
 
                 let overview = mockOverview;
-                if (realProgress && realProgress.timeline) {
-                    const receivedStep = realProgress.timeline.find(t => t.step === 'RECEIVED');
+                if (realProgress?.timeline) {
+                    const receivedStep = realProgress.timeline.find((step) => step.step === 'RECEIVED');
                     const ri = receivedStep?.reception_info || realProgress.reception_info;
+                    const advisorSignatureUrl = normalizeSignatureDataUrl(receivedStep?.signatures?.advisor?.signature_url);
+                    const customerSignatureUrl = normalizeSignatureDataUrl(receivedStep?.signatures?.customer?.signature_url);
+
                     if (ri) {
                         overview = {
                             booking_code: realProgress.booking_id?.booking_code || id,
@@ -61,12 +66,12 @@ export const useTrackingDetailLogic = () => {
                                 odometer: ri.odometer || 0,
                                 fuel_level: ri.fuel_level ?? 0
                             },
-                            vehicle_image: realProgress.images?.[0] || 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0',
+                            vehicle_image: realProgress.images?.[0] || mockOverview.vehicle_image,
                             hotspots: (ri.damage_map || []).map((h, idx) => ({
                                 id: idx + 1,
-                                top: `${h.y * 100}%`,
-                                left: `${h.x * 100}%`,
-                                label: h.description || `Điểm ${idx + 1}`
+                                top: `${Math.min(Math.max(Number(h.y) || 0, 0), 1) * 100}%`,
+                                left: `${Math.min(Math.max(Number(h.x) || 0, 0), 1) * 100}%`,
+                                label: h.description || h.label || `Điểm ${idx + 1}`
                             })),
                             checklist: (ri.belongings || []).map((b, idx) => ({
                                 id: idx + 1,
@@ -74,13 +79,28 @@ export const useTrackingDetailLogic = () => {
                                 checked: b.status
                             })),
                             signatures: {
-                                advisor: receivedStep?.signatures?.advisor?.signature_url ?
-                                    { name: 'CỐ VẤN DỊCH VỤ', isImage: true, url: receivedStep.signatures.advisor.signature_url } :
-                                    { name: 'CỐ VẤN DỊCH VỤ', svgPath: '' },
-                                customer: receivedStep?.signatures?.customer?.signature_url ?
-                                    { name: 'KHÁCH HÀNG', isImage: true, url: receivedStep.signatures.customer.signature_url } :
-                                    { name: 'KHÁCH HÀNG', svgPath: '' }
+                                advisor: advisorSignatureUrl
+                                    ? { name: receivedStep?.signatures?.advisor?.name || 'CỐ VẤN DỊCH VỤ', isImage: true, url: advisorSignatureUrl }
+                                    : { name: 'CỐ VẤN DỊCH VỤ', svgPath: '' },
+                                customer: customerSignatureUrl
+                                    ? { name: receivedStep?.signatures?.customer?.name || 'KHÁCH HÀNG', isImage: true, url: customerSignatureUrl }
+                                    : { name: 'KHÁCH HÀNG', svgPath: '' }
                             }
+                        };
+                    }
+
+                    if (quotation) {
+                        quotation = {
+                            ...quotation,
+                            customer_signature: customerSignatureUrl || quotation.customer_signature,
+                            advisor_signature: advisorSignatureUrl || quotation.advisor_signature,
+                            reception_snapshot: ri ? {
+                                odometer: ri.odometer || 0,
+                                fuel_level: ri.fuel_level ?? 0,
+                                customer_notes: ri.customer_notes || '',
+                                damage_map: ri.damage_map || [],
+                                belongings: ri.belongings || []
+                            } : quotation.reception_snapshot
                         };
                     }
                 }
@@ -90,14 +110,14 @@ export const useTrackingDetailLogic = () => {
                 setOverviewData(overview);
                 setQuotationData(quotation);
             } catch (error) {
-                console.error("Failed to load tracking details:", error);
+                console.error('Failed to load tracking details:', error);
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchDashboardDetail();
-    }, [id]);
+    }, [id, location.search, userInfo?.token]);
 
     return {
         isLoading,

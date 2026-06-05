@@ -60,6 +60,38 @@ class AssignedTechnician {
   }
 }
 
+class ReceptionInfo {
+  final int odometer;
+  final double fuelLevel;
+  final String customerNotes;
+  final List<Map<String, dynamic>> damageMap;
+  final List<Map<String, dynamic>> belongings;
+  final String? advisorSignatureUrl;
+  final String? customerSignatureUrl;
+
+  ReceptionInfo({
+    this.odometer = 0,
+    this.fuelLevel = 0.0,
+    this.customerNotes = '',
+    this.damageMap = const [],
+    this.belongings = const [],
+    this.advisorSignatureUrl,
+    this.customerSignatureUrl,
+  });
+
+  factory ReceptionInfo.fromJson(Map<String, dynamic> json, Map<String, dynamic> signatures) {
+    return ReceptionInfo(
+      odometer: json['odometer'] ?? 0,
+      fuelLevel: (json['fuel_level'] ?? 0.0).toDouble(),
+      customerNotes: json['customer_notes'] ?? '',
+      damageMap: List<Map<String, dynamic>>.from(json['damage_map'] ?? []),
+      belongings: List<Map<String, dynamic>>.from(json['belongings'] ?? []),
+      advisorSignatureUrl: signatures['advisor']?['signature_url'],
+      customerSignatureUrl: signatures['customer']?['signature_url'],
+    );
+  }
+}
+
 enum ROStage {
   pending,       // Cần đón
   quotation,     // Báo giá
@@ -83,6 +115,7 @@ class RepairOrderModel {
   final DateTime? expectedDeliveryTime;
   final AssignedTechnician? assignedTechnician;
   final List<ServicePackageModel> selectedServices;
+  final ReceptionInfo? receptionInfo;
 
   RepairOrderModel({
     required this.id,
@@ -99,6 +132,7 @@ class RepairOrderModel {
     this.expectedDeliveryTime,
     this.assignedTechnician,
     this.selectedServices = const [],
+    this.receptionInfo,
   });
 
   factory RepairOrderModel.fromJson(Map<String, dynamic> json) {
@@ -110,6 +144,18 @@ class RepairOrderModel {
         case 'DELIVERY': return ROStage.delivery;
         case 'PENDING':
         default: return ROStage.pending;
+      }
+    }
+
+    ReceptionInfo? parsedReceptionInfo;
+    final timelineList = json['timeline'] as List<dynamic>? ?? [];
+    for (var step in timelineList) {
+      if (step['step'] == 'RECEIVED' && step['reception_info'] != null) {
+        parsedReceptionInfo = ReceptionInfo.fromJson(
+          step['reception_info'],
+          step['signatures'] ?? {},
+        );
+        break;
       }
     }
 
@@ -133,6 +179,7 @@ class RepairOrderModel {
               ?.map((e) => ServicePackageModel.fromJson(e))
               .toList() ??
           [],
+      receptionInfo: parsedReceptionInfo,
     );
   }
 }

@@ -81,6 +81,18 @@ class AdvisorApiRepository {
 
     final currentStatus = json['current_step'] ?? json['status'] ?? 'PENDING';
 
+    ReceptionInfo? parsedReceptionInfo;
+    final timelineList = json['timeline'] as List<dynamic>? ?? [];
+    for (var step in timelineList) {
+      if (step['step'] == 'RECEIVED' && step['reception_info'] != null) {
+        parsedReceptionInfo = ReceptionInfo.fromJson(
+          step['reception_info'],
+          step['signatures'] ?? {},
+        );
+        break;
+      }
+    }
+
     return RepairOrderModel(
       id: json['_id']?.toString() ?? '',
       bookingId: booking['_id']?.toString() ?? '',
@@ -99,11 +111,11 @@ class AdvisorApiRepository {
       isWaitingInLounge: false,
       stage: parseStage(currentStatus),
       scheduledArrivalTime: booking['booking_date'] != null
-          ? DateTime.parse(booking['booking_date'])
+          ? (DateTime.tryParse(booking['booking_date'].toString()) ?? DateTime.now())
           : DateTime.now(),
       actualArrivalTime: null,
       expectedDeliveryTime: json['expected_delivery_time'] != null
-          ? DateTime.parse(json['expected_delivery_time'].toString())
+          ? DateTime.tryParse(json['expected_delivery_time'].toString())
           : null,
       assignedTechnician: json['mechanic_id'] != null && json['mechanic_id'] is Map
           ? AssignedTechnician(
@@ -112,6 +124,7 @@ class AdvisorApiRepository {
               avatarUrl: json['mechanic_id']['avatar']?.toString() ?? '',
             )
           : null,
+      receptionInfo: parsedReceptionInfo,
     );
   }
 }

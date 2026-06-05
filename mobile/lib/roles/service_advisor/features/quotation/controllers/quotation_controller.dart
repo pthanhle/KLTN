@@ -1,19 +1,96 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/quotation_model.dart';
-import '../data/quotation_mock_data.dart';
 import '../../../models/labor_item_model.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
+
+
+class _ActiveQuotationOrderIdNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+}
+
+final activeQuotationOrderIdProvider =
+    NotifierProvider<_ActiveQuotationOrderIdNotifier, String>(
+  _ActiveQuotationOrderIdNotifier.new,
+);
 
 class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
+  late String _orderId;
+
   @override
   AsyncValue<QuotationModel> build() {
-    _init();
     return const AsyncLoading();
   }
 
-  Future<void> _init() async {
-    // Simulate API load for Skeleton testing
-    await Future.delayed(const Duration(milliseconds: 1500));
-    state = AsyncData(mockQuotationData);
+  void init(String orderId) {
+    _orderId = orderId;
+    ref.read(activeQuotationOrderIdProvider.notifier).state = orderId;
+    _loadForOrder(orderId);
+  }
+
+  Future<void> _loadForOrder(String orderId) async {
+    final dashboard = ref.read(advisorDashboardProvider);
+    try {
+      final order = dashboard.allRepairOrders.firstWhere((o) => o.id == orderId);
+
+      final diagTitle = order.mpiDiagnostics.isNotEmpty
+          ? '${order.mpiDiagnostics.length} hạng mục đã kiểm tra'
+          : 'Chưa có kết quả chẩn đoán';
+
+      final criticalCount = order.mpiDiagnostics
+          .fold(0, (sum, cat) => sum + cat.criticalCount);
+      final warningCount = order.mpiDiagnostics
+          .fold(0, (sum, cat) => sum + cat.warningCount);
+
+      final diagDescription = order.mpiConclusion.isNotEmpty
+          ? order.mpiConclusion
+          : (criticalCount > 0 || warningCount > 0
+              ? '$criticalCount hạng mục lỗi, $warningCount hạng mục cần theo dõi'
+              : 'Xe trong tình trạng bình thường');
+
+      final receptionInfo = order.receptionInfo;
+      ReceptionSnapshot? snapshot;
+      if (receptionInfo != null) {
+        snapshot = ReceptionSnapshot(
+          odometer: receptionInfo.odometer,
+          fuelLevel: receptionInfo.fuelLevel.round(),
+          customerNotes: receptionInfo.customerNotes,
+          damageMap: receptionInfo.damageMap
+              .map((d) => ReceptionDamagePoint(
+                    label: d['label']?.toString() ?? '',
+                    description: d['description']?.toString() ?? '',
+                    x: (d['x'] as num?)?.toDouble() ?? 0.0,
+                    y: (d['y'] as num?)?.toDouble() ?? 0.0,
+                  ))
+              .toList(),
+          belongings: receptionInfo.belongings
+              .map((b) => ReceptionBelonging(
+                    item: b['item']?.toString() ?? '',
+                    status: b['status'] == true,
+                  ))
+              .toList(),
+        );
+      }
+
+      state = AsyncData(QuotationModel(
+        orderId: orderId,
+        diagnosis: DiagnosticItem(
+          title: diagTitle,
+          description: diagDescription,
+          imageUrl: '',
+        ),
+        receptionSnapshot: snapshot,
+      ));
+    } catch (_) {
+      state = AsyncData(QuotationModel(
+        orderId: orderId,
+        diagnosis: const DiagnosticItem(
+          title: 'Chưa có kết quả chẩn đoán',
+          description: 'KTV chưa hoàn tất kiểm tra xe',
+          imageUrl: '',
+        ),
+      ));
+    }
   }
 
   void updateAdvisorNote(String note) {
@@ -48,10 +125,8 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   void addPart(CartPartItem part) {
     if (state.hasValue && state.value != null) {
       final currentParts = List<CartPartItem>.from(state.value!.parts);
-      // Check if part already exists
       final existingIndex = currentParts.indexWhere((p) => p.id == part.id);
       if (existingIndex >= 0) {
-        // Update quantity
         final existing = currentParts[existingIndex];
         currentParts[existingIndex] = CartPartItem(
           id: existing.id,
@@ -71,7 +146,6 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   void addLabor(LaborItemModel labor) {
     if (state.hasValue && state.value != null) {
       final currentLabor = List<CartLaborItem>.from(state.value!.labor);
-      
       final existingIndex = currentLabor.indexWhere((l) => l.id == labor.id);
       if (existingIndex < 0) {
         currentLabor.add(CartLaborItem(
@@ -87,6 +161,6 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
 }
 
 final quotationControllerProvider =
-    NotifierProvider<QuotationController, AsyncValue<QuotationModel>>(() {
-  return QuotationController();
-});
+    NotifierProvider<QuotationController, AsyncValue<QuotationModel>>(
+  QuotationController.new,
+);

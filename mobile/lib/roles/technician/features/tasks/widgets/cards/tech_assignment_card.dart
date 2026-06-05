@@ -59,7 +59,10 @@ class _TechAssignmentCardState extends State<TechAssignmentCard>
     if (widget.task.status == TechTaskStatus.diagnosing) {
       Navigator.of(context, rootNavigator: true).push(
         CupertinoPageRoute(
-          builder: (_) => MpiChecklistPage(plate: widget.task.plate),
+          builder: (_) => MpiChecklistPage(
+            plate: widget.task.plate,
+            progressId: widget.task.id,
+          ),
         ),
       );
     } else {

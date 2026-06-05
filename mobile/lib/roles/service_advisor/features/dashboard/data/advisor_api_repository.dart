@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/config/api_config.dart';
 import '../models/repair_order_model.dart';
+// MpiCategory is defined in repair_order_model.dart
 
 class AdvisorApiRepository {
   final Dio _dio = Dio(BaseOptions(
@@ -68,12 +69,16 @@ class AdvisorApiRepository {
 
     ROStage parseStage(String status) {
       switch (status) {
+        // Reception done → advisor waits for KTV; KTV diagnosing; or advisor creating quotation
+        case 'RECEIVED':
+        case 'DIAGNOSING':
         case 'QUOTING':
         case 'QUOTATION': return ROStage.quotation;
         case 'IN_PROGRESS': return ROStage.inProgress;
+        case 'QC_TESTING':
         case 'QC': return ROStage.qc;
-        case 'DELIVERY': return ROStage.delivery;
-        case 'RECEIVED': return ROStage.pending;
+        case 'DELIVERY':
+        case 'COMPLETED': return ROStage.delivery;
         case 'PENDING':
         default: return ROStage.pending;
       }
@@ -82,6 +87,9 @@ class AdvisorApiRepository {
     final currentStatus = json['current_step'] ?? json['status'] ?? 'PENDING';
 
     ReceptionInfo? parsedReceptionInfo;
+    List<MpiCategory> mpiDiagnostics = [];
+    String mpiConclusion = '';
+
     final timelineList = json['timeline'] as List<dynamic>? ?? [];
     for (var step in timelineList) {
       if (step['step'] == 'RECEIVED' && step['reception_info'] != null) {
@@ -89,7 +97,13 @@ class AdvisorApiRepository {
           step['reception_info'],
           step['signatures'] ?? {},
         );
-        break;
+      }
+      if (step['step'] == 'DIAGNOSING' && step['diagnostics'] != null) {
+        final diagList = step['diagnostics'] as List<dynamic>;
+        mpiDiagnostics = diagList
+            .map((d) => MpiCategory.fromJson(d as Map<String, dynamic>))
+            .toList();
+        mpiConclusion = step['notes']?.toString() ?? '';
       }
     }
 
@@ -125,6 +139,8 @@ class AdvisorApiRepository {
             )
           : null,
       receptionInfo: parsedReceptionInfo,
+      mpiDiagnostics: mpiDiagnostics,
+      mpiConclusion: mpiConclusion,
     );
   }
 }

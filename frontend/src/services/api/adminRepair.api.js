@@ -1,43 +1,40 @@
 import axiosClient from '../../utils/axiosClient';
 
+// axiosClient interceptor already extracts response.data, so methods return the body directly.
 export const AdminRepairAPI = {
     getRepairProgresses: async (params) => {
-        const response = await axiosClient.get('/staff/service/repair', { params });
-        return response.data;
+        return axiosClient.get('/staff/service/repair-progress', { params });
+    },
+
+    assignMechanic: async (payload) => {
+        return axiosClient.post('/staff/service/repair-progress/assign', payload);
     },
 
     getRepairProgressById: async (id) => {
-        const response = await axiosClient.get(`/staff/service/repair/${id}`);
-        return response.data;
+        return axiosClient.get(`/staff/service/repair-progress/${id}`);
     },
 
     processReception: async (payload) => {
-        const response = await axiosClient.post('/staff/service/repair/reception', payload);
-        return response.data;
+        return axiosClient.post('/staff/service/repair-progress/reception', payload);
     },
 
     updateDiagnostics: async (payload) => {
-        const response = await axiosClient.post('/staff/service/repair/diagnostics', payload);
-        return response.data;
+        return axiosClient.post('/staff/service/repair-progress/diagnostics', payload);
     },
 
     createQuotation: async (payload) => {
-        const response = await axiosClient.post('/staff/service/repair/quotation', payload);
-        return response.data;
+        return axiosClient.post('/staff/service/repair-progress/quotation', payload);
     },
 
     approveQuotation: async (payload) => {
-        const response = await axiosClient.post('/staff/service/repair/quotation/approve', payload);
-        return response.data;
+        return axiosClient.post('/staff/service/repair-progress/quotation/approve', payload);
     },
 
     updateQC: async (payload) => {
-        const response = await axiosClient.post('/staff/service/repair/qc', payload);
-        return response.data;
+        return axiosClient.post('/staff/service/repair-progress/qc', payload);
     },
 
     processHandover: async (payload) => {
-        const response = await axiosClient.post('/staff/service/repair/handover', payload);
-        return response.data;
+        return axiosClient.post('/staff/service/repair-progress/handover', payload);
     },
 };

@@ -63,8 +63,7 @@ class LaborSearchController extends Notifier<LaborSearchState> {
 
   void setCategory(String category) {
     state = state.copyWith(selectedCategory: category, isLoading: true);
-    
-    // Simulate network delay for filtering
+
     Future.delayed(const Duration(milliseconds: 300), () {
       _applyFilters(category: category, query: state.searchQuery);
     });
@@ -96,18 +95,15 @@ class LaborSearchController extends Notifier<LaborSearchState> {
 
   void confirmSelection() {
     final quotationController = ref.read(quotationControllerProvider.notifier);
-    
-    // Find all selected labor models
+
     final selectedLabors = mockLaborMasterData
         .where((labor) => state.selectedLaborIds.contains(labor.id))
         .toList();
 
-    // Add them to the quotation
     for (final labor in selectedLabors) {
       quotationController.addLabor(labor);
     }
-    
-    // Clear selection after confirming
+
     state = state.copyWith(selectedLaborIds: const {});
   }
 }

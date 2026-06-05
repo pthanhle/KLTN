@@ -11,10 +11,12 @@ import 'widgets/sections/mpi_category_section.dart';
 import 'widgets/cards/mpi_conclusion_card.dart';
 import 'widgets/modals/mpi_item_update_modal.dart';
 import 'widgets/skeletons/mpi_checklist_skeleton.dart';
+import '../tasks/data/tech_api_repository.dart';
 
 class MpiChecklistPage extends ConsumerStatefulWidget {
   final String plate;
-  const MpiChecklistPage({super.key, required this.plate});
+  final String progressId;
+  const MpiChecklistPage({super.key, required this.plate, required this.progressId});
 
   @override
   ConsumerState<MpiChecklistPage> createState() => _MpiChecklistPageState();
@@ -22,6 +24,7 @@ class MpiChecklistPage extends ConsumerStatefulWidget {
 
 class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
   late TextEditingController _conclusionController;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -33,6 +36,47 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
   void dispose() {
     _conclusionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submitDiagnostics(TechMpiState mpiState) async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
+    final diagnostics = mpiState.categories.map((cat) {
+      return {
+        'id': cat.id,
+        'title': cat.name,
+        'items': cat.items.map((item) {
+          return {
+            'name': item.name,
+            'status': item.status.name.toUpperCase(),
+            if (item.note != null && item.note!.isNotEmpty) 'action_required': item.note,
+          };
+        }).toList(),
+      };
+    }).toList();
+
+    try {
+      await techApiRepository.submitDiagnostics(
+        progressId: widget.progressId,
+        diagnostics: diagnostics,
+        conclusion: mpiState.generalConclusion,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã gửi kết quả chẩn đoán thành công!')),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Theme.of(context).colorScheme.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   void _handleStatusChange(String categoryId, MpiItemModel item, MpiItemStatus status) {
@@ -144,8 +188,16 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 sliver: SliverToBoxAdapter(
                   child: LiquidButton(
-                    onPressed: () {},
-                    child: Text('Hoàn tất chẩn đoán'.tr()),
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitDiagnostics(stateAsync.value!),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : Text('Hoàn tất chẩn đoán'.tr()),
                   ),
                 ),
               ),

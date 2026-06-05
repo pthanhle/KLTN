@@ -1,9 +1,11 @@
 import RepairProgress from '../../../../models/repairprogressModel.js'
 import Part from '../../../../models/partModel.js'
 import asyncHandler from 'express-async-handler'
+import { getIO } from '../../../../config/socket.js'
 
+// Payload: { progress_id, diagnostics: [{id, title, icon, technician_note, items:[{name,status,action_required}]}], conclusion }
 export const updateDiagnostics = asyncHandler(async (req, res) => {
-    const { progress_id, diagnostics } = req.body
+    const { progress_id, diagnostics, conclusion } = req.body
 
     const progress = await RepairProgress.findById(progress_id)
     if (!progress) {
@@ -11,25 +13,53 @@ export const updateDiagnostics = asyncHandler(async (req, res) => {
         throw new Error('Không tìm thấy RepairProgress')
     }
 
-    progress.diagnostics = diagnostics || []
-    progress.current_step = 'DIAGNOSING'
-    progress.status = 'DIAGNOSING'
-
-    const stepExists = progress.timeline.find(t => t.step === 'DIAGNOSING')
-    if (!stepExists) {
+    // Store diagnostics inside the DIAGNOSING timeline step (SSOT)
+    const diagIdx = progress.timeline.findIndex(t => t.step === 'DIAGNOSING')
+    if (diagIdx !== -1) {
+        progress.timeline[diagIdx].status = 'COMPLETED'
+        progress.timeline[diagIdx].diagnostics = diagnostics || []
+        if (conclusion) progress.timeline[diagIdx].notes = conclusion
+    } else {
         progress.timeline.push({
             step: 'DIAGNOSING',
             status: 'COMPLETED',
             time: new Date(),
-            note: 'Đã hoàn tất chuẩn đoán'
+            note: 'Đã hoàn tất chẩn đoán',
+            diagnostics: diagnostics || [],
+            notes: conclusion || '',
+        })
+    }
+
+    // KTV done → hand off to SA for quoting
+    progress.current_step = 'QUOTING'
+    progress.status = 'QUOTING'
+
+    const quotingStepExists = progress.timeline.some(t => t.step === 'QUOTING')
+    if (!quotingStepExists) {
+        progress.timeline.push({
+            step: 'QUOTING',
+            status: 'IN_PROGRESS',
+            time: new Date(),
+            note: 'Chờ cố vấn lập báo giá',
         })
     }
 
     await progress.save()
 
+    // Notify SA via socket
+    try {
+        const io = getIO()
+        if (progress.advisor_id) {
+            io.to(`user_${progress.advisor_id}`).emit('diagnosis_completed', {
+                progress_id: progress._id,
+                message: 'KTV đã hoàn tất chẩn đoán. Vui lòng lập báo giá.',
+            })
+        }
+    } catch (_) {}
+
     res.json({
-        message: 'Cập nhật chuẩn đoán thành công',
-        repairProgress: progress
+        message: 'Hoàn tất chẩn đoán thành công',
+        repairProgress: progress,
     })
 })
 

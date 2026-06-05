@@ -206,7 +206,7 @@ class _DamagePreview extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Hotspot khi tiếp nhận',
+          'Điểm chú ý của xe khi tiếp nhận',
           style: theme.textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -222,16 +222,13 @@ class _DamagePreview extends StatelessWidget {
                 return Stack(
                   children: [
                     Positioned.fill(
-                      child: snapshot.vehicleImageUrl != null &&
-                              snapshot.vehicleImageUrl!.isNotEmpty
-                          ? Image.network(
-                              snapshot.vehicleImageUrl!,
-                              fit: BoxFit.cover,
-                              opacity: const AlwaysStoppedAnimation(0.42),
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const _CarPlaceholder(),
-                            )
-                          : const _CarPlaceholder(),
+                      child: Image.network(
+                        'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0',
+                        fit: BoxFit.cover,
+                        opacity: const AlwaysStoppedAnimation(0.42),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const _CarPlaceholder(),
+                      ),
                     ),
                     Positioned.fill(
                       child: Container(

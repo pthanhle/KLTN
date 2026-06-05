@@ -19,20 +19,34 @@ import '../widgets/reception_summary_modal.dart';
 import '../../dashboard/models/repair_order_model.dart';
 import '../constants/quotation_constants.dart';
 
-class QuotationPage extends ConsumerWidget {
+class QuotationPage extends ConsumerStatefulWidget {
   final String orderId;
 
   const QuotationPage({super.key, required this.orderId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<QuotationPage> createState() => _QuotationPageState();
+}
+
+class _QuotationPageState extends ConsumerState<QuotationPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(quotationControllerProvider.notifier).init(widget.orderId);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final asyncData = ref.watch(quotationControllerProvider);
     final advisorDashboard = ref.watch(advisorDashboardProvider);
     final theme = Theme.of(context);
 
     RepairOrderModel? order;
     try {
-      order = advisorDashboard.allRepairOrders.firstWhere((o) => o.id == orderId);
+      order = advisorDashboard.allRepairOrders.firstWhere((o) => o.id == widget.orderId);
     } catch (e) {
       order = null;
     }
@@ -48,7 +62,6 @@ class QuotationPage extends ConsumerWidget {
               parent: AlwaysScrollableScrollPhysics(),
             ),
             slivers: [
-              // Liquid App Bar
               SliverAppBar(
                 pinned: true,
                 backgroundColor:
@@ -115,7 +128,7 @@ class QuotationPage extends ConsumerWidget {
                       const SizedBox(height: 16),
                       ReceptionReviewSection(snapshot: data.receptionSnapshot),
                       const SizedBox(height: 32),
-                      TechnicianDiagnosisSection(data: data),
+                      TechnicianDiagnosisSection(data: data, orderId: widget.orderId),
                       const SizedBox(height: 32),
                       ServiceCartSection(data: data),
                       const SizedBox(height: 32),
@@ -134,3 +147,4 @@ class QuotationPage extends ConsumerWidget {
     );
   }
 }
+

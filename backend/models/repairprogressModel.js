@@ -164,6 +164,10 @@ const repairProgressSchema = mongoose.Schema(
       ref: 'User',
     },
 
+    bay_id: { type: String, default: null },
+    expected_start_datetime: { type: Date, default: null },
+    expected_end_datetime: { type: Date, default: null },
+
     current_step: {
       type: String,
       enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED'],

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -115,7 +116,7 @@ class ReceptionSummaryModal extends StatelessWidget {
                         child: _buildInfoCard(
                           context,
                           title: 'Mức nhiên liệu',
-                          value: '${(info.fuelLevel * 100).toInt()}%',
+                          value: '${info.fuelLevel.toInt()}%',
                           icon: CupertinoIcons.drop_fill,
                           color: Colors.orange,
                         ),
@@ -150,7 +151,7 @@ class ReceptionSummaryModal extends StatelessWidget {
                   _buildSectionTitle(context, 'Bản đồ hư hỏng'),
                   const SizedBox(height: 12),
                   HotspotImageBoard(
-                    imageUrl: order.vehicleInfo.imageUrl,
+                    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0',
                     hotspots: hotspots,
                     onTapDown: (_, __) {}, // Read-only
                     onRemoveHotspot: (_) {}, // Read-only
@@ -306,36 +307,67 @@ class ReceptionSummaryModal extends StatelessWidget {
 
   Widget _buildSignatureCard(BuildContext context, {required String title, String? url}) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Signatures are stored as base64 PNG strings (from signature pad)
+    Widget signatureWidget;
+    if (url != null && url.isNotEmpty) {
+      try {
+        final bytes = base64Decode(url);
+        signatureWidget = Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.memory(
+            bytes,
+            fit: BoxFit.contain,
+            color: isDark ? Colors.white : null,
+            colorBlendMode: isDark ? BlendMode.srcIn : null,
+          ),
+        );
+      } catch (_) {
+        // Fallback for actual image URLs
+        signatureWidget = Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.network(url, fit: BoxFit.contain),
+        );
+      }
+    } else {
+      signatureWidget = const Center(
+        child: Text('Chưa có chữ ký', style: TextStyle(color: Colors.grey, fontSize: 12)),
+      );
+    }
+
     return Container(
-      height: 120,
+      height: 140,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: url != null && url.isNotEmpty
+              ? theme.colorScheme.primary.withValues(alpha: 0.4)
+              : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (url != null && url.isNotEmpty)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image.network(url, fit: BoxFit.contain),
-              ),
-            )
-          else
-            const Expanded(
-              child: Center(
-                child: Text('Chưa có chữ ký', style: TextStyle(color: Colors.grey, fontSize: 12)),
-              ),
+          Expanded(child: signatureWidget),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(15)),
             ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
               title,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurfaceVariant,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
         ],

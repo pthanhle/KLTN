@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/tech_task_model.dart';
-import '../data/mocks/mock_tech_tasks_data.dart';
+import '../data/tech_api_repository.dart';
 
 class TechTasksState {
   final List<TechTaskModel> allTasks;
@@ -45,8 +45,6 @@ class TechTasksController extends AsyncNotifier<TechTasksState> {
   }
 
   Future<TechTasksState> _fetchTasksData(int tabIndex) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    
     TechTaskStatus? filter;
     switch (tabIndex) {
       case 0:
@@ -62,8 +60,10 @@ class TechTasksController extends AsyncNotifier<TechTasksState> {
         filter = null;
     }
 
+    final tasks = await techApiRepository.getTasks();
+
     return TechTasksState(
-      allTasks: MockTechTasksData.tasks,
+      allTasks: tasks,
       currentFilter: filter,
       currentTabIndex: tabIndex,
     );
@@ -72,15 +72,15 @@ class TechTasksController extends AsyncNotifier<TechTasksState> {
   Future<void> changeTab(int index) async {
     final previousState = state.value;
     if (previousState?.currentTabIndex == index) return;
-    
+
     if (previousState != null) {
       state = AsyncData(previousState.copyWith(currentTabIndex: index));
     }
-    
+
     state = const AsyncLoading<TechTasksState>().copyWithPrevious(state);
-    
+
     final currentFetchId = ++_fetchId;
-    
+
     try {
       final data = await _fetchTasksData(index);
       if (_fetchId == currentFetchId) {
@@ -95,11 +95,11 @@ class TechTasksController extends AsyncNotifier<TechTasksState> {
 
   Future<void> refresh() async {
     final currentIndex = state.value?.currentTabIndex ?? 0;
-    
+
     state = const AsyncLoading<TechTasksState>().copyWithPrevious(state);
-    
+
     final currentFetchId = ++_fetchId;
-    
+
     try {
       final data = await _fetchTasksData(currentIndex);
       if (_fetchId == currentFetchId) {

@@ -21,7 +21,7 @@ export const processReception = asyncHandler(async (req, res) => {
         throw new Error(`Không thể tiếp nhận booking đang ở trạng thái ${booking.booking_status}`)
     }
 
-    booking.booking_status = 'RECEIVED'
+    booking.booking_status = 'IN_PROGRESS'
     await booking.save()
 
     let progress = await RepairProgress.findOne({ booking_id })
@@ -49,8 +49,9 @@ export const processReception = asyncHandler(async (req, res) => {
     }
 
     if (progress) {
-        progress.current_step = 'QUOTING'
-        progress.status = 'QUOTING'
+        // Reception complete — now waiting for admin to assign a mechanic (DIAGNOSING)
+        progress.current_step = 'RECEIVED'
+        progress.status = 'RECEIVED'
 
         const receivedStepIndex = progress.timeline.findIndex(t => t.step === 'RECEIVED')
         if (receivedStepIndex !== -1) {
@@ -72,22 +73,12 @@ export const processReception = asyncHandler(async (req, res) => {
                 signatures: signaturesData
             })
         }
-
-        const quotationStepExists = progress.timeline.some(t => t.step === 'QUOTING')
-        if (!quotationStepExists) {
-            progress.timeline.push({
-                step: 'QUOTING',
-                status: 'IN_PROGRESS',
-                time: new Date(),
-                note: 'Chờ lên báo giá'
-            })
-        }
     } else {
         progress = new RepairProgress({
             booking_id,
             advisor_id: req.user._id,
-            current_step: 'QUOTING',
-            status: 'QUOTING',
+            current_step: 'RECEIVED',
+            status: 'RECEIVED',
             timeline: [{
                 step: 'RECEIVED',
                 status: 'COMPLETED',
@@ -95,11 +86,6 @@ export const processReception = asyncHandler(async (req, res) => {
                 note: 'Đã tiếp nhận xe',
                 reception_info: receptionInfoData,
                 signatures: signaturesData
-            }, {
-                step: 'QUOTING',
-                status: 'IN_PROGRESS',
-                time: new Date(),
-                note: 'Chờ lên báo giá'
             }]
         })
     }

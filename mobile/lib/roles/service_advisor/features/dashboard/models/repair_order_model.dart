@@ -100,6 +100,32 @@ enum ROStage {
   delivery,      // Giao xe
 }
 
+class MpiCategory {
+  final String id;
+  final String title;
+  final String? technicianNote;
+  final List<Map<String, dynamic>> items;
+
+  MpiCategory({
+    required this.id,
+    required this.title,
+    this.technicianNote,
+    this.items = const [],
+  });
+
+  factory MpiCategory.fromJson(Map<String, dynamic> json) {
+    return MpiCategory(
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      technicianNote: json['technician_note']?.toString(),
+      items: List<Map<String, dynamic>>.from(json['items'] ?? []),
+    );
+  }
+
+  int get warningCount => items.where((i) => i['status'] == 'warning').length;
+  int get criticalCount => items.where((i) => i['status'] == 'critical').length;
+}
+
 class RepairOrderModel {
   final String id;
   final String bookingId;
@@ -116,6 +142,8 @@ class RepairOrderModel {
   final AssignedTechnician? assignedTechnician;
   final List<ServicePackageModel> selectedServices;
   final ReceptionInfo? receptionInfo;
+  final List<MpiCategory> mpiDiagnostics;
+  final String mpiConclusion;
 
   RepairOrderModel({
     required this.id,
@@ -133,6 +161,8 @@ class RepairOrderModel {
     this.assignedTechnician,
     this.selectedServices = const [],
     this.receptionInfo,
+    this.mpiDiagnostics = const [],
+    this.mpiConclusion = '',
   });
 
   factory RepairOrderModel.fromJson(Map<String, dynamic> json) {

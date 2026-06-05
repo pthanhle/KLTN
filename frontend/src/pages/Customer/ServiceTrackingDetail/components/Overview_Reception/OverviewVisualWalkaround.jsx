@@ -13,21 +13,26 @@ const OverviewVisualWalkaround = ({ imageUrl, hotspots }) => {
                     {t('title_damage_hotspots', 'Damage Hotspots')}
                 </h3>
                 
-                <div className="relative w-full max-w-[320px]">
-                    {/* Blueprint SVG wireframe */}
-                    <svg className="w-full opacity-60 dark:opacity-30 stroke-yellow-600 dark:stroke-[#ffd165] fill-none" strokeWidth="1.5" viewBox="0 0 200 400">
-                        <path d="M50 40C50 20 80 10 100 10C120 10 150 20 150 40V360C150 380 120 390 100 390C80 390 50 380 50 360V40Z"></path>
-                        <path className="opacity-50" d="M65 80 Q100 70 135 80 L130 160 Q100 150 70 160 Z"></path>
-                        <rect height="50" rx="4" width="20" x="35" y="60"></rect>
-                        <rect height="50" rx="4" width="20" x="145" y="60"></rect>
-                        <rect height="50" rx="4" width="20" x="35" y="290"></rect>
-                        <rect height="50" rx="4" width="20" x="145" y="290"></rect>
-                        <path className="opacity-50" d="M65 320 Q100 330 135 320 L130 240 Q100 250 70 240 Z"></path>
-                    </svg>
+                <div className="relative w-full max-w-[350px] aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-[#1f2937] border border-slate-200 dark:border-yellow-500/20">
+                    {/* Render Vehicle Image */}
+                    {imageUrl ? (
+                        <img 
+                            src={imageUrl} 
+                            alt="Vehicle Top-Down" 
+                            className="absolute inset-0 w-full h-full object-cover" 
+                        />
+                    ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-[10px] font-bold text-slate-400">NO IMAGE</span>
+                        </div>
+                    )}
+
+                    {/* Dark overlay for better visibility of hotspots */}
+                    <div className="absolute inset-0 bg-black/10 dark:bg-black/30 pointer-events-none"></div>
 
                     {/* Render Dynamic Hotspots */}
                     {hotspots.map((spot) => (
-                        <div key={spot.id} className="absolute" style={{ top: spot.top, right: spot.right, left: spot.left, bottom: spot.bottom }}>
+                        <div key={spot.id} className="absolute" style={{ top: spot.top, left: spot.left }}>
                             <div className="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
                                 {/* Pulse Effect */}
                                 <span className="absolute inline-flex h-8 w-8 rounded-full bg-red-400 dark:bg-[#ffb4ab]/40 animate-pulse"></span>

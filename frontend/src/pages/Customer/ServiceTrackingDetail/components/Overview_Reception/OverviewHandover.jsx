@@ -19,29 +19,36 @@ const OverviewHandover = ({ signatures }) => {
                             {t('label_advisor_esign', 'Advisor E-Sign')}
                         </span>
                         
-                        {/* Animated SVG Path for Signature */}
-                        <svg className="w-40 h-auto opacity-80" viewBox="0 0 200 80">
-                            <style>
-                                {`
-                                    .signature-path-advisor {
-                                        stroke-dasharray: 1000;
-                                        stroke-dashoffset: 1000;
-                                        animation: dash 3s ease-out forwards;
-                                    }
-                                    @keyframes dash {
-                                        to { stroke-dashoffset: 0; }
-                                    }
-                                `}
-                            </style>
-                            <path 
-                                className="signature-path-advisor" 
-                                d={signatures.advisor.svgPath} 
-                                fill="none" 
-                                stroke="#eab308" 
-                                strokeLinecap="round" 
-                                strokeWidth="2.5"
-                            ></path>
-                        </svg>
+                        {signatures.advisor.isImage ? (
+                            <img 
+                                src={signatures.advisor.url} 
+                                alt="Advisor Signature" 
+                                className="w-full h-full object-contain p-2 filter dark:invert" 
+                            />
+                        ) : (
+                            <svg className="w-40 h-auto opacity-80" viewBox="0 0 200 80">
+                                <style>
+                                    {`
+                                        .signature-path-advisor {
+                                            stroke-dasharray: 1000;
+                                            stroke-dashoffset: 1000;
+                                            animation: dash 3s ease-out forwards;
+                                        }
+                                        @keyframes dash {
+                                            to { stroke-dashoffset: 0; }
+                                        }
+                                    `}
+                                </style>
+                                <path 
+                                    className="signature-path-advisor" 
+                                    d={signatures.advisor.svgPath} 
+                                    fill="none" 
+                                    stroke="#eab308" 
+                                    strokeLinecap="round" 
+                                    strokeWidth="2.5"
+                                ></path>
+                            </svg>
+                        )}
                     </div>
                     <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-[#d3c5ac]">
                         {signatures.advisor.name}

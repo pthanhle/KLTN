@@ -3,7 +3,7 @@ import Booking from '../../../../models/bookingModel.js'
 import asyncHandler from 'express-async-handler'
 
 export const processReception = asyncHandler(async (req, res) => {
-    const { booking_id, odometer, fuel_level, customer_notes, damage_map, belongings, signature_data } = req.body
+    const { booking_id, odometer, fuel_level, customer_notes, damage_map, belongings, advisor_signature_data, customer_signature_data } = req.body
 
     if (!booking_id) {
         res.status(400)
@@ -34,12 +34,19 @@ export const processReception = asyncHandler(async (req, res) => {
         belongings: belongings || []
     }
 
-    const signaturesData = signature_data ? {
-        customer: {
+    const signaturesData = {}
+    if (customer_signature_data) {
+        signaturesData.customer = {
             name: 'Khách hàng',
-            signature_url: signature_data
+            signature_url: customer_signature_data
         }
-    } : {}
+    }
+    if (advisor_signature_data) {
+        signaturesData.advisor = {
+            name: 'Cố vấn dịch vụ',
+            signature_url: advisor_signature_data
+        }
+    }
 
     if (progress) {
         progress.current_step = 'QUOTING'
@@ -49,7 +56,7 @@ export const processReception = asyncHandler(async (req, res) => {
         if (receivedStepIndex !== -1) {
             progress.timeline[receivedStepIndex].status = 'COMPLETED'
             progress.timeline[receivedStepIndex].reception_info = receptionInfoData
-            if (signature_data) {
+            if (Object.keys(signaturesData).length > 0) {
                 progress.timeline[receivedStepIndex].signatures = {
                     ...progress.timeline[receivedStepIndex].signatures,
                     ...signaturesData

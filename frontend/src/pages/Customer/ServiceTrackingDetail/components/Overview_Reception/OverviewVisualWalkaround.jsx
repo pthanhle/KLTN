@@ -7,24 +7,6 @@ const OverviewVisualWalkaround = ({ imageUrl, hotspots }) => {
 
     return (
         <div className="space-y-8">
-            {/* Main Car Image */}
-            <div className="bg-white/80 dark:bg-[#191f31]/70 backdrop-blur-xl rounded-3xl overflow-hidden group shadow-2xl border border-slate-200 dark:border-transparent">
-                <div className="relative aspect-[16/10]">
-                    <Image 
-                        src={imageUrl} 
-                        alt="Vehicle Status" 
-                        preview={true}
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 dark:from-[#0A0A0B] via-transparent to-transparent opacity-80 pointer-events-none"></div>
-                    <div className="absolute bottom-6 left-6 pointer-events-none">
-                        <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em] text-yellow-500 dark:text-[#ffd165] bg-white/90 dark:bg-[#0A0A0B]/80 backdrop-blur px-4 py-2 rounded-full border border-yellow-500/20 shadow-lg">
-                            {t('label_360_overview', '360° Inspection Overview')}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
             {/* 2D Blueprint with Hotspots */}
             <div className="bg-white/80 dark:bg-[#191f31]/70 backdrop-blur-xl p-6 md:p-10 rounded-3xl flex flex-col items-center shadow-inner border border-slate-200 dark:border-yellow-500/10">
                 <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-[#d3c5ac] mb-8 md:mb-12 self-start">

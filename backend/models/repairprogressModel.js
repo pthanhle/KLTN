@@ -170,6 +170,12 @@ const repairProgressSchema = mongoose.Schema(
       default: 'RECEIVED',
     },
 
+    status: {
+      type: String,
+      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED', 'CANCELLED'],
+      default: 'RECEIVED',
+    },
+
     timeline: { type: [timelineStepSchema], default: [] },
 
     notes: { type: String, default: '' },

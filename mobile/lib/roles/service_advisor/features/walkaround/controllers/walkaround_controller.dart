@@ -63,6 +63,12 @@ class WalkaroundController extends Notifier<WalkaroundState> {
           orderId: order.id,
           customerComplaint: order.customerNote,
           selectedPackages: order.selectedServices,
+          checklist: [
+            const ChecklistItemModel(id: 'chk_1', name: 'Tài sản (Tiền mặt, Kính râm)', checked: false),
+            const ChecklistItemModel(id: 'chk_2', name: 'Tình trạng đèn chiếu sáng', checked: false),
+            const ChecklistItemModel(id: 'chk_3', name: 'Lốp xe và Mâm xe', checked: false),
+            const ChecklistItemModel(id: 'chk_4', name: 'Laptop', checked: false),
+          ],
           imageUrl: order.vehicleInfo.imageUrl ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuC41rvL56LDgqy7Q6rRp-OwmmEOZG4_EigDYMPUCrG1yhJbO406mV-5oRTuJRbVcCnNUHk7qIGWh-eBoCzJg4OZ3gVUWsofrmxhMWwLPqW0klZNWejNMm6wcO72fS87wG5WLw4ODs5JgUTxgoJYy9ZjINalD6rwNGWpOZm_O6k5N99aISoOOC4qYJV8DldamtRrM-TvrHCkkadDIa9cdvmqURXu8ZcFDImprAz0mRvtPebV5przpkHQ4R6Z6Z3uzCQYSSuPdbCo0uV0',
         ),
       );
@@ -141,13 +147,19 @@ class WalkaroundController extends Notifier<WalkaroundState> {
     state = state.copyWith(data: state.data.copyWith(checklist: newChecklist));
   }
 
-  void setSignature(String signaturePath) {
-    state = state.copyWith(data: state.data.copyWith(signatureData: signaturePath));
+  void setAdvisorSignature(String signaturePath) {
+    state = state.copyWith(data: state.data.copyWith(advisorSignatureData: signaturePath));
+  }
+
+  void setCustomerSignature(String signaturePath) {
+    state = state.copyWith(data: state.data.copyWith(customerSignatureData: signaturePath));
   }
 
   bool canSubmit() {
-    return state.data.signatureData != null &&
-           state.data.signatureData!.isNotEmpty &&
+    return state.data.advisorSignatureData != null &&
+           state.data.advisorSignatureData!.isNotEmpty &&
+           state.data.customerSignatureData != null &&
+           state.data.customerSignatureData!.isNotEmpty &&
            state.data.odometer > 0;
   }
 
@@ -165,6 +177,7 @@ class WalkaroundController extends Notifier<WalkaroundState> {
         data: state.data,
       );
       state = state.copyWith(isLoading: false, submitSuccess: true);
+      ref.read(advisorDashboardProvider.notifier).refresh();
       return true;
     } catch (e) {
       state = state.copyWith(

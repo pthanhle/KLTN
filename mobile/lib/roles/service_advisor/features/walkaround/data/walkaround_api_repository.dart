@@ -51,7 +51,8 @@ class WalkaroundApiRepository {
       'customer_notes': data.customerComplaint,
       'damage_map': damageMap,
       'belongings': belongings,
-      'signature_data': data.signatureData,
+      'advisor_signature_data': data.advisorSignatureData,
+      'customer_signature_data': data.customerSignatureData,
     };
 
     try {

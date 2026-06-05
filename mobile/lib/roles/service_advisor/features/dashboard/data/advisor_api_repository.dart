@@ -33,10 +33,21 @@ class AdvisorApiRepository {
       final data = response.data;
       if (data['repairProgresses'] != null) {
         final List progresses = data['repairProgresses'];
-        return progresses.map((json) => _mapBackendToModel(json)).toList();
+        final List<RepairOrderModel> result = [];
+        for (int i = 0; i < progresses.length; i++) {
+          try {
+            result.add(_mapBackendToModel(progresses[i]));
+          } catch (parseErr) {
+            print('[AdvisorRepo] Failed to parse progress[$i]: $parseErr');
+            print('[AdvisorRepo] Raw data: ${progresses[i]}');
+          }
+        }
+        return result;
       }
       return [];
     } on DioException catch (e) {
+      print('[AdvisorRepo] DioException: ${e.response?.statusCode} ${e.message}');
+      print('[AdvisorRepo] Response body: ${e.response?.data}');
       if (e.response?.statusCode == 401) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('access_token');
@@ -44,6 +55,7 @@ class AdvisorApiRepository {
       }
       throw Exception('Không thể tải dữ liệu: ${e.message}');
     } catch (e) {
+      print('[AdvisorRepo] Unexpected error: $e');
       throw Exception('Đã xảy ra lỗi: $e');
     }
   }
@@ -67,6 +79,8 @@ class AdvisorApiRepository {
       }
     }
 
+    final currentStatus = json['current_step'] ?? json['status'] ?? 'PENDING';
+
     return RepairOrderModel(
       id: json['_id']?.toString() ?? '',
       bookingId: booking['_id']?.toString() ?? '',
@@ -83,7 +97,7 @@ class AdvisorApiRepository {
       ),
       serviceType: (service is Map ? service['service_name']?.toString() : null) ?? booking['service_type']?.toString() ?? '',
       isWaitingInLounge: false,
-      stage: parseStage(json['status'] ?? 'PENDING'),
+      stage: parseStage(currentStatus),
       scheduledArrivalTime: booking['booking_date'] != null
           ? DateTime.parse(booking['booking_date'])
           : DateTime.now(),

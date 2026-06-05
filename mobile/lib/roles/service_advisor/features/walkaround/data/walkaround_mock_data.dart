@@ -29,7 +29,8 @@ final WalkaroundModel mockWalkaroundData = WalkaroundModel(
     ChecklistItemModel(id: '2', name: 'Tình trạng đèn chiếu sáng', checked: true),
     ChecklistItemModel(id: '3', name: 'Lốp xe và Mâm xe', checked: true),
   ],
-  signatureData: null,
+  advisorSignatureData: null,
+  customerSignatureData: null,
 );
 
 final List<ServicePackageModel> mockServicePackages = [

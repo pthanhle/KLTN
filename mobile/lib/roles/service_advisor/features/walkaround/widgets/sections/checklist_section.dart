@@ -87,12 +87,12 @@ class ChecklistSection extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                'Chữ ký khách hàng'.tr(),
+                'Chữ ký cố vấn'.tr(),
                 style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
-              if (state.data.signatureData != null)
+              if (state.data.advisorSignatureData != null)
                 GestureDetector(
-                  onTap: () => controller.setSignature(''),
+                  onTap: () => controller.setAdvisorSignature(''),
                   child: Text(
                     'Xóa'.tr(),
                     style: theme.textTheme.labelLarge?.copyWith(
@@ -109,7 +109,7 @@ class ChecklistSection extends ConsumerWidget {
             onTap: () async {
               final signature = await SignaturePadModal.show(context);
               if (signature != null && signature.isNotEmpty) {
-                controller.setSignature(signature);
+                controller.setAdvisorSignature(signature);
               }
             },
             child: Container(
@@ -125,7 +125,7 @@ class ChecklistSection extends ConsumerWidget {
                     cornerSmoothing: 1.0,
                   ),
                   side: BorderSide(
-                    color: state.data.signatureData != null && state.data.signatureData!.isNotEmpty
+                    color: state.data.advisorSignatureData != null && state.data.advisorSignatureData!.isNotEmpty
                         ? theme.colorScheme.primary.withValues(alpha: 0.5)
                         : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                     width: 1,
@@ -139,20 +139,102 @@ class ChecklistSection extends ConsumerWidget {
                   )
                 ],
               ),
-                  child: state.data.signatureData != null && state.data.signatureData!.isNotEmpty
+                  child: state.data.advisorSignatureData != null && state.data.advisorSignatureData!.isNotEmpty
                       ? ClipSmoothRect(
                           radius: SmoothBorderRadius(
                             cornerRadius: 16,
                             cornerSmoothing: 1.0,
                           ),
                           child: Image.memory(
-                            base64Decode(state.data.signatureData!),
+                            base64Decode(state.data.advisorSignatureData!),
                             fit: BoxFit.contain,
                           ),
                         )
                   : Center(
                       child: Text(
-                        'Ký vào đây'.tr(),
+                        'Cố vấn ký vào đây'.tr(),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.outline,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'Chữ ký khách hàng'.tr(),
+                style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              if (state.data.customerSignatureData != null)
+                GestureDetector(
+                  onTap: () => controller.setCustomerSignature(''),
+                  child: Text(
+                    'Xóa'.tr(),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          GestureDetector(
+            onTap: () async {
+              final signature = await SignaturePadModal.show(context);
+              if (signature != null && signature.isNotEmpty) {
+                controller.setCustomerSignature(signature);
+              }
+            },
+            child: Container(
+              height: 160,
+              width: double.infinity,
+              decoration: ShapeDecoration(
+                color: isDark 
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : theme.colorScheme.surfaceContainerLowest,
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 16,
+                    cornerSmoothing: 1.0,
+                  ),
+                  side: BorderSide(
+                    color: state.data.customerSignatureData != null && state.data.customerSignatureData!.isNotEmpty
+                        ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                        : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    width: 1,
+                  ),
+                ),
+                shadows: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 0),
+                  )
+                ],
+              ),
+                  child: state.data.customerSignatureData != null && state.data.customerSignatureData!.isNotEmpty
+                      ? ClipSmoothRect(
+                          radius: SmoothBorderRadius(
+                            cornerRadius: 16,
+                            cornerSmoothing: 1.0,
+                          ),
+                          child: Image.memory(
+                            base64Decode(state.data.customerSignatureData!),
+                            fit: BoxFit.contain,
+                          ),
+                        )
+                  : Center(
+                      child: Text(
+                        'Khách hàng ký vào đây'.tr(),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.outline,
                           fontStyle: FontStyle.italic,

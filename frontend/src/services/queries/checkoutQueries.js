@@ -38,7 +38,7 @@ export const useGetCheckoutProfile = (options = {}) => {
     return useQuery({
         queryKey: ['checkoutProfile'],
         queryFn: () => CheckoutAPI.getUserProfile(),
-        staleTime: 10 * 60 * 1000, // 10 min cache
+        staleTime: 10 * 60 * 1000,
         ...options
     });
 };

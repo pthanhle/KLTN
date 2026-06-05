@@ -7,7 +7,7 @@ const getTrackingDetail = async (bookingCode, token) => {
         },
     };
     const response = await axiosClient.get(`/client/tracking/${bookingCode}`, config);
-    return response.data;
+    return response;
 };
 
 const lookupTracking = async (bookingCode, licensePlate) => {
@@ -15,11 +15,12 @@ const lookupTracking = async (bookingCode, licensePlate) => {
         booking_code: bookingCode,
         license_plate: licensePlate
     });
-    return response.data;
+    return response;
 };
+
 const getStats = async () => {
     const response = await axiosClient.get(`/client/tracking/stats`);
-    return response.data;
+    return response;
 };
 
 export default {

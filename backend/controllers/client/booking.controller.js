@@ -65,10 +65,11 @@ export const createBooking = asyncHandler(async (req, res) => {
     const {
         booking_type, product_id, vehicle_info,
         booking_date, time_slot,
-        test_drive_type, delivery_address,
+        test_drive_type, showroom_branch, delivery_address,
         service_type, services,
         customer_note,
         contact_phone,
+        has_driver_license,
     } = req.body
 
     if (!booking_date || !time_slot) {
@@ -122,7 +123,9 @@ export const createBooking = asyncHandler(async (req, res) => {
         booking_date: new Date(booking_date),
         time_slot,
         test_drive_type: test_drive_type || 'showroom',
+        showroom_branch: test_drive_type !== 'home' ? (showroom_branch || '') : null,
         delivery_address: delivery_address || '',
+        has_driver_license: has_driver_license || false,
         service_type: service_type || undefined,
         services: services || [],
         total_cost,
@@ -153,7 +156,7 @@ export const createBooking = asyncHandler(async (req, res) => {
 
 
 export const rescheduleBooking = asyncHandler(async (req, res) => {
-    const { booking_date, time_slot, reschedule_reason, test_drive_type, delivery_address } = req.body
+    const { booking_date, time_slot, reschedule_reason, test_drive_type, showroom_branch, delivery_address } = req.body
 
     const booking = await Booking.findById(req.params.id)
     if (!booking) {
@@ -175,6 +178,7 @@ export const rescheduleBooking = asyncHandler(async (req, res) => {
     if (time_slot) booking.time_slot = time_slot
     if (reschedule_reason) booking.reschedule_reason = reschedule_reason
     if (test_drive_type) booking.test_drive_type = test_drive_type
+    if (showroom_branch !== undefined) booking.showroom_branch = showroom_branch
     if (delivery_address) booking.delivery_address = delivery_address
 
     booking.booking_status = 'PENDING'

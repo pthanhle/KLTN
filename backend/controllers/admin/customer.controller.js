@@ -9,6 +9,7 @@ import crypto from 'crypto'
 import emailQueue from '../../queues/emailQueue.js'
 import { customerOtpCreationEmail, customerOtpResendEmail } from '../../utils/emailTemplates.js'
 import { loyaltyService } from '../../services/loyalty.service.js'
+import { createAndEmitNotification } from '../../utils/notificationHelper.js'
 
 
 export const getCustomerStats = asyncHandler(async (req, res) => {
@@ -491,6 +492,13 @@ export const addLoyaltyPoints = asyncHandler(async (req, res) => {
         transaction_type: 'GIFT',
         description: reason || 'Admin tặng điểm',
         reference_model: 'Admin'
+    })
+
+    await createAndEmitNotification(customer._id, {
+        title: 'Nhận điểm thưởng',
+        message: `Bạn vừa nhận được ${parseInt(points)} điểm thưởng từ TT AUTO.${reason ? ` Lý do: ${reason}` : ''}`,
+        type: 'PROMOTION',
+        reference_link: '/profile/loyalty',
     })
 
     res.json({ message: 'Tặng điểm thành công', loyalty: customer.loyalty, history })

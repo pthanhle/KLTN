@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from 'antd';
-import { Plus } from 'lucide-react';
+import { Plus, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PageBreadcrumbs from '../../../components/PageBreadcrumbs';
 import { useCarsCatalogLogic } from './hooks/useCarsCatalogLogic';
@@ -8,10 +9,12 @@ import CarsStats from './components/Stats/CarsStats';
 import FilterBar from './components/Toolbar/FilterBar';
 import CarsTable from './components/Table/CarsTable';
 import BulkActionBar from './components/Actions/BulkActionBar';
+import CostEstimateSettingsModal from './components/CostEstimateSettingsModal';
 
 const CarsCatalog = () => {
     const { t } = useTranslation('adminCars');
     const navigate = useNavigate();
+    const [costEstimateModalOpen, setCostEstimateModalOpen] = useState(false);
 
     const {
         cars,
@@ -47,7 +50,15 @@ const CarsCatalog = () => {
                     </div>
                     
                     <div className="flex flex-col sm:flex-row gap-4 mt-6 md:mt-0 w-full md:w-auto">
-                        <button 
+                        <button
+                            type="button"
+                            onClick={() => setCostEstimateModalOpen(true)}
+                            className="group flex items-center justify-center gap-2 px-6 py-3.5 bg-white dark:bg-[#141416] hover:bg-slate-50 dark:hover:bg-[#1e1e20] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-full font-black text-[11px] tracking-widest uppercase active:scale-95 transition-all outline-none cursor-pointer"
+                        >
+                            <Settings size={16} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-300" />
+                            DỰ TOÁN CHI PHÍ
+                        </button>
+                        <button
                             type="button"
                             onClick={() => navigate('/admin/cars/create')}
                             className="group flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 hover:bg-slate-800 dark:bg-yellow-500 dark:hover:bg-yellow-400 text-white dark:text-slate-900 rounded-full font-black text-[11px] tracking-widest uppercase shadow-xl shadow-slate-900/20 dark:shadow-yellow-500/20 active:scale-95 transition-all outline-none cursor-pointer"
@@ -90,6 +101,11 @@ const CarsCatalog = () => {
             <BulkActionBar
                 selectedKeys={selectedKeys}
                 toggleAllSelections={toggleAllSelections}
+            />
+
+            <CostEstimateSettingsModal
+                open={costEstimateModalOpen}
+                onClose={() => setCostEstimateModalOpen(false)}
             />
             </div>
         </div>

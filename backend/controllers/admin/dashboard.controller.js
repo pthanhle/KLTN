@@ -159,6 +159,16 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
 })
 
 
+export const getPendingCounts = asyncHandler(async (req, res) => {
+    const [pendingOrdersCount, pendingTestDrivesCount, pendingAppointmentsCount] = await Promise.all([
+        Order.countDocuments({ order_status: 'PENDING' }),
+        Booking.countDocuments({ booking_type: 'test_drive', booking_status: 'PENDING' }),
+        Booking.countDocuments({ booking_type: { $in: ['service', 'maintenance'] }, booking_status: 'PENDING' }),
+    ])
+    res.json({ pendingOrdersCount, pendingTestDrivesCount, pendingAppointmentsCount })
+})
+
+
 export const getRevenueReport = asyncHandler(async (req, res) => {
     const { year } = req.query
 

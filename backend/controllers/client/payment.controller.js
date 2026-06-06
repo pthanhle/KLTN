@@ -8,6 +8,7 @@ import { vnpayConfig } from '../../config/vnpayConfig.js'
 import { isVNPayMethod, validatePaymentMethodDetailed } from '../../utils/paymentValidation.js'
 import crypto from 'crypto'
 import moment from 'moment'
+import { createAndEmitNotification } from '../../utils/notificationHelper.js'
 
 
 export const createVNPayPayment = asyncHandler(async (req, res) => {
@@ -393,6 +394,16 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
       order.payment.method = paymentValidation.normalizedMethod
       order.payment.method_name = paymentValidation.displayName
       await order.save()
+
+      if (order.user_id) {
+        await createAndEmitNotification(order.user_id, {
+          title: 'Thanh toán thành công',
+          message: `Đơn hàng ${order.order_code} đã được thanh toán thành công. Cảm ơn bạn đã mua hàng!`,
+          type: 'ORDER',
+          reference_id: order.order_code,
+          reference_link: '/profile/orders',
+        }).catch(() => {})
+      }
 
       console.log(`VNPay payment completed successfully`, {
         paymentId: payment._id,

@@ -1,13 +1,23 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Car, MoreVertical, AlertTriangle, Clock, User, Wrench } from 'lucide-react';
+import { Car, MoreVertical, AlertTriangle, Clock, User, Wrench, Layers } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Popover, Image } from 'antd';
 import { calculateLeftPercentage, calculateWidthPercentage, calculateBlockBoundaries } from '../../utils/ganttUtils';
 
 const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDateStr }) => {
     const { t } = useTranslation('adminServiceReception');
+
+    const SERVICE_TYPE_LABELS = {
+        MAINTENANCE: 'Bảo dưỡng',
+        CAR_SPA: 'Chăm sóc xe',
+        REPAIR: 'Sửa chữa',
+        INSPECTION: 'Kiểm định',
+        OTHER: 'Khác',
+    };
+
+    const displayCode = booking.booking_code || `#${String(booking._id).slice(-8).toUpperCase()}`;
 
     const now = new Date();
     const currMins = now.getHours() * 60 + now.getMinutes();
@@ -85,10 +95,16 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
         }
     }
 
+    const primaryTech = booking.primary_technician && technicians
+        ? technicians.find(s => s._id === booking.primary_technician)
+        : null;
+
+    const assistantsCount = booking.assistant_technicians?.length || 0;
+
     const tooltipContent = (
         <div className="flex flex-col gap-2 p-1 min-w-[200px] text-slate-800 dark:text-slate-200">
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-1">
-                <span className="font-bold text-yellow-600 dark:text-yellow-500">{booking._id}</span>
+                <span className="font-bold text-yellow-600 dark:text-yellow-500">{displayCode}</span>
                 <span className="bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300">
                     {t(`status_${booking.status}`, booking.status)}
                 </span>
@@ -105,10 +121,41 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                 <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{displayTimeSlot}</span>
             </div>
-            <div className="flex items-start gap-2 text-xs mt-1 bg-slate-50 dark:bg-white/5 p-2 rounded">
-                <div className="flex items-center gap-1.5 mt-2 overflow-hidden w-full">
-                    <span className="text-slate-700 dark:text-slate-300">{booking.selected_services?.map(s => s.name).join(', ') || 'Dịch vụ'}</span>
+            {primaryTech && (
+                <div className="flex items-center gap-2 text-xs">
+                    <Wrench className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                    <span>KTV chính: <span className="font-semibold">{primaryTech.full_name}</span></span>
                 </div>
+            )}
+            {assistantsCount > 0 && (() => {
+                const assistantNames = (booking.assistant_technicians || [])
+                    .map(id => technicians?.find(t => t._id === id)?.full_name)
+                    .filter(Boolean)
+                    .join(', ');
+                return (
+                    <div className="flex items-center gap-2 text-xs">
+                        <User className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                        <span>KTV phụ: <span className="font-semibold">{assistantNames || `${assistantsCount} người`}</span></span>
+                    </div>
+                );
+            })()}
+            {booking.service_type && (
+                <div className="flex items-center gap-2 text-xs">
+                    <Layers className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                    <span>Nhóm: <span className="font-semibold">{SERVICE_TYPE_LABELS[booking.service_type] || booking.service_type}</span></span>
+                </div>
+            )}
+            <div className="mt-1 bg-slate-50 dark:bg-white/5 p-2 rounded text-xs">
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Hạng mục</div>
+                {(booking.selected_services?.length > 0
+                    ? booking.selected_services
+                    : [{ name: 'Dịch vụ' }]
+                ).map((s, i) => (
+                    <div key={i} className="flex items-center gap-1 text-slate-700 dark:text-slate-300 py-0.5">
+                        <span className="w-1 h-1 rounded-full bg-yellow-500 shrink-0" />
+                        {s.name}
+                    </div>
+                ))}
             </div>
 
             <div className="flex gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-white/10">
@@ -127,12 +174,6 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
             </div>
         </div>
     );
-
-    const primaryTech = booking.primary_technician && technicians
-        ? technicians.find(s => s._id === booking.primary_technician)
-        : null;
-
-    const assistantsCount = booking.assistant_technicians?.length || 0;
 
     const blockContent = (
         <div
@@ -199,7 +240,7 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                 <div className="flex justify-between items-start pointer-events-auto">
                     <div className="flex flex-col gap-1">
                         <span className={`text-[9px] font-bold uppercase tracking-widest ${isOverdue ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                            {booking._id} {isOverdue && t('status_overdue')}
+                            {displayCode} {isOverdue && t('status_overdue')}
                         </span>
                         <div className={`flex items-center gap-1.5 text-[10px] w-fit uppercase font-black tracking-wider px-2 py-0.5 rounded border shadow-inner ${isConflict
                             ? 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/20'
@@ -218,10 +259,25 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                     )}
                 </div>
 
-                <div className="flex items-center gap-1 overflow-hidden min-w-0 pr-1 truncate opacity-70">
-                    {booking.selected_services?.[0]?.name || 'Dịch vụ'}
-                    {booking.selected_services?.length > 1 && (
-                         <span className="text-[9px] font-bold text-slate-500">+{booking.selected_services.length - 1}</span>
+                <div className="flex flex-col gap-0.5 overflow-hidden min-w-0 pr-1">
+                    {booking.service_type && (
+                        <div className="flex items-center gap-1 text-[9px] text-yellow-600 dark:text-yellow-500 font-semibold truncate">
+                            <Layers className="w-2.5 h-2.5 shrink-0" />
+                            {SERVICE_TYPE_LABELS[booking.service_type] || booking.service_type}
+                        </div>
+                    )}
+                    <div className="flex items-center gap-1 truncate opacity-70 text-[10px]">
+                        {booking.selected_services?.[0]?.name || 'Dịch vụ'}
+                        {booking.selected_services?.length > 1 && (
+                             <span className="text-[9px] font-bold text-slate-500">+{booking.selected_services.length - 1}</span>
+                        )}
+                    </div>
+                    {primaryTech && (
+                        <div className="flex items-center gap-1 text-[9px] text-slate-400 dark:text-slate-500 truncate">
+                            <Wrench className="w-2.5 h-2.5 shrink-0" />
+                            <span className="truncate">{primaryTech.full_name}</span>
+                            {assistantsCount > 0 && <span className="shrink-0 text-slate-400">+{assistantsCount}</span>}
+                        </div>
                     )}
                 </div>
             </div>

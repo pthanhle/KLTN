@@ -20,6 +20,8 @@ const STATUS_MAP = {
 const normalizeBooking = (b) => {
   const obj = b.toObject ? b.toObject() : b
   const car = obj.product_id
+  // delivery_address may be an object {street,ward,district,city} or legacy string
+  const addr = obj.delivery_address && typeof obj.delivery_address === 'object' ? obj.delivery_address : null
   return {
     _id: obj._id,
     booking_code: obj.booking_code,
@@ -27,6 +29,7 @@ const normalizeBooking = (b) => {
     phoneNumber: obj.customer_info?.contact_phone || obj.user_id?.phone || '',
     email: obj.customer_info?.email || obj.user_id?.email || '',
     bookingType: obj.test_drive_type || 'showroom',
+    showroomBranch: obj.showroom_branch || null,
     selectedDate: obj.booking_date ? dayjs(obj.booking_date).format('DD/MM/YYYY') : '',
     selectedTimeSlot: obj.time_slot || '',
     targetCarSku: car?.sku || '',
@@ -43,7 +46,14 @@ const normalizeBooking = (b) => {
     note: obj.customer_note || '',
     priority: obj.priority || 'MEDIUM',
     assignment_note: obj.assignment_note || '',
-    delivery_address: obj.delivery_address || null,
+    // Nested object for BookingDetailDrawer
+    delivery_address: addr,
+    // Flat fields for LocationCell
+    addressDetail: addr?.street || (typeof obj.delivery_address === 'string' ? obj.delivery_address : ''),
+    ward: addr?.ward || '',
+    district: addr?.district || '',
+    city: addr?.city || '',
+    hasDriverLicense: obj.has_driver_license || false,
     driverLicenseUrl: obj.driver_license_url || null,
     signatureUrl: obj.signature_url || null,
     interestLevel: obj.interest_level ?? null,

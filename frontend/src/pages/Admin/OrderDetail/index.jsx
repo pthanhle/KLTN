@@ -129,7 +129,11 @@ const AdminOrderDetail = () => {
                 isOpen={isReassignModalVisible}
                 onCancel={() => setIsReassignModalVisible(false)}
                 onSubmit={handleReassignSubmit}
-                currentStaffId={order?.assignment?.assigned_staff_id}
+                currentStaffId={
+                    typeof order?.assignment?.assigned_staff_id === 'object'
+                        ? order?.assignment?.assigned_staff_id?._id?.toString()
+                        : order?.assignment?.assigned_staff_id
+                }
             />
         </div>
     );

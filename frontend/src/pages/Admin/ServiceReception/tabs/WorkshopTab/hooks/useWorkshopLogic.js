@@ -31,6 +31,7 @@ const mapProgressToBooking = (p) => {
         vehicle_model: vehicle.model || vehicle.brand || '',
         license_plate: vehicle.license_plate || '',
         vehicle_condition: booking.customer_note || '',
+        service_type: booking.service_type || '',
         selected_services: selectedServices,
         booking_date: booking.booking_date
             ? new Date(booking.booking_date).toISOString().split('T')[0]
@@ -39,7 +40,7 @@ const mapProgressToBooking = (p) => {
         expected_start_datetime: p.expected_start_datetime || null,
         expected_end_datetime: p.expected_end_datetime || null,
         time_slot: timeSlot,
-        primary_technician: mechanic?._id || mechanic || null,
+        primary_technician: mechanic?._id?.toString() || mechanic?.toString() || null,
         assistant_technicians: [],
         // RECEIVED → waiting for assignment, DIAGNOSING → assigned/in-progress
         status: p.status === 'RECEIVED' ? 'RO_CREATED' : 'IN_PROGRESS',
@@ -85,7 +86,7 @@ export const useWorkshopLogic = (selectedDate) => {
             const techs = allStaff
                 .filter(s => s.role === 'service' || s.role === 'advisor')
                 .map(s => ({
-                    _id: s._id,
+                    _id: s._id?.toString(),
                     full_name: s.fullName,
                     avatar: s.avatarUrl || '',
                     role: s.role || 'service',

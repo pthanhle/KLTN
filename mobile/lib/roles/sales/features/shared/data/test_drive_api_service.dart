@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -94,17 +93,13 @@ class TestDriveApiService {
 
   // POST /staff/sale/appointments/:id/checkin
   Future<void> submitCheckin(
-      String bookingId, String? licenseImagePath, Uint8List? signatureBytes) async {
+      String bookingId, Uint8List? licenseImageBytes, Uint8List? signatureBytes) async {
     final token = await _getToken();
     final dio = _buildDio(token);
     final url = '${ApiConfig.baseUrl}/staff/sale/appointments/$bookingId/checkin';
 
-    String? licenseBase64;
-    if (licenseImagePath != null) {
-      final bytes = await File(licenseImagePath).readAsBytes();
-      licenseBase64 = base64Encode(bytes);
-    }
-
+    final String? licenseBase64 =
+        licenseImageBytes != null ? base64Encode(licenseImageBytes) : null;
     final String? signatureBase64 =
         signatureBytes != null ? base64Encode(signatureBytes) : null;
 

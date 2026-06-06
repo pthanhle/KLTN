@@ -20,6 +20,7 @@ import { ensureConfigured } from './config/cloudinary.js'
 import { initSocket } from './config/socket.js'
 import './workers/emailWorker.js'
 import './workers/imageWorker.js'
+import './workers/maintenanceReminderWorker.js'
 
 import adminIndexRoutes from './routes/admin/index.route.js'
 import clientIndexRoutes from './routes/client/index.route.js'

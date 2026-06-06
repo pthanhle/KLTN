@@ -1,53 +1,62 @@
-import { useState, useEffect } from 'react';
-import { fetchNotificationsAPI, markAllAsReadAPI } from '../data/mockNotificationData';
+import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
+import notificationApi from '@/services/api/notification.api';
+import { socket } from '@/services/socket';
+
+const QUERY_KEY = ['notifications'];
 
 export const useNotificationLogic = () => {
-    const [notifications, setNotifications] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
+    const queryClient = useQueryClient();
+    const accessToken = useSelector((state) => state.auth.accessToken);
 
-    // Initial Fetch (Mô phỏng Lifecycle Mount)
+    const { data: notifications = [], isLoading } = useQuery({
+        queryKey: QUERY_KEY,
+        queryFn: () => notificationApi.getAll(),
+        enabled: !!accessToken,
+        select: (data) => (Array.isArray(data) ? data : []),
+        staleTime: 1000 * 60 * 2,
+    });
+
+    // Connect socket and listen for real-time notifications
     useEffect(() => {
-        const loadData = async () => {
-            try {
-                const response = await fetchNotificationsAPI();
-                if (response.success) {
-                    setNotifications(response.data);
-                }
-            } catch (error) {
-                console.error("Failed to load notifications", error);
-            } finally {
-                setIsLoading(false);
-            }
+        if (!accessToken) return;
+
+        if (!socket.connected) {
+            socket.auth = { token: accessToken };
+            socket.connect();
+        }
+
+        const handleNewNotification = (notification) => {
+            queryClient.setQueryData(QUERY_KEY, (prev = []) => [notification, ...prev]);
         };
-        loadData();
-    }, []);
 
-    // Derived States (Data Computation)
-    const unreadCount = notifications.filter(n => !n.is_read).length;
+        socket.on('new_notification', handleNewNotification);
+        return () => {
+            socket.off('new_notification', handleNewNotification);
+        };
+    }, [accessToken, queryClient]);
 
-    // Handlers
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
+    const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+    const toggleDropdown = () => setIsOpen((prev) => !prev);
 
     const handleMarkAllRead = async () => {
-        try {
-            const res = await markAllAsReadAPI();
-            if (res.success) {
-                setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-            }
-        } catch (error) {
-            console.error("Failed to mark read", error);
-        }
+        await notificationApi.markAllAsRead();
+        queryClient.setQueryData(QUERY_KEY, (prev = []) =>
+            prev.map((n) => ({ ...n, is_read: true }))
+        );
     };
 
-    const handleClickItem = (id) => {
-        setNotifications(prev =>
-            prev.map(n => n.id === id ? { ...n, is_read: true } : n)
-        );
-        setIsOpen(false); // Close dropdown on action
-    };
+    const handleClickItem = useCallback(async (notification) => {
+        if (!notification.is_read) {
+            await notificationApi.markAsRead(notification._id);
+            queryClient.setQueryData(QUERY_KEY, (prev = []) =>
+                prev.map((n) => (n._id === notification._id ? { ...n, is_read: true } : n))
+            );
+        }
+    }, [queryClient]);
 
     return {
         notifications,
@@ -57,6 +66,6 @@ export const useNotificationLogic = () => {
         unreadCount,
         toggleDropdown,
         handleMarkAllRead,
-        handleClickItem
+        handleClickItem,
     };
 };

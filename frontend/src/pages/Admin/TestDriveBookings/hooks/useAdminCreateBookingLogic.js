@@ -26,6 +26,7 @@ const adminBookingSchema = z
         selectedDate: z.any().refine((v) => v !== null && v !== undefined, { message: 'Vui lòng chọn ngày lái thử' }),
         selectedTimeSlot: z.string().min(1, 'Vui lòng chọn khung giờ'),
         staffId: z.string().optional(),
+        priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).default('MEDIUM'),
         note: z.string().optional(),
     })
     .superRefine((data, ctx) => {
@@ -53,6 +54,7 @@ const DEFAULT_VALUES = {
     selectedDate: null,
     selectedTimeSlot: '',
     staffId: undefined,
+    priority: 'MEDIUM',
     note: '',
 };
 
@@ -129,6 +131,7 @@ export const useAdminCreateBookingLogic = ({ onSuccess }) => {
             booking_date: dayjs(data.selectedDate).format('YYYY-MM-DD'),
             time_slot: data.selectedTimeSlot,
             advisor_id: data.staffId || null,
+            priority: data.priority || 'MEDIUM',
             note: data.note || '',
         };
 

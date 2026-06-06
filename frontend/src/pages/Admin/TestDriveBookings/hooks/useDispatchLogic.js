@@ -8,7 +8,7 @@ import { message } from 'antd';
 export const useDispatchLogic = (t) => {
     const queryClient = useQueryClient();
     const [searchStaff, setSearchStaff] = useState('');
-    const [filterDate, setFilterDate] = useState(dayjs());
+    const [filterDate, setFilterDate] = useState(null);
     const [activeBooking, setActiveBooking] = useState(null);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [pendingAssignmentData, setPendingAssignmentData] = useState(null);
@@ -130,6 +130,11 @@ export const useDispatchLogic = (t) => {
         setPendingAssignmentData(null);
     };
 
+    const handleAssignFromRequest = (booking, staff) => {
+        setPendingAssignmentData({ booking, staff });
+        setIsAssignModalOpen(true);
+    };
+
     return {
         pendingBookings,
         staffList: filteredStaff,
@@ -146,6 +151,7 @@ export const useDispatchLogic = (t) => {
         isAssignModalOpen,
         pendingAssignmentData,
         confirmAssignment,
-        closeAssignModal
+        closeAssignModal,
+        handleAssignFromRequest
     };
 };

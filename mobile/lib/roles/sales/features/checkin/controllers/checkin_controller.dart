@@ -16,7 +16,9 @@ class CheckInController extends Notifier<CheckInStateModel> {
     try {
       final XFile? image = await _picker.pickImage(source: source, imageQuality: 80);
       if (image != null) {
-        state = state.copyWith(driverLicensePath: image.path);
+        // Read bytes immediately — XFile.readAsBytes() works on all platforms (including web)
+        final bytes = await image.readAsBytes();
+        state = state.copyWith(licenseImageBytes: bytes);
       }
     } catch (e) {
       state = state.copyWith(error: 'Lỗi khi chụp ảnh: $e');
@@ -31,7 +33,7 @@ class CheckInController extends Notifier<CheckInStateModel> {
     state = state.copyWith(clearSignature: true);
   }
 
-  bool get isValid => state.driverLicensePath != null && state.signatureBytes != null;
+  bool get isValid => state.licenseImageBytes != null && state.signatureBytes != null;
 
   Future<void> submitCheckin(String taskId) async {
     if (!isValid) return;
@@ -39,7 +41,7 @@ class CheckInController extends Notifier<CheckInStateModel> {
     try {
       await testDriveApiService.submitCheckin(
         taskId,
-        state.driverLicensePath,
+        state.licenseImageBytes,
         state.signatureBytes,
       );
       state = state.copyWith(isSubmitting: false, isSuccess: true);

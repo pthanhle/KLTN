@@ -144,6 +144,40 @@ export const resetPasswordEmail = (fullName, resetUrl) => ({
     `,
 })
 
+export const maintenanceReminderEmail = (fullName, bookingUrl) => ({
+    subject: 'Nhắc nhở bảo dưỡng định kì – TT AUTO',
+    html: `
+        <div style="${BASE_STYLE}">
+            <h2 style="color: #1e293b; text-align: center;">Đã đến lúc bảo dưỡng xe của bạn!</h2>
+            <p>Xin chào <strong>${fullName}</strong>,</p>
+            <p>Chúng tôi nhận thấy đã hơn <strong>3 tháng</strong> kể từ lần bảo dưỡng gần nhất của bạn tại <strong>TT AUTO</strong>.</p>
+
+            <div style="background-color: #fffbeb; border-left: 4px solid #eab308; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                <p style="margin: 0; font-weight: 700; color: #92400e;">Tại sao bảo dưỡng định kỳ quan trọng?</p>
+                <ul style="margin: 10px 0 0 0; padding-left: 18px; color: #78350f; font-size: 14px;">
+                    <li>Đảm bảo an toàn khi vận hành</li>
+                    <li>Phát hiện sớm hư hỏng, tiết kiệm chi phí sửa chữa</li>
+                    <li>Duy trì hiệu suất và tuổi thọ động cơ</li>
+                    <li>Giữ nguyên giá trị xe lâu dài</li>
+                </ul>
+            </div>
+
+            <p>Đặt lịch ngay hôm nay để nhận <strong>ưu đãi dành riêng cho khách hàng thân thiết</strong>!</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="${bookingUrl}"
+                   style="background-color: #eab308; color: #1e293b; padding: 14px 36px; font-weight: bold;
+                          text-decoration: none; border-radius: 8px; display: inline-block; font-size: 15px;">
+                    Đặt lịch bảo dưỡng ngay
+                </a>
+            </div>
+
+            <hr style="${HR_STYLE}">
+            <p style="${FOOTER_STYLE}">Đây là email tự động, vui lòng không phản hồi trực tiếp. Liên hệ hỗ trợ: support@ttauto.vn</p>
+        </div>
+    `,
+})
+
+
 export const serviceTrackingEmail = (fullName, trackingCode, trackingUrl, licensePlate, serviceItems = []) => ({
     subject: 'Thông tin dịch vụ & Theo dõi tiến độ',
     html: `

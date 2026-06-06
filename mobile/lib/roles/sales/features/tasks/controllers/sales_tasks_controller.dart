@@ -9,12 +9,14 @@ class SalesTasksState {
   final TaskTab currentTab;
   final bool isLoading;
   final String? error;
+  final String searchQuery;
 
   SalesTasksState({
     this.allTasks = const [],
     this.currentTab = TaskTab.todo,
     this.isLoading = true,
     this.error,
+    this.searchQuery = '',
   });
 
   SalesTasksState copyWith({
@@ -22,30 +24,44 @@ class SalesTasksState {
     TaskTab? currentTab,
     bool? isLoading,
     String? error,
+    String? searchQuery,
   }) {
     return SalesTasksState(
       allTasks: allTasks ?? this.allTasks,
       currentTab: currentTab ?? this.currentTab,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
-  List<TaskModel> get todoTasks => allTasks
-      .where((t) =>
-          t.status == 'confirmed' ||
-          t.status == 'todo' ||
-          t.status == null)
-      .toList();
+  List<TaskModel> _sortAndFilter(List<TaskModel> list) {
+    var result = List<TaskModel>.from(list);
+    if (searchQuery.isNotEmpty) {
+      final q = searchQuery.toLowerCase();
+      result = result.where((t) {
+        return (t.licensePlate?.toLowerCase().contains(q) ?? false) ||
+            (t.customerName?.toLowerCase().contains(q) ?? false) ||
+            t.title.toLowerCase().contains(q);
+      }).toList();
+    }
+    // Sort newest first by appointmentTime (ISO string)
+    result.sort((a, b) {
+      final aTime = DateTime.tryParse(a.appointmentTime ?? '') ?? DateTime(0);
+      final bTime = DateTime.tryParse(b.appointmentTime ?? '') ?? DateTime(0);
+      return bTime.compareTo(aTime);
+    });
+    return result;
+  }
 
-  List<TaskModel> get inProgressTasks => allTasks
-      .where((t) =>
-          t.status == 'customer_arrived' || t.status == 'in_progress')
-      .toList();
+  List<TaskModel> get todoTasks => _sortAndFilter(allTasks.where((t) =>
+      t.status == 'confirmed' || t.status == 'todo' || t.status == null).toList());
 
-  List<TaskModel> get doneTasks => allTasks
-      .where((t) => t.status == 'post_drive' || t.status == 'done')
-      .toList();
+  List<TaskModel> get inProgressTasks => _sortAndFilter(allTasks.where((t) =>
+      t.status == 'customer_arrived' || t.status == 'in_progress').toList());
+
+  List<TaskModel> get doneTasks => _sortAndFilter(allTasks.where((t) =>
+      t.status == 'post_drive' || t.status == 'done').toList());
 
   List<TaskModel> get activeTasks {
     switch (currentTab) {
@@ -107,6 +123,10 @@ class SalesTasksController extends Notifier<SalesTasksState> {
       // Revert on error and reload
       await _loadTasks();
     }
+  }
+
+  void updateSearch(String query) {
+    state = state.copyWith(searchQuery: query);
   }
 
   Future<void> refresh() async {

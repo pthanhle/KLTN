@@ -67,25 +67,9 @@ class AdvisorApiRepository {
     final customer = booking['user_id'] ?? {};
     final service = booking['service_id'] ?? {};
 
-    ROStage parseStage(String status) {
-      switch (status) {
-        // Reception done → advisor waits for KTV; KTV diagnosing; or advisor creating quotation
-        case 'RECEIVED':
-        case 'DIAGNOSING':
-        case 'QUOTING':
-        case 'QUOTATION': return ROStage.quotation;
-        case 'IN_PROGRESS': return ROStage.inProgress;
-        case 'QC_TESTING':
-        case 'QC': return ROStage.qc;
-        case 'DELIVERY':
-        case 'COMPLETED': return ROStage.delivery;
-        case 'PENDING':
-        default: return ROStage.pending;
-      }
-    }
-
     final currentStatus = json['current_step'] ?? json['status'] ?? 'PENDING';
 
+    // Parse timeline first — receptionInfo is needed to determine the correct stage
     ReceptionInfo? parsedReceptionInfo;
     List<MpiCategory> mpiDiagnostics = [];
     String mpiConclusion = '';
@@ -105,6 +89,30 @@ class AdvisorApiRepository {
             .toList();
         mpiConclusion = step['notes']?.toString() ?? '';
       }
+    }
+
+    // Determine stage after parsing receptionInfo.
+    // Admin may assign a mechanic (→ DIAGNOSING) before the advisor has done the
+    // walkaround. Reception is the gate: until reception_info exists the advisor
+    // must stay in "Cần Đón", regardless of whether the current_step is RECEIVED
+    // or DIAGNOSING.
+    ROStage stage;
+    switch (currentStatus) {
+      case 'IN_PROGRESS':
+        stage = ROStage.inProgress;
+        break;
+      case 'QC_TESTING':
+      case 'QC':
+        stage = ROStage.qc;
+        break;
+      case 'DELIVERY':
+      case 'COMPLETED':
+        stage = ROStage.delivery;
+        break;
+      default:
+        // RECEIVED, DIAGNOSING, QUOTING, QUOTATION — or anything unknown:
+        // if reception not done yet → Cần Đón; otherwise → Báo Giá
+        stage = parsedReceptionInfo == null ? ROStage.pending : ROStage.quotation;
     }
 
     String? pendingSupplementId;
@@ -132,7 +140,7 @@ class AdvisorApiRepository {
       ),
       serviceType: (service is Map ? service['service_name']?.toString() : null) ?? booking['service_type']?.toString() ?? '',
       isWaitingInLounge: false,
-      stage: parseStage(currentStatus),
+      stage: stage,
       rawStatus: currentStatus,
       scheduledArrivalTime: booking['booking_date'] != null
           ? (DateTime.tryParse(booking['booking_date'].toString()) ?? DateTime.now())

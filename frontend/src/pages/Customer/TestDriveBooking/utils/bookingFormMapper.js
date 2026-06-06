@@ -81,6 +81,7 @@ export const mapFormToBookingPayload = (data, carId, isReschedule, rescheduleDat
         contact_phone: data.phoneNumber,
         booking_date: data.selectedDate.format('YYYY-MM-DD'),
         time_slot: data.selectedTimeSlot,
+        has_driver_license: data.hasDriverLicense ?? false,
         customer_note: data.note,
 
         is_reschedule: isReschedule,

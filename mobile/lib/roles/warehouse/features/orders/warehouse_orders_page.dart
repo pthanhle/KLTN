@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:ttauto_staff/roles/warehouse/features/orders/controllers/warehouse_orders_controller.dart';
 import 'package:ttauto_staff/roles/warehouse/features/orders/widgets/controls/orders_segmented_control.dart';
 import 'package:ttauto_staff/roles/warehouse/features/orders/widgets/orders_list_view.dart';
+import 'package:ttauto_staff/shared/widgets/inputs/list_search_bar.dart';
 
 class WarehouseOrdersPage extends ConsumerStatefulWidget {
   const WarehouseOrdersPage({super.key});
@@ -65,10 +66,23 @@ class _WarehouseOrdersPageState extends ConsumerState<WarehouseOrdersPage> {
               SliverPersistentHeader(
                 pinned: true,
                 delegate: _SegmentedControlDelegate(
-                  child: OrdersSegmentedControl(
-                    selectedTab: state.currentTab,
-                    onTabChanged: controller.setTab,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      OrdersSegmentedControl(
+                        selectedTab: state.currentTab,
+                        onTabChanged: controller.setTab,
+                      ),
+                    ],
                   ),
+                ),
+              ),
+
+              SliverToBoxAdapter(
+                child: ListSearchBar(
+                  hintText: 'Tìm mã đơn, khách hàng...',
+                  onChanged: controller.updateSearch,
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
                 ),
               ),
 

@@ -11,24 +11,48 @@ class ServiceOrdersState {
   final bool isLoading;
   final List<ServiceOrderModel> orders;
   final String? error;
+  final String searchQuery;
 
   const ServiceOrdersState({
     this.isLoading = false,
     this.orders = const [],
     this.error,
+    this.searchQuery = '',
   });
 
   ServiceOrdersState copyWith({
     bool? isLoading,
     List<ServiceOrderModel>? orders,
     String? error,
+    String? searchQuery,
   }) {
     return ServiceOrdersState(
       isLoading: isLoading ?? this.isLoading,
       orders: orders ?? this.orders,
       error: error,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
+
+  List<ServiceOrderModel> _applySearchAndSort(List<ServiceOrderModel> list) {
+    var result = List<ServiceOrderModel>.from(list);
+    if (searchQuery.isNotEmpty) {
+      final q = searchQuery.toLowerCase();
+      result = result.where((o) {
+        return o.quotationId.toLowerCase().contains(q) ||
+            o.customer.name.toLowerCase().contains(q) ||
+            o.customer.licensePlate.toLowerCase().contains(q);
+      }).toList();
+    }
+    result.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return result;
+  }
+
+  List<ServiceOrderModel> get pendingOrders =>
+      _applySearchAndSort(orders.where((o) => o.status == ServiceOrderStatus.pendingPick).toList());
+
+  List<ServiceOrderModel> get readyOrders =>
+      _applySearchAndSort(orders.where((o) => o.status == ServiceOrderStatus.readyForHandover).toList());
 }
 
 class ServiceOrdersController extends Notifier<ServiceOrdersState> {
@@ -93,6 +117,10 @@ class ServiceOrdersController extends Notifier<ServiceOrdersState> {
     );
   }
 
+  void updateSearch(String query) {
+    state = state.copyWith(searchQuery: query);
+  }
+
   void updateOrderStatus(String orderId, ServiceOrderStatus newStatus) {
     final updatedOrders = state.orders.map((o) {
       if (o.id == orderId) {
@@ -115,11 +143,9 @@ class ServiceOrdersController extends Notifier<ServiceOrdersState> {
 }
 
 final pendingServiceOrdersProvider = Provider<List<ServiceOrderModel>>((ref) {
-  final state = ref.watch(serviceOrdersProvider);
-  return state.orders.where((o) => o.status == ServiceOrderStatus.pendingPick).toList();
+  return ref.watch(serviceOrdersProvider).pendingOrders;
 });
 
 final readyServiceOrdersProvider = Provider<List<ServiceOrderModel>>((ref) {
-  final state = ref.watch(serviceOrdersProvider);
-  return state.orders.where((o) => o.status == ServiceOrderStatus.readyForHandover).toList();
+  return ref.watch(serviceOrdersProvider).readyOrders;
 });

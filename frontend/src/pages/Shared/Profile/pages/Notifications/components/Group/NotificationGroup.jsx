@@ -15,8 +15,8 @@ const NotificationGroup = ({ title, notifications, onMarkRead, onMarkUnread, onD
             
             <div className="grid gap-4 md:gap-5 w-full">
                 {notifications.map(notif => (
-                    <NotificationCard 
-                        key={notif.id} 
+                    <NotificationCard
+                        key={notif._id}
                         notification={notif}
                         onMarkRead={onMarkRead}
                         onMarkUnread={onMarkUnread}

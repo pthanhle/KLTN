@@ -34,7 +34,7 @@ const ProfileNotifications = () => {
         yest.setDate(yest.getDate() - 1);
 
         notifications.forEach(notif => {
-            const date = new Date(notif.created_at);
+            const date = new Date(notif.createdAt);
             if (date >= now) {
                 today.push(notif);
             } else if (date >= yest) {

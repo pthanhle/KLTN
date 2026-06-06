@@ -1,9 +1,8 @@
 import { Image } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const GallerySlider = ({
-    activeTab,
     galleryItems,
     currentIndex,
     handlePrev,
@@ -14,16 +13,10 @@ export const GallerySlider = ({
     if (!hasItems) {
         return (
             <div className="relative w-full h-[280px] md:h-[40vh] lg:h-[55vh] flex items-center justify-center bg-slate-100 dark:bg-white/5 rounded-[32px]">
-                <span className="text-slate-400 dark:text-slate-500 font-medium">No media available</span>
+                <span className="text-slate-400 dark:text-slate-500 font-medium">No photos available</span>
             </div>
         );
     }
-
-    const handleVideoClick = () => {
-        if (activeTab === 'videos' && galleryItems[currentIndex]?.url) {
-            window.open(galleryItems[currentIndex].url, '_blank', 'noopener,noreferrer');
-        }
-    };
 
     return (
         <div className="relative w-full overflow-hidden flex justify-center items-center py-4">
@@ -55,23 +48,15 @@ export const GallerySlider = ({
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.98 }}
                             transition={{ duration: 0.3 }}
-                            className={`w-full h-full relative rounded-2xl lg:rounded-[32px] overflow-hidden group ${activeTab === 'videos' ? 'cursor-pointer' : ''}`}
-                            onClick={handleVideoClick}
+                            className="w-full h-full relative rounded-2xl lg:rounded-[32px] overflow-hidden"
                         >
                             <Image
                                 src={galleryItems[currentIndex]?.thumbnail}
                                 alt="Active Gallery Image"
                                 rootClassName="w-full h-full"
-                                className="!w-full !h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                preview={activeTab !== 'videos'}
+                                className="!w-full !h-full object-cover transition-transform duration-700 ease-out hover:scale-105"
+                                preview={true}
                             />
-                            {activeTab === 'videos' && (
-                                <div className="absolute inset-0 flex items-center justify-center group-hover:bg-black/10 transition-colors">
-                                    <div className="w-20 h-20 rounded-full bg-[#ff0000] shadow-[0_10px_40px_rgba(255,0,0,0.4)] flex items-center justify-center text-white transform group-hover:scale-110 transition-transform duration-500">
-                                        <Play size={32} fill="white" className="ml-1" />
-                                    </div>
-                                </div>
-                            )}
                         </motion.div>
                     </AnimatePresence>
                 </div>

@@ -11,26 +11,26 @@ class WarehouseOrdersState {
   final bool isLoading;
   final OrderStatus currentTab;
   final List<WarehouseOrderModel> orders;
-  final String currentStaffId;
+  final String searchQuery;
 
   const WarehouseOrdersState({
     this.isLoading = false,
     this.currentTab = OrderStatus.pendingPick,
     this.orders = const [],
-    this.currentStaffId = 'INV-112',
+    this.searchQuery = '',
   });
 
   WarehouseOrdersState copyWith({
     bool? isLoading,
     OrderStatus? currentTab,
     List<WarehouseOrderModel>? orders,
-    String? currentStaffId,
+    String? searchQuery,
   }) {
     return WarehouseOrdersState(
       isLoading: isLoading ?? this.isLoading,
       currentTab: currentTab ?? this.currentTab,
       orders: orders ?? this.orders,
-      currentStaffId: currentStaffId ?? this.currentStaffId,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 }
@@ -46,38 +46,26 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
     state = state.copyWith(isLoading: true);
 
     try {
-      final pickLists = await WarehouseApiService.fetchPickLists();
+      final rawOrders = await WarehouseApiService.fetchMyOrders();
 
-      final parsedOrders = pickLists.map<WarehouseOrderModel>((json) {
-        final partsList = json['parts'] as List<dynamic>? ?? [];
-        return WarehouseOrderModel(
-          id: json['progress_id'] ?? '',
-          code: json['booking_code'] ?? 'N/A',
-          customerName: json['customer_name'] ?? 'Khách hàng',
-          customerType: CustomerType.b2c,
-          totalItems: partsList.length,
-          priority: OrderPriority.standard,
-          status: OrderStatus.pendingPick,
-          createdAt: DateTime.now(),
-          assignedStaffId: 'INV-112',
-          items: partsList.map<WarehouseOrderItemModel>((part) {
-            return WarehouseOrderItemModel(
-              partId: part['_id'] ?? '',
-              sku: part['sku'] ?? 'N/A',
-              name: part['name'] ?? 'N/A',
-              quantity: part['quantity'] ?? 1,
-              unitPrice: 0.0,
-              totalPrice: 0.0,
-            );
-          }).toList(),
-        );
-      }).toList();
+      final parsedOrders = rawOrders
+          .map<WarehouseOrderModel?>((json) {
+            try {
+              return WarehouseOrderModel.fromJson(json as Map<String, dynamic>);
+            } catch (e) {
+              print('Failed to parse order: $e');
+              return null;
+            }
+          })
+          .whereType<WarehouseOrderModel>()
+          .toList();
 
       state = state.copyWith(
         isLoading: false,
         orders: parsedOrders,
       );
     } catch (e) {
+      print('Error loading orders: $e');
       state = state.copyWith(isLoading: false, orders: const []);
     }
   }
@@ -86,49 +74,68 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
     state = state.copyWith(currentTab: tab);
   }
 
-  List<WarehouseOrderModel> get myOrders {
-    return state.orders.where((order) => order.assignedStaffId == state.currentStaffId).toList();
+  List<WarehouseOrderModel> get filteredOrders {
+    var list = state.orders.where((order) => order.status == state.currentTab).toList();
+
+    if (state.searchQuery.isNotEmpty) {
+      final q = state.searchQuery.toLowerCase();
+      list = list.where((o) {
+        return o.code.toLowerCase().contains(q) ||
+            o.customerName.toLowerCase().contains(q);
+      }).toList();
+    }
+
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
   }
 
-  List<WarehouseOrderModel> get filteredOrders {
-    return myOrders.where((order) => order.status == state.currentTab).toList();
+  void updateSearch(String query) {
+    state = state.copyWith(searchQuery: query);
   }
 
   Future<void> refresh() async {
     await _loadOrders();
   }
 
-  Future<void> quickPack(String id) async {
-    final order = state.orders.firstWhere((o) => o.id == id);
-    final partIds = order.items.map((e) => e.partId).toList();
+  // Mark order as packed: CONFIRMED → PROCESSING
+  Future<bool> quickPack(String id) async {
+    final success = await WarehouseApiService.packOrder(id);
 
-    final success = await WarehouseApiService.dispatchParts(id, partIds);
-    if (!success) {
-      print('Failed to dispatch parts on API');
+    if (success) {
+      final updatedOrders = state.orders.map((o) {
+        if (o.id == id) {
+          return o.copyWith(status: OrderStatus.pendingDelivery);
+        }
+        return o;
+      }).toList();
+      state = state.copyWith(orders: updatedOrders);
     }
 
-    final updatedOrders = state.orders.map((o) {
-      if (o.id == id) {
-        return o.copyWith(status: OrderStatus.pendingDelivery);
-      }
-      return o;
-    }).toList();
-
-    state = state.copyWith(orders: updatedOrders);
+    return success;
   }
 
-  void dispatchOrder(String id, String provider, String trackingCode) {
-    final updatedOrders = state.orders.map((order) {
-      if (order.id == id) {
-        return order.copyWith(
-          status: OrderStatus.completed,
-          shippingProvider: provider,
-          trackingCode: trackingCode,
-        );
-      }
-      return order;
-    }).toList();
+  // Confirm dispatch: PROCESSING → SHIPPED
+  Future<bool> dispatchOrder(String id, String provider, String trackingCode) async {
+    final success = await WarehouseApiService.dispatchOrderToShipping(
+      id,
+      provider: provider.isNotEmpty ? provider : null,
+      trackingCode: trackingCode.isNotEmpty ? trackingCode : null,
+    );
 
-    state = state.copyWith(orders: updatedOrders);
+    if (success) {
+      final updatedOrders = state.orders.map((order) {
+        if (order.id == id) {
+          return order.copyWith(
+            status: OrderStatus.shipping,
+            shippingProvider: provider,
+            trackingCode: trackingCode,
+          );
+        }
+        return order;
+      }).toList();
+      state = state.copyWith(orders: updatedOrders);
+    }
+
+    return success;
   }
 }

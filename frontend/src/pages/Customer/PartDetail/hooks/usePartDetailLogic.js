@@ -22,21 +22,20 @@ export const usePartDetailLogic = (id) => {
     const [activeTab, setActiveTab] = useState('description');
 
     useEffect(() => {
-        if (part && part.options && part.options.length > 0) {
-            const defaults = {};
-            part.options.forEach(opt => {
-                const optIdentifier = opt.type;
-                if (opt.choices && opt.choices.length > 0) {
-                    const firstChoice = opt.choices[0];
-                    defaults[optIdentifier] = typeof firstChoice === 'string' ? firstChoice : firstChoice.label;
-                }
-            });
-            setSelectedOptions(defaults);
-        }
-    }, [part]);
+        // Reset selection when the part changes (e.g. navigating between parts)
+        setSelectedOptions({});
+    }, [part?._id]);
 
     const handleOptionSelect = (optionName, choice) => {
-        setSelectedOptions(prev => ({ ...prev, [optionName]: choice }));
+        setSelectedOptions(prev => {
+            if (prev[optionName] === choice) {
+                // Second click on same choice → deselect, return to default price/image
+                const next = { ...prev };
+                delete next[optionName];
+                return next;
+            }
+            return { ...prev, [optionName]: choice };
+        });
     };
 
     // Derive the selected choice object for a given option type

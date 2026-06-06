@@ -1,69 +1,56 @@
-import { useState, useEffect, useMemo } from 'react';
-import { fetchNotificationsAPI, markAllAsReadAPI } from '../../../../../../layout/CustomerLayout/Header/data/mockNotificationData';
-import { NOTIFICATION_STATUS } from '../../../../../../layout/CustomerLayout/Header/constants/notification.constants';
-
+import { useState, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
+import notificationApi from '../../../../../../services/api/notification.api';
 import { FILTER_TABS } from '../constants/notificationPage.constants';
 
-export const useNotificationPageLogic = () => {
-    const [notifications, setNotifications] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState(FILTER_TABS.ALL);
-    
-    // Load initial data
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const response = await fetchNotificationsAPI();
-                if (response.success) {
-                    setNotifications(response.data);
-                }
-            } catch (error) {
-                console.error("Fetch error:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        loadData();
-    }, []);
+const QUERY_KEY = ['notifications'];
 
-    // Handlers
+export const useNotificationPageLogic = () => {
+    const [activeTab, setActiveTab] = useState(FILTER_TABS.ALL);
+    const queryClient = useQueryClient();
+    const accessToken = useSelector((state) => state.auth.accessToken);
+
+    const { data: allNotifications = [], isLoading } = useQuery({
+        queryKey: QUERY_KEY,
+        queryFn: () => notificationApi.getAll(),
+        enabled: !!accessToken,
+        select: (data) => (Array.isArray(data) ? data : []),
+        staleTime: 1000 * 60 * 2,
+    });
+
     const handleMarkAllRead = async () => {
-        try {
-            await markAllAsReadAPI();
-            setNotifications(prev => prev.map(n => ({ ...n, is_read: NOTIFICATION_STATUS.READ })));
-        } catch (error) {
-            console.error(error);
-        }
+        await notificationApi.markAllAsRead();
+        queryClient.setQueryData(QUERY_KEY, (prev = []) => prev.map((n) => ({ ...n, is_read: true })));
     };
 
-    const handleMarkAsRead = (id) => {
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: NOTIFICATION_STATUS.READ } : n));
+    const handleMarkAsRead = async (id) => {
+        await notificationApi.markAsRead(id);
+        queryClient.setQueryData(QUERY_KEY, (prev = []) =>
+            prev.map((n) => (n._id === id ? { ...n, is_read: true } : n))
+        );
     };
 
     const handleMarkAsUnread = (id) => {
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: NOTIFICATION_STATUS.UNREAD } : n));
+        // Optimistic local toggle (backend doesn't expose unread endpoint — keep local only)
+        queryClient.setQueryData(QUERY_KEY, (prev = []) =>
+            prev.map((n) => (n._id === id ? { ...n, is_read: false } : n))
+        );
     };
 
     const handleDelete = (id) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
+        queryClient.setQueryData(QUERY_KEY, (prev = []) => prev.filter((n) => n._id !== id));
     };
 
-    // Derived States
     const filteredNotifications = useMemo(() => {
         switch (activeTab) {
-            case FILTER_TABS.UNREAD:
-                return notifications.filter(n => n.is_read === NOTIFICATION_STATUS.UNREAD);
-            case FILTER_TABS.READ:
-                return notifications.filter(n => n.is_read === NOTIFICATION_STATUS.READ);
-            case FILTER_TABS.ALL:
-            default:
-                return notifications;
+            case FILTER_TABS.UNREAD: return allNotifications.filter((n) => !n.is_read);
+            case FILTER_TABS.READ:   return allNotifications.filter((n) => n.is_read);
+            default:                 return allNotifications;
         }
-    }, [notifications, activeTab]);
+    }, [allNotifications, activeTab]);
 
-    const unreadCount = useMemo(() => {
-        return notifications.filter(n => n.is_read === NOTIFICATION_STATUS.UNREAD).length;
-    }, [notifications]);
+    const unreadCount = useMemo(() => allNotifications.filter((n) => !n.is_read).length, [allNotifications]);
 
     return {
         notifications: filteredNotifications,
@@ -74,6 +61,6 @@ export const useNotificationPageLogic = () => {
         handleMarkAsRead,
         handleMarkAsUnread,
         handleDelete,
-        unreadCount
+        unreadCount,
     };
 };

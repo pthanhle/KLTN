@@ -89,6 +89,7 @@ const bookingSchema = mongoose.Schema(
       enum: ['showroom', 'home'],
       default: 'showroom',
     },
+    showroom_branch: { type: String },
     delivery_address: {
       type: mongoose.Schema.Types.Mixed, // Accept old strings OR new {street, ward, district, city} objects
     },
@@ -139,6 +140,9 @@ const bookingSchema = mongoose.Schema(
     status_text: { type: String },
 
     timeline: { type: [timelineStepSchema], default: [] },
+
+    // Committed before test drive (from client booking form)
+    has_driver_license: { type: Boolean, default: false },
 
     // Test-drive checkin data (collected by sales staff on mobile)
     driver_license_url: { type: String },

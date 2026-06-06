@@ -16,7 +16,7 @@ const ProfileForm = ({ profile, isEditing, methods, provinces, districts, wards,
                     {isEditing ? (
                         <div className="flex items-center gap-3">
                             <Button
-                                type="button"
+                                htmlType="button"
                                 onClick={handleEditToggle}
                                 className="!h-11 !px-5 !rounded-xl !border-slate-200 dark:!border-white/10 !bg-transparent !text-slate-600 dark:!text-slate-300 hover:!bg-slate-50 dark:hover:!bg-white/5 !font-bold transition-all shadow-none"
                             >
@@ -32,7 +32,7 @@ const ProfileForm = ({ profile, isEditing, methods, provinces, districts, wards,
                         </div>
                     ) : (
                         <Button
-                            type="button"
+                            htmlType="button"
                             onClick={handleEditToggle}
                             className="!h-11 !px-6 !rounded-xl !bg-yellow-500 hover:!bg-yellow-400 !border-yellow-500 !text-slate-900 !font-black !shadow-[0_8px_20px_rgba(234,179,8,0.25)] transition-all"
                         >

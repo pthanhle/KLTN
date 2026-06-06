@@ -9,17 +9,32 @@ class AdvisorDashboardState {
   final List<RepairOrderModel> allRepairOrders;
   final ROStage selectedStage;
   final bool sessionExpired;
-  
+  final String searchQuery;
+
   AdvisorDashboardState({
     this.isLoading = true,
     this.advisorName = '',
     this.allRepairOrders = const [],
     this.selectedStage = ROStage.pending,
     this.sessionExpired = false,
+    this.searchQuery = '',
   });
 
-  List<RepairOrderModel> get filteredOrders => 
-      allRepairOrders.where((ro) => ro.stage == selectedStage).toList();
+  List<RepairOrderModel> get filteredOrders {
+    var list = allRepairOrders.where((ro) => ro.stage == selectedStage).toList();
+
+    if (searchQuery.isNotEmpty) {
+      final q = searchQuery.toLowerCase();
+      list = list.where((ro) {
+        return ro.vehicleInfo.licensePlate.toLowerCase().contains(q) ||
+            ro.customerInfo.name.toLowerCase().contains(q) ||
+            ro.bookingCode.toLowerCase().contains(q);
+      }).toList();
+    }
+
+    list.sort((a, b) => b.scheduledArrivalTime.compareTo(a.scheduledArrivalTime));
+    return list;
+  }
 
   AdvisorDashboardState copyWith({
     bool? isLoading,
@@ -27,6 +42,7 @@ class AdvisorDashboardState {
     List<RepairOrderModel>? allRepairOrders,
     ROStage? selectedStage,
     bool? sessionExpired,
+    String? searchQuery,
   }) {
     return AdvisorDashboardState(
       isLoading: isLoading ?? this.isLoading,
@@ -34,6 +50,7 @@ class AdvisorDashboardState {
       allRepairOrders: allRepairOrders ?? this.allRepairOrders,
       selectedStage: selectedStage ?? this.selectedStage,
       sessionExpired: sessionExpired ?? this.sessionExpired,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 }
@@ -71,6 +88,10 @@ class AdvisorDashboardController extends Notifier<AdvisorDashboardState> {
   void selectStage(ROStage stage) {
     if (state.selectedStage == stage) return;
     state = state.copyWith(selectedStage: stage);
+  }
+
+  void updateSearch(String query) {
+    state = state.copyWith(searchQuery: query);
   }
 
   Future<void> refresh() async {

@@ -1,4 +1,5 @@
 
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +8,9 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../../../core/config/api_config.dart';
 import '../../models/mpi_item_model.dart';
 import '../inputs/mpi_note_textfield.dart';
 import '../inputs/mpi_image_picker_grid.dart';
@@ -61,6 +65,7 @@ class _MpiItemUpdateModalState extends State<MpiItemUpdateModal> {
   late List<String> _mediaUrls;
   String? _errorMessage;
   int _errorShakeKey = 0;
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -245,17 +250,41 @@ class _MpiItemUpdateModalState extends State<MpiItemUpdateModal> {
         imageQuality: 80,
         maxWidth: 1920,
       );
-      if (file != null && mounted) {
+      if (file == null || !mounted) return;
+
+      setState(() {
+        _isUploading = true;
+        _errorMessage = null;
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+      if (token == null) throw Exception('SESSION_EXPIRED');
+
+      final dio = Dio();
+      final formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(file.path, filename: File(file.path).uri.pathSegments.last),
+      });
+
+      final response = await dio.post(
+        '${ApiConfig.baseUrl}/upload/image',
+        data: formData,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      final url = response.data['url'] as String?;
+      if (url != null && mounted) {
         setState(() {
-          _errorMessage = null;
-          _mediaUrls.add(file.path);
+          _mediaUrls.add(url);
+          _isUploading = false;
         });
       }
     } catch (_) {
       if (mounted) {
         HapticFeedback.heavyImpact();
         setState(() {
-          _errorMessage = 'Không thể truy cập camera hoặc thư viện ảnh.'.tr();
+          _isUploading = false;
+          _errorMessage = 'Không thể tải ảnh lên. Vui lòng thử lại.'.tr();
           _errorShakeKey++;
         });
       }
@@ -336,10 +365,27 @@ class _MpiItemUpdateModalState extends State<MpiItemUpdateModal> {
                       const SizedBox(height: 20),
                       _SectionLabel(label: 'Ảnh minh chứng (bắt buộc nếu lỗi)'.tr()),
                       const SizedBox(height: 8),
-                      MpiImagePickerGrid(
-                        mediaUrls: _mediaUrls,
-                        onAddImage: _pickImage,
-                        onRemoveImage: _removeImage,
+                      Stack(
+                        children: [
+                          MpiImagePickerGrid(
+                            mediaUrls: _mediaUrls,
+                            onAddImage: _isUploading ? () async {} : _pickImage,
+                            onRemoveImage: _isUploading ? (_) {} : _removeImage,
+                          ),
+                          if (_isUploading)
+                            Positioned.fill(
+                              child: Container(
+                                color: Colors.black.withValues(alpha: 0.25),
+                                child: const Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -366,8 +412,14 @@ class _MpiItemUpdateModalState extends State<MpiItemUpdateModal> {
                           const SizedBox(height: 10),
                         ],
                         LiquidButton(
-                          onPressed: _handleSave,
-                          child: Text('Lưu thông tin'.tr()),
+                          onPressed: _isUploading ? null : _handleSave,
+                          child: _isUploading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                )
+                              : Text('Lưu thông tin'.tr()),
                         ),
                       ],
                     ),

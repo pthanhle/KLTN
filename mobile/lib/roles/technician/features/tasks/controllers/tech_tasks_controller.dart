@@ -7,27 +7,44 @@ class TechTasksState {
   final List<TechTaskModel> allTasks;
   final TechTaskStatus? currentFilter;
   final int currentTabIndex;
+  final String searchQuery;
 
   TechTasksState({
     required this.allTasks,
     required this.currentFilter,
     required this.currentTabIndex,
+    this.searchQuery = '',
   });
 
   List<TechTaskModel> get filteredTasks {
-    if (currentFilter == null) return allTasks;
-    return allTasks.where((task) => task.status == currentFilter).toList();
+    var list = currentFilter == null
+        ? List<TechTaskModel>.from(allTasks)
+        : allTasks.where((task) => task.status == currentFilter).toList();
+
+    if (searchQuery.isNotEmpty) {
+      final q = searchQuery.toLowerCase();
+      list = list.where((t) {
+        return t.plate.toLowerCase().contains(q) ||
+            t.model.toLowerCase().contains(q) ||
+            t.bay.toLowerCase().contains(q);
+      }).toList();
+    }
+
+    // Newest first: reverse insertion order (API returns chronological)
+    return list.reversed.toList();
   }
 
   TechTasksState copyWith({
     List<TechTaskModel>? allTasks,
     TechTaskStatus? currentFilter,
     int? currentTabIndex,
+    String? searchQuery,
   }) {
     return TechTasksState(
       allTasks: allTasks ?? this.allTasks,
       currentFilter: currentFilter,
       currentTabIndex: currentTabIndex ?? this.currentTabIndex,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 }
@@ -94,6 +111,12 @@ class TechTasksController extends AsyncNotifier<TechTasksState> {
         state = AsyncValue.error(e, st);
       }
     }
+  }
+
+  void updateSearch(String query) {
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(searchQuery: query));
   }
 
   Future<void> refresh() async {

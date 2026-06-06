@@ -15,13 +15,30 @@ import {
     CalendarCheck,
     FileText
 } from 'lucide-react';
+import { useAdminPendingCounts } from '../../../../services/queries/adminDashboard.queries';
+
+const BadgeIcon = ({ icon, count }) => {
+    if (!count) return icon;
+    return (
+        <span className="relative inline-flex">
+            {icon}
+            <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none shadow-sm">
+                {count > 99 ? '99+' : count}
+            </span>
+        </span>
+    );
+};
 
 export const useSiderMenu = (collapsed) => {
     const { t } = useTranslation('layout');
     const navigate = useNavigate();
     const location = useLocation();
+    const { data: pendingCounts } = useAdminPendingCounts();
 
     const iconSize = 24;
+    const ordersCount = pendingCounts?.pendingOrdersCount || 0;
+    const testDrivesCount = pendingCounts?.pendingTestDrivesCount || 0;
+    const appointmentsCount = pendingCounts?.pendingAppointmentsCount || 0;
 
     const menuItems = [
         {
@@ -36,7 +53,7 @@ export const useSiderMenu = (collapsed) => {
         },
         {
             key: '/admin/orders',
-            icon: <ShoppingCart size={iconSize} />,
+            icon: <BadgeIcon icon={<ShoppingCart size={iconSize} />} count={ordersCount} />,
             label: t('admin.sider.orders'),
         },
         {
@@ -46,12 +63,12 @@ export const useSiderMenu = (collapsed) => {
         },
         {
             key: '/admin/test-drive-bookings',
-            icon: <CalendarCheck size={iconSize} />,
+            icon: <BadgeIcon icon={<CalendarCheck size={iconSize} />} count={testDrivesCount} />,
             label: t('admin.sider.test-drive-bookings', 'Lái Thử'),
         },
         {
             key: '/admin/services/reception',
-            icon: <Box size={iconSize} />,
+            icon: <BadgeIcon icon={<Box size={iconSize} />} count={appointmentsCount} />,
             label: t('admin.sider.service-reception', 'Lịch Dịch Vụ'),
         },
         {

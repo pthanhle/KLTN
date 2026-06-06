@@ -49,9 +49,14 @@ export const processReception = asyncHandler(async (req, res) => {
     }
 
     if (progress) {
-        // Reception complete — now waiting for admin to assign a mechanic (DIAGNOSING)
-        progress.current_step = 'RECEIVED'
-        progress.status = 'RECEIVED'
+        // Only reset to RECEIVED if mechanic hasn't been assigned yet.
+        // If admin already assigned (DIAGNOSING), keep that status so the
+        // workshop dispatch board isn't disrupted.
+        if (progress.status === 'RECEIVED') {
+            progress.current_step = 'RECEIVED'
+            progress.status = 'RECEIVED'
+        }
+        // If DIAGNOSING (mechanic already assigned), status stays DIAGNOSING.
 
         const receivedStepIndex = progress.timeline.findIndex(t => t.step === 'RECEIVED')
         if (receivedStepIndex !== -1) {

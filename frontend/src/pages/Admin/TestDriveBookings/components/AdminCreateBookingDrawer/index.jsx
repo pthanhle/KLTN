@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Drawer, Input, AutoComplete, Select, DatePicker } from 'antd';
+import { Drawer, Input, AutoComplete, Select, DatePicker, Tag } from 'antd';
 import { FormProvider, Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { User, PhoneCall, AlignLeft, Search } from 'lucide-react';
+import { User, PhoneCall, AlignLeft, Search, Flag } from 'lucide-react';
 import viVN from 'antd/locale/vi_VN';
 import enUS from 'antd/locale/en_US';
 import dayjs from 'dayjs';
@@ -236,24 +236,45 @@ const FormBody = ({
 
             {/* ─── Assignment ─── */}
             <SectionLabel>Phân công nhân viên</SectionLabel>
-            <div>
-                <FieldLabel optional>Nhân viên kinh doanh phụ trách</FieldLabel>
-                <Controller
-                    name="staffId"
-                    control={control}
-                    render={({ field }) => (
-                        <Select
-                            {...field}
-                            placeholder="Chọn nhân viên kinh doanh..."
-                            options={staffOptions}
-                            allowClear
-                            showSearch
-                            filterOption={(input, opt) => (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                            className={`${SELECT_CLS} hover:[&_.ant-select-selector]:!border-yellow-500/50`}
-                        />
-                    )}
-                />
-                <p className="text-[12px] text-slate-400 mt-1.5">Bỏ trống để tạo đơn chờ phân công.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <FieldLabel optional>Nhân viên kinh doanh phụ trách</FieldLabel>
+                    <Controller
+                        name="staffId"
+                        control={control}
+                        render={({ field }) => (
+                            <Select
+                                {...field}
+                                placeholder="Chọn nhân viên..."
+                                options={staffOptions}
+                                allowClear
+                                showSearch
+                                filterOption={(input, opt) => (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                                className={`${SELECT_CLS} hover:[&_.ant-select-selector]:!border-yellow-500/50`}
+                            />
+                        )}
+                    />
+                    <p className="text-[12px] text-slate-400 mt-1.5">Bỏ trống để tạo đơn chờ phân công.</p>
+                </div>
+                <div>
+                    <FieldLabel icon={Flag}>Mức độ ưu tiên</FieldLabel>
+                    <Controller
+                        name="priority"
+                        control={control}
+                        render={({ field }) => (
+                            <Select
+                                {...field}
+                                className={SELECT_CLS}
+                                options={[
+                                    { value: 'LOW', label: '🟢 Thấp' },
+                                    { value: 'MEDIUM', label: '🟡 Trung bình' },
+                                    { value: 'HIGH', label: '🟠 Cao' },
+                                    { value: 'URGENT', label: '🔴 Khẩn cấp' },
+                                ]}
+                            />
+                        )}
+                    />
+                </div>
             </div>
 
             {/* ─── Note ─── */}

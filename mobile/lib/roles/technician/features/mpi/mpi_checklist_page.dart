@@ -47,10 +47,20 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
         'id': cat.id,
         'title': cat.name,
         'items': cat.items.map((item) {
+          String backendStatus;
+          switch (item.status) {
+            case MpiItemStatus.fail:
+              backendStatus = 'critical';
+            case MpiItemStatus.monitor:
+              backendStatus = 'warning';
+            default:
+              backendStatus = 'normal';
+          }
           return {
             'name': item.name,
-            'status': item.status.name.toUpperCase(),
+            'status': backendStatus,
             if (item.note != null && item.note!.isNotEmpty) 'action_required': item.note,
+            if (item.mediaUrls.isNotEmpty) 'media_urls': item.mediaUrls,
           };
         }).toList(),
       };

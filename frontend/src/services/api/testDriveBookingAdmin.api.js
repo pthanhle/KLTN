@@ -37,4 +37,8 @@ export const bookingApi = {
     createBooking: async (payload) => {
         return axiosClient.post('/admin/test-drives', payload);
     },
+
+    fetchBookingById: async (id) => {
+        return axiosClient.get(`/admin/test-drives/${id}`);
+    },
 };

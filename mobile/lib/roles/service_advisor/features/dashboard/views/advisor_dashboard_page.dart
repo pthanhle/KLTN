@@ -11,6 +11,7 @@ import '../widgets/cards/repair_order_skeleton.dart';
 import '../../../../../core/views/components/navigation/header/header_avatar_button.dart';
 import '../../../../../core/views/components/navigation/header/header_notification_button.dart';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
+import '../../../../../shared/widgets/inputs/list_search_bar.dart';
 import '../../../../../roles/auth/controllers/auth_controller.dart';
 
 class AdvisorDashboardPage extends ConsumerStatefulWidget {
@@ -90,12 +91,21 @@ class _AdvisorDashboardPageState extends ConsumerState<AdvisorDashboardPage> {
                 ),
               ),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 16),
-                  child: AdvisorKanbanTabs(
-                    selectedStage: state.selectedStage,
-                    onStageSelected: controller.selectStage,
-                  ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 4),
+                      child: AdvisorKanbanTabs(
+                        selectedStage: state.selectedStage,
+                        onStageSelected: controller.selectStage,
+                      ),
+                    ),
+                    ListSearchBar(
+                      hintText: 'Tìm biển số, khách hàng, mã đơn...',
+                      onChanged: controller.updateSearch,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    ),
+                  ],
                 ),
               ),
               if (state.isLoading)

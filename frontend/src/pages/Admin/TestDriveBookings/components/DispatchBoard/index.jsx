@@ -24,7 +24,8 @@ const DispatchBoard = ({ t }) => {
         closeAssignModal,
         isAssigning,
         filterDate,
-        setFilterDate
+        setFilterDate,
+        handleAssignFromRequest
     } = useDispatchLogic(t);
 
     const [selectedTask, setSelectedTask] = React.useState(null);
@@ -49,6 +50,7 @@ const DispatchBoard = ({ t }) => {
                     bookings={pendingBookings}
                     isLoading={isLoading}
                     t={t}
+                    onAssignFromRequest={handleAssignFromRequest}
                 />
                 <ResourcePane
                     staffList={staffList}

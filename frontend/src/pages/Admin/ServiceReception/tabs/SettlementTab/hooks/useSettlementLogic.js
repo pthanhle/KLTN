@@ -1,144 +1,214 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { message } from 'antd';
-import { MOCK_SERVICE_BOOKINGS } from '../../../data/mockServiceBookings';
-import { fetchInvoiceData, fetchQcData } from '../../../data/mockSettlementData';
+import { AdminRepairAPI } from '../../../../../../services/api/adminRepair.api';
+
+const QUERY_KEY = ['settlement-progresses'];
+
+const buildInvoiceItems = (quotation) => {
+    const parts = (quotation?.parts || []).map((p, i) => ({
+        id: `part_${i}`,
+        name: p.name || p.sku || 'Phụ tùng',
+        qty: p.quantity || 1,
+        unitPrice: p.unit_price || 0,
+        total: (p.unit_price || 0) * (p.quantity || 1),
+        type: 'PART',
+    }));
+
+    const labors = (quotation?.labors || []).map((l, i) => ({
+        id: `labor_${i}`,
+        name: l.description || 'Tiền công',
+        qty: l.hours || 1,
+        unitPrice: l.rate || 0,
+        total: (l.rate || 0) * (l.hours || 1),
+        type: 'LABOR',
+    }));
+
+    return [...parts, ...labors];
+};
+
+const buildFinancials = (quotation, invoiceItems) => {
+    const subtotal = invoiceItems.reduce((s, i) => s + i.total, 0);
+    const vatRate = (quotation?.vat_rate || 0.1) * 100;
+    const vat = subtotal * (quotation?.vat_rate || 0.1);
+    const deposit = quotation?.deposit_amount || 0;
+    const finalBalance = subtotal + vat - deposit;
+
+    return { subtotal, vatRate, vat, deposit, finalBalance };
+};
+
+const mapProgressToQueueItem = (p) => {
+    const booking = p.booking_id || {};
+    const vehicle = booking.vehicle_info || {};
+    const customer = booking.user_id || booking.customer_info || {};
+    const invoiceLedger = p.delivery?.invoice_ledger || {};
+    const isPaid = invoiceLedger.payment_status === 'PAID';
+
+    return {
+        id: p._id,
+        progress_id: p._id,
+        booking_code: booking.booking_code || p._id,
+        plateText: vehicle.license_plate || 'Chưa có biển số',
+        customerNameText: customer.full_name || customer.name || 'Khách hàng',
+        customerPhoneText: customer.phone || customer.contact_phone || '',
+        vehicleBrandModelText: [vehicle.brand, vehicle.model].filter(Boolean).join(' ') || vehicle.license_plate || '',
+        isReadyForHandover: p.status === 'QC_TESTING' || p.status === 'COMPLETED',
+        statusText: isPaid ? 'Đã thanh toán — chờ bàn giao' : p.status === 'QC_TESTING' ? 'Sẵn sàng bàn giao' : 'Chờ quyết toán',
+        paymentBadgeText: isPaid ? 'ĐÃ THANH TOÁN' : 'CHƯA THANH TOÁN',
+        isPaid,
+        raw_status: p.status,
+    };
+};
 
 export const useSettlementLogic = () => {
     const { t } = useTranslation('adminServiceReception');
+    const queryClient = useQueryClient();
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedBookingCode, setSelectedBookingCode] = useState(null);
-    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-    const [isClosingRO, setIsClosingRO] = useState(false);
-    const [localPaymentStatus, setLocalPaymentStatus] = useState({});
-    const [closedROs, setClosedROs] = useState(new Set());
+    const [selectedProgressId, setSelectedProgressId] = useState(null);
+    const [closedIds, setClosedIds] = useState(new Set());
 
-    const mappedQueueVehicles = useMemo(() => {
-        return MOCK_SERVICE_BOOKINGS
-            .filter(booking => {
-                const isReady = booking.status === 'COMPLETED' || booking.status === 'READY_FOR_HANDOVER';
-                const isNotClosed = !closedROs.has(booking.booking_code);
-                return isReady && isNotClosed;
-            })
-            .map(booking => {
-                const isReadyForHandover = booking.status === 'COMPLETED' || booking.status === 'READY_FOR_HANDOVER';
-                const invoice = fetchInvoiceData(booking.booking_code);
-                const isPaid = localPaymentStatus[booking.booking_code] || (invoice?.status === 'COMPLETED');
+    const { data: progressData, isLoading } = useQuery({
+        queryKey: QUERY_KEY,
+        queryFn: async () => {
+            const [qcRes, completedRes] = await Promise.all([
+                AdminRepairAPI.getRepairProgresses({ status: 'QC_TESTING', limit: 100 }),
+                AdminRepairAPI.getRepairProgresses({ status: 'COMPLETED', limit: 100 }),
+            ]);
+            return [
+                ...(qcRes?.repairProgresses || []),
+                ...(completedRes?.repairProgresses || []),
+            ];
+        },
+        staleTime: 30 * 1000,
+    });
 
-                return {
-                    id: booking.booking_code,
-                    plateText: booking.license_plate || 'Chưa cập nhật biển số',
-                    customerNameText: booking.customer_name || 'Khách vãng lai',
-                    isReadyForHandover,
-                    statusText: isReadyForHandover ? t('settlement_ready', 'Sẵn sàng bàn giao') : t('settlement_pending_kcs', 'Chờ KCS cuối'),
-                    paymentBadgeText: isPaid ? t('settlement_paid', 'ĐÃ THANH TOÁN') : t('settlement_unpaid', 'CHƯA THANH TOÁN'),
-                    isPaid
-                };
-            })
-            .filter(mapped => {
+    const allProgresses = progressData || [];
+
+    const queueVehicles = useMemo(() => {
+        return allProgresses
+            .filter(p => !closedIds.has(p._id))
+            .map(mapProgressToQueueItem)
+            .filter(item => {
+                if (!searchQuery) return true;
                 const q = searchQuery.toLowerCase();
-                return mapped.plateText.toLowerCase().includes(q) ||
-                    mapped.id.toLowerCase().includes(q) ||
-                    mapped.customerNameText.toLowerCase().includes(q);
+                return item.plateText.toLowerCase().includes(q) ||
+                    item.customerNameText.toLowerCase().includes(q) ||
+                    item.booking_code.toLowerCase().includes(q);
             });
-    }, [searchQuery, closedROs, localPaymentStatus, t]);
+    }, [allProgresses, closedIds, searchQuery]);
+
+    const selectedProgress = useMemo(() => {
+        if (!selectedProgressId) return null;
+        return allProgresses.find(p => p._id === selectedProgressId) || null;
+    }, [selectedProgressId, allProgresses]);
 
     const activeTerminalData = useMemo(() => {
-        if (!selectedBookingCode) return null;
+        if (!selectedProgress) return null;
+        const p = selectedProgress;
+        const booking = p.booking_id || {};
+        const vehicle = booking.vehicle_info || {};
+        const customer = p.booking_id?.user_id || booking.customer_info || {};
+        const quotation = p.quotation || {};
+        const invoiceLedger = p.delivery?.invoice_ledger || {};
 
-        const selectedBooking = MOCK_SERVICE_BOOKINGS.find(s => s.booking_code === selectedBookingCode) || {};
-        const invoice = fetchInvoiceData(selectedBookingCode);
-        const qc = fetchQcData(selectedBookingCode);
+        const invoiceItems = buildInvoiceItems(quotation);
+        const financials = buildFinancials(quotation, invoiceItems);
 
-        const mappedInvoiceItems = invoice?.items?.map(i => ({
-            id: i.id || Math.random().toString(),
-            name: i.name,
-            qty: i.qty || 1,
-            unitPrice: i.unitPrice || 0,
-            total: i.total || 0
-        })) || (selectedBooking.selected_services || []).map((s, i) => ({
-            id: s.service_id || `item_${i + 1}`,
-            name: s.name,
-            qty: 1,
-            unitPrice: s.price || 0,
-            total: s.price || 0
+        const isPaid = invoiceLedger.payment_status === 'PAID';
+
+        const qcStep = (p.timeline || []).find(t => t.step === 'QC_TESTING');
+        const kcsTasks = (qcStep?.qc_checklist || []).map((task, i) => ({
+            id: `qc_${i}`,
+            name: task.task,
+            isCompleted: task.status === 'passed',
         }));
-
-        const financials = invoice?.financials || {
-            subtotal: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total, 0),
-            vatRate: 10,
-            vat: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total, 0) * 0.1,
-            deposit: 0,
-            finalBalance: mappedInvoiceItems.reduce((acc, curr) => acc + curr.total, 0) * 1.1
-        };
-
-        const isPaid = localPaymentStatus[selectedBookingCode] || (invoice?.status === 'COMPLETED');
-        const isQCPassed = qc?.kcs_tasks?.every(task => task.status === 'completed') ?? false;
-
-        const mappedKcsTasks = (qc?.kcs_tasks || []).map(t => ({
-            id: t.id || Math.random().toString(),
-            name: t.title,
-            isCompleted: t.status === 'completed'
-        }));
+        const isQCPassed = kcsTasks.length === 0 || kcsTasks.every(t => t.isCompleted);
 
         return {
-            id: selectedBookingCode,
-            plateText: selectedBooking.license_plate || 'Chưa cập nhật biển số',
-            customerNameText: selectedBooking.customer_name || 'Khách vãng lai',
-            customerPhoneText: selectedBooking.customer_phone || 'Chưa cập nhật số ĐT',
-            vehicleBrandModelText: `${selectedBooking.vehicle_brand || ''} ${selectedBooking.vehicle_model || ''}`.trim() || 'Chưa cập nhật loại xe',
-            invoiceItems: mappedInvoiceItems,
+            id: p._id,
+            progress_id: p._id,
+            booking_code: booking.booking_code || p._id,
+            plateText: vehicle.license_plate || 'Chưa có biển số',
+            customerNameText: customer.full_name || customer.name || 'Khách hàng',
+            customerPhoneText: customer.phone || customer.contact_phone || '',
+            vehicleBrandModelText: [vehicle.brand, vehicle.model].filter(Boolean).join(' ') || '',
+            invoiceItems,
             financials,
-            kcsTasks: mappedKcsTasks,
+            kcsTasks,
             isPaid,
+            isQCPassed,
             canPrint: true,
-            canCloseRO: isPaid && isQCPassed
+            canCloseRO: isPaid,
+            raw_status: p.status,
         };
-    }, [selectedBookingCode, localPaymentStatus]);
+    }, [selectedProgress]);
 
-    const handleSelectVehicle = (bookingCode) => {
-        setSelectedBookingCode(bookingCode);
-    };
+    const handoverMutation = useMutation({
+        mutationFn: ({ progress_id, payment_method, total_amount }) =>
+            AdminRepairAPI.processHandover({
+                progress_id,
+                payment_method,
+                delivery: {
+                    invoice_ledger: {
+                        total_amount,
+                        payment_status: 'PAID',
+                        paid_amount: total_amount,
+                        payment_method,
+                    },
+                    handover_brief: {},
+                    handover_agreement: {},
+                    handshake_protocol: {
+                        actual_delivery_date: new Date().toISOString(),
+                    },
+                },
+            }),
+        onSuccess: () => {
+            message.success(t('settlement_payment_success', 'Thanh toán và bàn giao thành công!'));
+            queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+        },
+        onError: (err) => {
+            message.error(err?.response?.data?.message || t('settlement_payment_error', 'Thanh toán thất bại'));
+        },
+    });
 
-    const handleConfirmPayment = () => {
-        if (!selectedBookingCode) return;
+    const handleSelectVehicle = useCallback((progressId) => {
+        setSelectedProgressId(progressId);
+    }, []);
 
-        setIsProcessingPayment(true);
-        setTimeout(() => {
-            setLocalPaymentStatus(prev => ({ ...prev, [selectedBookingCode]: true }));
-            setIsProcessingPayment(false);
-            message.success(t('settlement_payment_success', 'Thanh toán thành công!'));
-        }, 800);
-    };
+    const handleConfirmPayment = useCallback((paymentMethod = 'CASH') => {
+        if (!activeTerminalData) return;
+        handoverMutation.mutate({
+            progress_id: activeTerminalData.progress_id,
+            payment_method: paymentMethod,
+            total_amount: activeTerminalData.financials.finalBalance,
+        });
+    }, [activeTerminalData, handoverMutation]);
 
-    const handlePrintInvoice = () => {
-        if (!activeTerminalData?.canPrint) return;
+    const handlePrintInvoice = useCallback(() => {
         window.print();
-    };
+    }, []);
 
-    const handleCloseRO = () => {
-        if (!activeTerminalData?.canCloseRO || !selectedBookingCode) return;
-
-        setIsClosingRO(true);
-        setTimeout(() => {
-            setClosedROs(prev => new Set(prev).add(selectedBookingCode));
-            setSelectedBookingCode(null);
-            setIsClosingRO(false);
-            message.success(t('settlement_close_success', 'Đóng Lệnh Sửa Chữa thành công. Xe đã được bàn giao!'));
-        }, 1000);
-    };
+    const handleCloseRO = useCallback(() => {
+        if (!selectedProgressId) return;
+        setClosedIds(prev => new Set(prev).add(selectedProgressId));
+        setSelectedProgressId(null);
+        message.success(t('settlement_close_success', 'Đã đóng Lệnh Sửa Chữa. Xe đã bàn giao!'));
+    }, [selectedProgressId, t]);
 
     return {
         searchQuery,
         setSearchQuery,
-        queueVehicles: mappedQueueVehicles,
-        selectedBookingCode,
+        queueVehicles,
+        selectedBookingCode: selectedProgressId,
         handleSelectVehicle,
         activeTerminalData,
-        isProcessingPayment,
-        isClosingRO,
+        isLoading,
+        isLoadingTerminal: isLoading,
+        isProcessingPayment: handoverMutation.isPending,
+        isClosingRO: false,
         handleConfirmPayment,
         handlePrintInvoice,
-        handleCloseRO
+        handleCloseRO,
     };
 };

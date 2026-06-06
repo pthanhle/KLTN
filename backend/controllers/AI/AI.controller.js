@@ -25,7 +25,8 @@ export const AiChatController = {
           success: true,
           answer: data.answer,
           conversation_id: data.conversation_id,
-          title: data.title
+          title: data.title,
+          booking_draft: data.booking_draft || null,
         });
       } else {
         throw new Error(data.detail || "AI Service Error");

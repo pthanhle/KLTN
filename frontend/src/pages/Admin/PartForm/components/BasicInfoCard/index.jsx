@@ -50,11 +50,24 @@ const BasicInfoCard = ({ categories, conditions = [], createConditionAsync, t })
                             {t('adminPartForm:sku')}
                         </label>
                     </div>
-                    <FormInput 
-                        name="sku" 
-                        control={control} 
-                        placeholder={t('adminPartForm:phSku')} 
+                    <FormInput
+                        name="sku"
+                        control={control}
+                        placeholder={t('adminPartForm:phSku')}
                         isMono={true}
+                    />
+                </div>
+
+                <div>
+                    <div className="h-[28px] flex items-center mb-3">
+                        <label className="block text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">
+                            {t('adminPartForm:brand', 'Thương hiệu')}
+                        </label>
+                    </div>
+                    <FormInput
+                        name="brand"
+                        control={control}
+                        placeholder={t('adminPartForm:phBrand', 'VD: Bosch, NGK, Brembo...')}
                     />
                 </div>
                 

@@ -41,6 +41,17 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
     const left = calculateLeftPercentage(displayStart);
     const width = calculateWidthPercentage(displayStart, displayEnd);
 
+    // Time-based progress bar (0–100%)
+    let progressPercent = 0;
+    if (booking.expected_start_datetime && booking.expected_end_datetime) {
+        const startMs = new Date(booking.expected_start_datetime).getTime();
+        const endMs = new Date(booking.expected_end_datetime).getTime();
+        const nowMs = now.getTime();
+        if (nowMs > startMs && endMs > startMs) {
+            progressPercent = Math.min(100, ((nowMs - startMs) / (endMs - startMs)) * 100);
+        }
+    }
+
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: booking._id,
         data: {
@@ -169,11 +180,11 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                 <div className="absolute -right-2 -top-2 flex items-center z-20 shadow-md">
                     <div className="w-6 h-6 rounded-full border-2 border-white dark:border-[#1c1c1e] overflow-hidden bg-slate-700 shrink-0 flex items-center justify-center">
                         <Image
-                            src={primaryTech.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(primaryTech.fullName)}&background=random`}
-                            alt={primaryTech.fullName}
+                            src={primaryTech.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(primaryTech.full_name || '')}&background=random`}
+                            alt={primaryTech.full_name}
                             className="w-full h-full object-cover"
                             preview={false}
-                            fallback={`https://ui-avatars.com/api/?name=${encodeURIComponent(primaryTech.fullName)}&background=random`}
+                            fallback={`https://ui-avatars.com/api/?name=${encodeURIComponent(primaryTech.full_name || '')}&background=random`}
                         />
                     </div>
                     {assistantsCount > 0 && (
@@ -209,11 +220,21 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
 
                 <div className="flex items-center gap-1 overflow-hidden min-w-0 pr-1 truncate opacity-70">
                     {booking.selected_services?.[0]?.name || 'Dịch vụ'}
-                    {booking.selected_services?.length > 1 && ( 
+                    {booking.selected_services?.length > 1 && (
                          <span className="text-[9px] font-bold text-slate-500">+{booking.selected_services.length - 1}</span>
                     )}
                 </div>
             </div>
+
+            {/* Time-elapsed progress bar */}
+            {progressPercent > 0 && (
+                <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-b-xl overflow-hidden z-20 bg-slate-200/30 dark:bg-white/5">
+                    <div
+                        style={{ width: `${progressPercent}%` }}
+                        className={`h-full transition-all duration-[60000ms] ease-linear ${isOverdue ? 'bg-red-500' : 'bg-emerald-500'}`}
+                    />
+                </div>
+            )}
         </div>
     );
 

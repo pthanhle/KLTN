@@ -25,7 +25,18 @@ class AuthApiRepository implements AuthRepository {
         'password': request.password,
       });
 
-      final data = response.data as Map<String, dynamic>;
+      final raw = response.data as Map<String, dynamic>;
+      final data = <String, dynamic>{
+        ...raw,
+        'id': raw['id']?.toString() ?? '',
+        'employeeId': raw['employeeId']?.toString() ?? 'EMP-000',
+        'fullName': raw['fullName']?.toString() ?? '',
+        'email': raw['email']?.toString() ?? '',
+        'phone': raw['phone']?.toString() ?? '',
+        'role': raw['role']?.toString() ?? 'staff',
+        'department': raw['department']?.toString() ?? '',
+        'status': (raw['status']?.toString() ?? 'ACTIVE').toUpperCase(),
+      };
 
       final prefs = await SharedPreferences.getInstance();
       if (data['accessToken'] != null) {

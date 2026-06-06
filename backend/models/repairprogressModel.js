@@ -182,6 +182,76 @@ const repairProgressSchema = mongoose.Schema(
 
     timeline: { type: [timelineStepSchema], default: [] },
 
+    quotation: {
+      parts: [
+        {
+          sku: String,
+          name: String,
+          quantity: { type: Number, default: 0 },
+          unit_price: { type: Number, default: 0 },
+        },
+      ],
+      labors: [
+        {
+          description: String,
+          hours: { type: Number, default: 0 },
+          rate: { type: Number, default: 0 },
+        },
+      ],
+      vat_rate: { type: Number, default: 0.1 },
+      deposit_amount: { type: Number, default: 0 },
+      status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
+      approved_at: Date,
+    },
+
+    parts_usage: [
+      {
+        name: String,
+        sku: String,
+        quantity: { type: Number, default: 1 },
+        progress: { type: Number, default: 0 },
+        status: { type: String, enum: ['WAITING', 'IN_PROGRESS', 'COMPLETED'], default: 'WAITING' },
+        eta: Date,
+      },
+    ],
+
+    system_logs: [
+      {
+        time: { type: Date, default: Date.now },
+        type: { type: String, enum: ['LOG', 'INF', 'WRN', 'ERR'], default: 'LOG' },
+        message: String,
+      },
+    ],
+
+    supplement_requests: [
+      {
+        title: String,
+        description: String,
+        mechanic_name: String,
+        evidence_images: [String],
+        parts: [
+          {
+            sku: String,
+            name: String,
+            quantity: { type: Number, default: 0 },
+            unit_price: { type: Number, default: 0 },
+          },
+        ],
+        labors: [
+          {
+            description: String,
+            hours: { type: Number, default: 0 },
+            rate: { type: Number, default: 0 },
+          },
+        ],
+        total_price: { type: Number, default: 0 },
+        delay_reason: String,
+        status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
+        created_at: { type: Date, default: Date.now },
+        resolved_at: Date,
+      },
+    ],
+
     notes: { type: String, default: '' },
 
     estimated_completion: { type: Date },

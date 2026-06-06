@@ -1,6 +1,5 @@
 import axiosClient from '../../utils/axiosClient';
 
-// axiosClient interceptor already extracts response.data, so methods return the body directly.
 export const AdminRepairAPI = {
     getRepairProgresses: async (params) => {
         return axiosClient.get('/staff/service/repair-progress', { params });
@@ -36,5 +35,33 @@ export const AdminRepairAPI = {
 
     processHandover: async (payload) => {
         return axiosClient.post('/staff/service/repair-progress/handover', payload);
+    },
+
+    searchParts: async (params) => {
+        return axiosClient.get('/staff/service/repair-progress/catalog/parts', { params });
+    },
+
+    searchServiceItems: async (params) => {
+        return axiosClient.get('/staff/service/repair-progress/catalog/service-items', { params });
+    },
+
+    getServiceBays: async (params) => {
+        return axiosClient.get('/staff/service/service-bays', { params });
+    },
+
+    createServiceBay: async (payload) => {
+        return axiosClient.post('/staff/service/service-bays', payload);
+    },
+
+    deleteServiceBay: async (id) => {
+        return axiosClient.delete(`/staff/service/service-bays/${id}`);
+    },
+
+    createSupplement: async (payload) => {
+        return axiosClient.post('/staff/service/repair-progress/supplement', payload);
+    },
+
+    resolveSupplement: async (payload) => {
+        return axiosClient.post('/staff/service/repair-progress/supplement/resolve', payload);
     },
 };

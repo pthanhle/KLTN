@@ -21,6 +21,8 @@ const StaffManagement = () => {
         setFilterRole,
         filterStatus,
         setFilterStatus,
+        filterDepartment,
+        setFilterDepartment,
         breadcrumbItems,
         pagination,
         handleTableChange
@@ -43,6 +45,8 @@ const StaffManagement = () => {
                     setFilterRole={setFilterRole}
                     filterStatus={filterStatus}
                     setFilterStatus={setFilterStatus}
+                    filterDepartment={filterDepartment}
+                    setFilterDepartment={setFilterDepartment}
                     t={t}
                 />
 

@@ -151,7 +151,7 @@ class LoginPage extends ConsumerWidget {
         } else if (role == 'technician' || role == 'lead_technician' || role == 'service') {
           context.go('/technician');
         } else if (role == 'sales_executive' || role == 'sale') {
-          context.go('/sales');
+          context.go('/dashboard');
         } else {
           context.go('/dashboard');
         }

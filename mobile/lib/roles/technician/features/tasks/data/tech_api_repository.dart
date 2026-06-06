@@ -107,12 +107,18 @@ class TechApiRepository {
     final String status = json['status']?.toString() ?? 'DIAGNOSING';
     final taskStatus = _parseStatus(status);
 
+    // Prefer bay_name (resolved by backend); fall back to raw bay_id string
+    final bayName = json['bay_name']?.toString();
+    final rawBayId = json['bay_id']?.toString() ?? '';
+    final bayDisplay = (bayName != null && bayName.isNotEmpty)
+        ? bayName
+        : (rawBayId.isNotEmpty ? rawBayId : '-');
+
     return TechTaskModel(
-      // Store progress._id as task id so MPI submit can use it
       id: json['_id']?.toString() ?? '',
       plate: vehicle['license_plate']?.toString() ?? '',
       model: '${vehicle['brand'] ?? ''} ${vehicle['model'] ?? ''}'.trim(),
-      bay: json['bay_id']?.toString() ?? '-',
+      bay: bayDisplay,
       startTime: startTime,
       endTime: endTime,
       role: 'Thợ chính',

@@ -1,16 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Filter } from 'lucide-react';
-import { Input, Select } from 'antd';
-import { RECEPTION_CONSTANTS } from '../../../constants/receptionConstants';
+import { Search, Plus } from 'lucide-react';
+import { Input } from 'antd';
 
-const FilterToolbar = ({ searchTerm, onSearchChange }) => {
+const FilterToolbar = ({ searchTerm, onSearchChange, onAddBay }) => {
     const { t } = useTranslation('adminServiceReception');
-
-    const filterOptions = RECEPTION_CONSTANTS.BAY_FILTER_OPTIONS.map(opt => ({
-        value: opt.value,
-        label: t(opt.labelKey, opt.fallback)
-    }));
 
     return (
         <div className="bg-white dark:bg-[#141416] rounded-xl p-6 mb-6 flex flex-wrap gap-6 justify-between items-center shadow-lg border border-slate-200 dark:border-white/5">
@@ -26,6 +20,14 @@ const FilterToolbar = ({ searchTerm, onSearchChange }) => {
                     />
                 </div>
             </div>
+
+            <button
+                onClick={onAddBay}
+                className="flex items-center gap-2 px-4 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold text-sm rounded-xl transition-colors shadow-md"
+            >
+                <Plus className="w-4 h-4" />
+                {t('btn_add_bay', 'Thêm khoang')}
+            </button>
         </div>
     );
 };

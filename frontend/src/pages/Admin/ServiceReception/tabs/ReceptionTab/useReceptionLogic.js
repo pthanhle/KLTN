@@ -53,12 +53,11 @@ export const useReceptionLogic = (selectedDate) => {
     const advisors = useMemo(() => {
         const allStaff = staffData?.staff || [];
         return allStaff
-            .filter(s => s.role_id?.role_name === 'advisor' && s.status === 'active')
+            .filter(s => s.role === 'advisor' && s.status === 'ACTIVE')
             .map(s => ({
                 _id: s._id.toString(),
-                // Use fullName & avatarUrl to match what AdvisorColumn expects
-                fullName: s.full_name,
-                avatarUrl: s.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(s.full_name)}&background=random`,
+                fullName: s.fullName,
+                avatarUrl: s.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(s.fullName || '')}&background=random`,
                 role: 'advisor',
                 status: 'Sẵn sàng',
                 workload: 0,
@@ -82,6 +81,11 @@ export const useReceptionLogic = (selectedDate) => {
 
         const booking = bookings.find(b => b._id === bookingId);
         if (!booking || booking.advisor_id === advisorId) return;
+
+        if (booking.status === 'RECEIVED') {
+            message.warning('Đơn đã được cố vấn tiếp nhận, không thể thay đổi phân công.');
+            return;
+        }
 
         queryClient.setQueryData(QUERY_KEY, (old) => {
             if (!old) return old;

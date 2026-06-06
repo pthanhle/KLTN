@@ -1,10 +1,11 @@
 import asyncio
+import json
+import re
 import time
 import redis.asyncio as redis
 from collections import deque
 from datetime import datetime
 from bson import ObjectId
-
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, AIMessage
@@ -31,6 +32,32 @@ GREETING_KEYWORDS = {
     "helo", "alo", "ơi", "bạn ơi", "cho hỏi", "giúp mình", "giúp tôi",
 }
 
+BOOKING_KEYWORDS = {
+    "đặt lịch", "đặt hẹn", "book lịch", "hẹn dịch vụ", "lịch dịch vụ",
+    "lịch bảo dưỡng", "bảo dưỡng xe", "đặt bảo dưỡng", "muốn đặt",
+    "đặt lịch sửa", "đặt lịch rửa", "đặt lịch kiểm tra",
+    "lịch sửa xe", "lịch rửa xe", "đặt dịch vụ",
+}
+
+PARTS_KEYWORDS = {
+    "linh kiện", "phụ tùng", "phụ kiện", "lốp xe", "lốp",
+    "dầu nhớt", "dầu động cơ", "bộ lọc", "lọc gió", "lọc dầu",
+    "ắc quy", "phanh", "đèn xe", "gương xe", "kính xe",
+    "má phanh", "bugi", "dây curoa", "bình xăng", "nhớt xe",
+}
+
+SERVICE_KEYWORDS = {
+    "dịch vụ", "bảo dưỡng", "sửa chữa", "sửa xe", "rửa xe",
+    "kiểm tra xe", "chăm sóc xe", "spa xe", "thay dầu",
+    "bảo trì", "kiểm định", "căn chỉnh", "cân bằng",
+    "dịch vụ gì", "có dịch vụ", "dịch vụ nào", "giá dịch vụ",
+}
+
+PERSONAL_KEYWORDS = {
+    "tôi", "của tôi", "mình", "của mình", "đơn hàng", "order", "tài khoản",
+    "account", "mật khẩu", "password", "tên", "name", "địa chỉ", "address",
+    "phone", "sdt", "số điện thoại", "giỏ hàng", "cart", "thanh toán", "payment",
+}
 
 SYSTEM_GREETING = (
     "Bạn là trợ lý ảo thân thiện của CarsShop. "
@@ -38,29 +65,33 @@ SYSTEM_GREETING = (
     "Trả lời ngắn gọn, tự nhiên, không dùng ký hiệu Markdown."
 )
 
-
 SYSTEM_TEMPLATE = (
     "Bạn là trợ lý ảo chuyên nghiệp của CarsShop. CHỈ trả lời dựa trên dữ liệu thật sau đây:\n"
     "{context}\n\n"
     "QUY TẮC:\n"
-    "1. KHÔNG ĐƯỢC nhắc đến bất kỳ mẫu xe nào KHÔNG CÓ trong danh sách trên.\n"
-    "2. Nếu danh sách trống hoặc không có xe đúng yêu cầu, trả lời: 'Hiện tại hệ thống chưa tìm thấy xe nào phù hợp với yêu cầu này tại shop. Bạn vui lòng để lại thông tin hoặc yêu cầu khác để em tìm kiếm thêm nhé!'\n"
-    "3. Tuyệt đối không dùng kiến thức bên ngoài về các dòng xe không có trong dữ liệu.\n"
+    "1. KHÔNG ĐƯỢC nhắc đến bất kỳ mẫu xe/sản phẩm nào KHÔNG CÓ trong danh sách trên.\n"
+    "2. Nếu danh sách trống hoặc không có dữ liệu đúng yêu cầu, trả lời lịch sự và gợi ý khách hàng liên hệ trực tiếp.\n"
+    "3. Tuyệt đối không dùng kiến thức bên ngoài về các sản phẩm/dịch vụ không có trong dữ liệu.\n"
     "4. Trả lời ngắn gọn, thân thiện, không dùng ký hiệu Markdown."
 )
 
+BOOKING_ASK_TEMPLATE = (
+    "Bạn là trợ lý ảo của CarsShop hỗ trợ đặt lịch dịch vụ xe hơi.\n"
+    "Khách hàng muốn đặt lịch nhưng còn thiếu thông tin: {missing_info}.\n"
+    "Hãy hỏi khách hàng một cách tự nhiên và thân thiện để lấy thông tin còn thiếu. "
+    "Không liệt kê kiểu gạch đầu dòng, hỏi tự nhiên như đang trò chuyện. Không dùng Markdown."
+)
+
+BOOKING_CONFIRM_SYSTEM = (
+    "Bạn là trợ lý ảo của CarsShop. Khách hàng vừa cung cấp đủ thông tin đặt lịch dịch vụ. "
+    "Hãy xác nhận thông tin một cách thân thiện và thông báo phiếu xác nhận đã hiện bên dưới để khách hàng duyệt. "
+    "Không dùng Markdown."
+)
 
 QUOTA_EXCEEDED_MSG = (
     "Hiện tại hệ thống AI đang bận, vui lòng thử lại sau ít phút. "
     "Bạn có thể để lại thông tin liên hệ để chúng tôi hỗ trợ trực tiếp."
 )
-
-
-PERSONAL_KEYWORDS = {
-    "tôi", "của tôi", "mình", "của mình", "đơn hàng", "order", "tài khoản",
-    "account", "mật khẩu", "password", "tên", "name", "địa chỉ", "address",
-    "phone", "sdt", "số điện thoại", "giỏ hàng", "cart", "thanh toán", "payment"
-}
 
 
 def _is_greeting(message: str) -> bool:
@@ -72,8 +103,22 @@ def _is_greeting(message: str) -> bool:
     return False
 
 
+def _is_booking_intent(message: str) -> bool:
+    msg = message.lower()
+    return any(kw in msg for kw in BOOKING_KEYWORDS)
+
+
+def _is_asking_about_parts(message: str) -> bool:
+    msg = message.lower()
+    return any(kw in msg for kw in PARTS_KEYWORDS)
+
+
+def _is_asking_about_services(message: str) -> bool:
+    msg = message.lower()
+    return any(kw in msg for kw in SERVICE_KEYWORDS)
+
+
 def _extract_price(message: str) -> dict | None:
-    import re
     msg = message.lower()
 
     match_billion = re.search(r"(\d+[\.,]?\d*)\s*tỷ", msg)
@@ -168,8 +213,46 @@ async def _generate_ai_title(first_msg: str) -> str:
         return first_msg[:30] + "..."
 
 
+async def _extract_booking_details(message: str) -> dict | None:
+    today = datetime.now().strftime("%Y-%m-%d (%A)")
+    prompt = (
+        f"Hôm nay là {today}. Trích xuất thông tin đặt lịch dịch vụ xe hơi từ tin nhắn tiếng Việt sau.\n"
+        f'Tin nhắn: "{message}"\n\n'
+        "Khung giờ hợp lệ (chọn đúng một): 08:00-10:00, 10:00-12:00, 13:00-15:00, 15:00-17:00\n"
+        "Quy tắc khung giờ: sáng/8h/9h → 08:00-10:00 | 10h/11h → 10:00-12:00 | chiều/13h/14h → 13:00-15:00 | chiều muộn/15h/16h → 15:00-17:00\n"
+        "Loại dịch vụ: MAINTENANCE (bảo dưỡng định kỳ), REPAIR (sửa chữa), CAR_SPA (rửa/chăm sóc xe), INSPECTION (kiểm tra), OTHER\n\n"
+        "Chỉ trả về JSON hợp lệ, không có text nào khác:\n"
+        '{"service_type":"MAINTENANCE","booking_date":"YYYY-MM-DD hoặc null","time_slot":"khung giờ hoặc null",'
+        '"vehicle_brand":"null nếu không đề cập","vehicle_model":"null nếu không đề cập",'
+        '"vehicle_license_plate":"null nếu không đề cập","notes":"ghi chú nếu có","is_complete":true,"missing_info":[]}'
+    )
+    try:
+        result = await llm.ainvoke([HumanMessage(content=prompt)])
+        raw = result.content.strip()
+        json_match = re.search(r'\{.*\}', raw, re.DOTALL)
+        if json_match:
+            data = json.loads(json_match.group())
+            missing = []
+            if not data.get("booking_date") or data.get("booking_date") == "null":
+                data["booking_date"] = None
+                missing.append("ngày đặt lịch")
+            if not data.get("time_slot") or data.get("time_slot") == "null":
+                data["time_slot"] = None
+                missing.append("khung giờ mong muốn (sáng hoặc chiều)")
+            if not data.get("service_type"):
+                missing.append("loại dịch vụ (bảo dưỡng, sửa chữa, rửa xe...)")
+            for field in ["vehicle_brand", "vehicle_model", "vehicle_license_plate"]:
+                if data.get(field) == "null":
+                    data[field] = None
+            data["is_complete"] = len(missing) == 0
+            data["missing_info"] = missing
+            return data
+    except Exception:
+        pass
+    return None
+
+
 async def _fetch_context(message: str) -> str:
-    import re
     msg_low = message.lower()
     price_filter = _extract_price(message)
 
@@ -184,10 +267,17 @@ async def _fetch_context(message: str) -> str:
     if not cars and price_filter:
         cars, _, _ = await _query_all(None, price_filter)
 
-    is_asking_generic = any(x in msg_low for x in ["option nào", "lựa chọn nào", "có gì", "xe gì", "còn gì", "liệt kê", "danh sách"])
-    if not cars or is_asking_generic:
-        if not cars or is_asking_generic:
-            cars = await db.cars.find({}).sort("price", 1).limit(5).to_list(5)
+    is_asking_generic_cars = any(x in msg_low for x in ["option nào", "lựa chọn nào", "có gì", "xe gì", "còn gì", "liệt kê", "danh sách"])
+    if not cars or is_asking_generic_cars:
+        cars = await db.cars.find({}).sort("price", 1).limit(5).to_list(5)
+
+    is_parts_query = _is_asking_about_parts(message)
+    is_services_query = _is_asking_about_services(message)
+
+    if not parts and is_parts_query:
+        parts = await db.parts.find({"status": "active"}).sort("sold_count", -1).limit(5).to_list(5)
+    if not services and is_services_query:
+        services = await db.serviceitems.find({"isActive": True}).sort("basePrice", 1).limit(5).to_list(5)
 
     if not any([cars, parts, services]) and clean_msg:
         words = [w for w in clean_msg.split() if len(w) > 2]
@@ -197,11 +287,17 @@ async def _fetch_context(message: str) -> str:
 
     segments = []
     if cars:
-        segments.append("Xe tại shop: " + " | ".join(f"{c['name']} ({c.get('year', 'N/A')}) - {c.get('price', 0):,.0f} VND" for c in cars))
+        segments.append("Xe tại shop: " + " | ".join(
+            f"{c['name']} ({c.get('year', 'N/A')}) - {c.get('price', 0):,.0f} VND" for c in cars
+        ))
     if parts:
-        segments.append("Phụ tùng tại shop: " + " | ".join(f"{p['name']} - {p.get('price', 0):,.0f} VND" for p in parts))
+        segments.append("Phụ tùng/Linh kiện tại shop: " + " | ".join(
+            f"{p['name']} - {p.get('price', p.get('original_price', 0)):,.0f} VND" for p in parts
+        ))
     if services:
-        segments.append("Dịch vụ tại shop: " + " | ".join(f"{s['service_name']} - {s.get('price', 0):,.0f} VND" for s in services))
+        segments.append("Dịch vụ tại shop: " + " | ".join(
+            f"{s['serviceName']} - {s.get('basePrice', 0):,.0f} VND ({s.get('priceType', 'CONTACT')})" for s in services
+        ))
 
     return "\n".join(segments)[:1200] if segments else ""
 
@@ -222,8 +318,19 @@ async def _query_all(keyword_regex: dict | None, price_filter: dict | None = Non
     parts = []
     services = []
     if keyword_regex:
-        parts = await db.parts.find({"$or": [{"name": keyword_regex}, {"category": keyword_regex}]}).limit(3).to_list(3)
-        services = await db.servicepackages.find({"$or": [{"service_name": keyword_regex}, {"description": keyword_regex}]}).limit(3).to_list(3)
+        parts = await db.parts.find({
+            "$and": [
+                {"$or": [{"name": keyword_regex}, {"category": keyword_regex}, {"brand": keyword_regex}]},
+                {"status": "active"},
+            ]
+        }).limit(3).to_list(3)
+
+        services = await db.serviceitems.find({
+            "$and": [
+                {"$or": [{"serviceName": keyword_regex}, {"description": keyword_regex}]},
+                {"isActive": True},
+            ]
+        }).limit(3).to_list(3)
 
     return cars, parts, services
 
@@ -338,38 +445,57 @@ def _build_messages(system: str, history: list, user_message: str) -> list:
 async def generate_response(user_id: str, message: str, conversation_id: str = None) -> dict:
     conv_id, title = await _get_or_create_conversation(user_id, conversation_id, message)
 
+    is_booking = _is_booking_intent(message)
     is_private = _is_personal_query(message)
     cache_key = _normalize_key(message, user_id if is_private else None)
 
-    cached = await redis_client.get(cache_key)
-    if cached:
-        answer = await _rephrase_answer(cached, message)
-        await _save_message(user_id, conv_id, "user", message)
-        await _save_message(user_id, conv_id, "assistant", answer)
-        return {"answer": answer, "conversation_id": conv_id, "title": title}
+    if not is_booking:
+        cached = await redis_client.get(cache_key)
+        if cached:
+            answer = await _rephrase_answer(cached, message)
+            await _save_message(user_id, conv_id, "user", message)
+            await _save_message(user_id, conv_id, "assistant", answer)
+            return {"answer": answer, "conversation_id": conv_id, "title": title, "booking_draft": None}
 
     await _wait_for_rate_limit()
 
     history = await _get_history(conv_id)
 
+    booking_draft = None
+
     if _is_greeting(message):
         system_prompt = SYSTEM_GREETING
+    elif is_booking:
+        booking_info = await _extract_booking_details(message)
+        if booking_info and booking_info.get("is_complete"):
+            booking_draft = booking_info
+            system_prompt = BOOKING_CONFIRM_SYSTEM
+        elif booking_info and not booking_info.get("is_complete"):
+            missing = ", ".join(booking_info.get("missing_info", []))
+            system_prompt = BOOKING_ASK_TEMPLATE.format(missing_info=missing)
+        else:
+            system_prompt = (
+                "Bạn là trợ lý ảo của CarsShop hỗ trợ đặt lịch dịch vụ. "
+                "Hỏi khách hàng về ngày giờ mong muốn, loại dịch vụ cần và thông tin xe. "
+                "Không dùng Markdown."
+            )
     else:
         context = await _fetch_context(message)
         system_prompt = SYSTEM_TEMPLATE.format(context=context)
 
-    messages = _build_messages(system_prompt, history, message)
+    messages_to_send = _build_messages(system_prompt, history, message)
 
     try:
-        answer = await _invoke_with_backoff(messages)
+        answer = await _invoke_with_backoff(messages_to_send)
     except RuntimeError as e:
         if str(e) == "quota_exceeded":
-            return {"answer": QUOTA_EXCEEDED_MSG, "conversation_id": conv_id, "title": title}
+            return {"answer": QUOTA_EXCEEDED_MSG, "conversation_id": conv_id, "title": title, "booking_draft": None}
         raise
 
     await _save_message(user_id, conv_id, "user", message)
     await _save_message(user_id, conv_id, "assistant", answer)
 
-    await redis_client.setex(cache_key, 3600, answer)
+    if not is_booking:
+        await redis_client.setex(cache_key, 3600, answer)
 
-    return {"answer": answer, "conversation_id": conv_id, "title": title}
+    return {"answer": answer, "conversation_id": conv_id, "title": title, "booking_draft": booking_draft}

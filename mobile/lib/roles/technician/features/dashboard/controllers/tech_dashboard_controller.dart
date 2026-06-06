@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/tech_summary_model.dart';
 import '../models/tech_job_model.dart';
 import '../models/tech_assignment_model.dart';
-import '../data/mocks/mock_tech_dashboard_data.dart';
+import '../../tasks/data/tech_api_repository.dart';
+import '../../tasks/models/tech_task_model.dart';
 
 class TechDashboardState {
   final TechSummaryModel summary;
@@ -28,11 +29,48 @@ class TechDashboardController extends AsyncNotifier<TechDashboardState> {
   }
 
   Future<TechDashboardState> _fetchDashboardData() async {
-    await Future.delayed(const Duration(milliseconds: 1500));
+    final tasks = await techApiRepository.getTasks();
+
+    final activeCount = tasks.where((t) =>
+      t.status == TechTaskStatus.diagnosing || t.status == TechTaskStatus.inProgress
+    ).length;
+    final completedCount = tasks.where((t) => t.status == TechTaskStatus.completed).length;
+    final waitingCount = tasks.where((t) => t.status == TechTaskStatus.waitingParts).length;
+
+    final activeJobs = tasks
+        .where((t) => t.status == TechTaskStatus.diagnosing || t.status == TechTaskStatus.inProgress)
+        .map((t) => TechJobModel(
+              id: t.id,
+              plate: t.plate,
+              model: t.model,
+              stage: t.status == TechTaskStatus.diagnosing ? 'Đang chẩn đoán' : 'Đang thi công',
+              stageColorHex: t.status == TechTaskStatus.diagnosing ? 0xFFFF9500 : 0xFF007AFF,
+            ))
+        .toList();
+
+    TechTaskModel? firstActive;
+    try {
+      firstActive = tasks.firstWhere(
+        (t) => t.status == TechTaskStatus.diagnosing || t.status == TechTaskStatus.inProgress,
+      );
+    } catch (_) {
+      firstActive = tasks.isNotEmpty ? tasks.first : null;
+    }
+
+    final assignment = TechAssignmentModel(
+      teamLeaderName: 'Trưởng ca',
+      shiftTime: firstActive != null ? '${firstActive.startTime} – ${firstActive.endTime}' : '07:30 – 17:00',
+      workingBay: firstActive?.bay ?? '-',
+    );
+
     return TechDashboardState(
-      summary: MockTechDashboardData.summary,
-      activeJobs: MockTechDashboardData.activeJobs,
-      assignment: MockTechDashboardData.assignment,
+      summary: TechSummaryModel(
+        activeJobs: activeCount,
+        completedJobs: completedCount,
+        waitingPartsJobs: waitingCount,
+      ),
+      activeJobs: activeJobs,
+      assignment: assignment,
     );
   }
 

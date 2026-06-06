@@ -77,12 +77,12 @@ export const staffLogin = asyncHandler(async (req, res) => {
   res.json({
     id: user._id,
     employeeId: staffDoc ? staffDoc.employeeId : 'EMP-000',
-    fullName: user.full_name,
-    email: user.email,
-    phone: user.phone,
+    fullName: user.full_name || '',
+    email: user.email || '',
+    phone: user.phone || '',
     avatarUrl: user.avatar || "https://randomuser.me/api/portraits/lego/1.jpg",
     role: user.role_id?.role_name || (staffDoc ? staffDoc.roleName : 'STAFF'),
-    department: staffDoc ? staffDoc.department : (employeeDoc ? employeeDoc.position : 'General'),
+    department: staffDoc ? (staffDoc.department || '') : (employeeDoc ? (employeeDoc.position || '') : 'General'),
     status: user.status.toUpperCase(),
     joinDate: staffDoc
       ? staffDoc.createdAt?.toISOString()

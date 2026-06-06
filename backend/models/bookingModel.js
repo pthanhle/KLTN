@@ -76,7 +76,7 @@ const bookingSchema = mongoose.Schema(
 
     product_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: 'Car',
       required: false,
     },
     vehicle_info: { type: vehicleInfoSchema },
@@ -110,6 +110,20 @@ const bookingSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+
+    requested_staff: [
+      {
+        user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        requested_at: { type: Date, default: Date.now },
+        _id: false,
+      },
+    ],
+    priority: {
+      type: String,
+      enum: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'],
+      default: 'MEDIUM',
+    },
+    assignment_note: { type: String },
 
     booking_status: {
       type: String,

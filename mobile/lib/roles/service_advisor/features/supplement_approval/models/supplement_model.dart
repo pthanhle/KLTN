@@ -1,5 +1,6 @@
 class SupplementModel {
   final String id;
+  final String supplementId;
   final String orderId;
   final String issueTitle;
   final String issueDescription;
@@ -16,6 +17,7 @@ class SupplementModel {
 
   SupplementModel({
     required this.id,
+    this.supplementId = '',
     required this.orderId,
     required this.issueTitle,
     required this.issueDescription,
@@ -34,6 +36,7 @@ class SupplementModel {
   factory SupplementModel.fromJson(Map<String, dynamic> json) {
     return SupplementModel(
       id: json['id'] ?? '',
+      supplementId: json['supplement_id'] ?? '',
       orderId: json['order_id'] ?? '',
       issueTitle: json['issue_title'] ?? '',
       issueDescription: json['issue_description'] ?? '',

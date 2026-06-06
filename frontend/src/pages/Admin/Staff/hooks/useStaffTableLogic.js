@@ -1,80 +1,68 @@
-import { useState, useMemo } from 'react';
-import { mockStaffData } from '../data/mockStaffData';
+import { useState, useCallback, useEffect } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { AdminStaffAPI } from '@/services/api/adminStaff.api';
+import { message } from 'antd';
 
 export const useStaffTableLogic = (t) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('ALL');
     const [filterStatus, setFilterStatus] = useState('ALL');
-    const [isLoading, setIsLoading] = useState(false);
+    const [filterDepartment, setFilterDepartment] = useState('ALL');
+    const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
 
-    // Filter logic based on mock data
-    const filteredData = useMemo(() => {
-        let result = [...mockStaffData];
+    const { data: apiData, isLoading, isError } = useQuery({
+        queryKey: ['admin-staff', searchTerm, filterRole, filterStatus, filterDepartment, pagination.current, pagination.pageSize],
+        queryFn: async () => {
+            const params = {
+                page: pagination.current,
+                limit: pagination.pageSize,
+                search: searchTerm,
+            };
+            if (filterRole !== 'ALL') params.role = filterRole;
+            if (filterStatus !== 'ALL') params.status = filterStatus;
+            if (filterDepartment !== 'ALL') params.department = filterDepartment;
+            const res = await AdminStaffAPI.getStaff(params);
+            return res;
+        },
+        placeholderData: keepPreviousData,
+    });
 
-        // 1. Role Filter
-        if (filterRole !== 'ALL') {
-            result = result.filter(staff => {
-                if (filterRole === 'SALES') return staff.role.includes('SALES') || staff.role === 'SERVICE_ADVISOR';
-                if (filterRole === 'TECHS') return staff.role.includes('TECHNICIAN') || staff.role === 'SHOP_FOREMAN';
-                if (filterRole === 'INVENTORY') return staff.role.includes('INVENTORY') || staff.role === 'CASHIER';
-                return true;
-            });
-        }
+    useEffect(() => {
+        if (isError) message.error('Không thể tải danh sách nhân viên');
+    }, [isError]);
 
-        // 2. Status Filter
-        if (filterStatus !== 'ALL') {
-            result = result.filter(staff => staff.status === filterStatus);
-        }
+    const staffList = apiData?.staff || [];
+    const paginationInfo = {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+        total: apiData?.pagination?.total || 0,
+    };
 
-        // 3. Search Filter
-        if (searchTerm.trim()) {
-            const lowerSearch = searchTerm.toLowerCase();
-            result = result.filter(staff => 
-                staff.fullName.toLowerCase().includes(lowerSearch) ||
-                staff.employeeId.toLowerCase().includes(lowerSearch) ||
-                staff.department.toLowerCase().includes(lowerSearch)
-            );
-        }
-
-        return result;
-    }, [searchTerm, filterRole, filterStatus]);
+    const handleTableChange = useCallback((newPagination) => {
+        setPagination(prev => ({
+            ...prev,
+            current: newPagination.current,
+            pageSize: newPagination.pageSize,
+        }));
+    }, []);
 
     const breadcrumbItems = [
         { label: t('adminStaff:breadcrumb_staff', 'Nhân viên') }
     ];
 
-    // Pagination state
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
-
-    const paginatedData = useMemo(() => {
-        const startIndex = (pagination.current - 1) * pagination.pageSize;
-        return filteredData.slice(startIndex, startIndex + pagination.pageSize);
-    }, [filteredData, pagination]);
-
-    // Update total when filtered data changes
-    useMemo(() => {
-        setPagination(prev => ({ ...prev, total: filteredData.length, current: 1 }));
-    }, [filteredData.length]);
-
-    const handleTableChange = (newPagination) => {
-        setPagination({
-            current: newPagination.current,
-            pageSize: newPagination.pageSize,
-            total: filteredData.length
-        });
-    };
-
     return {
-        data: paginatedData,
+        data: staffList,
         isLoading,
         searchTerm,
-        setSearchTerm,
+        setSearchTerm: (val) => { setSearchTerm(val); setPagination(p => ({ ...p, current: 1 })); },
         filterRole,
-        setFilterRole,
+        setFilterRole: (val) => { setFilterRole(val); setPagination(p => ({ ...p, current: 1 })); },
         filterStatus,
-        setFilterStatus,
+        setFilterStatus: (val) => { setFilterStatus(val); setPagination(p => ({ ...p, current: 1 })); },
+        filterDepartment,
+        setFilterDepartment: (val) => { setFilterDepartment(val); setPagination(p => ({ ...p, current: 1 })); },
         breadcrumbItems,
-        pagination,
+        pagination: paginationInfo,
         handleTableChange
     };
 };

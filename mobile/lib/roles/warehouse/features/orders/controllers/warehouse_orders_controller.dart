@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ttauto_staff/roles/warehouse/features/shared/models/warehouse_enums.dart';
 import 'package:ttauto_staff/roles/warehouse/features/shared/models/warehouse_order_model.dart';
-import 'package:ttauto_staff/roles/warehouse/features/orders/data/mocks/warehouse_orders_mock.dart';
 import 'package:ttauto_staff/roles/warehouse/shared/services/warehouse_api_service.dart';
 
 final warehouseOrdersProvider = NotifierProvider<WarehouseOrdersController, WarehouseOrdersState>(() {
@@ -79,15 +78,7 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
         orders: parsedOrders,
       );
     } catch (e) {
-      print('Failed to load orders from API: $e');
-      final parsedOrders = mockWarehouseOrdersJson
-          .map((json) => WarehouseOrderModel.fromJson(json))
-          .toList();
-
-      state = state.copyWith(
-        isLoading: false,
-        orders: parsedOrders,
-      );
+      state = state.copyWith(isLoading: false, orders: const []);
     }
   }
 

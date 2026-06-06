@@ -33,10 +33,10 @@ class ProfileDetailsCard extends StatelessWidget {
           ),
           _buildRow(
             context,
-            icon: CupertinoIcons.money_dollar_circle,
+            icon: CupertinoIcons.building_2_fill,
             iconColor: Theme.of(context).colorScheme.primary,
-            title: 'Lương cơ bản'.tr(),
-            value: Formatters.formatCurrency(user!.baseSalary),
+            title: 'Phòng ban'.tr(),
+            value: user!.department.isNotEmpty ? user!.department : 'N/A',
             isLast: true,
             isHighlight: true,
           ),

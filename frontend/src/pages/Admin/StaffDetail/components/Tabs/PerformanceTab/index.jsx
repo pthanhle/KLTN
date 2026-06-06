@@ -1,23 +1,64 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 import { usePerformanceData } from './hooks/usePerformanceData';
 import { PerformanceSkeleton } from './components/Shared/PerformanceSkeleton';
-import { RevenueCard } from './components/StatCards/RevenueCard';
-import { CsatCard } from './components/StatCards/CsatCard';
-import { EfficiencyCard } from './components/StatCards/EfficiencyCard';
-import { ReworkCard } from './components/StatCards/ReworkCard';
-import { AccuracyCard } from './components/StatCards/AccuracyCard';
-import { SlaCard } from './components/StatCards/SlaCard';
-import { TransactionTimeCard } from './components/StatCards/TransactionTimeCard';
-import { ErrorRateCard } from './components/StatCards/ErrorRateCard';
 import { WorkloadKanban } from './components/WorkloadKanban';
-import { ROLE_GROUPS } from './constants/performanceConstants';
-import { DateFilter } from './components/Filters/DateFilter';
+
+const getRoleLabel = (role) => {
+    const map = {
+        advisor: 'Cố vấn Dịch vụ',
+        service: 'Kỹ thuật viên',
+        sale: 'Kinh doanh',
+        inventory: 'Kho phụ tùng',
+    };
+    return map[role] || role || 'Nhân viên';
+};
+
+const CompletionRateCard = ({ completionRate, total, completed }) => (
+    <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-6 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none">
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">
+            Tỉ lệ hoàn thành
+        </p>
+        <div className="flex items-end gap-3 mb-4">
+            <span className={`text-5xl font-black ${completionRate >= 80 ? 'text-green-500' : completionRate >= 50 ? 'text-yellow-500' : 'text-red-500'}`}>
+                {completionRate}%
+            </span>
+        </div>
+        <div className="w-full bg-slate-100 dark:bg-white/5 rounded-full h-2 mb-4 overflow-hidden">
+            <div
+                className={`h-2 rounded-full transition-all ${completionRate >= 80 ? 'bg-green-500' : completionRate >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                style={{ width: `${completionRate}%` }}
+            />
+        </div>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+            {completed}/{total} lệnh sửa chữa hoàn thành
+        </p>
+    </div>
+);
+
+const KanbanSummaryCard = ({ todo, inProgress, done }) => (
+    <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-6 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none">
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">
+            Phân bổ công việc
+        </p>
+        <div className="flex flex-col gap-3 mt-2">
+            <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-600 dark:text-slate-300">Chờ xử lý</span>
+                <span className="text-sm font-bold text-slate-800 dark:text-white bg-slate-100 dark:bg-white/10 rounded-full px-3 py-0.5">{todo}</span>
+            </div>
+            <div className="flex items-center justify-between">
+                <span className="text-sm text-yellow-600 dark:text-yellow-500">Đang xử lý</span>
+                <span className="text-sm font-bold text-slate-800 dark:text-white bg-yellow-50 dark:bg-yellow-500/10 rounded-full px-3 py-0.5">{inProgress}</span>
+            </div>
+            <div className="flex items-center justify-between">
+                <span className="text-sm text-green-600 dark:text-green-500">Hoàn thành</span>
+                <span className="text-sm font-bold text-slate-800 dark:text-white bg-green-50 dark:bg-green-500/10 rounded-full px-3 py-0.5">{done}</span>
+            </div>
+        </div>
+    </div>
+);
 
 const PerformanceTab = ({ staff }) => {
-    const { t } = useTranslation();
-    const [dateRange, setDateRange] = useState('this_month');
-    const { performanceData, isLoading } = usePerformanceData(staff?._id, dateRange);
+    const { performanceData, isLoading } = usePerformanceData(staff);
 
     if (isLoading) {
         return <PerformanceSkeleton />;
@@ -25,65 +66,40 @@ const PerformanceTab = ({ staff }) => {
 
     if (!performanceData) {
         return (
-            <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-16 border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center shadow-sm dark:shadow-none transition-colors h-64">
+            <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-16 border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center shadow-sm dark:shadow-none h-64">
                 <p className="text-slate-500 dark:text-slate-400">
-                    {t('adminStaffDetail:perf_fallback_unavailable', { role: staff?.role?.replace('_', ' ') })}
+                    Chưa có dữ liệu hiệu suất cho <strong>{getRoleLabel(staff?.role)}</strong>
                 </p>
             </div>
         );
     }
 
     const { kpis, kanban } = performanceData;
-
-    const isSalesOrAdvisor = ROLE_GROUPS.SALES_AND_ADVISOR.includes(staff?.role);
-    const isTech = ROLE_GROUPS.TECHNICIANS.includes(staff?.role);
-    const isInventory = staff?.role === 'INVENTORY_MGR';
-    const isCashier = staff?.role === 'CASHIER' || staff?.role === 'ACCOUNTANT';
+    const { todo = [], inProgress = [], done = [] } = kanban;
+    const totalRepairs = kpis.totalRepairs ?? (todo.length + inProgress.length + done.length);
+    const completedRepairs = kpis.completedRepairs ?? done.length;
+    const completionRate = kpis.completionRate ?? (totalRepairs > 0 ? Math.round((completedRepairs / totalRepairs) * 100) : 0);
 
     return (
-        <div className="space-y-12 animate-fade-in">
-            <DateFilter value={dateRange} onChange={setDateRange} />
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                {isSalesOrAdvisor && kpis.revenue && (
-                    <RevenueCard current={kpis.revenue.current} target={kpis.revenue.target} />
-                )}
-
-                {kpis.csat && (
-                    <CsatCard score={kpis.csat.score} percentile={kpis.csat.percentile} />
-                )}
-
-                {isTech && kpis.efficiency && (
-                    <EfficiencyCard billed={kpis.efficiency.billed} clocked={kpis.efficiency.clocked} rate={kpis.efficiency.rate} />
-                )}
-
-                {isTech && kpis.rework && (
-                    <ReworkCard rate={kpis.rework.rate} trend={kpis.rework.trend} />
-                )}
-
-                {isInventory && kpis.inventoryAccuracy && (
-                    <AccuracyCard accuracy={kpis.inventoryAccuracy.score} target={kpis.inventoryAccuracy.target} />
-                )}
-
-                {isInventory && kpis.avgSla && (
-                    <SlaCard avgTime={kpis.avgSla.time} unit={kpis.avgSla.unit} />
-                )}
-
-                {isCashier && kpis.transactionTime && (
-                    <TransactionTimeCard time={kpis.transactionTime.time} unit={kpis.transactionTime.unit} />
-                )}
-
-                {isCashier && kpis.errorRate && (
-                    <ErrorRateCard rate={kpis.errorRate.rate} />
-                )}
-
-                {!isTech && !isSalesOrAdvisor && !isInventory && !isCashier && (
-                    <div className="col-span-full p-6 text-slate-400 dark:text-gray-500 text-center border border-slate-200 dark:border-white/5 border-dashed rounded-xl">
-                        {t('adminStaffDetail:perf_fallback_no_kpi')}
-                    </div>
-                )}
+        <div className="space-y-8 animate-fade-in">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CompletionRateCard
+                    completionRate={completionRate}
+                    total={totalRepairs}
+                    completed={completedRepairs}
+                />
+                <KanbanSummaryCard
+                    todo={todo.length}
+                    inProgress={inProgress.length}
+                    done={done.length}
+                />
             </div>
 
-            <WorkloadKanban kanbanData={kanban} role={staff?.role} staffName={staff?.fullName} />
+            <WorkloadKanban
+                kanbanData={kanban}
+                role={staff?.role}
+                staffName={staff?.fullName}
+            />
         </div>
     );
 };

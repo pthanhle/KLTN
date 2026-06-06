@@ -11,18 +11,20 @@ export const TASK_PRIORITY = {
     LOW: 'LOW'
 };
 
+// Backend roles: advisor, service, sale, inventory
 export const ROLE_GROUPS = {
-    SALES_AND_ADVISOR: ['SERVICE_ADVISOR', 'SALES_EXECUTIVE'],
-    TECHNICIANS: ['TECHNICIAN', 'LEAD_TECHNICIAN', 'SHOP_FOREMAN']
+    SALES_AND_ADVISOR: ['advisor', 'sale'],
+    TECHNICIANS: ['service'],
+    INVENTORY: ['inventory'],
 };
 
 export const getKanbanColumnKeys = (role) => {
     if (!role) return { todo: 'kanban_todo_tech', inProgress: 'kanban_in_progress_tech', done: 'kanban_done_tech' };
 
-    if (role.includes('SALES')) return { todo: 'kanban_todo_sales', inProgress: 'kanban_in_progress_sales', done: 'kanban_done_sales' };
-    if (role.includes('ADVISOR')) return { todo: 'kanban_todo_advisor', inProgress: 'kanban_in_progress_advisor', done: 'kanban_done_advisor' };
-    if (role.includes('INVENTORY')) return { todo: 'kanban_todo_inventory', inProgress: 'kanban_in_progress_inventory', done: 'kanban_done_inventory' };
-    if (role.includes('CASHIER') || role.includes('ACC')) return { todo: 'kanban_todo_cashier', inProgress: 'kanban_in_progress_cashier', done: 'kanban_done_cashier' };
+    if (role === 'sale') return { todo: 'kanban_todo_sales', inProgress: 'kanban_in_progress_sales', done: 'kanban_done_sales' };
+    if (role === 'advisor') return { todo: 'kanban_todo_advisor', inProgress: 'kanban_in_progress_advisor', done: 'kanban_done_advisor' };
+    if (role === 'inventory') return { todo: 'kanban_todo_inventory', inProgress: 'kanban_in_progress_inventory', done: 'kanban_done_inventory' };
+    if (role === 'service') return { todo: 'kanban_todo_tech', inProgress: 'kanban_in_progress_tech', done: 'kanban_done_tech' };
 
     return { todo: 'kanban_todo_tech', inProgress: 'kanban_in_progress_tech', done: 'kanban_done_tech' };
 };

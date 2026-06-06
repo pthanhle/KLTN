@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { AdminRepairAPI } from '../../../../../../services/api/adminRepair.api';
-import { mockBays } from '../../../data/mockBays';
-import { mockStaffData } from '../../../../Staff/data/mockStaffData';
+import { AdminStaffAPI } from '../../../../../../services/api/adminStaff.api';
 
 const mapProgressToBooking = (p) => {
     const booking = p.booking_id || {};
@@ -56,33 +55,48 @@ export const useWorkshopLogic = (selectedDate) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeBooking, setActiveBooking] = useState(null);
     const [pendingAssignment, setPendingAssignment] = useState(null);
+    const [isAddBayModalOpen, setIsAddBayModalOpen] = useState(false);
 
     const dateStr = selectedDate ? selectedDate.format('YYYY-MM-DD') : null;
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [receivedRes, diagnosingRes] = await Promise.all([
+            const [receivedRes, diagnosingRes, baysRes, staffRes] = await Promise.all([
                 AdminRepairAPI.getRepairProgresses({ status: 'RECEIVED', limit: 100 }),
                 AdminRepairAPI.getRepairProgresses({ status: 'DIAGNOSING', limit: 100 }),
+                AdminRepairAPI.getServiceBays({ limit: 50 }),
+                AdminStaffAPI.getStaff({ limit: 100 }),
             ]);
 
             const received = (receivedRes?.repairProgresses || []).map(mapProgressToBooking);
             const diagnosing = (diagnosingRes?.repairProgresses || []).map(mapProgressToBooking);
-
             setAllBookings([...received, ...diagnosing]);
-        } catch (err) {
-            console.error('WorkshopTab: failed to load repair progresses', err);
-            message.error(t('toast_load_error', 'Không thể tải dữ liệu xưởng'));
+
+            const rawBays = baysRes?.serviceBays || [];
+            setBays(rawBays.map(b => ({
+                id: b._id,
+                bay_number: b.bay_number,
+                name: `KHOANG ${b.bay_number}`,
+                status: b.status,
+            })));
+
+            const allStaff = staffRes?.staff || [];
+            const techs = allStaff
+                .filter(s => s.role === 'service' || s.role === 'advisor')
+                .map(s => ({
+                    _id: s._id,
+                    full_name: s.fullName,
+                    avatar: s.avatarUrl || '',
+                    role: s.role || 'service',
+                    status: s.status,
+                }));
+            setTechnicians(techs);
+        } catch (e) {
+            message.error(t('toast_load_error', 'Không thể tải dữ liệu'));
         } finally {
             setIsLoading(false);
         }
-
-        const techs = mockStaffData.filter(
-            s => s.role === 'TECHNICIAN' || s.role === 'LEAD_TECHNICIAN'
-        );
-        setTechnicians(techs);
-        setBays(mockBays);
     }, [t]);
 
     useEffect(() => {
@@ -119,6 +133,11 @@ export const useWorkshopLogic = (selectedDate) => {
 
         const targetBay = bays.find(b => b.id === over.id);
         if (targetBay) {
+            const occupant = allBookings.find(b => b.bay_id === targetBay.id && b._id !== bookingId);
+            if (occupant) {
+                message.error(`${targetBay.name} đang có xe "${occupant.license_plate || occupant.booking_code}". Mỗi khoang chỉ nhận 1 xe.`);
+                return;
+            }
             setPendingAssignment({ booking: draggedBooking, targetBay });
         }
     };
@@ -162,6 +181,30 @@ export const useWorkshopLogic = (selectedDate) => {
     };
 
     const cancelAssignment = () => setPendingAssignment(null);
+
+    const openAddBayModal = () => setIsAddBayModalOpen(true);
+    const closeAddBayModal = () => setIsAddBayModalOpen(false);
+
+    const createBay = async (bayNumber) => {
+        try {
+            await AdminRepairAPI.createServiceBay({ bay_number: bayNumber });
+            message.success(`Đã tạo khoang ${bayNumber} thành công!`);
+            setIsAddBayModalOpen(false);
+            fetchData();
+        } catch (err) {
+            message.error(err?.response?.data?.message || 'Không thể tạo khoang. Vui lòng thử lại.');
+        }
+    };
+
+    const deleteBay = async (bayId, bayName) => {
+        try {
+            await AdminRepairAPI.deleteServiceBay(bayId);
+            message.success(`Đã xoá ${bayName}`);
+            fetchData();
+        } catch (err) {
+            message.error(err?.response?.data?.message || 'Không thể xoá khoang đang sử dụng.');
+        }
+    };
 
     const adjustDuration = (bookingId, minutesToAdd) => {
         setAllBookings(prev => prev.map(b => {
@@ -207,5 +250,10 @@ export const useWorkshopLogic = (selectedDate) => {
         cancelAssignment,
         selectedDateStr: dateStr,
         refresh: fetchData,
+        isAddBayModalOpen,
+        openAddBayModal,
+        closeAddBayModal,
+        createBay,
+        deleteBay,
     };
 };

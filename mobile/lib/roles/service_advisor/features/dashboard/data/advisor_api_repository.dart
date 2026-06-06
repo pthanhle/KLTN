@@ -107,6 +107,15 @@ class AdvisorApiRepository {
       }
     }
 
+    String? pendingSupplementId;
+    final supplementRequests = json['supplement_requests'] as List<dynamic>? ?? [];
+    for (final s in supplementRequests) {
+      if ((s['status'] ?? '') == 'PENDING') {
+        pendingSupplementId = s['_id']?.toString();
+        break;
+      }
+    }
+
     return RepairOrderModel(
       id: json['_id']?.toString() ?? '',
       bookingId: booking['_id']?.toString() ?? '',
@@ -124,6 +133,7 @@ class AdvisorApiRepository {
       serviceType: (service is Map ? service['service_name']?.toString() : null) ?? booking['service_type']?.toString() ?? '',
       isWaitingInLounge: false,
       stage: parseStage(currentStatus),
+      rawStatus: currentStatus,
       scheduledArrivalTime: booking['booking_date'] != null
           ? (DateTime.tryParse(booking['booking_date'].toString()) ?? DateTime.now())
           : DateTime.now(),
@@ -141,6 +151,7 @@ class AdvisorApiRepository {
       receptionInfo: parsedReceptionInfo,
       mpiDiagnostics: mpiDiagnostics,
       mpiConclusion: mpiConclusion,
+      pendingSupplementId: pendingSupplementId,
     );
   }
 }

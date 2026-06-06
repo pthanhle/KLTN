@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ttauto_staff/roles/warehouse/features/shared/models/warehouse_enums.dart';
 import '../models/service_order_model.dart';
 import 'service_orders_controller.dart';
+import '../../../shared/services/warehouse_api_service.dart';
 
 class ServicePackingState {
   final ServiceOrderModel? order;
@@ -176,18 +177,27 @@ class ServicePackingController extends Notifier<ServicePackingState> {
   }
 
   Future<bool> submitHandover() async {
-    if (!state.isAllProcessed) return false;
-    
+    if (!state.isAllProcessed || state.order == null) return false;
+
     state = state.copyWith(isSubmitting: true);
-    
-    await Future.delayed(const Duration(milliseconds: 800));
-    
-    ref.read(serviceOrdersProvider.notifier).updateOrderStatus(
-      state.order!.id,
-      ServiceOrderStatus.handedOver,
-    );
-    
-    state = state.copyWith(isSubmitting: false);
-    return true;
+    try {
+      final partIds = state.order!.parts
+          .where((p) => (state.packedQuantities[p.partId] ?? 0) >= p.quantity)
+          .map((p) => p.partId)
+          .toList();
+
+      final success = await WarehouseApiService.dispatchParts(state.order!.id, partIds);
+      if (success) {
+        ref.read(serviceOrdersProvider.notifier).updateOrderStatus(
+          state.order!.id,
+          ServiceOrderStatus.handedOver,
+        );
+      }
+      state = state.copyWith(isSubmitting: false);
+      return success;
+    } catch (e) {
+      state = state.copyWith(isSubmitting: false);
+      return false;
+    }
   }
 }

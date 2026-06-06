@@ -26,6 +26,7 @@ class DiagnosticItem {
 
 class CartPartItem {
   final String id;
+  final String sku;
   final String name;
   final double price;
   final int quantity;
@@ -34,6 +35,7 @@ class CartPartItem {
 
   const CartPartItem({
     required this.id,
+    this.sku = '',
     required this.name,
     required this.price,
     required this.quantity,
@@ -44,6 +46,7 @@ class CartPartItem {
   factory CartPartItem.fromJson(Map<String, dynamic> json) {
     return CartPartItem(
       id: json['id'] ?? '',
+      sku: json['sku'] ?? '',
       name: json['name'] ?? '',
       price: (json['price'] ?? 0).toDouble(),
       quantity: json['quantity'] ?? 1,
@@ -54,6 +57,7 @@ class CartPartItem {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'sku': sku,
     'name': name,
     'price': price,
     'quantity': quantity,

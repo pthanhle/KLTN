@@ -13,6 +13,7 @@ const BookingsPage = () => {
     const { t } = useTranslation(['adminTestDriveBookings', 'layout']);
     const [isDispatchOpen, setIsDispatchOpen] = useState(false);
     const { bookings, isLoading, filters, stats, pagination, handleFilterChange } = useBookingsLogic();
+    const pendingCount = stats?.pending || 0;
 
     const breadcrumbItems = [
         { label: t('layout:admin.sider.test-drive-bookings', 'Lái Thử') }
@@ -31,6 +32,7 @@ const BookingsPage = () => {
                     breadcrumbItems={breadcrumbItems}
                     onAddBooking={handleAddBooking}
                     onOpenDispatch={() => setIsDispatchOpen(true)}
+                    pendingCount={pendingCount}
                 />
 
                 <TestDriveToolbar

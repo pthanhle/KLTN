@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { AiAPI } from '@/services/api/ai';
+import { BookingAPI } from '@/services/api/booking';
 import { DEFAULT_BOT_MSG } from '../constants/chatbot.constants';
 
 export const useAIChatbotLogic = (isOpen) => {
@@ -103,7 +104,6 @@ export const useAIChatbotLogic = (isOpen) => {
     const handleDeleteSession = async (e, id) => {
         e.stopPropagation();
 
-        // Call API if it's a real ID
         if (typeof id === 'string') {
             try {
                 await AiAPI.deleteConversation(id);
@@ -136,6 +136,26 @@ export const useAIChatbotLogic = (isOpen) => {
         if (newConvId) setCurrentSessionId(newConvId);
     };
 
+    const handleConfirmBooking = async (bookingDraft) => {
+        if (!user) {
+            throw new Error('Bạn cần đăng nhập để đặt lịch dịch vụ.');
+        }
+        const payload = {
+            booking_type: 'service',
+            booking_date: bookingDraft.booking_date,
+            time_slot: bookingDraft.time_slot,
+            service_type: bookingDraft.service_type || 'OTHER',
+            vehicle_info: {
+                brand: bookingDraft.vehicle_brand || '',
+                model: bookingDraft.vehicle_model || '',
+                license_plate: bookingDraft.vehicle_license_plate || '',
+            },
+            customer_note: bookingDraft.notes || '',
+        };
+        const result = await BookingAPI.submitServiceBooking(payload);
+        return result;
+    };
+
     const handleSendMessage = async (e) => {
         if (e && typeof e.preventDefault === 'function') {
             e.preventDefault();
@@ -145,11 +165,11 @@ export const useAIChatbotLogic = (isOpen) => {
         const userMsg = inputText.trim();
         const currentMessages = [...messages, { sender: 'user', text: userMsg }];
 
-        // Optimistic update
         setSessions(prev => prev.map(s => {
             if (s.id === currentSessionId) {
-                // Only update title optimistically if it's the very first message
-                const title = s.messages.length <= 1 ? (userMsg.slice(0, 20) + (userMsg.length > 20 ? '...' : '')) : s.title;
+                const title = s.messages.length <= 1
+                    ? (userMsg.slice(0, 20) + (userMsg.length > 20 ? '...' : ''))
+                    : s.title;
                 return { ...s, title, messages: currentMessages };
             }
             return s;
@@ -163,17 +183,32 @@ export const useAIChatbotLogic = (isOpen) => {
         try {
             const res = await AiAPI.askPricing(userMsg, conversationIdForApi);
             if (res && res.answer) {
-                updateCurrentSessionMessages(
-                    [...currentMessages, { sender: 'bot', text: res.answer }],
-                    res.conversation_id,
-                    res.title
-                );
+                const newMessages = [
+                    ...currentMessages,
+                    { sender: 'bot', text: res.answer },
+                ];
+
+                if (res.booking_draft && res.booking_draft.is_complete) {
+                    newMessages.push({
+                        sender: 'bot',
+                        type: 'booking_card',
+                        bookingDraft: res.booking_draft,
+                    });
+                }
+
+                updateCurrentSessionMessages(newMessages, res.conversation_id, res.title);
             } else {
-                updateCurrentSessionMessages([...currentMessages, { sender: 'bot', text: 'Xin lỗi, tôi chưa hiểu rõ ý bạn.' }]);
+                updateCurrentSessionMessages([
+                    ...currentMessages,
+                    { sender: 'bot', text: 'Xin lỗi, tôi chưa hiểu rõ ý bạn.' }
+                ]);
             }
         } catch (error) {
             console.error(error);
-            updateCurrentSessionMessages([...currentMessages, { sender: 'bot', text: 'Xin lỗi, hệ thống AI đang gặp sự cố.' }]);
+            updateCurrentSessionMessages([
+                ...currentMessages,
+                { sender: 'bot', text: 'Xin lỗi, hệ thống AI đang gặp sự cố.' }
+            ]);
         } finally {
             setIsLoading(false);
         }
@@ -190,6 +225,7 @@ export const useAIChatbotLogic = (isOpen) => {
         messages,
         handleCreateNewSession,
         handleDeleteSession,
-        handleSendMessage
+        handleSendMessage,
+        handleConfirmBooking,
     };
 };

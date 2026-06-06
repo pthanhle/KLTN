@@ -16,6 +16,7 @@ import revenueReportRoutes from './revenuereport.route.js'
 import supportRoutes from './support.route.js'
 import settingsRoutes from './settings.route.js'
 import customerContractRoutes from './customerContract.route.js'
+import testDriveRoutes from './testDrive.route.js'
 
 const router = express.Router()
 
@@ -36,5 +37,6 @@ router.use('/revenue-reports', revenueReportRoutes)
 router.use('/support', supportRoutes)
 router.use('/settings', settingsRoutes)
 router.use('/contracts', customerContractRoutes)
+router.use('/test-drives', testDriveRoutes)
 
 export default router

@@ -16,10 +16,12 @@ import 'widgets/modals/supplement_modal/supplement_modal.dart';
 
 class JobExecutionPage extends ConsumerStatefulWidget {
   final String plate;
+  final String progressId;
 
   const JobExecutionPage({
     super.key,
     required this.plate,
+    required this.progressId,
   });
 
   @override
@@ -34,6 +36,9 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
   void initState() {
     super.initState();
     _pageController = PageController();
+    Future.microtask(() {
+      ref.read(jobExecutionControllerProvider.notifier).init(widget.progressId);
+    });
   }
 
   @override
@@ -99,8 +104,8 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
   void _handleReportIssue() {
     SupplementModal.show(
       context,
-      orderId: 'RO-12345', // Giả lập dữ liệu
-      taskId: 'TASK-001',
+      orderId: widget.progressId,
+      taskId: widget.progressId,
     );
   }
 

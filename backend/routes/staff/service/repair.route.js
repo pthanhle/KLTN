@@ -11,6 +11,8 @@ import { updateDiagnostics, createQuotation, approveQuotation } from '../../../c
 import { assignMechanic } from '../../../controllers/staff/service/workflow/assign.controller.js'
 import { updateQC } from '../../../controllers/staff/service/workflow/qc.controller.js'
 import { processHandover } from '../../../controllers/staff/service/workflow/handover.controller.js'
+import { createSupplement, resolveSupplement } from '../../../controllers/staff/service/workflow/supplement.controller.js'
+import { searchParts, searchServiceItems } from '../../../controllers/staff/service/catalog.controller.js'
 import { protect, serviceStaff } from '../../../middleware/authMiddleware.js'
 
 const router = express.Router()
@@ -21,6 +23,9 @@ router.route('/')
     .get(getRepairProgresses)
     .post(createRepairProgress)
 
+router.get('/catalog/parts', searchParts)
+router.get('/catalog/service-items', searchServiceItems)
+
 router.post('/reception', processReception)
 router.post('/assign', assignMechanic)
 router.post('/diagnostics', updateDiagnostics)
@@ -28,6 +33,8 @@ router.post('/quotation', createQuotation)
 router.post('/quotation/approve', approveQuotation)
 router.post('/qc', updateQC)
 router.post('/handover', processHandover)
+router.post('/supplement', createSupplement)
+router.post('/supplement/resolve', resolveSupplement)
 
 router.route('/:id')
     .get(getRepairProgressById)

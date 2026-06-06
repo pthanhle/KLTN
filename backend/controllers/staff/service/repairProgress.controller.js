@@ -55,22 +55,24 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
             match: { _id: { $exists: true } },
         })
 
-    progresses.forEach(p => {
-        const rawProgress = p.toObject();
-        if (!p.advisor_id && !p.mechanic_id) {
-            console.error(
-                `Populate lỗi: advisor_id/mechanic_id không tìm thấy cho repairProgress ${p._id}. `
-            );
-        }
-        if (!p.booking_id) {
-            console.error(`Populate lỗi: booking_id không tìm thấy cho repairProgress ${p._id}. Kiểm tra bookings collection.`);
-        } else if (!p.booking_id.service_id) {
-            console.error(`Populate lỗi: service_id không tìm thấy cho booking ${p.booking_id._id}. Kiểm tra servicepackages collection.`);
-        }
-    });
+    // Batch-resolve bay names (bay_id is stored as String → ObjectId of ServiceBay)
+    const bayIds = [...new Set(progresses.map(p => p.bay_id).filter(Boolean))]
+    let bayMap = {}
+    if (bayIds.length > 0) {
+        try {
+            const bays = await ServiceBay.find({ _id: { $in: bayIds } }).select('bay_number')
+            bays.forEach(b => { bayMap[b._id.toString()] = b.bay_number })
+        } catch (_) {}
+    }
 
     res.json({
-        repairProgresses: progresses,
+        repairProgresses: progresses.map(p => {
+            const obj = p.toObject()
+            if (p.bay_id && bayMap[p.bay_id]) {
+                obj.bay_name = `KHOANG ${bayMap[p.bay_id]}`
+            }
+            return obj
+        }),
         pagination: {
             page,
             limit,

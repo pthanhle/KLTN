@@ -24,7 +24,7 @@ const useAssignmentModal = ({ visible, assignmentData, onConfirm }) => {
             }
 
             form.setFieldsValue({
-                bay: assignmentData.targetBay?.bay_id,
+                bay: assignmentData.targetBay?.name,
                 time_slot: timeRange,
                 primary_technician: assignmentData.booking?.primary_technician || undefined,
                 assistant_technicians: assignmentData.booking?.assistant_technicians || []

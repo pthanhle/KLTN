@@ -4,12 +4,11 @@ import { useDraggable } from '@dnd-kit/core';
 export const useBookingCard = (booking, onReschedule, onNoShow) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    const isReceived = booking.status === 'RECEIVED';
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: booking._id,
-        data: {
-            type: 'booking',
-            booking,
-        },
+        data: { type: 'booking', booking },
+        disabled: isReceived,
     });
 
     const handleMenuClick = (e) => {

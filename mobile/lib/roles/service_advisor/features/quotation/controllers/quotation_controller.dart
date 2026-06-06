@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../../core/config/api_config.dart';
 import '../models/quotation_model.dart';
 import '../../../models/labor_item_model.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
@@ -16,6 +20,16 @@ final activeQuotationOrderIdProvider =
 
 class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   late String _orderId;
+
+  final Dio _dio = Dio(BaseOptions(
+    connectTimeout: const Duration(milliseconds: ApiConfig.connectTimeout),
+    receiveTimeout: const Duration(milliseconds: ApiConfig.receiveTimeout),
+  ));
+
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('access_token');
+  }
 
   @override
   AsyncValue<QuotationModel> build() {
@@ -152,10 +166,71 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
           id: labor.id,
           name: labor.name,
           hours: labor.estimatedHours,
-          rate: labor.estimatedHours > 0 ? labor.price / labor.estimatedHours : 0,
+          rate: labor.estimatedHours > 0 ? labor.price / labor.estimatedHours : labor.price,
         ));
         state = AsyncData(state.value!.copyWith(labor: currentLabor));
       }
+    }
+  }
+
+  Future<void> submitQuotation() async {
+    if (!state.hasValue || state.value == null) return;
+    final quotation = state.value!;
+    if (quotation.parts.isEmpty && quotation.labor.isEmpty) {
+      throw Exception('Vui lòng thêm ít nhất một phụ tùng hoặc dịch vụ');
+    }
+
+    final token = await _getToken();
+    final url = '${ApiConfig.baseUrl}/staff/service/repair-progress/quotation';
+
+    final backendParts = quotation.parts.map((p) => {
+      'sku': p.sku,
+      'name': p.name,
+      'quantity': p.quantity,
+      'unit_price': p.price,
+    }).toList();
+
+    final backendLabors = quotation.labor.map((l) => {
+      'description': l.name,
+      'hours': l.hours,
+      'rate': l.rate,
+    }).toList();
+
+    final response = await _dio.post(
+      url,
+      data: jsonEncode({
+        'progress_id': _orderId,
+        'parts': backendParts,
+        'labors': backendLabors,
+        'vat_rate': 0.1,
+        'deposit_amount': quotation.depositRequired,
+      }),
+      options: Options(headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      }),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(response.data['message'] ?? 'Gửi báo giá thất bại');
+    }
+  }
+
+  Future<void> approveQuotation() async {
+    final token = await _getToken();
+    final url = '${ApiConfig.baseUrl}/staff/service/repair-progress/quotation/approve';
+
+    final response = await _dio.post(
+      url,
+      data: jsonEncode({'progress_id': _orderId}),
+      options: Options(headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(response.data['message'] ?? 'Phê duyệt báo giá thất bại');
     }
   }
 }

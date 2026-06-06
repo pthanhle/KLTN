@@ -53,14 +53,14 @@ export const KPI_TYPES = {
 
 export const getRoleFilterOptions = (t) => [
     { label: t('adminStaff:filter_all', 'Tất Cả Chức Vụ'), value: 'ALL' },
-    { label: t('adminStaff:filter_sales', 'Kinh Doanh'), value: 'SALES' },
-    { label: t('adminStaff:filter_techs', 'Kỹ Thuật'), value: 'TECHS' },
-    { label: t('adminStaff:filter_inventory', 'Kho & Kế Toán'), value: 'INVENTORY' }
+    { label: 'Cố vấn Dịch vụ', value: 'advisor' },
+    { label: 'Kỹ thuật viên', value: 'service' },
+    { label: 'Kinh doanh', value: 'sale' },
+    { label: 'Kho phụ tùng', value: 'inventory' },
 ];
 
 export const getStatusFilterOptions = (t) => [
     { label: t('adminStaff:filter_status_all', 'Tất Cả Trạng Thái'), value: 'ALL' },
-    { label: t('adminStaff:status_active', 'Đang Làm Việc'), value: 'ACTIVE' },
-    { label: t('adminStaff:status_on_leave', 'Nghỉ Phép'), value: 'ON_LEAVE' },
-    { label: t('adminStaff:status_suspended', 'Đình Chỉ'), value: 'SUSPENDED' }
+    { label: t('adminStaff:status_active', 'Đang Làm Việc'), value: 'active' },
+    { label: t('adminStaff:status_suspended', 'Đình Chỉ'), value: 'suspended' }
 ];

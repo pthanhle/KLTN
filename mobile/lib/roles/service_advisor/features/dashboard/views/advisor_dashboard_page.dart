@@ -132,7 +132,11 @@ class _AdvisorDashboardPageState extends ConsumerState<AdvisorDashboardPage> {
                             if (order.stage == ROStage.quotation) {
                               context.go('/advisor/quotation/${order.id}');
                             } else if (order.stage == ROStage.inProgress) {
-                              context.go('/advisor/supplement/${order.id}');
+                              if (order.pendingSupplementId != null) {
+                                context.go('/advisor/supplement/${order.id}');
+                              } else {
+                                context.go('/advisor/qc/${order.id}');
+                              }
                             } else {
                               context.go('/advisor/walkaround/${order.id}');
                             }

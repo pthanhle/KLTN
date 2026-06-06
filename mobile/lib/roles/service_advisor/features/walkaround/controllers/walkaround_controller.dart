@@ -3,7 +3,6 @@ import '../models/walkaround_model.dart';
 import '../models/service_package_model.dart';
 import '../models/hotspot_model.dart';
 import '../models/checklist_item_model.dart';
-import '../data/walkaround_mock_data.dart';
 import '../data/walkaround_api_repository.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 
@@ -49,7 +48,7 @@ class WalkaroundController extends Notifier<WalkaroundState> {
   @override
   WalkaroundState build() {
     return WalkaroundState(
-      data: mockWalkaroundData,
+      data: const WalkaroundModel(orderId: ''),
     );
   }
 

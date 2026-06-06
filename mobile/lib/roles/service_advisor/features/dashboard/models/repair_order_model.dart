@@ -136,6 +136,7 @@ class RepairOrderModel {
   final String serviceType;
   final bool isWaitingInLounge;
   final ROStage stage;
+  final String rawStatus;
   final DateTime scheduledArrivalTime;
   final DateTime? actualArrivalTime;
   final DateTime? expectedDeliveryTime;
@@ -144,6 +145,7 @@ class RepairOrderModel {
   final ReceptionInfo? receptionInfo;
   final List<MpiCategory> mpiDiagnostics;
   final String mpiConclusion;
+  final String? pendingSupplementId;
 
   RepairOrderModel({
     required this.id,
@@ -155,6 +157,7 @@ class RepairOrderModel {
     required this.serviceType,
     required this.isWaitingInLounge,
     required this.stage,
+    this.rawStatus = '',
     required this.scheduledArrivalTime,
     this.actualArrivalTime,
     this.expectedDeliveryTime,
@@ -163,6 +166,7 @@ class RepairOrderModel {
     this.receptionInfo,
     this.mpiDiagnostics = const [],
     this.mpiConclusion = '',
+    this.pendingSupplementId,
   });
 
   factory RepairOrderModel.fromJson(Map<String, dynamic> json) {

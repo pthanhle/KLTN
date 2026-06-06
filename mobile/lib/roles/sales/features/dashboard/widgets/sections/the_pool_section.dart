@@ -73,11 +73,16 @@ class ThePoolSection extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final booking = poolBookings[index];
                 final isRequestedByMe = booking.requestedStaff?.any((staff) => staff.id == currentUserId) ?? false;
-                
+                final isRequesting = dashboardState.requestingJobIds.contains(booking.id);
+
                 return PoolItemCard(
                   booking: booking,
-                  isRequestedByMe: isRequestedByMe,
-                  onRequestJob: () => ref.read(salesDashboardProvider.notifier).requestJob(booking.id),
+                  isRequestedByMe: isRequestedByMe || isRequesting,
+                  onRequestJob: () {
+                    if (!isRequestedByMe && !isRequesting) {
+                      ref.read(salesDashboardProvider.notifier).requestJob(booking.id);
+                    }
+                  },
                 );
               },
             ),

@@ -11,6 +11,7 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
         defaultValues: {
             name: '',
             sku: '',
+            brand: '',
             category: null,
             condition: 'new',
             original_price: 0,

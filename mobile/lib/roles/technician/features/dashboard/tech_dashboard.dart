@@ -9,11 +9,41 @@ import 'widgets/sections/tech_today_summary_section.dart';
 import 'widgets/sections/tech_active_jobs_section.dart';
 import 'widgets/sections/tech_assignment_section.dart';
 
-class TechDashboardPage extends ConsumerWidget {
+class TechDashboardPage extends ConsumerStatefulWidget {
   const TechDashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TechDashboardPage> createState() => _TechDashboardPageState();
+}
+
+class _TechDashboardPageState extends ConsumerState<TechDashboardPage>
+    with WidgetsBindingObserver {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Refresh data every time the page is mounted (navigation to this tab)
+    Future.microtask(() =>
+      ref.read(techDashboardControllerProvider.notifier).refresh(),
+    );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(techDashboardControllerProvider.notifier).refresh();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final dashboardState = ref.watch(techDashboardControllerProvider);
     final theme = Theme.of(context);
 

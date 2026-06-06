@@ -73,7 +73,6 @@ export const getTrackingDetail = asyncHandler(async (req, res) => {
 
 export const lookupTracking = asyncHandler(async (req, res) => {
     const { booking_code, license_plate } = req.body
-    const userId = req.user._id
 
     if (!booking_code || !license_plate) {
         res.status(400)
@@ -82,8 +81,7 @@ export const lookupTracking = asyncHandler(async (req, res) => {
 
     const booking = await Booking.findOne({
         booking_code: booking_code,
-        'vehicle_info.license_plate': license_plate,
-        user_id: userId
+        'vehicle_info.license_plate': license_plate
     })
 
     if (!booking) {
@@ -274,15 +272,14 @@ export const confirmPayment = asyncHandler(async (req, res) => {
 })
 
 export const getTrackingStats = asyncHandler(async (req, res) => {
-    const activeOrdersStatus = ['RECEIVED', 'IN_PROGRESS', 'QC_TESTING']
-    const activeOrders = await Booking.countDocuments({
-        booking_status: { $in: activeOrdersStatus }
-    })
+    const realCompleted = await Booking.countDocuments({ booking_status: 'COMPLETED' })
 
-    const avgSpeed = "4.2"
+    const baseNumber = 1250
+    const totalServiced = realCompleted + baseNumber
 
     res.json({
-        active_orders: activeOrders,
-        avg_speed: avgSpeed
+        total_serviced: totalServiced,
+        years_experience: 5,
+        service_standard: 'Chính hãng'
     })
 })

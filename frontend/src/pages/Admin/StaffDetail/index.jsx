@@ -3,18 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 
-// Hooks & Constants
 import { useStaffDetail } from './hooks/useStaffDetail';
 import { STAFF_DETAIL_TABS } from './constants/tabs';
 
-// Components
 import Header from './components/Header';
 import ProfileTab from './components/Tabs/ProfileTab';
-import PayrollRulesTab from './components/Tabs/PayrollRulesTab';
 import PerformanceTab from './components/Tabs/PerformanceTab';
-import AttendanceTab from './components/Tabs/AttendanceTab';
 import ComplianceTab from './components/Tabs/ComplianceTab';
 import SkeletonDetail from './components/Shared/SkeletonDetail';
+import EditProfileModal from './components/EditProfileModal';
 
 const StaffDetail = () => {
     const { id } = useParams();
@@ -26,8 +23,8 @@ const StaffDetail = () => {
         isLoading,
         isUpdating,
         isDeactivating,
-        formatCurrency,
-        getKpiDisplay,
+        isEditModalOpen,
+        setIsEditModalOpen,
         handleEditProfile,
         handleDeactivateAccount
     } = useStaffDetail(id);
@@ -41,9 +38,9 @@ const StaffDetail = () => {
     if (!staff) {
         return (
             <div className="p-10 flex flex-col justify-center items-center h-screen bg-slate-50 dark:bg-[#141416]">
-                <h1 className="text-2xl text-slate-800 dark:text-white mb-4">{t('adminStaffDetail:not_found')}</h1>
+                <h1 className="text-2xl text-slate-800 dark:text-white mb-4">{t('adminStaffDetail:not_found', 'Không tìm thấy nhân viên')}</h1>
                 <button onClick={() => navigate('/admin/staff')} className="text-blue-500 hover:underline">
-                    {t('adminStaffDetail:back_to_list')}
+                    {t('adminStaffDetail:back_to_list', 'Quay lại danh sách')}
                 </button>
             </div>
         );
@@ -53,12 +50,8 @@ const StaffDetail = () => {
         switch (activeTab) {
             case 'PROFILE':
                 return <ProfileTab staff={staff} />;
-            case 'PAYROLL':
-                return <PayrollRulesTab staff={staff} formatCurrency={formatCurrency} getKpiDisplay={getKpiDisplay} />;
             case 'PERFORMANCE':
                 return <PerformanceTab staff={staff} />;
-            case 'ATTENDANCE':
-                return <AttendanceTab staff={staff} />;
             case 'COMPLIANCE':
                 return <ComplianceTab staff={staff} />;
             default:
@@ -103,6 +96,12 @@ const StaffDetail = () => {
             <div className="animate-fade-in">
                 {renderActiveTab()}
             </div>
+
+            <EditProfileModal
+                open={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                staff={staff}
+            />
         </div>
     );
 };

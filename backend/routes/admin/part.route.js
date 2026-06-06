@@ -8,7 +8,9 @@ import {
   deletePart,
   updatePartStatus,
   bulkDeleteParts,
-  replyPartReview
+  replyPartReview,
+  getPartReviews,
+  updateReviewStatus
 } from '../../controllers/admin/part.controller.js';
 
 const router = express.Router();
@@ -28,6 +30,8 @@ router.route('/:id')
 
 router.patch('/:id/status', updatePartStatus);
 
+router.get('/:id/reviews', getPartReviews);
+router.patch('/reviews/:reviewId/status', updateReviewStatus);
 router.post('/reviews/:reviewId/reply', replyPartReview);
 
 export default router;

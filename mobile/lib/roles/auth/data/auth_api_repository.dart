@@ -25,7 +25,18 @@ class AuthApiRepository implements AuthRepository {
         'password': request.password,
       });
 
-      final data = response.data as Map<String, dynamic>;
+      final raw = response.data as Map<String, dynamic>;
+      final data = <String, dynamic>{
+        ...raw,
+        'id': raw['id']?.toString() ?? '',
+        'employeeId': raw['employeeId']?.toString() ?? 'EMP-000',
+        'fullName': raw['fullName']?.toString() ?? '',
+        'email': raw['email']?.toString() ?? '',
+        'phone': raw['phone']?.toString() ?? '',
+        'role': raw['role']?.toString() ?? 'staff',
+        'department': raw['department']?.toString() ?? '',
+        'status': (raw['status']?.toString() ?? 'ACTIVE').toUpperCase(),
+      };
 
       final prefs = await SharedPreferences.getInstance();
       if (data['accessToken'] != null) {
@@ -34,7 +45,16 @@ class AuthApiRepository implements AuthRepository {
 
       return UserModel.fromJson(data);
     } on DioException catch (e) {
-      final serverMessage = e.response?.data?['message'] as String?;
+      String? serverMessage;
+      if (e.response?.data is Map) {
+        serverMessage = e.response?.data['message']?.toString();
+      } else if (e.response?.data is List && (e.response?.data as List).isNotEmpty) {
+        final firstError = (e.response?.data as List).first;
+        if (firstError is Map) {
+          serverMessage = firstError['message']?.toString();
+        }
+      }
+
       if (serverMessage != null && serverMessage.isNotEmpty) {
         throw Exception(serverMessage);
       }

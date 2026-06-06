@@ -19,6 +19,7 @@ import trackingRoutes from './tracking.route.js'
 import loyaltyRoutes from './loyalty.routes.js'
 import voucherRoutes from './voucher.routes.js'
 import promotionRoutes from './promotion.route.js'
+import costEstimateRoutes from './costEstimate.route.js'
 
 const router = express.Router()
 
@@ -42,5 +43,6 @@ router.use('/tracking', trackingRoutes)
 router.use('/loyalty', loyaltyRoutes)
 router.use('/vouchers', voucherRoutes)
 router.use('/promotions', promotionRoutes)
+router.use('/cost-estimate', costEstimateRoutes)
 
 export default router

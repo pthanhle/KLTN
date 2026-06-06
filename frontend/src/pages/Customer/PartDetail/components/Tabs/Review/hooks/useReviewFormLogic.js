@@ -81,7 +81,7 @@ export const useReviewFormLogic = (part, selectedOptions, t) => {
             images: uploadedImages,
         }, {
             onSuccess: () => {
-                message.success(t('msg_review_success', 'Cảm ơn bạn! Đánh giá đang chờ được duyệt.'));
+                message.success(t('msg_review_success', 'Cảm ơn bạn! Đánh giá của bạn đã được đăng.'));
                 setRating(0);
                 setComment('');
                 setUploadedImages([]);

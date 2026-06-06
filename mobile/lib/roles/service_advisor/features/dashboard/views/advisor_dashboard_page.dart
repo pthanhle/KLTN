@@ -11,15 +11,42 @@ import '../widgets/cards/repair_order_skeleton.dart';
 import '../../../../../core/views/components/navigation/header/header_avatar_button.dart';
 import '../../../../../core/views/components/navigation/header/header_notification_button.dart';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
+import '../../../../../shared/widgets/inputs/list_search_bar.dart';
+import '../../../../../roles/auth/controllers/auth_controller.dart';
 
-class AdvisorDashboardPage extends ConsumerWidget {
+class AdvisorDashboardPage extends ConsumerStatefulWidget {
   const AdvisorDashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdvisorDashboardPage> createState() =>
+      _AdvisorDashboardPageState();
+}
+
+class _AdvisorDashboardPageState extends ConsumerState<AdvisorDashboardPage> {
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(advisorDashboardProvider);
     final controller = ref.read(advisorDashboardProvider.notifier);
     final theme = Theme.of(context);
+
+    // Listen for session expiry and auto-logout
+    ref.listen<AdvisorDashboardState>(advisorDashboardProvider, (prev, next) {
+      if (next.sessionExpired && !(prev?.sessionExpired ?? false)) {
+        ref.read(authControllerProvider.notifier).logout();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            context.go('/login');
+          }
+        });
+      }
+    });
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -27,7 +54,8 @@ class AdvisorDashboardPage extends ConsumerWidget {
         child: RefreshIndicator(
           onRefresh: () => controller.refresh(),
           child: CustomScrollView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics:
+                const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             slivers: [
               SliverAppBar.medium(
                 backgroundColor: Colors.transparent,
@@ -40,7 +68,8 @@ class AdvisorDashboardPage extends ConsumerWidget {
                 stretch: false,
                 flexibleSpace: FlexibleSpaceBar(
                   stretchModes: const [],
-                  titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  titlePadding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   title: Text(
                     'Trang chủ'.tr(),
                     style: theme.textTheme.headlineLarge?.copyWith(
@@ -62,17 +91,27 @@ class AdvisorDashboardPage extends ConsumerWidget {
                 ),
               ),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 16),
-                  child: AdvisorKanbanTabs(
-                    selectedStage: state.selectedStage,
-                    onStageSelected: controller.selectStage,
-                  ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 4),
+                      child: AdvisorKanbanTabs(
+                        selectedStage: state.selectedStage,
+                        onStageSelected: controller.selectStage,
+                      ),
+                    ),
+                    ListSearchBar(
+                      hintText: 'Tìm biển số, khách hàng, mã đơn...',
+                      onChanged: controller.updateSearch,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    ),
+                  ],
                 ),
               ),
               if (state.isLoading)
                 SliverPadding(
-                  padding: const EdgeInsets.only(top: 4, left: 16.0, right: 16.0, bottom: 100.0),
+                  padding: const EdgeInsets.only(
+                      top: 4, left: 16.0, right: 16.0, bottom: 100.0),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => const RepairOrderSkeleton(),
@@ -90,7 +129,8 @@ class AdvisorDashboardPage extends ConsumerWidget {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.only(top: 4, left: 16.0, right: 16.0, bottom: 100.0),
+                  padding: const EdgeInsets.only(
+                      top: 4, left: 16.0, right: 16.0, bottom: 100.0),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -101,8 +141,14 @@ class AdvisorDashboardPage extends ConsumerWidget {
                           onTap: () {
                             if (order.stage == ROStage.quotation) {
                               context.go('/advisor/quotation/${order.id}');
+                            } else if (order.stage == ROStage.qc) {
+                              context.go('/advisor/qc/${order.id}');
                             } else if (order.stage == ROStage.inProgress) {
-                              context.go('/advisor/supplement/${order.id}');
+                              if (order.pendingSupplementId != null) {
+                                context.go('/advisor/supplement/${order.id}');
+                              } else {
+                                context.go('/advisor/qc/${order.id}');
+                              }
                             } else {
                               context.go('/advisor/walkaround/${order.id}');
                             }

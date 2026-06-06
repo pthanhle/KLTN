@@ -11,6 +11,7 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
         defaultValues: {
             name: '',
             sku: '',
+            brand: '',
             category: null,
             condition: 'new',
             original_price: 0,
@@ -34,10 +35,15 @@ export const usePartForm = (initialData, isEditMode, savePart, t) => {
     useEffect(() => {
         if (isEditMode && initialData) {
 
-            // Map the choices if they are objects, convert them to strings for the UI tags
+            // Normalise choices: DB stores objects {label, price_modifier, image_url}.
+            // Legacy records may have plain strings — upgrade them so the form always gets objects.
             const mappedOptions = (initialData.options || []).map(opt => ({
                 ...opt,
-                choices: opt.choices?.map(c => typeof c === 'object' ? c.label : c) || []
+                choices: (opt.choices || []).map(c =>
+                    typeof c === 'string'
+                        ? { label: c, price_modifier: 0, image_url: '' }
+                        : c
+                ),
             }));
 
             reset({

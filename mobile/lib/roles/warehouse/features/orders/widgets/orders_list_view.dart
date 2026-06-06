@@ -36,7 +36,7 @@ class OrdersListView extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 80.0),
           child: AssignedEmptyState(
             currentTab: state.currentTab,
-            hasAnyOrders: controller.myOrders.isNotEmpty,
+            hasAnyOrders: state.orders.isNotEmpty,
           ),
         ),
       );

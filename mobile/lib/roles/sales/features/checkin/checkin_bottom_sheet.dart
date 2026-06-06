@@ -124,7 +124,7 @@ class CheckInBottomSheet extends ConsumerWidget {
                   const SizedBox(height: 32),
 
                   CheckInCameraBox(
-                    imagePath: state.driverLicensePath,
+                    imageBytes: state.licenseImageBytes,
                     onTap: () {
                       showCupertinoModalPopup<void>(
                         context: context,

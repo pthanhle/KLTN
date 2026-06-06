@@ -44,6 +44,11 @@ const partSchema = new mongoose.Schema(
       required: [true, 'Danh mục là bắt buộc'],
       trim: true,
     },
+    brand: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     condition: {
       type: String,
       default: 'new', // e.g., 'new', 'used', 'oem', 'open_box' (values come from PartCondition Master Data)

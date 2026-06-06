@@ -1,13 +1,26 @@
 import React from 'react';
+import { CalendarOutlined } from '@ant-design/icons';
 
 const TimeSlotSelector = ({ timeSlots, bookingData, updateBookingData, t }) => {
+    const hasDate = !!bookingData.booking_date;
+
     return (
         <div className="mt-8 lg:mt-12">
             <h4 className="text-[18px] font-bold text-slate-900 dark:text-white mb-6">
-                {t('services:available_time_slots', 'Available Time Slots')}
+                {t('services:available_time_slots', 'Các khung giờ trống')}
             </h4>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Hint banner when no date selected */}
+            {!hasDate && (
+                <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-2xl bg-yellow-500/8 border border-yellow-500/20">
+                    <CalendarOutlined className="text-yellow-500 text-base shrink-0" />
+                    <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">
+                        {t('services:select_date_first', 'Vui lòng chọn ngày trước khi chọn khung giờ.')}
+                    </p>
+                </div>
+            )}
+
+            <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 transition-opacity duration-300 ${!hasDate ? 'opacity-40 pointer-events-none select-none' : ''}`}>
                 {timeSlots.map((slotObj, index) => {
                     const slot = typeof slotObj === 'string' ? slotObj : slotObj.time_slot;
                     const isBooked = typeof slotObj === 'object' ? slotObj.isFull : false;
@@ -30,7 +43,8 @@ const TimeSlotSelector = ({ timeSlots, bookingData, updateBookingData, t }) => {
                     return (
                         <button
                             key={slot}
-                            disabled={isBooked}
+                            type="button"
+                            disabled={isBooked || !hasDate}
                             onClick={() => updateBookingData({ time_slot: slot })}
                             className={btnClass}
                         >
@@ -38,7 +52,7 @@ const TimeSlotSelector = ({ timeSlots, bookingData, updateBookingData, t }) => {
 
                             {isRecommended && !isBooked && (
                                 <span className={`text-[9px] font-bold tracking-widest uppercase mt-1 ${isSelected ? 'text-yellow-600 dark:text-yellow-500' : 'text-yellow-500'}`}>
-                                    {t('services:recommended', 'RECOMMENDED')}
+                                    {t('services:recommended', 'ĐỀ XUẤT')}
                                 </span>
                             )}
 

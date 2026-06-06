@@ -1,7 +1,9 @@
 import React from 'react';
-import { Search, Filter, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import { Select } from 'antd';
+import { useQuery } from '@tanstack/react-query';
 import { getRoleFilterOptions, getStatusFilterOptions } from '../../constants/staffConstants';
+import { AdminStaffAPI } from '@/services/api/adminStaff.api';
 
 const FilterSelect = ({ value, onChange, options }) => {
     return (
@@ -16,36 +18,47 @@ const FilterSelect = ({ value, onChange, options }) => {
     );
 };
 
-export const StaffToolbar = ({ filterRole, setFilterRole, filterStatus, setFilterStatus, searchTerm, setSearchTerm, t }) => {
+export const StaffToolbar = ({ filterRole, setFilterRole, filterStatus, setFilterStatus, filterDepartment, setFilterDepartment, searchTerm, setSearchTerm, t }) => {
+    const { data: deptData } = useQuery({
+        queryKey: ['admin-staff-departments'],
+        queryFn: () => AdminStaffAPI.getDepartments(),
+        staleTime: 5 * 60 * 1000,
+    });
+
+    const departmentOptions = [
+        { label: 'Tất Cả Phòng Ban', value: 'ALL' },
+        ...(deptData?.departments || []).map(d => ({ label: d, value: d })),
+    ];
+
     return (
         <div className="bg-white dark:bg-[#141416] rounded-2xl p-6 mb-8 border border-slate-200 dark:border-white/5 flex flex-col xl:flex-row xl:justify-between xl:items-center gap-6 shadow-sm">
-            <div className="w-full xl:max-w-[320px] bg-slate-50 dark:bg-[#141416] border border-transparent dark:border-white/10 rounded-full h-[54px] px-5 flex items-center gap-3 shadow-sm transition-all focus-within:ring-2 focus-within:ring-yellow-500/30 focus-within:border-yellow-500 relative group">
+            <div className="w-full xl:max-w-[360px] bg-slate-50 dark:bg-[#141416] border border-transparent dark:border-white/10 rounded-full h-[54px] px-5 flex items-center gap-3 shadow-sm transition-all focus-within:ring-2 focus-within:ring-yellow-500/30 focus-within:border-yellow-500 relative group">
                 <Search className="text-slate-400 group-focus-within:text-yellow-500 transition-colors shrink-0" size={20} />
                 <input
                     type="text"
                     className="w-full bg-transparent border-none text-slate-700 dark:text-white placeholder:text-slate-400 focus:ring-0 outline-none"
-                    placeholder={t('adminStaff:search_placeholder')}
+                    placeholder="Tìm theo tên, email, SĐT, mã nhân viên..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
             <div className="flex items-center gap-4 flex-wrap xl:justify-end w-full xl:w-auto">
-                <div className="relative">
-                    <FilterSelect
-                        value={filterRole}
-                        onChange={setFilterRole}
-                        options={getRoleFilterOptions(t)}
-                    />
-                </div>
-
-                <div className="relative">
-                    <FilterSelect
-                        value={filterStatus}
-                        onChange={setFilterStatus}
-                        options={getStatusFilterOptions(t)}
-                    />
-                </div>
+                <FilterSelect
+                    value={filterRole}
+                    onChange={setFilterRole}
+                    options={getRoleFilterOptions(t)}
+                />
+                <FilterSelect
+                    value={filterDepartment}
+                    onChange={setFilterDepartment}
+                    options={departmentOptions}
+                />
+                <FilterSelect
+                    value={filterStatus}
+                    onChange={setFilterStatus}
+                    options={getStatusFilterOptions(t)}
+                />
             </div>
         </div>
     );

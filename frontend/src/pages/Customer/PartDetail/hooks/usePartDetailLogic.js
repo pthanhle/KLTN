@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { App } from 'antd';
 import { useClientSinglePartData, useSubmitPartReviewMutation } from '../../../../services/queries/clientPart.queries';
@@ -22,22 +22,55 @@ export const usePartDetailLogic = (id) => {
     const [activeTab, setActiveTab] = useState('description');
 
     useEffect(() => {
-        if (part && part.options && part.options.length > 0) {
-            const defaults = {};
-            part.options.forEach(opt => {
-                const optIdentifier = opt.type;
-                if (opt.choices && opt.choices.length > 0) {
-                    const firstChoice = opt.choices[0];
-                    defaults[optIdentifier] = typeof firstChoice === 'string' ? firstChoice : firstChoice.label;
-                }
-            });
-            setSelectedOptions(defaults);
-        }
-    }, [part]);
+        // Reset selection when the part changes (e.g. navigating between parts)
+        setSelectedOptions({});
+    }, [part?._id]);
 
     const handleOptionSelect = (optionName, choice) => {
-        setSelectedOptions(prev => ({ ...prev, [optionName]: choice }));
+        setSelectedOptions(prev => {
+            if (prev[optionName] === choice) {
+                // Second click on same choice → deselect, return to default price/image
+                const next = { ...prev };
+                delete next[optionName];
+                return next;
+            }
+            return { ...prev, [optionName]: choice };
+        });
     };
+
+    // Derive the selected choice object for a given option type
+    const getSelectedChoice = (optType) => {
+        if (!part?.options) return null;
+        const opt = part.options.find(o => o.type === optType);
+        if (!opt?.choices) return null;
+        const selectedLabel = selectedOptions[optType];
+        return opt.choices.find(c => (typeof c === 'string' ? c : c.label) === selectedLabel) || null;
+    };
+
+    const displayPrice = useMemo(() => {
+        if (!part) return 0;
+        let price = part.price || 0;
+        if (part.options) {
+            part.options.forEach(opt => {
+                const choice = getSelectedChoice(opt.type);
+                if (choice && typeof choice === 'object' && choice.price_modifier) {
+                    price += choice.price_modifier;
+                }
+            });
+        }
+        return price;
+    }, [part, selectedOptions]);
+
+    const variantImageUrl = useMemo(() => {
+        if (!part?.options) return null;
+        for (const opt of part.options) {
+            const choice = getSelectedChoice(opt.type);
+            if (choice && typeof choice === 'object' && choice.image_url) {
+                return choice.image_url;
+            }
+        }
+        return null;
+    }, [part, selectedOptions]);
 
     const handleQuantityChange = (type) => {
         const availableStock = part?.inventory?.available_stock ?? part?.stock ?? 0;
@@ -143,6 +176,8 @@ export const usePartDetailLogic = (id) => {
         formatCurrency: formatVND,
         handleAddToCart,
         handleBuyNow,
-        isSubmittingAction: isAdding
+        isSubmittingAction: isAdding,
+        displayPrice,
+        variantImageUrl
     };
 };

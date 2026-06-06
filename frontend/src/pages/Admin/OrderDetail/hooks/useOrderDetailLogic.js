@@ -21,13 +21,6 @@ export const useOrderDetailLogic = () => {
         try {
             const data = await adminOrderApi.getOrderById(id);
             try {
-                if (!data.assignment) {
-                    data.assignment = {
-                        assigned_staff_id: "INV-112",
-                        assigned_at: new Date().toISOString()
-                    };
-                }
-
                 const validatedOrder = orderDetailSchema.parse(data);
                 setOrder(validatedOrder);
             } catch (validationError) {
@@ -117,6 +110,7 @@ export const useOrderDetailLogic = () => {
         try {
             await adminOrderApi.updateOrder(id, {
                 order_status: 'CANCELLED',
+                cancel_reason: data?.cancel_reason || '',
             });
             message.success('Đã hủy đơn hàng');
             setIsCancelModalVisible(false);
@@ -130,14 +124,14 @@ export const useOrderDetailLogic = () => {
 
     const handleReassignSubmit = async (staffId) => {
         try {
-            // Placeholder cho API gán lại nhân viên
-            console.log('Reassign to staff:', staffId);
-            message.success('Đã chuyển giao đơn hàng thành công');
+            await adminOrderApi.updateOrder(id, { staff_id: staffId });
+            message.success('Đã phân công nhân viên đóng gói thành công');
             setIsReassignModalVisible(false);
-            // await fetchOrder();
+            await fetchOrder();
         } catch (err) {
-            console.error('Error reassigning staff:', err);
-            message.error('Chuyển giao thất bại');
+            console.error('Error assigning staff:', err);
+            const errorMsg = err.response?.data?.message || 'Phân công thất bại';
+            message.error(errorMsg);
         }
     };
 

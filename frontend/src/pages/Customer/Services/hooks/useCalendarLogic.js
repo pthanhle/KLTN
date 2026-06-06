@@ -37,7 +37,7 @@ export const useCalendarLogic = (bookingData, updateBookingData) => {
         const date = String(clickedDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${date}`;
 
-        updateBookingData({ booking_date: formattedDate });
+        updateBookingData({ booking_date: formattedDate, time_slot: '' });
     };
 
     const daysInMonth = useMemo(() => {

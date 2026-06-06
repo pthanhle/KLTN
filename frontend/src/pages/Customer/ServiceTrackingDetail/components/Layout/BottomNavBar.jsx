@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MOBILE_MENU_ITEMS } from '../../constants/trackingDetailConstants';
+import { Loader2 } from 'lucide-react';
+import { MOBILE_MENU_ITEMS, isTabAccessible } from '../../constants/trackingDetailConstants';
 
-const BottomNavBar = ({ activeTab, setActiveTab }) => {
+const BottomNavBar = ({ activeTab, setActiveTab, repairStatus = 'RECEIVED' }) => {
     const { t } = useTranslation('tracking');
 
     return (
@@ -10,22 +11,54 @@ const BottomNavBar = ({ activeTab, setActiveTab }) => {
             {MOBILE_MENU_ITEMS.slice(0, 5).map((item, idx) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
-
+                const accessible = isTabAccessible(item.minStatus, repairStatus);
                 const isCenter = idx === 2;
+
+                if (!accessible) {
+                    return (
+                        <div
+                            key={item.id}
+                            className={`flex flex-col items-center justify-center p-2 opacity-30 cursor-not-allowed select-none ${
+                                isCenter ? 'rounded-full p-3 mb-2 transform -translate-y-2 scale-110 bg-slate-200 dark:bg-[#191f31]' : ''
+                            }`}
+                        >
+                            <Loader2 className="w-5 h-5 mb-1 animate-spin text-slate-400 dark:text-slate-500" />
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                                {t(item.labelKey, item.defaultLabel)}
+                            </span>
+                        </div>
+                    );
+                }
 
                 if (isCenter) {
                     return (
-                        <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center rounded-full p-3 mb-2 transform -translate-y-2 scale-110 shadow-lg transition-colors ${isActive ? 'bg-yellow-500 dark:bg-[#eab308] text-white dark:text-[#0A0A0B] shadow-yellow-500/30' : 'bg-slate-200 dark:bg-[#191f31] text-slate-500 dark:text-[#d3c5ac]'}`}>
+                        <button
+                            key={item.id}
+                            onClick={() => setActiveTab(item.id)}
+                            className={`flex flex-col items-center justify-center rounded-full p-3 mb-2 transform -translate-y-2 scale-110 shadow-lg transition-colors ${
+                                isActive
+                                    ? 'bg-yellow-500 dark:bg-[#eab308] text-white dark:text-[#0A0A0B] shadow-yellow-500/30'
+                                    : 'bg-slate-200 dark:bg-[#191f31] text-slate-500 dark:text-[#d3c5ac]'
+                            }`}
+                        >
                             <Icon className="w-5 h-5 mb-1" />
-                            <span className=" text-[9px] font-bold uppercase tracking-wider">{t(item.labelKey, item.defaultLabel)}</span>
+                            <span className="text-[9px] font-bold uppercase tracking-wider">{t(item.labelKey, item.defaultLabel)}</span>
                         </button>
                     );
                 }
 
                 return (
-                    <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center p-2 transition-colors ${isActive ? 'text-yellow-600 dark:text-[#ffd165]' : 'text-slate-500 dark:text-[#d3c5ac] hover:text-yellow-600 dark:hover:text-[#ffd165]'}`}>
+                    <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        className={`flex flex-col items-center justify-center p-2 transition-colors ${
+                            isActive
+                                ? 'text-yellow-600 dark:text-[#ffd165]'
+                                : 'text-slate-500 dark:text-[#d3c5ac] hover:text-yellow-600 dark:hover:text-[#ffd165]'
+                        }`}
+                    >
                         <Icon className="w-5 h-5 mb-1" />
-                        <span className=" text-[9px] font-bold uppercase tracking-wider">{t(item.labelKey, item.defaultLabel)}</span>
+                        <span className="text-[9px] font-bold uppercase tracking-wider">{t(item.labelKey, item.defaultLabel)}</span>
                     </button>
                 );
             })}

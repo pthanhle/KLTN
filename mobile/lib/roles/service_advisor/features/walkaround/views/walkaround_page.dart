@@ -158,8 +158,28 @@ class _WalkaroundPageState extends ConsumerState<WalkaroundPage> {
                       isLoading: state.isLoading,
                       icon: CupertinoIcons.checkmark_seal_fill,
                       onPressed: controller.canSubmit() && !state.isLoading
-                          ? () {
-                              controller.submit();
+                          ? () async {
+                              final success = await controller.submit();
+                              if (!context.mounted) return;
+                              if (success) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Tiếp nhận xe thành công!'),
+                                    backgroundColor: Color(0xFF22C55E),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                                context.pop();
+                              } else {
+                                final err = state.submitError ?? 'Có lỗi xảy ra, vui lòng thử lại.';
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(' $err'),
+                                    backgroundColor: const Color(0xFFEF4444),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
                             }
                           : null,
                       child: Text('Hoàn Thành Tiếp Nhận'.tr()),

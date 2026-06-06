@@ -3,7 +3,7 @@ import BookingCard from './BookingCard';
 import BookingSkeleton from '../../BookingSkeleton';
 import { FilterOutlined } from '@ant-design/icons';
 
-const BacklogPane = ({ bookings, isLoading, t }) => {
+const BacklogPane = ({ bookings, isLoading, t, onAssignFromRequest }) => {
     return (
         <section className="w-[320px] xl:w-[350px] shrink-0 h-full flex flex-col bg-slate-50 dark:bg-[#0a0a0a] z-10 border-r border-slate-200 dark:border-white/5 relative">
             <div className="h-[88px] px-6 flex justify-between items-center bg-white dark:bg-[#0a0a0a] rounded-br-xl shrink-0 border-b border-slate-200 dark:border-white/5 z-20">
@@ -25,7 +25,7 @@ const BacklogPane = ({ bookings, isLoading, t }) => {
                     <BookingSkeleton />
                 ) : bookings.length > 0 ? (
                     bookings.map(booking => (
-                        <BookingCard key={booking._id} booking={booking} t={t} />
+                        <BookingCard key={booking._id} booking={booking} t={t} onAssignFromRequest={onAssignFromRequest} />
                     ))
                 ) : (
                     <div className="text-center text-slate-500 dark:text-slate-400 mt-10">

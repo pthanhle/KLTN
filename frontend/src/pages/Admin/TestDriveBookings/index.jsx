@@ -7,20 +7,21 @@ import BookingStats from './components/BookingStats';
 import BookingGrid from './components/BookingGrid/index';
 import DispatchBoard from './components/DispatchBoard/index';
 import BookingSkeleton from './components/BookingSkeleton';
+import AdminCreateBookingDrawer from './components/AdminCreateBookingDrawer/index';
+import BookingDetailDrawer from './components/BookingDetailDrawer/index';
 import { useBookingsLogic } from './hooks/useBookingsLogic';
 
 const BookingsPage = () => {
     const { t } = useTranslation(['adminTestDriveBookings', 'layout']);
     const [isDispatchOpen, setIsDispatchOpen] = useState(false);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [detailBookingId, setDetailBookingId] = useState(null);
     const { bookings, isLoading, filters, stats, pagination, handleFilterChange } = useBookingsLogic();
+    const pendingCount = stats?.pending || 0;
 
     const breadcrumbItems = [
         { label: t('layout:admin.sider.test-drive-bookings', 'Lái Thử') }
     ];
-
-    const handleAddBooking = () => {
-        console.log("Open Add Booking Drawer");
-    };
 
     return (
         <div className="w-full flex justify-center pb-20 animate-in fade-in duration-500">
@@ -29,8 +30,9 @@ const BookingsPage = () => {
                 <TestDriveHeader
                     t={t}
                     breadcrumbItems={breadcrumbItems}
-                    onAddBooking={handleAddBooking}
+                    onAddBooking={() => setIsCreateOpen(true)}
                     onOpenDispatch={() => setIsDispatchOpen(true)}
+                    pendingCount={pendingCount}
                 />
 
                 <TestDriveToolbar
@@ -46,7 +48,12 @@ const BookingsPage = () => {
                         <BookingSkeleton />
                     ) : (
                         <>
-                            <BookingGrid bookings={bookings} t={t} onOpenDispatch={() => setIsDispatchOpen(true)} />
+                            <BookingGrid
+                                bookings={bookings}
+                                t={t}
+                                onOpenDispatch={() => setIsDispatchOpen(true)}
+                                onViewDetail={(id) => setDetailBookingId(id)}
+                            />
 
                             {pagination.total > 0 && (
                                 <div className="mt-8 flex justify-end">
@@ -87,6 +94,17 @@ const BookingsPage = () => {
             >
                 <DispatchBoard t={t} />
             </Drawer>
+
+            <AdminCreateBookingDrawer
+                open={isCreateOpen}
+                onClose={() => setIsCreateOpen(false)}
+            />
+
+            <BookingDetailDrawer
+                bookingId={detailBookingId}
+                open={!!detailBookingId}
+                onClose={() => setDetailBookingId(null)}
+            />
         </div>
     );
 };

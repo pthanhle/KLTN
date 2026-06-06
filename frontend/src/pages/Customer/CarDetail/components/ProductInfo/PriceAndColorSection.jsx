@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import Car360Viewer from './Car360Viewer';
-import { ChevronDown, Box, Maximize2 } from 'lucide-react';
+import { Box, Maximize2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Image } from 'antd';
+import CostEstimateModal from './CostEstimateModal';
 
 const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t }) => {
     const navigate = useNavigate();
     const [previewVisible, setPreviewVisible] = useState(false);
+    const [estimateOpen, setEstimateOpen] = useState(false);
     const img1 = "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200";
     const img2 = "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=1200";
     const frames = Array.from({ length: 36 }).map((_, i) => i % 2 === 0 ? img1 : img2);
 
     return (
+        <>
         <section id="price-color" className="min-h-[calc(100vh-136px)] flex items-center py-10 lg:py-0 bg-white dark:bg-[#0a0a0b] overflow-hidden">
             <style>
                 {`
@@ -99,7 +102,10 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
                                 </div>
                                 <div className="h-px bg-slate-200 dark:bg-white/10 w-full"></div>
                                 <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
-                                    <button className="w-full py-4 bg-slate-900 dark:bg-yellow-500 text-white dark:text-slate-900 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-yellow-600 dark:hover:bg-yellow-400 transition-all rounded-xl shadow-lg shadow-slate-900/10 dark:shadow-yellow-500/10 active:scale-95">
+                                    <button
+                                        onClick={() => setEstimateOpen(true)}
+                                        className="w-full py-4 bg-slate-900 dark:bg-yellow-500 text-white dark:text-slate-900 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-yellow-600 dark:hover:bg-yellow-400 transition-all rounded-xl shadow-lg shadow-slate-900/10 dark:shadow-yellow-500/10 active:scale-95"
+                                    >
                                         {t('estimateBtn', 'DỰ TOÁN CHI PHÍ')}
                                     </button>
                                     <button
@@ -175,6 +181,13 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
                 </div>
             </div>
         </section>
+
+        <CostEstimateModal
+            open={estimateOpen}
+            onClose={() => setEstimateOpen(false)}
+            carPrice={car.price ?? 0}
+        />
+        </>
     );
 };
 

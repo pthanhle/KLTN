@@ -7,7 +7,7 @@ export const useBookingsLogic = () => {
         search: '',
         status: 'all',
         type: 'all',
-        date: dayjs().format('DD/MM/YYYY'),
+        date: '',
         page: 1,
         pageSize: 10
     });

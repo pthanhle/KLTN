@@ -35,7 +35,7 @@ class HotspotsSection extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           HotspotImageBoard(
             imageUrl: state.data.imageUrl,
             hotspots: state.data.hotspots,
@@ -52,7 +52,7 @@ class HotspotsSection extends ConsumerWidget {
             },
             onRemoveHotspot: controller.removeHotspot,
           ),
-          
+
           if (state.data.hotspots.isNotEmpty) ...[
             const SizedBox(height: 24),
             Text(
@@ -62,10 +62,13 @@ class HotspotsSection extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
-            ...state.data.hotspots.map((hotspot) {
+            ...state.data.hotspots.asMap().entries.map((entry) {
+              final idx = entry.key;
+              final hotspot = entry.value;
               return HotspotListItem(
                 key: ValueKey(hotspot.id),
                 hotspot: hotspot,
+                index: idx + 1,
                 onRemove: () => controller.removeHotspot(hotspot.id),
               );
             }),

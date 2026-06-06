@@ -1,6 +1,6 @@
 import React from 'react';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Calendar, Clock, MoreVertical, XCircle, CalendarClock } from 'lucide-react';
+import { GripVertical, Lock, Calendar, Clock, MoreVertical, XCircle, CalendarClock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBookingCard } from './hooks/useBookingCard';
 
@@ -19,6 +19,8 @@ const BookingCard = ({ booking, onReschedule, onNoShow }) => {
         isDragging
     } = useBookingCard(booking, onReschedule, onNoShow);
 
+    const isReceived = booking.status === 'RECEIVED';
+
     const style = {
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 0.4 : 1,
@@ -31,7 +33,7 @@ const BookingCard = ({ booking, onReschedule, onNoShow }) => {
             style={style}
             {...attributes}
             {...listeners}
-            className="bg-white dark:bg-[#1c1c1e] rounded-xl p-5 shadow-lg dark:shadow-[0_15px_30px_rgba(0,0,0,0.3)] relative group hover:-translate-y-1 transition-transform cursor-grab touch-none border border-slate-100 dark:border-white/5"
+            className={`bg-white dark:bg-[#1c1c1e] rounded-xl p-5 shadow-lg dark:shadow-[0_15px_30px_rgba(0,0,0,0.3)] relative group hover:-translate-y-1 transition-transform touch-none border border-slate-100 dark:border-white/5 ${isReceived ? 'cursor-default opacity-80' : 'cursor-grab'}`}
         >
             <div className="absolute inset-0 bg-black/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity"></div>
             
@@ -49,7 +51,10 @@ const BookingCard = ({ booking, onReschedule, onNoShow }) => {
                     </div>
                 </div>
                 <div className="flex items-center gap-1">
-                    <GripVertical className="text-slate-400 dark:text-slate-500 w-4 h-4 shrink-0 cursor-grab" />
+                    {isReceived
+                        ? <Lock className="text-emerald-500 w-4 h-4 shrink-0" title="Đã tiếp nhận" />
+                        : <GripVertical className="text-slate-400 dark:text-slate-500 w-4 h-4 shrink-0 cursor-grab" />
+                    }
                     <div className="relative" onPointerDown={(e) => e.stopPropagation()}>
                         <button 
                             onClick={handleMenuClick}

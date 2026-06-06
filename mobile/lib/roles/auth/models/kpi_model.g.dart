@@ -18,7 +18,7 @@ Map<String, dynamic> _$RevenueMetricToJson(_RevenueMetric instance) =>
 _CsatMetric _$CsatMetricFromJson(Map<String, dynamic> json) => _CsatMetric(
   score: (json['score'] as num).toDouble(),
   totalReviews: (json['totalReviews'] as num).toInt(),
-  percentile: json['percentile'] as String,
+  percentile: json['percentile'] as String?,
 );
 
 Map<String, dynamic> _$CsatMetricToJson(_CsatMetric instance) =>

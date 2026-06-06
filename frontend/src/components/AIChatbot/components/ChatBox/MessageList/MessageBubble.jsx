@@ -1,7 +1,8 @@
 import React from 'react';
 import BrandLogo from '@/assets/images/brand/logo.png';
+import BookingConfirmationCard from './BookingConfirmationCard';
 
-const MessageBubble = ({ msg, isWelcome, t }) => {
+const MessageBubble = ({ msg, t, onConfirmBooking }) => {
     const isUser = msg.sender === 'user';
     const timeString = new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -16,6 +17,21 @@ const MessageBubble = ({ msg, isWelcome, t }) => {
                         {timeString} · {t ? t('chatbot_you') : 'You'}
                     </span>
                 </div>
+            </div>
+        );
+    }
+
+    if (msg.type === 'booking_card') {
+        return (
+            <div className="flex gap-3 animate-in fade-in slide-in-from-left-2 duration-300">
+                <div className="w-8 h-8 flex items-center justify-center shrink-0 mt-1 mb-auto">
+                    <img src={BrandLogo} alt="AI" className="w-full h-full object-contain transition-all duration-300 [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.08))] dark:[filter:drop-shadow(0_0_2px_rgba(255,255,255,0.6))_drop-shadow(0_0_12px_rgba(255,255,255,0.15))]" />
+                </div>
+                <BookingConfirmationCard
+                    bookingDraft={msg.bookingDraft}
+                    defaultPhone={msg.defaultPhone}
+                    onConfirm={onConfirmBooking}
+                />
             </div>
         );
     }
@@ -36,4 +52,5 @@ const MessageBubble = ({ msg, isWelcome, t }) => {
         </div>
     );
 };
+
 export default MessageBubble;

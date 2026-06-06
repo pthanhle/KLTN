@@ -109,6 +109,12 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .limit(5)
         .lean();
 
+    const recentTestDrives = await Booking.find({ booking_type: 'test_drive' })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate('product_id', 'name sku images')
+        .lean();
+
     // Monthly revenue for the current year (bar chart)
     const monthlyRevenue = await Order.aggregate([
         {
@@ -144,11 +150,22 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         recentOrders,
         lowStockParts,
         recentAppointments,
+        recentTestDrives,
         dateRange: {
             start: start.toISOString(),
             end: end.toISOString(),
         },
     })
+})
+
+
+export const getPendingCounts = asyncHandler(async (req, res) => {
+    const [pendingOrdersCount, pendingTestDrivesCount, pendingAppointmentsCount] = await Promise.all([
+        Order.countDocuments({ order_status: 'PENDING' }),
+        Booking.countDocuments({ booking_type: 'test_drive', booking_status: 'PENDING' }),
+        Booking.countDocuments({ booking_type: { $in: ['service', 'maintenance'] }, booking_status: 'PENDING' }),
+    ])
+    res.json({ pendingOrdersCount, pendingTestDrivesCount, pendingAppointmentsCount })
 })
 
 

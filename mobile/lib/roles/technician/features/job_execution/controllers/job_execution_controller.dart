@@ -1,86 +1,165 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ttauto_staff/core/config/api_config.dart';
 import '../models/job_task_model.dart';
 import '../models/job_part_model.dart';
-import '../data/mocks/mock_job_execution_data.dart';
 
 class JobExecutionState {
+  final String? progressId;
   final List<JobTaskModel> tasks;
   final List<JobPartModel> parts;
+  final bool isLoading;
+  final String? error;
 
-  const JobExecutionState({required this.tasks, required this.parts});
+  JobExecutionState({
+    this.progressId,
+    required this.tasks,
+    required this.parts,
+    this.isLoading = false,
+    this.error,
+  });
 
   JobExecutionState copyWith({
+    String? progressId,
     List<JobTaskModel>? tasks,
     List<JobPartModel>? parts,
-  }) =>
-      JobExecutionState(
-        tasks: tasks ?? this.tasks,
-        parts: parts ?? this.parts,
-      );
+    bool? isLoading,
+    String? error,
+  }) {
+    return JobExecutionState(
+      progressId: progressId ?? this.progressId,
+      tasks: tasks ?? this.tasks,
+      parts: parts ?? this.parts,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
 }
 
 class JobExecutionController extends AsyncNotifier<JobExecutionState> {
+  final Dio _dio = Dio(BaseOptions(
+    connectTimeout: const Duration(milliseconds: ApiConfig.connectTimeout),
+    receiveTimeout: const Duration(milliseconds: ApiConfig.receiveTimeout),
+    headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+  ));
+
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('access_token');
+  }
+
   @override
   FutureOr<JobExecutionState> build() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    return JobExecutionState(
-      tasks: MockJobExecutionData.parsedTasks(),
-      parts: MockJobExecutionData.parsedParts(),
-    );
+    return JobExecutionState(tasks: [], parts: []);
+  }
+
+  Future<void> init(String progressId) async {
+    final current = state.value;
+    if (current?.progressId == progressId) return;
+
+    state = AsyncData(JobExecutionState(progressId: progressId, tasks: [], parts: [], isLoading: true));
+
+    try {
+      final token = await _getToken();
+      if (token == null) throw Exception('Phiên đăng nhập đã hết hạn');
+
+      final response = await _dio.get(
+        '${ApiConfig.baseUrl}/staff/service/repair-progress/$progressId',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      final data = response.data as Map<String, dynamic>? ?? {};
+      final quotation = data['quotation'] as Map<String, dynamic>? ?? {};
+      final labors = quotation['labors'] as List<dynamic>? ?? [];
+      final parts = quotation['parts'] as List<dynamic>? ?? [];
+
+      final taskModels = labors.asMap().entries.map((entry) {
+        final i = entry.key;
+        final l = entry.value as Map<String, dynamic>;
+        return JobTaskModel(
+          id: l['_id']?.toString() ?? l['service_id']?.toString() ?? 'labor_$i',
+          name: l['service_name']?.toString() ?? 'Hạng mục ${i + 1}',
+          description: '${l['hours'] ?? 0} giờ công',
+          icon: JobTaskIcon.build,
+        );
+      }).toList();
+
+      final partModels = parts.asMap().entries.map((entry) {
+        final i = entry.key;
+        final p = entry.value as Map<String, dynamic>;
+        return JobPartModel(
+          id: p['part_id']?.toString() ?? p['_id']?.toString() ?? 'part_$i',
+          name: p['name']?.toString() ?? 'Phụ tùng ${i + 1}',
+          quantity: (p['quantity'] as num?)?.toInt() ?? 1,
+          icon: JobPartIcon.settings,
+        );
+      }).toList();
+
+      state = AsyncData(JobExecutionState(
+        progressId: progressId,
+        tasks: taskModels,
+        parts: partModels,
+        isLoading: false,
+      ));
+    } catch (e, st) {
+      state = AsyncData(JobExecutionState(
+        progressId: progressId,
+        tasks: [],
+        parts: [],
+        isLoading: false,
+        error: e.toString(),
+      ));
+    }
   }
 
   Future<void> startTask(String taskId) async {
-    final current = state.value;
-    if (current == null) return;
-    state = AsyncData(current.copyWith(
-      tasks: current.tasks.map((t) {
-        if (t.id == taskId && t.status == JobTaskStatus.pending) {
-          return t.copyWith(
-            status: JobTaskStatus.inProgress,
-            startedAt: DateTime.now(),
-          );
-        }
-        return t;
-      }).toList(),
-    ));
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    final updatedTasks = currentState.tasks.map((task) {
+      if (task.id == taskId && task.status == JobTaskStatus.pending) {
+        return task.copyWith(status: JobTaskStatus.inProgress, startedAt: DateTime.now());
+      }
+      return task;
+    }).toList();
+
+    state = AsyncData(currentState.copyWith(tasks: updatedTasks));
   }
 
   Future<void> completeTask(String taskId) async {
-    final current = state.value;
-    if (current == null) return;
-    state = AsyncData(current.copyWith(
-      tasks: current.tasks.map((t) {
-        if (t.id == taskId && t.status == JobTaskStatus.inProgress) {
-          return t.copyWith(
-            status: JobTaskStatus.completed,
-            completedAt: DateTime.now(),
-          );
-        }
-        return t;
-      }).toList(),
-    ));
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    final updatedTasks = currentState.tasks.map((task) {
+      if (task.id == taskId && task.status == JobTaskStatus.inProgress) {
+        return task.copyWith(status: JobTaskStatus.completed, completedAt: DateTime.now());
+      }
+      return task;
+    }).toList();
+
+    state = AsyncData(currentState.copyWith(tasks: updatedTasks));
   }
 
   Future<void> togglePartCheck(String partId) async {
-    final current = state.value;
-    if (current == null) return;
-    state = AsyncData(current.copyWith(
-      parts: current.parts.map((p) {
-        if (p.id == partId) {
-          return p.copyWith(
-            status: p.status == JobPartStatus.completed
-                ? JobPartStatus.pending
-                : JobPartStatus.completed,
-          );
-        }
-        return p;
-      }).toList(),
-    ));
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    final updatedParts = currentState.parts.map((part) {
+      if (part.id == partId) {
+        final newStatus = part.status == JobPartStatus.completed
+            ? JobPartStatus.pending
+            : JobPartStatus.completed;
+        return part.copyWith(status: newStatus);
+      }
+      return part;
+    }).toList();
+
+    state = AsyncData(currentState.copyWith(parts: updatedParts));
   }
 }
 
-final jobExecutionControllerProvider =
-    AsyncNotifierProvider<JobExecutionController, JobExecutionState>(
-  JobExecutionController.new,
+final jobExecutionControllerProvider = AsyncNotifierProvider<JobExecutionController, JobExecutionState>(
+  () => JobExecutionController(),
 );

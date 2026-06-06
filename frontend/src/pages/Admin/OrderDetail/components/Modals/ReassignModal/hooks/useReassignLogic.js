@@ -1,40 +1,31 @@
 import { useState, useMemo, useEffect } from 'react';
-import { mockStaffData } from '../../../../../Staff/data/mockStaffData';
+import { adminOrderApi } from '@/services/api/adminOrder.api';
 
 export const useReassignLogic = (isOpen, currentStaffId) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedStaffId, setSelectedStaffId] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [staffList, setStaffList] = useState([]);
 
     useEffect(() => {
-        if (isOpen) {
-            setSearchQuery('');
-            setSelectedStaffId(null);
-        }
+        if (!isOpen) return;
+        setSearchQuery('');
+        setSelectedStaffId(null);
+        setLoading(true);
+        adminOrderApi.getInventoryStaff()
+            .then(data => setStaffList(Array.isArray(data) ? data : []))
+            .catch(() => setStaffList([]))
+            .finally(() => setLoading(false));
     }, [isOpen]);
 
-    const warehouseStaffList = useMemo(() => {
-        return mockStaffData
-            .filter(staff => staff.department === 'Logistics' || staff.role === 'INVENTORY_MGR')
-            .map(staff => {
-                const todoCount = staff.performance?.kanban?.todo?.length || 0;
-                const inProgressCount = staff.performance?.kanban?.inProgress?.length || 0;
-                const workloadCount = todoCount + inProgressCount;
-                return {
-                    ...staff,
-                    workloadCount
-                };
-            });
-    }, []);
-
     const filteredStaffList = useMemo(() => {
-        if (!searchQuery.trim()) return warehouseStaffList;
+        if (!searchQuery.trim()) return staffList;
         const query = searchQuery.toLowerCase();
-        return warehouseStaffList.filter(staff =>
-            staff.fullName.toLowerCase().includes(query) ||
-            staff.employeeId.toLowerCase().includes(query)
+        return staffList.filter(staff =>
+            (staff.fullName || '').toLowerCase().includes(query) ||
+            (staff.employeeId || '').toLowerCase().includes(query)
         );
-    }, [searchQuery, warehouseStaffList]);
+    }, [searchQuery, staffList]);
 
     return {
         searchQuery,

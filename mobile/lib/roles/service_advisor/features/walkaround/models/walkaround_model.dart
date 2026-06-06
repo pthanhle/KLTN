@@ -11,7 +11,8 @@ class WalkaroundModel {
   final int odometer;
   final List<HotspotModel> hotspots;
   final List<ChecklistItemModel> checklist;
-  final String? signatureData;
+  final String? advisorSignatureData;
+  final String? customerSignatureData;
   final String? imageUrl;
 
   const WalkaroundModel({
@@ -22,7 +23,8 @@ class WalkaroundModel {
     this.odometer = 0,
     this.hotspots = const [],
     this.checklist = const [],
-    this.signatureData,
+    this.advisorSignatureData,
+    this.customerSignatureData,
     this.imageUrl,
   });
 
@@ -34,7 +36,8 @@ class WalkaroundModel {
     int? odometer,
     List<HotspotModel>? hotspots,
     List<ChecklistItemModel>? checklist,
-    String? signatureData,
+    String? advisorSignatureData,
+    String? customerSignatureData,
     String? imageUrl,
   }) {
     return WalkaroundModel(
@@ -45,7 +48,8 @@ class WalkaroundModel {
       odometer: odometer ?? this.odometer,
       hotspots: hotspots ?? this.hotspots,
       checklist: checklist ?? this.checklist,
-      signatureData: signatureData ?? this.signatureData,
+      advisorSignatureData: advisorSignatureData ?? this.advisorSignatureData,
+      customerSignatureData: customerSignatureData ?? this.customerSignatureData,
       imageUrl: imageUrl ?? this.imageUrl,
     );
   }
@@ -68,7 +72,8 @@ class WalkaroundModel {
               ?.map((e) => ChecklistItemModel.fromJson(e))
               .toList() ??
           [],
-      signatureData: json['signature_data'],
+      advisorSignatureData: json['advisor_signature_data'],
+      customerSignatureData: json['customer_signature_data'],
       imageUrl: json['image_url'],
     );
   }
@@ -82,7 +87,8 @@ class WalkaroundModel {
       'odometer': odometer,
       'hotspots': hotspots.map((e) => e.toJson()).toList(),
       'checklist': checklist.map((e) => e.toJson()).toList(),
-      'signature_data': signatureData,
+      'advisor_signature_data': advisorSignatureData,
+      'customer_signature_data': customerSignatureData,
       'image_url': imageUrl,
     };
   }

@@ -9,6 +9,7 @@ import 'widgets/cards/service_order_glass_card_skeleton.dart';
 import 'widgets/controls/service_segmented_control.dart';
 import 'widgets/empty_state/service_empty_state.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ttauto_staff/shared/widgets/inputs/list_search_bar.dart';
 
 class ServiceOrdersPage extends ConsumerStatefulWidget {
   const ServiceOrdersPage({super.key});
@@ -83,7 +84,15 @@ class _ServiceOrdersPageState extends ConsumerState<ServiceOrdersPage> {
                   ),
                 ),
               ),
-              
+
+              SliverToBoxAdapter(
+                child: ListSearchBar(
+                  hintText: 'Tìm mã đơn, biển số, khách hàng...',
+                  onChanged: ref.read(serviceOrdersProvider.notifier).updateSearch,
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                ),
+              ),
+
               if (isLoading)
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

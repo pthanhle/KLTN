@@ -1,10 +1,8 @@
 export const ROLE_OPTIONS = [
-    { value: 'Manager', label: 'Quản lý (Manager)' },
-    { value: 'Sales', label: 'Nhân viên Kinh doanh (Sales)' },
-    { value: 'Service Advisor', label: 'Cố vấn Dịch vụ (Advisor)' },
-    { value: 'Technician', label: 'Kỹ thuật viên (Technician)' },
-    { value: 'Inventory', label: 'Kho phụ tùng (Inventory)' },
-    { value: 'Cashier', label: 'Thu ngân (Cashier)' }
+    { value: 'advisor', label: 'Cố vấn Dịch vụ (Advisor)' },
+    { value: 'service', label: 'Kỹ thuật viên (Technician)' },
+    { value: 'sale', label: 'Nhân viên Kinh doanh (Sales)' },
+    { value: 'inventory', label: 'Kho phụ tùng (Inventory)' },
 ];
 
 export const DEPARTMENT_OPTIONS = [

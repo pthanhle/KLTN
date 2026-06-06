@@ -42,6 +42,31 @@ const kanbanTaskSchema = new mongoose.Schema(
   { _id: false }
 )
 
+const staffIdentitySchema = new mongoose.Schema({
+  idNumber: { type: String, default: null },
+  issueDate: { type: String, default: null },
+  issuePlace: { type: String, default: null },
+  dob: { type: String, default: null },
+  pob: { type: String, default: null },
+  permanentAddress: { type: String, default: null },
+  currentAddress: { type: String, default: null },
+}, { _id: false })
+
+const staffFinancialSchema = new mongoose.Schema({
+  bankAccount: { type: String, default: null },
+  bankName: { type: String, default: null },
+  bankBranch: { type: String, default: null },
+  taxCode: { type: String, default: null },
+  insuranceCode: { type: String, default: null },
+}, { _id: false })
+
+const staffEmergencySchema = new mongoose.Schema({
+  contactName: { type: String, default: null },
+  relation: { type: String, default: null },
+  phone: { type: String, default: null },
+  address: { type: String, default: null },
+}, { _id: false })
+
 const staffSchema = mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
@@ -54,6 +79,11 @@ const staffSchema = mongoose.Schema(
     kpiValue: { type: Number, default: 0 },
     isOvertimeEligible: { type: Boolean, default: false },
     accessLevel: { type: String, default: 'STANDARD_USER' },
+    lastSetPassword: { type: String, default: null },
+
+    identity: { type: staffIdentitySchema, default: () => ({}) },
+    financial: { type: staffFinancialSchema, default: () => ({}) },
+    emergency: { type: staffEmergencySchema, default: () => ({}) },
 
     performance: {
       kpis: { type: kpiSchema },

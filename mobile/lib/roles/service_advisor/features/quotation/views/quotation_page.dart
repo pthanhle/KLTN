@@ -10,19 +10,46 @@ import '../../../../../shared/widgets/buttons/glass_menu_button.dart';
 import '../controllers/quotation_controller.dart';
 import '../widgets/shared/quotation_skeleton.dart';
 import '../widgets/sections/technician_diagnosis_section.dart';
+import '../widgets/sections/reception_review_section.dart';
 import '../widgets/sections/service_cart_section.dart';
 import '../widgets/sections/promotions_section.dart';
 import '../widgets/shared/quotation_summary_card.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
+import '../widgets/reception_summary_modal.dart';
+import '../../dashboard/models/repair_order_model.dart';
+import '../constants/quotation_constants.dart';
 
-class QuotationPage extends ConsumerWidget {
+class QuotationPage extends ConsumerStatefulWidget {
   final String orderId;
 
   const QuotationPage({super.key, required this.orderId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<QuotationPage> createState() => _QuotationPageState();
+}
+
+class _QuotationPageState extends ConsumerState<QuotationPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(quotationControllerProvider.notifier).init(widget.orderId);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final asyncData = ref.watch(quotationControllerProvider);
+    final advisorDashboard = ref.watch(advisorDashboardProvider);
     final theme = Theme.of(context);
+
+    RepairOrderModel? order;
+    try {
+      order = advisorDashboard.allRepairOrders.firstWhere((o) => o.id == widget.orderId);
+    } catch (e) {
+      order = null;
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -35,7 +62,6 @@ class QuotationPage extends ConsumerWidget {
               parent: AlwaysScrollableScrollPhysics(),
             ),
             slivers: [
-              // Liquid App Bar
               SliverAppBar(
                 pinned: true,
                 backgroundColor:
@@ -77,7 +103,32 @@ class QuotationPage extends ConsumerWidget {
                   data: (data) => Column(
                     children: [
                       const SizedBox(height: 24),
-                      TechnicianDiagnosisSection(data: data),
+                      if (order != null && order.receptionInfo != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: QuotationConstants.paddingHorizontal),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                ReceptionSummaryModal.show(context, order!);
+                              },
+                              icon: const Icon(CupertinoIcons.doc_text_viewfinder),
+                              label: Text('Xem chi tiết phiếu tiếp nhận xe'.tr()),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                backgroundColor: theme.colorScheme.primaryContainer,
+                                foregroundColor: theme.colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 16),
+                      ReceptionReviewSection(snapshot: data.receptionSnapshot),
+                      const SizedBox(height: 32),
+                      TechnicianDiagnosisSection(data: data, orderId: widget.orderId),
                       const SizedBox(height: 32),
                       ServiceCartSection(),
                       const SizedBox(height: 32),
@@ -96,3 +147,4 @@ class QuotationPage extends ConsumerWidget {
     );
   }
 }
+

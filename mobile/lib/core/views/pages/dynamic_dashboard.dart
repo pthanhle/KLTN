@@ -17,16 +17,20 @@ class DynamicDashboard extends ConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    switch (user.role) {
-      case 'SALES_EXECUTIVE':
+    switch (user.role.toLowerCase()) {
+      case 'sales_executive':
+      case 'sale':
         return const SalesDashboardPage();
-      case 'SERVICE_ADVISOR':
+      case 'service_advisor':
+      case 'advisor':
         return const AdvisorDashboardPage();
-      case 'LEAD_TECHNICIAN':
-      case 'TECHNICIAN':
+      case 'lead_technician':
+      case 'technician':
+      case 'service':
         return const TechDashboardPage();
-      case 'INVENTORY_MGR':
-      case 'WAREHOUSE_MANAGER':
+      case 'inventory_mgr':
+      case 'warehouse_manager':
+      case 'inventory':
         return const WarehouseDashboardPage();
       default:
         return Center(

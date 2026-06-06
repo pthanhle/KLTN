@@ -2,13 +2,11 @@ import { useState, useMemo, useCallback } from 'react';
 import { normalizeMediaGallery } from '../utils/media.util';
 
 export const useMediaGallery = (galleryData) => {
-    const [activeTab, setActiveTab] = useState('photos'); // 'photos' | 'videos'
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // Normalize data purely once when props change
     const normalizedData = useMemo(() => normalizeMediaGallery(galleryData), [galleryData]);
 
-    const galleryItems = activeTab === 'photos' ? normalizedData.photos : normalizedData.videos;
+    const galleryItems = normalizedData.photos;
     const hasItems = galleryItems.length > 0;
 
     const handleNext = useCallback(() => {
@@ -26,21 +24,12 @@ export const useMediaGallery = (galleryData) => {
         return (index + galleryItems.length) % galleryItems.length;
     }, [galleryItems.length, hasItems]);
 
-    const handleTabChange = useCallback((tab) => {
-        if (tab !== activeTab) {
-            setActiveTab(tab);
-            setCurrentIndex(0);
-        }
-    }, [activeTab]);
-
     return {
-        activeTab,
         currentIndex,
         galleryItems,
         handleNext,
         handlePrev,
         getSafeIndex,
-        handleTabChange,
         setCurrentIndex,
         hasItems
     };

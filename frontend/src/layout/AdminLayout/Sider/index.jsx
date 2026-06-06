@@ -1,16 +1,16 @@
-import { Layout, Menu as AntMenu, Image } from 'antd';
+import { Layout, Menu as AntMenu } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useLogoutMutation } from '../../../services/queries/auth.queries';
-import { CarFront, LogOut } from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 import { useSiderMenu } from './hooks/useSiderMenu';
 import BrandLogo from '@/assets/images/brand/logo.png';
 
 
 const { Sider: AntSider } = Layout;
 
-const Sider = ({ collapsed }) => {
+const Sider = ({ collapsed, onToggle }) => {
     const { t } = useTranslation('layout');
     const { isDarkMode } = useTheme();
     const { menuItems, handleMenuClick, selectedKey } = useSiderMenu(collapsed);
@@ -36,15 +36,31 @@ const Sider = ({ collapsed }) => {
         >
             <div className={`h-full flex flex-col justify-between overflow-hidden`}>
 
-                <div className={`h-20 flex items-center transition-all border-b ${collapsed ? 'justify-center px-0' : 'px-6'} ${isDarkMode ? 'border-white/5 bg-[#141416]' : 'border-slate-100 bg-white'}`}>
+                <div className={`h-20 flex items-center transition-all border-b ${collapsed ? 'justify-center px-0' : 'px-4'} ${isDarkMode ? 'border-white/5 bg-[#141416]' : 'border-slate-100 bg-white'}`}>
                     <div className="w-10 h-10 flex items-center justify-center shrink-0 transition-all duration-300 scale-110">
                         <img src={BrandLogo} alt="TT AUTO" className="w-full h-full object-contain [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.08))] dark:[filter:drop-shadow(0_0_2px_rgba(255,255,255,0.6))_drop-shadow(0_0_12px_rgba(255,255,255,0.15))] transition-all duration-300" />
                     </div>
                     {!collapsed && (
-                        <div className="flex flex-col ml-3 overflow-hidden transition-opacity duration-300 whitespace-nowrap">
+                        <div className="flex flex-col ml-3 overflow-hidden transition-opacity duration-300 whitespace-nowrap flex-1">
                             <span className={`text-xl font-black tracking-tighter uppercase italic leading-none ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>TT AUTO</span>
                             <span className="text-[9px] tracking-[0.2em] text-yellow-600 dark:text-premium-gold font-bold uppercase mt-1 leading-none">Premium Workshop</span>
                         </div>
+                    )}
+                    {!collapsed && (
+                        <button
+                            onClick={onToggle}
+                            className={`ml-auto p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-800'}`}
+                        >
+                            <Menu size={20} />
+                        </button>
+                    )}
+                    {collapsed && (
+                        <button
+                            onClick={onToggle}
+                            className={`mt-0 p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-800'}`}
+                        >
+                            <Menu size={20} />
+                        </button>
                     )}
                 </div>
 

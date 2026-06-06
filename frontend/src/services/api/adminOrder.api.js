@@ -21,4 +21,10 @@ export const adminOrderApi = {
         const response = await axiosClient.delete(`/admin/orders/${id}`);
         return response;
     },
+
+    // Returns list of active inventory staff for the reassign modal
+    getInventoryStaff: async () => {
+        const response = await axiosClient.get('/admin/orders/inventory-staff');
+        return response;
+    },
 };

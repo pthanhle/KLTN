@@ -11,8 +11,9 @@ import '../../constants/quotation_constants.dart';
 
 class TechnicianDiagnosisSection extends ConsumerWidget {
   final QuotationModel data;
+  final String orderId;
 
-  const TechnicianDiagnosisSection({super.key, required this.data});
+  const TechnicianDiagnosisSection({super.key, required this.data, required this.orderId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

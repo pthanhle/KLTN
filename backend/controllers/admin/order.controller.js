@@ -1,6 +1,8 @@
 import Order from '../../models/orderModel.js'
 import Part from '../../models/partModel.js'
 import User from '../../models/userModel.js'
+import Staff from '../../models/staffModel.js'
+import Role from '../../models/roleModel.js'
 import { loyaltyService } from '../../services/loyalty.service.js'
 import asyncHandler from 'express-async-handler'
 
@@ -69,11 +71,33 @@ export const getOrders = asyncHandler(async (req, res) => {
 export const getOrderById = asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id)
         .populate('user_id', 'full_name email phone address')
+        .populate({
+            path: 'assignment.assigned_staff_id',
+            select: 'user_id employeeId department',
+            populate: {
+                path: 'user_id',
+                select: 'full_name phone avatar',
+            },
+        })
         .lean()
 
     if (!order) {
         res.status(404)
         throw new Error('Đơn hàng không tồn tại')
+    }
+
+    // Transform nested populated staff to flat shape for frontend
+    if (order.assignment?.assigned_staff_id && typeof order.assignment.assigned_staff_id === 'object') {
+        const staffDoc = order.assignment.assigned_staff_id
+        const userDoc = staffDoc.user_id || {}
+        order.assignment.assigned_staff_id = {
+            _id: staffDoc._id,
+            employeeId: staffDoc.employeeId,
+            department: staffDoc.department || 'Logistics',
+            fullName: userDoc.full_name || 'N/A',
+            avatarUrl: userDoc.avatar || null,
+            phone: userDoc.phone || 'N/A',
+        }
     }
 
     res.json(order)
@@ -191,7 +215,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
 
 export const updateOrder = asyncHandler(async (req, res) => {
-    const { order_status, payment_status, tracking_info, invoice_url } = req.body
+    const { order_status, payment_status, tracking_info, invoice_url, staff_id, cancel_reason } = req.body
 
     const order = await Order.findById(req.params.id)
     if (!order) {
@@ -253,6 +277,28 @@ export const updateOrder = asyncHandler(async (req, res) => {
 
     if (invoice_url) order.invoice_url = invoice_url
 
+    if (cancel_reason !== undefined) {
+        order.cancel_reason = cancel_reason
+    }
+
+    // Assign packing staff (pass staff_id = null to unassign)
+    if (staff_id !== undefined) {
+        if (staff_id === null) {
+            order.assignment = null
+        } else {
+            const staff = await Staff.findById(staff_id)
+            if (!staff) {
+                res.status(404)
+                throw new Error('Nhân viên không tồn tại')
+            }
+            order.assignment = {
+                assigned_staff_id: staff._id,
+                assigned_at: new Date(),
+                assigned_by: req.user._id,
+            }
+        }
+    }
+
     const updated = await order.save()
     res.json({ message: 'Cập nhật đơn hàng thành công', order: updated })
 })
@@ -273,4 +319,38 @@ export const deleteOrder = asyncHandler(async (req, res) => {
 
     await order.deleteOne()
     res.json({ message: 'Xóa đơn hàng thành công' })
+})
+
+
+
+export const getInventoryStaff = asyncHandler(async (req, res) => {
+    const inventoryRole = await Role.findOne({ role_name: 'inventory' }).lean()
+    if (!inventoryRole) return res.json([])
+
+    const users = await User.find({ role_id: inventoryRole._id }).select('_id full_name phone avatar').lean()
+    if (!users.length) return res.json([])
+
+    const userMap = Object.fromEntries(users.map(u => [u._id.toString(), u]))
+
+    const staffList = await Staff.find({
+        user_id: { $in: users.map(u => u._id) },
+        status: 'ACTIVE',
+    }).select('user_id employeeId department performance').lean()
+
+    const result = staffList.map(s => {
+        const user = userMap[s.user_id?.toString()] || {}
+        const todoCount = s.performance?.kanban?.todo?.length || 0
+        const inProgressCount = s.performance?.kanban?.inProgress?.length || 0
+        return {
+            _id: s._id,
+            fullName: user.full_name || 'N/A',
+            avatarUrl: user.avatar || null,
+            phone: user.phone || 'N/A',
+            employeeId: s.employeeId,
+            department: s.department || 'Logistics',
+            workloadCount: todoCount + inProgressCount,
+        }
+    })
+
+    res.json(result)
 })

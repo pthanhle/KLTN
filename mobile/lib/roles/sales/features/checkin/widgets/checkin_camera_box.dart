@@ -1,23 +1,23 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class CheckInCameraBox extends StatelessWidget {
-  final String? imagePath;
+  final Uint8List? imageBytes;
   final VoidCallback onTap;
 
   const CheckInCameraBox({
     super.key,
-    required this.imagePath,
+    required this.imageBytes,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasImage = imagePath != null;
+    final hasImage = imageBytes != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +41,7 @@ class CheckInCameraBox extends StatelessWidget {
             width: double.infinity,
             alignment: Alignment.center,
             decoration: ShapeDecoration(
-              color: hasImage 
+              color: hasImage
                   ? theme.colorScheme.surface.withValues(alpha: 0.1)
                   : theme.colorScheme.surface.withValues(alpha: 0.25),
               shape: SmoothRectangleBorder(
@@ -49,39 +49,41 @@ class CheckInCameraBox extends StatelessWidget {
                 side: BorderSide(
                   color: hasImage
                       ? theme.colorScheme.primary.withValues(alpha: 0.8)
-                      : theme.colorScheme.surface.withValues(alpha: 0.5), // Specular highlight
+                      : theme.colorScheme.surface.withValues(alpha: 0.5),
                   width: hasImage ? 1.5 : 0.5,
                 ),
               ),
-              image: hasImage ? DecorationImage(
-                image: FileImage(File(imagePath!)),
-                fit: BoxFit.cover,
-                opacity: 0.8,
-              ) : null,
+              image: hasImage
+                  ? DecorationImage(
+                      image: MemoryImage(imageBytes!),
+                      fit: BoxFit.cover,
+                      opacity: 0.8,
+                    )
+                  : null,
             ),
-            child: hasImage 
-              ? Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check_rounded, color: Colors.white, size: 24),
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.camera_alt_rounded, color: theme.colorScheme.primary, size: 28),
-                    const SizedBox(height: 12),
-                    Text(
-                      tr('Chụp/Tải lên mặt trước Bằng Lái'),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
-                      ),
+            child: hasImage
+                ? Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
                     ),
-                  ],
-                ),
+                    child: const Icon(Icons.check_rounded, color: Colors.white, size: 24),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.camera_alt_rounded, color: theme.colorScheme.primary, size: 28),
+                      const SizedBox(height: 12),
+                      Text(
+                        tr('Chụp/Tải lên mặt trước Bằng Lái'),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ],

@@ -8,6 +8,7 @@ import 'package:figma_squircle/figma_squircle.dart';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../../shared/widgets/buttons/glass_nav_back_button.dart';
 import '../../../../../shared/widgets/buttons/glass_menu_button.dart';
+import '../../../../../shared/widgets/toast/glass_toast.dart';
 import '../controllers/supplement_controller.dart';
 import '../widgets/shared/supplement_skeleton.dart';
 import '../widgets/shared/glass_warning_banner.dart';
@@ -18,17 +19,56 @@ import '../widgets/sections/supplement_actions/supplement_add_part_button.dart';
 import '../widgets/sections/supplement_actions/supplement_add_labor_button.dart';
 import '../widgets/sections/timeline_impact_section.dart';
 import '../constants/supplement_constants.dart';
-import '../widgets/shared/vibrant_liquid_button.dart';
 
-class SupplementApprovalPage extends ConsumerWidget {
+class SupplementApprovalPage extends ConsumerStatefulWidget {
   final String supplementId;
 
   const SupplementApprovalPage({super.key, required this.supplementId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SupplementApprovalPage> createState() => _SupplementApprovalPageState();
+}
+
+class _SupplementApprovalPageState extends ConsumerState<SupplementApprovalPage> {
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(supplementControllerProvider.notifier).init(widget.supplementId);
+    });
+  }
+
+  Future<void> _handleAction(String action) async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+    try {
+      await ref.read(supplementControllerProvider.notifier).resolve(action);
+      if (mounted) {
+        GlassToast.show(
+          context,
+          title: action == 'APPROVED' ? 'Đã duyệt bổ sung'.tr() : 'Đã từ chối bổ sung'.tr(),
+          icon: action == 'APPROVED' ? CupertinoIcons.check_mark_circled : CupertinoIcons.xmark_circle,
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        GlassToast.show(
+          context,
+          title: e.toString().replaceFirst('Exception: ', ''),
+          icon: CupertinoIcons.xmark_circle,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(supplementControllerProvider);
-    final controller = ref.read(supplementControllerProvider.notifier);
     final theme = Theme.of(context);
     final bottomSafeArea = MediaQuery.of(context).padding.bottom;
 
@@ -72,27 +112,27 @@ class SupplementApprovalPage extends ConsumerWidget {
                     ),
                   ),
                 ),
-                
+
                 state.when(
                   loading: () => const SliverFillRemaining(
                     child: SupplementSkeleton(),
                   ),
                   error: (error, stack) => SliverFillRemaining(
-                    child: Center(child: Text('Đã xảy ra lỗi'.tr())),
+                    child: Center(child: Text('Đã xảy ra lỗi: $error')),
                   ),
                   data: (data) => SliverPadding(
-                    padding: const EdgeInsets.only(
-                      left: SupplementConstants.pagePaddingX, 
-                      right: SupplementConstants.pagePaddingX, 
-                      bottom: SupplementConstants.pagePaddingBottom,
+                    padding: EdgeInsets.only(
+                      left: SupplementConstants.pagePaddingX,
+                      right: SupplementConstants.pagePaddingX,
+                      bottom: SupplementConstants.pagePaddingBottom + 100,
                     ),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
                         const SizedBox(height: 8),
                         GlassWarningBanner(
                           icon: CupertinoIcons.exclamationmark_triangle_fill,
-                          title: 'LỆNH ĐANG TẠM DỪNG'.tr(),
-                          subtitle: 'Cần duyệt gấp để tiếp tục sửa chữa'.tr(),
+                          title: 'YÊU CẦU BỔ SUNG'.tr(),
+                          subtitle: 'KTV yêu cầu bổ sung vật tư / công việc'.tr(),
                         ),
                         const SizedBox(height: SupplementConstants.sectionSpacing),
                         SupplementIssueSection(
@@ -165,15 +205,31 @@ class SupplementApprovalPage extends ConsumerWidget {
                           left: SupplementConstants.cardPadding,
                           right: SupplementConstants.cardPadding,
                           top: 16,
-                          bottom: bottomSafeArea > 0
-                              ? bottomSafeArea
-                              : SupplementConstants.cardPadding,
+                          bottom: bottomSafeArea > 0 ? bottomSafeArea : SupplementConstants.cardPadding,
                         ),
-                        child: VibrantLiquidButton(
-                          text: 'Gửi Yêu Cầu Duyệt Bổ Sung'.tr(),
-                          icon: CupertinoIcons.paperplane_fill,
-                          onPressed: () => controller.submitApproval(),
-                          isLoading: state.isLoading,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _ActionButton(
+                                label: 'Từ Chối'.tr(),
+                                icon: CupertinoIcons.xmark_circle_fill,
+                                color: theme.colorScheme.error,
+                                isLoading: _isSubmitting,
+                                onPressed: () => _handleAction('REJECTED'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              flex: 2,
+                              child: _ActionButton(
+                                label: 'Duyệt Bổ Sung'.tr(),
+                                icon: CupertinoIcons.check_mark_circled_solid,
+                                color: theme.colorScheme.primary,
+                                isLoading: _isSubmitting,
+                                onPressed: () => _handleAction('APPROVED'),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -181,6 +237,47 @@ class SupplementApprovalPage extends ConsumerWidget {
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final bool isLoading;
+  final VoidCallback? onPressed;
+
+  const _ActionButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return FilledButton.icon(
+      onPressed: isLoading ? null : onPressed,
+      style: FilledButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+        ),
+      ),
+      icon: isLoading
+          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          : Icon(icon, size: 18, color: Colors.white),
+      label: Text(
+        label,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

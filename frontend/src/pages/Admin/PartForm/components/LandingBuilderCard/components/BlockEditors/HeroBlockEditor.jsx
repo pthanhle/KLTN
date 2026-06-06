@@ -1,12 +1,11 @@
 import React from 'react';
-import { Upload } from 'antd';
-import { CloudUpload } from 'lucide-react';
 import { useWatch } from 'react-hook-form';
 import FormInput from '../../../ui/FormInput';
 import FormSelect from '../../../ui/FormSelect';
+import ImageUploadField from '../../../ui/ImageUploadField';
 import { getAlignOptions } from '../../constants/index.jsx';
 
-const HeroBlockEditor = ({ control, index, handleImageUpload, t }) => {
+const HeroBlockEditor = ({ control, index, t }) => {
     const blockData = useWatch({ control, name: `landing_blocks.${index}` }) || {};
 
     return (
@@ -28,30 +27,17 @@ const HeroBlockEditor = ({ control, index, handleImageUpload, t }) => {
                     </div>
                 </div>
                 <div className="space-y-4">
-                    <div>
-                        <div className="flex items-center justify-between mb-2">
-                            <label className="block text-[10px] uppercase tracking-widest text-slate-500 font-bold select-none">
-                                {t('adminPartForm:lblImgUrl')}
-                            </label>
-                            <Upload
-                                accept="image/*"
-                                showUploadList={false}
-                                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
-                                onChange={(info) => handleImageUpload(index, info)}
-                            >
-                                <button type="button" className="text-[10px] flex items-center gap-1 font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
-                                    <CloudUpload size={12} /> {t('adminPartForm:btnUploadImg')}
-                                </button>
-                            </Upload>
-                        </div>
-                        <FormInput name={`landing_blocks.${index}.image_url`} control={control} placeholder={t('adminPartForm:phImgUrl')} />
-                    </div>
+                    <ImageUploadField
+                        name={`landing_blocks.${index}.image_url`}
+                        control={control}
+                        label={t('adminPartForm:lblImgUrl')}
+                    />
                     <div>
                         <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-2 font-bold select-none">
                             {t('adminPartForm:lblAlign')}
                         </label>
-                        <FormSelect 
-                            name={`landing_blocks.${index}.align`} 
+                        <FormSelect
+                            name={`landing_blocks.${index}.align`}
                             control={control}
                             options={getAlignOptions(t)}
                         />
@@ -60,17 +46,23 @@ const HeroBlockEditor = ({ control, index, handleImageUpload, t }) => {
             </div>
 
             {/* Live Visual Preview */}
-            <div className="xl:col-span-5 relative w-full h-[220px] rounded-2xl bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/5 overflow-hidden group shadow-sm flex">
-                <div className={`w-full h-full flex flex-col justify-center px-8 relative z-10 text-slate-900 dark:text-white ${blockData.align === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
+            <div className="xl:col-span-5 relative w-full h-[220px] rounded-2xl overflow-hidden group shadow-sm flex">
+                {blockData.image_url && (
+                    <div
+                        className="absolute inset-0 bg-cover bg-center z-0"
+                        style={{ backgroundImage: `url(${blockData.image_url})` }}
+                    />
+                )}
+                <div className={`absolute inset-0 ${blockData.image_url ? 'bg-black/40' : 'bg-white dark:bg-[#141416]'} z-0`} />
+                <div className={`w-full h-full flex flex-col justify-center px-8 relative z-10 ${blockData.image_url ? 'text-white' : 'text-slate-900 dark:text-white'} ${blockData.align === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
                     <h4 className="font-bold text-xl leading-tight mb-2">
                         {blockData.title || t('adminPartForm:phH2Title')}
                     </h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3">
+                    <p className="text-sm opacity-80 line-clamp-3">
                         {blockData.subtitle || t('adminPartForm:phSubtitle')}
                     </p>
                 </div>
-                
-                {/* Live Preview Badge */}
+
                 <div className="absolute top-3 left-3 bg-indigo-500 text-white text-[9px] uppercase tracking-widest px-2 py-1 rounded-md font-bold z-20 shadow-lg">
                     {t('adminPartForm:livePreview')}
                 </div>

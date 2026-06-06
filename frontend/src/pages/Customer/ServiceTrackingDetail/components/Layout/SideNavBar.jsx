@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Button } from 'antd';
-import { TRACKING_MENU_ITEMS } from '../../constants/trackingDetailConstants';
+import { Image, Tooltip } from 'antd';
+import { Loader2 } from 'lucide-react';
+import { TRACKING_MENU_ITEMS, isTabAccessible } from '../../constants/trackingDetailConstants';
 
-const SideNavBar = ({ technician, activeTab, setActiveTab }) => {
+const SideNavBar = ({ technician, activeTab, setActiveTab, repairStatus = 'RECEIVED' }) => {
     const { t } = useTranslation('tracking');
 
     return (
@@ -12,23 +13,42 @@ const SideNavBar = ({ technician, activeTab, setActiveTab }) => {
                 <h1 className="text-lg font-bold text-slate-900 dark:text-white">{t('portal_title', 'Service Portal')}</h1>
                 <p className=" uppercase tracking-[0.1em] text-xs text-slate-500 dark:text-[#d3c5ac]">{t('portal_subtitle', 'Elite Performance Hub')}</p>
             </div>
-            
+
             <nav className="flex-1 space-y-2">
                 {TRACKING_MENU_ITEMS.map((item) => {
                     const Icon = item.icon;
                     const isActive = item.id === activeTab;
+                    const accessible = isTabAccessible(item.minStatus, repairStatus);
+
+                    if (!accessible) {
+                        return (
+                            <Tooltip
+                                key={item.id}
+                                title={t('tab_not_ready', 'Công đoạn này chưa đến lượt')}
+                                placement="right"
+                            >
+                                <div className="w-full flex items-center gap-4 px-4 py-3 rounded-full cursor-not-allowed opacity-40 select-none">
+                                    <Loader2 className="w-5 h-5 animate-spin text-slate-400 dark:text-slate-500 shrink-0" />
+                                    <span className="uppercase tracking-[0.1em] text-xs text-slate-400 dark:text-slate-500">
+                                        {t(item.labelKey, item.defaultLabel)}
+                                    </span>
+                                </div>
+                            </Tooltip>
+                        );
+                    }
+
                     return (
-                        <button 
-                            key={item.id} 
+                        <button
+                            key={item.id}
                             onClick={() => setActiveTab(item.id)}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-full transition-all group ${
-                                isActive 
-                                    ? 'bg-yellow-100 dark:bg-[#eab308]/10 text-yellow-700 dark:text-[#ffd165] translate-x-1 shadow-sm' 
+                                isActive
+                                    ? 'bg-yellow-100 dark:bg-[#eab308]/10 text-yellow-700 dark:text-[#ffd165] translate-x-1 shadow-sm'
                                     : 'text-slate-500 dark:text-[#d3c5ac] hover:bg-slate-100 dark:hover:bg-[#191f31]'
                             }`}
                         >
                             <Icon className={`w-5 h-5 ${isActive ? 'fill-current opacity-20' : ''}`} />
-                            <span className={` uppercase tracking-[0.1em] text-xs ${isActive ? 'font-bold' : ''}`}>
+                            <span className={`uppercase tracking-[0.1em] text-xs ${isActive ? 'font-bold' : ''}`}>
                                 {t(item.labelKey, item.defaultLabel)}
                             </span>
                         </button>
@@ -40,11 +60,11 @@ const SideNavBar = ({ technician, activeTab, setActiveTab }) => {
                 <div className="mt-auto pt-6 border-t border-slate-200 dark:border-white/10 px-4">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-[#2e3447] flex items-center justify-center overflow-hidden shrink-0">
-                            <Image 
-                                src={technician.avatar} 
-                                alt={technician.name} 
-                                preview={false} 
-                                className="w-full h-full object-cover" 
+                            <Image
+                                src={technician.avatar}
+                                alt={technician.name}
+                                preview={false}
+                                className="w-full h-full object-cover"
                             />
                         </div>
                         <div className="overflow-hidden">

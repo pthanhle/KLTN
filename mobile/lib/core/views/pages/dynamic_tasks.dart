@@ -14,8 +14,9 @@ class DynamicTasks extends ConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    switch (user.role) {
-      case 'SALES_EXECUTIVE':
+    switch (user.role.toLowerCase()) {
+      case 'sales_executive':
+      case 'sale':
         return const SalesTasksPage();
       default:
         return Scaffold(

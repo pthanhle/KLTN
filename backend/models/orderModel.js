@@ -82,6 +82,12 @@ const orderSchema = mongoose.Schema(
 
     items: { type: [itemsSchema], default: [] },
 
+    assignment: {
+      assigned_staff_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Staff', default: null },
+      assigned_at: { type: Date },
+      assigned_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    },
+
     invoice_url: { type: String, default: null },
 
     order_date: { type: Date, default: Date.now },

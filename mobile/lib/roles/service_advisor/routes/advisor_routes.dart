@@ -6,6 +6,7 @@ import '../features/appointments/views/advisor_appointments_page.dart';
 import '../features/walkaround/views/walkaround_page.dart';
 import '../features/quotation/views/quotation_page.dart';
 import '../features/supplement_approval/views/supplement_approval_page.dart';
+import '../features/qc/views/qc_page.dart';
 import '../../auth/views/pages/profile_page.dart';
 
 final StatefulShellRoute advisorRoutes = StatefulShellRoute.indexedStack(
@@ -43,6 +44,14 @@ final StatefulShellRoute advisorRoutes = StatefulShellRoute.indexedStack(
               parentNavigatorKey: RouterKeys.rootNavigatorKey,
               builder: (context, state) => SupplementApprovalPage(
                 supplementId: state.pathParameters['id'] ?? '',
+              ),
+            ),
+            GoRoute(
+              path: 'qc/:id',
+              name: 'advisor_qc',
+              parentNavigatorKey: RouterKeys.rootNavigatorKey,
+              builder: (context, state) => QcPage(
+                progressId: state.pathParameters['id'] ?? '',
               ),
             ),
           ],

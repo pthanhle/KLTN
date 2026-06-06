@@ -5,7 +5,7 @@ import { CalendarOutlined, ScheduleOutlined } from '@ant-design/icons';
 import { useBookingCardLogic } from './hooks/useBookingCardLogic';
 import { ClaimRequestGroup } from './components/ClaimRequestGroup';
 
-export const BookingCardUI = ({ booking, t, isDragging, style, setNodeRef, listeners, attributes }) => {
+export const BookingCardUI = ({ booking, t, isDragging, style, setNodeRef, listeners, attributes, onAssignFromRequest }) => {
     const {
         typeTheme,
         typeBadgeLabel,
@@ -63,12 +63,13 @@ export const BookingCardUI = ({ booking, t, isDragging, style, setNodeRef, liste
             <ClaimRequestGroup
                 requestedStaff={requestedStaff}
                 label={requestedClaimLabel}
+                onAssignStaff={onAssignFromRequest ? (staff) => onAssignFromRequest(booking, staff) : undefined}
             />
         </div>
     );
 };
 
-const BookingCard = ({ booking, t }) => {
+const BookingCard = ({ booking, t, onAssignFromRequest }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: booking._id,
         data: {
@@ -92,6 +93,7 @@ const BookingCard = ({ booking, t }) => {
             setNodeRef={setNodeRef}
             listeners={listeners}
             attributes={attributes}
+            onAssignFromRequest={onAssignFromRequest}
         />
     );
 };

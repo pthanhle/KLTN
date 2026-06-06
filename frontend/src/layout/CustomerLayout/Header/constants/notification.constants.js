@@ -1,8 +1,10 @@
+// These must match the backend notificationModel.js type enum
 export const NOTIFICATION_TYPES = {
-    SERVICE_UPDATE: 'SERVICE_UPDATE',
-    SYSTEM_ALERT: 'SYSTEM_ALERT',
+    BOOKING: 'BOOKING',
+    ORDER: 'ORDER',
+    SYSTEM: 'SYSTEM',
     PROMOTION: 'PROMOTION',
-    QUOTATION_WAITED: 'QUOTATION_WAITED',
+    MAINTENANCE: 'MAINTENANCE',
 };
 
 export const NOTIFICATION_STATUS = {

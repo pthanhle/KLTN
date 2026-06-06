@@ -30,7 +30,7 @@ const ChatSidebar = ({ sessions, currentSessionId, setCurrentSessionId, handleCr
                 ))}
             </div>
             
-            <UserProfile t={t} isLoading={false} />
+            <UserProfile t={t} />
         </aside>
     );
 };

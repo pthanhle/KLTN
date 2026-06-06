@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import '../../../models/hotspot_model.dart';
 import 'hotspot_pin.dart';
-import 'hotspot_camera_badge.dart';
 
 class HotspotImageBoard extends StatelessWidget {
   final String? imageUrl;
@@ -66,25 +65,20 @@ class HotspotImageBoard extends StatelessWidget {
                   ),
                 ),
 
-                ...hotspots.map((hotspot) {
+                ...hotspots.asMap().entries.map((entry) {
+                  final idx = entry.key;
+                  final hotspot = entry.value;
                   return Positioned(
-                    left: hotspot.x * constraints.maxWidth - 12,
-                    top: hotspot.y * constraints.maxHeight - 12,
+                    left: hotspot.x * constraints.maxWidth - 14,
+                    top: hotspot.y * constraints.maxHeight - 14,
                     child: HotspotPin(
+                      index: idx + 1,
                       onTap: () => onRemoveHotspot(hotspot.id),
                     ),
                   );
                 }),
 
-                Positioned(
-                  bottom: 16,
-                  right: 16,
-                  child: HotspotCameraBadge(
-                    onTap: () {
-                      // Xử lý mở camera sau
-                    },
-                  ),
-                ),
+
               ],
             );
           }

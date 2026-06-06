@@ -25,3 +25,22 @@ export const useAssignBookingMutation = () => {
         }
     });
 };
+
+export const useTestDriveBookingDetail = (id) => {
+    return useQuery({
+        queryKey: ['adminBookingDetail', id],
+        queryFn: () => bookingApi.fetchBookingById(id),
+        enabled: !!id,
+    });
+};
+
+export const useCreateTestDriveBookingMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (payload) => bookingApi.createBooking(payload),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['adminBookings'] });
+            queryClient.invalidateQueries({ queryKey: ['adminSalesStaff'] });
+        },
+    });
+};

@@ -74,16 +74,15 @@ export const mapFormToBookingPayload = (data, carId, isReschedule, rescheduleDat
 
     return {
         product_id: carId,
-        booking_type: 'vehicle',
+        booking_type: 'test_drive',
         test_drive_type: data.bookingType,
         showroom_branch: data.bookingType === 'showroom' ? data.showroomBranch : null,
         delivery_address: deliveryAddressObj,
-        full_name: data.fullName,
         contact_phone: data.phoneNumber,
         booking_date: data.selectedDate.format('YYYY-MM-DD'),
         time_slot: data.selectedTimeSlot,
-        has_driver_license: data.hasDriverLicense,
-        note: data.note,
+        has_driver_license: data.hasDriverLicense ?? false,
+        customer_note: data.note,
 
         is_reschedule: isReschedule,
         reschedule_reason: data.rescheduleReason || null,

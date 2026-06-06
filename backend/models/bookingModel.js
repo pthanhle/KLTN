@@ -63,7 +63,6 @@ const bookingSchema = mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     customer_info: { type: customerInfoSchema },
 
@@ -76,7 +75,7 @@ const bookingSchema = mongoose.Schema(
 
     product_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: 'Car',
       required: false,
     },
     vehicle_info: { type: vehicleInfoSchema },
@@ -90,6 +89,7 @@ const bookingSchema = mongoose.Schema(
       enum: ['showroom', 'home'],
       default: 'showroom',
     },
+    showroom_branch: { type: String },
     delivery_address: {
       type: mongoose.Schema.Types.Mixed, // Accept old strings OR new {street, ward, district, city} objects
     },
@@ -111,6 +111,20 @@ const bookingSchema = mongoose.Schema(
       ref: 'User',
     },
 
+    requested_staff: [
+      {
+        user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        requested_at: { type: Date, default: Date.now },
+        _id: false,
+      },
+    ],
+    priority: {
+      type: String,
+      enum: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'],
+      default: 'MEDIUM',
+    },
+    assignment_note: { type: String },
+
     booking_status: {
       type: String,
       enum: [
@@ -126,6 +140,16 @@ const bookingSchema = mongoose.Schema(
     status_text: { type: String },
 
     timeline: { type: [timelineStepSchema], default: [] },
+
+    // Committed before test drive (from client booking form)
+    has_driver_license: { type: Boolean, default: false },
+
+    // Test-drive checkin data (collected by sales staff on mobile)
+    driver_license_url: { type: String },
+    signature_url: { type: String },
+    // Post-drive evaluation
+    interest_level: { type: Number, min: 0, max: 2 },
+    evaluation_feedback: { type: String },
 
     customer_note: { type: String },
     reschedule_reason: { type: String },

@@ -1,14 +1,19 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ttauto_staff/roles/sales/features/tasks/widgets/controls/tasks_segmented_control.dart';
+import 'package:ttauto_staff/roles/sales/features/tasks/controllers/sales_tasks_controller.dart';
 import '../../../../../../core/utils/theme_extension.dart';
+import '../../../../../../shared/widgets/inputs/list_search_bar.dart';
 
-class TasksHeader extends StatelessWidget {
+class TasksHeader extends ConsumerWidget {
   const TasksHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(salesTasksControllerProvider.notifier);
+
     return Padding(
       padding: const EdgeInsets.only(top: 16, left: 24, right: 24, bottom: 8),
       child: Column(
@@ -24,6 +29,12 @@ class TasksHeader extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const TasksSegmentedControl(),
+          const SizedBox(height: 8),
+          ListSearchBar(
+            hintText: 'Tìm biển số, khách hàng...',
+            onChanged: controller.updateSearch,
+            padding: EdgeInsets.zero,
+          ),
         ],
       ),
     );

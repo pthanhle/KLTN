@@ -19,7 +19,7 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
                     <div>
                         <h3 className="text-lg font-bold text-slate-800 dark:text-white leading-none mb-1">{t('modal_assign_title')}</h3>
                         <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                            {assignmentData?.booking?.license_plate} • {assignmentData?.targetBay?.bay_id}
+                            {assignmentData?.booking?.license_plate} • {assignmentData?.targetBay?.name}
                         </p>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
                             size="large"
                             options={technicians.map(t => ({
                                 value: t._id,
-                                label: t.fullName,
+                                label: t.full_name,
                                 tech: t
                             }))}
                             optionRender={(option) => (
@@ -124,7 +124,7 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
                             maxTagCount="responsive"
                             options={technicians.map(t => ({
                                 value: t._id,
-                                label: t.fullName,
+                                label: t.full_name,
                                 tech: t
                             }))}
                             optionRender={(option) => (

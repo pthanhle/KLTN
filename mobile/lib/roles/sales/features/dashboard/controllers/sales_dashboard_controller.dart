@@ -1,21 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ttauto_staff/roles/auth/controllers/auth_controller.dart';
 import 'package:ttauto_staff/roles/sales/features/shared/constants/sales_constants.dart';
+import 'package:ttauto_staff/roles/sales/features/shared/data/test_drive_api_service.dart';
 import 'package:ttauto_staff/roles/sales/features/shared/models/test_drive_booking.dart';
-import 'package:ttauto_staff/roles/sales/features/shared/data/mocks/sales_mock_data.dart';
 
-// State class holding the dashboard data
 class SalesDashboardState {
   final bool isLoading;
   final String? error;
   final List<TestDriveBooking> todayBookings;
   final List<TestDriveBooking> poolBookings;
+  final Set<String> requestingJobIds;
 
   const SalesDashboardState({
     this.isLoading = false,
     this.error,
     this.todayBookings = const [],
     this.poolBookings = const [],
+    this.requestingJobIds = const {},
   });
 
   SalesDashboardState copyWith({
@@ -23,12 +23,14 @@ class SalesDashboardState {
     String? error,
     List<TestDriveBooking>? todayBookings,
     List<TestDriveBooking>? poolBookings,
+    Set<String>? requestingJobIds,
   }) {
     return SalesDashboardState(
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       todayBookings: todayBookings ?? this.todayBookings,
       poolBookings: poolBookings ?? this.poolBookings,
+      requestingJobIds: requestingJobIds ?? this.requestingJobIds,
     );
   }
 }
@@ -42,25 +44,19 @@ class SalesDashboardController extends Notifier<SalesDashboardState> {
 
   Future<void> _loadDashboardData() async {
     state = state.copyWith(isLoading: true, error: null);
-
     try {
-      // Giả lập API delay
-      await Future.delayed(const Duration(milliseconds: 800));
+      final results = await Future.wait([
+        testDriveApiService.fetchPool(),
+        testDriveApiService.fetchMyBookings(),
+      ]);
 
-      final currentUser = ref.read(authControllerProvider).value;
-      final currentUserId = currentUser?.id ?? '';
+      final pool = results[0] as List<TestDriveBooking>;
+      final myBookings = results[1] as List<TestDriveBooking>;
 
-      // Mock dữ liệu
-      final allBookings = List<TestDriveBooking>.from(globalTestDrivesMock);
-
-      // Filter "The Pool": status == Pending
-      final pool = allBookings.where((b) => b.status == BookingStatus.pending).toList();
-
-      // Filter "Hôm nay": Những booking đã Confirm/InProgress cho nhân viên hiện tại trong hôm nay
-      // Để mock, ta lấy những booking assignedStaff == currentUserId
-      final today = allBookings.where((b) {
-        return b.assignedStaff?.id == currentUserId &&
-            (b.status == BookingStatus.confirmed || b.status == BookingStatus.inProgress);
+      final today = myBookings.where((b) {
+        return b.status == BookingStatus.confirmed ||
+            b.status == BookingStatus.inProgress ||
+            b.status == BookingStatus.received;
       }).toList();
 
       state = state.copyWith(
@@ -74,45 +70,30 @@ class SalesDashboardController extends Notifier<SalesDashboardState> {
   }
 
   Future<void> requestJob(String bookingId) async {
-    // 1. Loading state on a specific job (could add specific loading array, but full reload is fine for mock)
+    // Optimistic: mark as requesting
+    state = state.copyWith(
+      requestingJobIds: {...state.requestingJobIds, bookingId},
+    );
     try {
-      // Mock API Call delay
-      await Future.delayed(const Duration(seconds: 1));
-
-      final currentUser = ref.read(authControllerProvider).value;
-      if (currentUser == null) return;
-
-      // Update the mock data
-      final index = globalTestDrivesMock.indexWhere((b) => b.id == bookingId);
-      if (index != -1) {
-        final booking = globalTestDrivesMock[index];
-        final currentRequests = List<RequestedStaff>.from(booking.requestedStaff ?? []);
-        
-        // Kiểm tra xem đã ứng cử chưa
-        if (!currentRequests.any((r) => r.id == currentUser.id)) {
-          currentRequests.add(RequestedStaff(
-            id: currentUser.id,
-            fullName: currentUser.fullName,
-            avatarUrl: currentUser.avatarUrl,
-          ));
-
-          final updatedBooking = booking.copyWith(requestedStaff: currentRequests);
-          globalTestDrivesMock[index] = updatedBooking;
-
-          // Cập nhật State nội bộ để UI render lại ngay lập tức
-          final updatedPool = List<TestDriveBooking>.from(state.poolBookings);
-          final poolIndex = updatedPool.indexWhere((b) => b.id == bookingId);
-          if (poolIndex != -1) {
-            updatedPool[poolIndex] = updatedBooking;
-          }
-          state = state.copyWith(poolBookings: updatedPool);
-        }
-      }
+      await testDriveApiService.requestJob(bookingId);
+      // Reload pool to get updated requestedStaff list
+      final pool = await testDriveApiService.fetchPool();
+      final newRequestingIds = Set<String>.from(state.requestingJobIds)
+        ..remove(bookingId);
+      state = state.copyWith(
+        poolBookings: pool,
+        requestingJobIds: newRequestingIds,
+      );
     } catch (e) {
-      state = state.copyWith(error: "Không thể yêu cầu nhận việc: $e");
+      final newRequestingIds = Set<String>.from(state.requestingJobIds)
+        ..remove(bookingId);
+      state = state.copyWith(
+        error: 'Không thể yêu cầu nhận việc: $e',
+        requestingJobIds: newRequestingIds,
+      );
     }
   }
-  
+
   Future<void> refresh() async {
     await _loadDashboardData();
   }

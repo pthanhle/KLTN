@@ -20,6 +20,7 @@ import { ensureConfigured } from './config/cloudinary.js'
 import { initSocket } from './config/socket.js'
 import './workers/emailWorker.js'
 import './workers/imageWorker.js'
+import './workers/maintenanceReminderWorker.js'
 
 import adminIndexRoutes from './routes/admin/index.route.js'
 import clientIndexRoutes from './routes/client/index.route.js'
@@ -42,7 +43,9 @@ const server = http.createServer(app)
 initSocket(server)
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.NODE_ENV === 'production' 
+    ? (process.env.FRONTEND_URL || 'http://localhost:3000')
+    : true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -53,7 +56,7 @@ app.use(cookieParser())
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 
 app.use('/api/admin', adminIndexRoutes)
 app.use('/api/client', clientIndexRoutes)

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { identitySchema } from '../schemas/editComplianceSchema';
-import { updateMockCompliance } from '../data/mockComplianceData';
+import { AdminStaffAPI } from '@/services/api/adminStaff.api';
 import { message } from 'antd';
 
 export const useIdentityForm = (staffId, data, t, onUpdateSuccess) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const queryClient = useQueryClient();
 
     const methods = useForm({
         resolver: zodResolver(identitySchema),
@@ -18,35 +20,39 @@ export const useIdentityForm = (staffId, data, t, onUpdateSuccess) => {
             dob: data?.dob || '',
             pob: data?.pob || '',
             permanentAddress: data?.permanentAddress || '',
-            currentAddress: data?.currentAddress || ''
+            currentAddress: data?.currentAddress || '',
         }
     });
 
     const { reset, handleSubmit } = methods;
+
+    const handleEditClick = () => {
+        reset({
+            idNumber: data?.idNumber || '',
+            issueDate: data?.issueDate || '',
+            issuePlace: data?.issuePlace || '',
+            dob: data?.dob || '',
+            pob: data?.pob || '',
+            permanentAddress: data?.permanentAddress || '',
+            currentAddress: data?.currentAddress || '',
+        });
+        setIsEditing(true);
+    };
 
     const handleCancel = () => {
         reset();
         setIsEditing(false);
     };
 
-    const handleEditClick = () => setIsEditing(true);
-
     const submitForm = async (values) => {
         setIsSubmitting(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 600));
-            
-            const updatedData = updateMockCompliance(staffId, { identity: values });
-            
-            message.success({
-                content: t('adminStaffCompliance:msg_update_success', 'Cập nhật thông tin thành công!'),
-                duration: 2
-            });
-            
-            if(onUpdateSuccess) onUpdateSuccess(updatedData);
+            await AdminStaffAPI.updateCompliance(staffId, { identity: values });
+            message.success({ content: t('adminStaffCompliance:msg_update_success', 'Cập nhật thông tin thành công!'), duration: 2 });
+            queryClient.invalidateQueries({ queryKey: ['admin-staff-compliance', staffId] });
             setIsEditing(false);
         } catch (error) {
-            message.error(t('adminStaffCompliance:msg_update_error', 'Lỗi khi cập nhật dữ liệu.'));
+            message.error(error?.response?.data?.message || t('adminStaffCompliance:msg_update_error', 'Lỗi khi cập nhật dữ liệu.'));
         } finally {
             setIsSubmitting(false);
         }

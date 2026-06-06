@@ -19,7 +19,7 @@ abstract class CsatMetric with _$CsatMetric {
   const factory CsatMetric({
     required double score,
     required int totalReviews,
-    required String percentile,
+    String? percentile,
   }) = _CsatMetric;
 
   factory CsatMetric.fromJson(Map<String, dynamic> json) =>

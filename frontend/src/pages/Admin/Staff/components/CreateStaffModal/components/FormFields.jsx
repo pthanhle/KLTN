@@ -1,8 +1,10 @@
 import React from 'react';
 import { Input, Select } from 'antd';
-import { User, Mail, Phone, Briefcase, Building } from 'lucide-react';
+import { User, Mail, Phone, Briefcase, Building2 } from 'lucide-react';
 import { Controller } from 'react-hook-form';
-import { ROLE_OPTIONS, DEPARTMENT_OPTIONS } from '../../../constants/createStaffConstants';
+import { useQuery } from '@tanstack/react-query';
+import { ROLE_OPTIONS } from '../../../constants/createStaffConstants';
+import { AdminStaffAPI } from '@/services/api/adminStaff.api';
 
 const FieldWrapper = ({ label, error, children }) => (
     <div className="flex flex-col gap-1.5 mb-5">
@@ -15,6 +17,14 @@ const FieldWrapper = ({ label, error, children }) => (
 );
 
 export const StaffFormFields = ({ t, control, errors }) => {
+    const { data: deptData } = useQuery({
+        queryKey: ['admin-staff-departments'],
+        queryFn: () => AdminStaffAPI.getDepartments(),
+        staleTime: 5 * 60 * 1000,
+    });
+
+    const departmentOptions = (deptData?.departments || []).map(d => ({ value: d, label: d }));
+
     return (
         <div className="flex flex-col mt-6">
             <Controller
@@ -65,41 +75,44 @@ export const StaffFormFields = ({ t, control, errors }) => {
                 )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-                <Controller
-                    name="department"
-                    control={control}
-                    render={({ field }) => (
-                        <FieldWrapper label={t('adminStaffCreate:label_department', 'Phòng ban')} error={errors.department}>
-                            <Select
-                                {...field}
-                                placeholder={t('adminStaffCreate:placeholder_department', 'Chọn phòng ban...')}
-                                className={`h-11 [&>.ant-select-selector]:!rounded-lg dark:[&>.ant-select-selector]:!bg-[#141416] dark:[&_.ant-select-selection-item]:!text-white ${errors.department ? '[&>.ant-select-selector]:!border-red-500' : 'dark:[&>.ant-select-selector]:!border-white/10'}`}
-                                options={DEPARTMENT_OPTIONS}
-                                suffixIcon={<Building size={16} className="text-slate-400" />}
-                                status={errors.department ? 'error' : ''}
-                            />
-                        </FieldWrapper>
-                    )}
-                />
+            <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                    <FieldWrapper label={t('adminStaffCreate:label_role', 'Vai trò (Chức vụ)')} error={errors.role}>
+                        <Select
+                            {...field}
+                            placeholder={t('adminStaffCreate:placeholder_role', 'Chọn vai trò...')}
+                            className={`h-11 [&>.ant-select-selector]:!rounded-lg dark:[&>.ant-select-selector]:!bg-[#141416] dark:[&_.ant-select-selection-item]:!text-white ${errors.role ? '[&>.ant-select-selector]:!border-red-500' : 'dark:[&>.ant-select-selector]:!border-white/10'}`}
+                            options={ROLE_OPTIONS}
+                            suffixIcon={<Briefcase size={16} className="text-slate-400" />}
+                            status={errors.role ? 'error' : ''}
+                        />
+                    </FieldWrapper>
+                )}
+            />
 
-                <Controller
-                    name="role"
-                    control={control}
-                    render={({ field }) => (
-                        <FieldWrapper label={t('adminStaffCreate:label_role', 'Vai trò (Chức vụ)')} error={errors.role}>
-                            <Select
-                                {...field}
-                                placeholder={t('adminStaffCreate:placeholder_role', 'Chọn vai trò...')}
-                                className={`h-11 [&>.ant-select-selector]:!rounded-lg dark:[&>.ant-select-selector]:!bg-[#141416] dark:[&_.ant-select-selection-item]:!text-white ${errors.role ? '[&>.ant-select-selector]:!border-red-500' : 'dark:[&>.ant-select-selector]:!border-white/10'}`}
-                                options={ROLE_OPTIONS}
-                                suffixIcon={<Briefcase size={16} className="text-slate-400" />}
-                                status={errors.role ? 'error' : ''}
-                            />
-                        </FieldWrapper>
-                    )}
-                />
-            </div>
+            <Controller
+                name="department"
+                control={control}
+                render={({ field }) => (
+                    <FieldWrapper label={t('adminStaffCreate:label_department', 'Phòng ban')} error={errors.department}>
+                        <Select
+                            {...field}
+                            placeholder={t('adminStaffCreate:placeholder_department', 'Chọn hoặc nhập phòng ban...')}
+                            className="h-11 [&>.ant-select-selector]:!rounded-lg dark:[&>.ant-select-selector]:!bg-[#141416] dark:[&_.ant-select-selection-item]:!text-white dark:[&>.ant-select-selector]:!border-white/10"
+                            options={departmentOptions}
+                            suffixIcon={<Building2 size={16} className="text-slate-400" />}
+                            mode="combobox"
+                            allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option?.label?.toLowerCase().includes(input.toLowerCase())
+                            }
+                        />
+                    </FieldWrapper>
+                )}
+            />
         </div>
     );
 };

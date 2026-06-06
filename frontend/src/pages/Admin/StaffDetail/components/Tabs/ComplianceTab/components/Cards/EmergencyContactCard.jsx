@@ -1,7 +1,7 @@
 import React from 'react';
 import { Phone, Edit2, Check, X } from 'lucide-react';
 import { Controller } from 'react-hook-form';
-import { Button, Input, Form } from 'antd';
+import { Button, Input } from 'antd';
 import { useEmergencyForm } from '../../hooks/useEmergencyForm';
 import { InfoRow, FieldWrapper } from '../Shared/FormHelpers';
 
@@ -39,7 +39,7 @@ const EmergencyContactCard = ({ staffId, data, t, onUpdateSuccess }) => {
             </div>
 
             {isEditing ? (
-                <Form component="form" onSubmit={handleEditSubmit} className="animate-fade-in flex flex-col">
+                <form onSubmit={handleEditSubmit} className="animate-fade-in flex flex-col">
                     <Controller name="contactName" control={control} render={({ field }) => (
                         <FieldWrapper label={t('adminStaffCompliance:label_contact_name', 'Họ và tên')} error={errors.contactName}>
                             <Input {...field} className="h-11 rounded-lg border-slate-200 dark:border-white/10 hover:border-yellow-500 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 transition-all dark:bg-[#141416] dark:text-white" />
@@ -88,7 +88,7 @@ const EmergencyContactCard = ({ staffId, data, t, onUpdateSuccess }) => {
                             {isSubmitting ? t('adminStaffCompliance:btn_saving', 'Đang lưu...') : t('adminStaffCompliance:btn_save', 'Lưu thay đổi')}
                         </button>
                     </div>
-                </Form>
+                </form>
             ) : (
                 <div className="flex flex-col animate-fade-in">
                     <InfoRow label={t('adminStaffCompliance:label_contact_name', 'Họ và tên')}>

@@ -61,31 +61,51 @@ export const getColumns = (t, navigate) => [
         render: (status) => <StatusIndicator status={status} />
     },
     {
-        title: t('adminStaff:colSalary', 'Lương cơ bản'),
-        dataIndex: 'baseSalary',
-        key: 'baseSalary',
-        width: 180,
-        render: (salary) => (
-            <span className="font-mono text-slate-900 dark:text-white text-base whitespace-nowrap">
-                ${salary?.toLocaleString()}
-                <span className="text-slate-500 dark:text-[#d3c5ac] text-xs">/mo</span>
-            </span>
-        )
-    },
-    {
         title: t('adminStaff:colKpi', 'Cấu trúc KPI'),
         dataIndex: 'compensation',
         key: 'kpi',
-        width: 200,
+        width: 220,
         render: (_, record) => {
-            const { kpiType, kpiValue } = record;
-            if (kpiType === 'FLAT_RATE') {
-                return <span className="text-slate-600 dark:text-[#d3c5ac] whitespace-nowrap font-medium">{t('adminStaff:kpi_flat_rate', { rate: `$${kpiValue}` })}</span>;
-            }
-            if (kpiType === 'COMMISSION') {
-                return <span className="text-slate-600 dark:text-[#d3c5ac] whitespace-nowrap font-medium">{t('adminStaff:kpi_commission', { rate: kpiValue })}</span>;
-            }
-            return <span className="text-slate-600 dark:text-[#d3c5ac] whitespace-nowrap font-medium">{t('adminStaff:kpi_salary_only', 'Salary Only')}</span>;
+            const { kpiType, kpiValue, isOvertimeEligible } = record;
+
+            const kpiConfig = {
+                COMMISSION: {
+                    label: 'Hoa hồng',
+                    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30',
+                    value: kpiValue ? `${kpiValue}%` : null,
+                },
+                FLAT_RATE: {
+                    label: 'Cố định',
+                    badge: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30',
+                    value: kpiValue ? `${kpiValue?.toLocaleString()}đ` : null,
+                },
+                SALARY_ONLY: {
+                    label: 'Lương thuần',
+                    badge: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10',
+                    value: null,
+                },
+            };
+
+            const config = kpiConfig[kpiType] || kpiConfig['SALARY_ONLY'];
+
+            return (
+                <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${config.badge}`}>
+                            {config.label}
+                        </span>
+                        {config.value && (
+                            <span className="text-slate-900 dark:text-white font-semibold text-sm font-mono">{config.value}</span>
+                        )}
+                    </div>
+                    {isOvertimeEligible && (
+                        <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block shrink-0" />
+                            Hỗ trợ OT
+                        </span>
+                    )}
+                </div>
+            );
         }
     },
     {

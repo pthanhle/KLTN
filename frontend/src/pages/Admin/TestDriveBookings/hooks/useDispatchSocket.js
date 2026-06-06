@@ -33,12 +33,16 @@ export const useDispatchSocket = () => {
         socket.on('booking_assigned', handleBookingUpdate);
         socket.on('booking_updated', handleBookingUpdate);
         socket.on('booking_cancelled', handleBookingUpdate);
+        socket.on('test_drive_assigned', handleBookingUpdate);
+        socket.on('test_drive_job_requested', handleBookingUpdate);
 
         // Cleanup listeners on unmount
         return () => {
             socket.off('booking_assigned', handleBookingUpdate);
             socket.off('booking_updated', handleBookingUpdate);
             socket.off('booking_cancelled', handleBookingUpdate);
+            socket.off('test_drive_assigned', handleBookingUpdate);
+            socket.off('test_drive_job_requested', handleBookingUpdate);
         };
     }, [queryClient]);
 };

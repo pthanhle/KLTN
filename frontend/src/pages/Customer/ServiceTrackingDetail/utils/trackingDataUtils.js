@@ -55,6 +55,15 @@ export const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN').format(amount);
 };
 
+export const normalizeSignatureDataUrl = (signature) => {
+    if (!signature || typeof signature !== 'string') return '';
+    const trimmed = signature.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('data:image/')) return trimmed;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return `data:image/png;base64,${trimmed}`;
+};
+
 /**
  * Format ISO String thành "HH:mm"
  * @param {string} isoString - "2026-03-25T14:05:00Z"

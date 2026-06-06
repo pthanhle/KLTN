@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAdminBookings, useAdminSalesStaff, useAssignBookingMutation } from '../../../../services/queries/testDriveBookingAdmin.queries';
 import { useDispatchSocket } from './useDispatchSocket';
 import { message } from 'antd';
 
 export const useDispatchLogic = (t) => {
+    const queryClient = useQueryClient();
     const [searchStaff, setSearchStaff] = useState('');
-    const [filterDate, setFilterDate] = useState(dayjs());
+    const [filterDate, setFilterDate] = useState(null);
     const [activeBooking, setActiveBooking] = useState(null);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [pendingAssignmentData, setPendingAssignmentData] = useState(null);
@@ -62,9 +64,13 @@ export const useDispatchLogic = (t) => {
     const confirmAssignment = (values) => {
         if (!pendingAssignmentData) return;
 
+        const booking = pendingAssignmentData.booking;
+
+        const targetStaffId = pendingAssignmentData.staff._id;
+
         assignBooking({
-            bookingId: pendingAssignmentData.booking._id,
-            staffId: pendingAssignmentData.staff._id,
+            bookingId: booking._id,
+            staffId: targetStaffId,
             priority: values.priority,
             note: values.note
         }, {
@@ -72,6 +78,46 @@ export const useDispatchLogic = (t) => {
                 message.success(t('adminTestDriveBookings:assign_success', 'Đã phân công lịch lái thử thành công!'));
                 setIsAssignModalOpen(false);
                 setPendingAssignmentData(null);
+
+                // Sync filter date → card becomes visible after refetch
+                if (booking.selectedDate) {
+                    const bookingDay = dayjs(booking.selectedDate, 'DD/MM/YYYY');
+                    if (bookingDay.isValid()) setFilterDate(bookingDay);
+                }
+
+                // Optimistic update: add task to staff column immediately (before refetch)
+                queryClient.setQueriesData({ queryKey: ['adminSalesStaff'] }, (oldData) => {
+                    if (!Array.isArray(oldData)) return oldData;
+                    return oldData.map((staff) => {
+                        if (String(staff._id) !== String(targetStaffId)) return staff;
+                        const newTask = {
+                            id: String(booking._id),
+                            title: `Lịch lái thử xe ${booking.targetCar?.name || booking.targetCarSku || ''}`,
+                            priority: values.priority || 'MEDIUM',
+                            vehicleModel: booking.targetCar?.name || booking.targetCarSku || '',
+                            customerName: booking.fullName,
+                            customerPhone: booking.phoneNumber,
+                            appointmentDate: booking.selectedDate,
+                            appointmentTime: booking.selectedTimeSlot,
+                            locationType: booking.bookingType === 'home' ? 'HOME' : 'SHOWROOM',
+                            status: 'confirmed',
+                        };
+                        const existingTodo = staff.performance?.kanban?.todo || [];
+                        const alreadyAdded = existingTodo.some((t) => String(t.id) === String(booking._id));
+                        if (alreadyAdded) return staff;
+                        return {
+                            ...staff,
+                            workload: (staff.workload || 0) + 1,
+                            performance: {
+                                ...staff.performance,
+                                kanban: {
+                                    ...staff.performance?.kanban,
+                                    todo: [...existingTodo, newTask],
+                                },
+                            },
+                        };
+                    });
+                });
             },
             onError: () => {
                 message.error(t('adminTestDriveBookings:assign_error', 'Phân công thất bại. Vui lòng thử lại.'));
@@ -82,6 +128,11 @@ export const useDispatchLogic = (t) => {
     const closeAssignModal = () => {
         setIsAssignModalOpen(false);
         setPendingAssignmentData(null);
+    };
+
+    const handleAssignFromRequest = (booking, staff) => {
+        setPendingAssignmentData({ booking, staff });
+        setIsAssignModalOpen(true);
     };
 
     return {
@@ -100,6 +151,7 @@ export const useDispatchLogic = (t) => {
         isAssignModalOpen,
         pendingAssignmentData,
         confirmAssignment,
-        closeAssignModal
+        closeAssignModal,
+        handleAssignFromRequest
     };
 };

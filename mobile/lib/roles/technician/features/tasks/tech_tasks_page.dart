@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'dart:ui';
 import '../../../../shared/widgets/backgrounds/mesh_background.dart';
+import '../../../../shared/widgets/inputs/list_search_bar.dart';
 import '../../../../core/views/components/navigation/header/header_avatar_button.dart';
 import 'controllers/tech_tasks_controller.dart';
 import 'widgets/sections/tech_tasks_list_section.dart';
@@ -59,15 +60,24 @@ class TechTasksPage extends ConsumerWidget {
                 leading: HeaderAvatarButton(onPressed: () {}),
               ),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 4, bottom: 8),
-                  child: TechKanbanTabs(
-                    selectedTab: selectedTab,
-                    onTabSelected: (tab) {
-                      final index = TechTaskTab.values.indexOf(tab);
-                      ref.read(techTasksControllerProvider.notifier).changeTab(index);
-                    },
-                  ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, bottom: 4),
+                      child: TechKanbanTabs(
+                        selectedTab: selectedTab,
+                        onTabSelected: (tab) {
+                          final index = TechTaskTab.values.indexOf(tab);
+                          ref.read(techTasksControllerProvider.notifier).changeTab(index);
+                        },
+                      ),
+                    ),
+                    ListSearchBar(
+                      hintText: 'Tìm biển số, dòng xe, khoang...',
+                      onChanged: (q) => ref.read(techTasksControllerProvider.notifier).updateSearch(q),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    ),
+                  ],
                 ),
               ),
               SliverPadding(

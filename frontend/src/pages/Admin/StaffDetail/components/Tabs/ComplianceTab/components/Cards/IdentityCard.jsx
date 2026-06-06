@@ -2,7 +2,7 @@ import React from 'react';
 import { IdCard, Edit2, Check, X } from 'lucide-react';
 import MaskedField from '../Shared/MaskedField';
 import { Controller } from 'react-hook-form';
-import { Button, Input, Form, DatePicker } from 'antd';
+import { Button, Input, DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat);
@@ -43,7 +43,7 @@ const IdentityCard = ({ staffId, data, t, onUnmask, onUpdateSuccess }) => {
             </div>
 
             {isEditing ? (
-                <Form component="form" onSubmit={handleEditSubmit} className="animate-fade-in">
+                <form onSubmit={handleEditSubmit} className="animate-fade-in">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <Controller name="idNumber" control={control} render={({ field: { onChange, ...field } }) => (
@@ -126,7 +126,7 @@ const IdentityCard = ({ staffId, data, t, onUnmask, onUpdateSuccess }) => {
                             {isSubmitting ? t('adminStaffCompliance:btn_saving', 'Đang lưu...') : t('adminStaffCompliance:btn_save', 'Lưu thay đổi')}
                         </button>
                     </div>
-                </Form>
+                </form>
             ) : (
                 <div className="animate-fade-in">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

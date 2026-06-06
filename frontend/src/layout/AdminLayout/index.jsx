@@ -20,9 +20,9 @@ const AdminLayout = () => {
 
     return (
         <Layout key={location.key} style={{ minHeight: '100vh' }} className={isDarkMode ? 'dark' : ''}>
-            {!isBuilderMode && <Sider collapsed={collapsed} />}
+            {!isBuilderMode && <Sider collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />}
             <Layout className={`transition-all w-full overflow-x-hidden duration-300 ${isDarkMode ? 'bg-[#0a0a0b]' : 'bg-[#f4f7fa]'}`}>
-                <Header collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} hideToggle={isBuilderMode} />
+                <Header />
                 <Content className={`transition-all duration-300 ${isBuilderMode ? 'p-0' : 'p-4 md:p-8 xl:p-10'} min-h-[280px]`}>
                     <div className={`${isBuilderMode ? 'w-full h-full' : 'max-w-[1600px] mx-auto w-full'}`}>
                         <Outlet />

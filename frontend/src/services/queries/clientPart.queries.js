@@ -70,8 +70,12 @@ export const useClientSinglePartData = (slug) => {
 };
 
 export const useSubmitPartReviewMutation = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (reviewData) => clientPartApi.submitPartReview(reviewData),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['clientPart'] });
+        },
     });
 };
 

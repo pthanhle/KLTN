@@ -30,39 +30,50 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
         query.booking_id = { $in: bookings.map(b => b._id) }
     }
 
+    const userRole = req.user.role_id?.role_name?.toLowerCase()
+    if (userRole === 'advisor') {
+        query.advisor_id = req.user._id
+    } else if (userRole === 'service') {
+        query.mechanic_id = req.user._id
+    }
+
     const total = await RepairProgress.countDocuments(query)
     const progresses = await RepairProgress.find(query)
         .populate({
             path: 'booking_id',
             populate: [
-                { path: 'user_id', select: 'full_name email phone' },
-                { path: 'service_id', select: 'service_name price duration' },
+                { path: 'user_id', select: 'full_name email phone' }
             ],
         })
         .populate({
-            path: 'staff_id',
+            path: 'advisor_id',
+            select: 'full_name',
+            match: { _id: { $exists: true } },
+        })
+        .populate({
+            path: 'mechanic_id',
             select: 'full_name',
             match: { _id: { $exists: true } },
         })
 
-    progresses.forEach(p => {
-        const rawProgress = p.toObject();
-        if (!p.staff_id) {
-            console.error(
-                `Populate lỗi: staff_id không tìm thấy cho repairProgress ${p._id}. ` +
-                `Kiểm tra users collection với _id: ${rawProgress.staff_id}. ` +
-                `Raw staff_id in DB: ${mongoose.Types.ObjectId.isValid(rawProgress.staff_id) ? rawProgress.staff_id : 'Invalid or Undefined'}`
-            );
-        }
-        if (!p.booking_id) {
-            console.error(`Populate lỗi: booking_id không tìm thấy cho repairProgress ${p._id}. Kiểm tra bookings collection.`);
-        } else if (!p.booking_id.service_id) {
-            console.error(`Populate lỗi: service_id không tìm thấy cho booking ${p.booking_id._id}. Kiểm tra servicepackages collection.`);
-        }
-    });
+    // Batch-resolve bay names (bay_id is stored as String → ObjectId of ServiceBay)
+    const bayIds = [...new Set(progresses.map(p => p.bay_id).filter(Boolean))]
+    let bayMap = {}
+    if (bayIds.length > 0) {
+        try {
+            const bays = await ServiceBay.find({ _id: { $in: bayIds } }).select('bay_number')
+            bays.forEach(b => { bayMap[b._id.toString()] = b.bay_number })
+        } catch (_) {}
+    }
 
     res.json({
-        repairProgresses: progresses,
+        repairProgresses: progresses.map(p => {
+            const obj = p.toObject()
+            if (p.bay_id && bayMap[p.bay_id]) {
+                obj.bay_name = `KHOANG ${bayMap[p.bay_id]}`
+            }
+            return obj
+        }),
         pagination: {
             page,
             limit,
@@ -116,7 +127,7 @@ export const createRepairProgress = asyncHandler(async (req, res) => {
 
     const progress = await RepairProgress.create({
         booking_id,
-        staff_id: req.user._id,
+        advisor_id: req.user._id,
         status,
         notes: notes || '',
         estimated_completion: estimated_completion ? new Date(estimated_completion) : null,
@@ -132,7 +143,8 @@ export const createRepairProgress = asyncHandler(async (req, res) => {
                     { path: 'service_id', select: 'service_name price duration' },
                 ],
             })
-            .populate('staff_id', 'full_name'),
+            .populate('advisor_id', 'full_name')
+            .populate('mechanic_id', 'full_name'),
     })
 })
 
@@ -146,7 +158,7 @@ export const updateRepairProgress = asyncHandler(async (req, res) => {
         throw new Error('Tiến độ sửa chữa không tồn tại')
     }
 
-    if (progress.staff_id.toString() !== req.user._id.toString()) {
+    if (progress.advisor_id?.toString() !== req.user._id.toString() && progress.mechanic_id?.toString() !== req.user._id.toString()) {
         res.status(403)
         throw new Error('Không có quyền cập nhật tiến độ này')
     }
@@ -231,7 +243,8 @@ export const updateRepairProgress = asyncHandler(async (req, res) => {
                     { path: 'service_id', select: 'service_name price duration' },
                 ],
             })
-            .populate('staff_id', 'full_name'),
+            .populate('advisor_id', 'full_name')
+            .populate('mechanic_id', 'full_name'),
     })
 })
 
@@ -243,7 +256,7 @@ export const deleteRepairProgress = asyncHandler(async (req, res) => {
         throw new Error('Tiến độ sửa chữa không tồn tại')
     }
 
-    if (progress.staff_id.toString() !== req.user._id.toString()) {
+    if (progress.advisor_id?.toString() !== req.user._id.toString() && progress.mechanic_id?.toString() !== req.user._id.toString()) {
         res.status(403)
         throw new Error('Không có quyền xóa tiến độ này')
     }

@@ -63,8 +63,12 @@ export const staffLogin = asyncHandler(async (req, res) => {
     formattedPerformance = {
       kpis: {
         ...(perf.kpis ? (perf.kpis.toObject ? perf.kpis.toObject() : perf.kpis) : {}),
-        inventoryAccuracy: perf.kpis?.inventoryAccuracy || 0,
-        avgSla: perf.kpis?.avgSla || 0,
+        inventoryAccuracy: typeof perf.kpis?.inventoryAccuracy === 'object' && perf.kpis?.inventoryAccuracy !== null
+          ? perf.kpis.inventoryAccuracy
+          : { score: Number(perf.kpis?.inventoryAccuracy) || 0, target: 100 },
+        avgSla: typeof perf.kpis?.avgSla === 'object' && perf.kpis?.avgSla !== null
+          ? perf.kpis.avgSla
+          : { time: Number(perf.kpis?.avgSla) || 0, unit: 'h' },
       },
       kanban: { tasks }
     }
@@ -73,12 +77,12 @@ export const staffLogin = asyncHandler(async (req, res) => {
   res.json({
     id: user._id,
     employeeId: staffDoc ? staffDoc.employeeId : 'EMP-000',
-    fullName: user.full_name,
-    email: user.email,
-    phone: user.phone,
+    fullName: user.full_name || '',
+    email: user.email || '',
+    phone: user.phone || '',
     avatarUrl: user.avatar || "https://randomuser.me/api/portraits/lego/1.jpg",
     role: user.role_id?.role_name || (staffDoc ? staffDoc.roleName : 'STAFF'),
-    department: staffDoc ? staffDoc.department : (employeeDoc ? employeeDoc.position : 'General'),
+    department: staffDoc ? (staffDoc.department || '') : (employeeDoc ? (employeeDoc.position || '') : 'General'),
     status: user.status.toUpperCase(),
     joinDate: staffDoc
       ? staffDoc.createdAt?.toISOString()

@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ttauto_staff/roles/warehouse/features/shared/data/mocks/warehouse_mock_data.dart';
+import 'package:ttauto_staff/roles/warehouse/shared/services/warehouse_api_service.dart';
 
 class WarehouseDashboardState {
   final int urgentCount;
@@ -12,8 +12,8 @@ class WarehouseDashboardState {
   const WarehouseDashboardState({
     this.urgentCount = 0,
     this.packedCount = 0,
-    this.totalTarget = 50,
-    this.completed = 45,
+    this.totalTarget = 0,
+    this.completed = 0,
     this.exceptions = const [],
     this.isLoading = false,
   });
@@ -46,20 +46,22 @@ class WarehouseDashboardController extends Notifier<WarehouseDashboardState> {
 
   Future<void> _loadData() async {
     state = state.copyWith(isLoading: true);
-    
-    await Future.delayed(const Duration(milliseconds: 800));
+    try {
+      final pickLists = await WarehouseApiService.fetchPickLists();
+      final urgent = pickLists.where((o) => o['priority'] == 'urgent').length;
+      final total = pickLists.length;
 
-    int urgent = mockWarehouseOrders.where((o) => o['is_urgent'] == true && o['order_status'] == 'PROCESSING').length;
-    int packed = mockWarehouseOrders.where((o) => o['order_status'] == 'PACKED').length;
-
-    state = state.copyWith(
-      urgentCount: urgent,
-      packedCount: packed,
-      completed: mockShiftTarget['completed'],
-      totalTarget: mockShiftTarget['total_target'],
-      exceptions: List<String>.from(mockShiftTarget['exceptions']),
-      isLoading: false,
-    );
+      state = state.copyWith(
+        urgentCount: urgent,
+        packedCount: 0,
+        completed: 0,
+        totalTarget: total,
+        exceptions: const [],
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   Future<void> refresh() async {

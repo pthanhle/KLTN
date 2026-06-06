@@ -3,6 +3,7 @@ import LoyaltyHistory from '../../models/loyaltyHistoryModel.js';
 import CustomerVoucher from '../../models/customerVoucherModel.js';
 import Promotion from '../../models/promotionModel.js';
 import User from '../../models/userModel.js';
+import { createAndEmitNotification } from '../../utils/notificationHelper.js';
 
 
 export const getLoyaltyHistory = asyncHandler(async (req, res) => {
@@ -166,6 +167,13 @@ export const redeemVoucher = asyncHandler(async (req, res) => {
         promotion: promotion._id,
         code: voucherCode,
         expires_at: expiresAt,
+    });
+
+    await createAndEmitNotification(req.user._id, {
+        title: 'Đổi điểm thành công',
+        message: `Bạn đã đổi ${promotion.points_required} điểm lấy ưu đãi "${promotion.title}". Mã voucher: ${voucherCode}.`,
+        type: 'PROMOTION',
+        reference_link: '/profile/vouchers',
     });
 
     res.status(201).json({

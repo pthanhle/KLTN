@@ -281,7 +281,7 @@ as double,
 /// @nodoc
 mixin _$CsatMetric {
 
- double get score; int get totalReviews; String get percentile;
+ double get score; int get totalReviews; String? get percentile;
 /// Create a copy of CsatMetric
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -314,7 +314,7 @@ abstract mixin class $CsatMetricCopyWith<$Res>  {
   factory $CsatMetricCopyWith(CsatMetric value, $Res Function(CsatMetric) _then) = _$CsatMetricCopyWithImpl;
 @useResult
 $Res call({
- double score, int totalReviews, String percentile
+ double score, int totalReviews, String? percentile
 });
 
 
@@ -331,12 +331,12 @@ class _$CsatMetricCopyWithImpl<$Res>
 
 /// Create a copy of CsatMetric
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? score = null,Object? totalReviews = null,Object? percentile = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? score = null,Object? totalReviews = null,Object? percentile = freezed,}) {
   return _then(_self.copyWith(
 score: null == score ? _self.score : score // ignore: cast_nullable_to_non_nullable
 as double,totalReviews: null == totalReviews ? _self.totalReviews : totalReviews // ignore: cast_nullable_to_non_nullable
-as int,percentile: null == percentile ? _self.percentile : percentile // ignore: cast_nullable_to_non_nullable
-as String,
+as int,percentile: freezed == percentile ? _self.percentile : percentile // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -421,7 +421,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double score,  int totalReviews,  String percentile)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double score,  int totalReviews,  String? percentile)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CsatMetric() when $default != null:
 return $default(_that.score,_that.totalReviews,_that.percentile);case _:
@@ -442,7 +442,7 @@ return $default(_that.score,_that.totalReviews,_that.percentile);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double score,  int totalReviews,  String percentile)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double score,  int totalReviews,  String? percentile)  $default,) {final _that = this;
 switch (_that) {
 case _CsatMetric():
 return $default(_that.score,_that.totalReviews,_that.percentile);case _:
@@ -462,7 +462,7 @@ return $default(_that.score,_that.totalReviews,_that.percentile);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double score,  int totalReviews,  String percentile)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double score,  int totalReviews,  String? percentile)?  $default,) {final _that = this;
 switch (_that) {
 case _CsatMetric() when $default != null:
 return $default(_that.score,_that.totalReviews,_that.percentile);case _:
@@ -477,12 +477,12 @@ return $default(_that.score,_that.totalReviews,_that.percentile);case _:
 @JsonSerializable()
 
 class _CsatMetric implements CsatMetric {
-  const _CsatMetric({required this.score, required this.totalReviews, required this.percentile});
+  const _CsatMetric({required this.score, required this.totalReviews, this.percentile});
   factory _CsatMetric.fromJson(Map<String, dynamic> json) => _$CsatMetricFromJson(json);
 
 @override final  double score;
 @override final  int totalReviews;
-@override final  String percentile;
+@override final  String? percentile;
 
 /// Create a copy of CsatMetric
 /// with the given fields replaced by the non-null parameter values.
@@ -517,7 +517,7 @@ abstract mixin class _$CsatMetricCopyWith<$Res> implements $CsatMetricCopyWith<$
   factory _$CsatMetricCopyWith(_CsatMetric value, $Res Function(_CsatMetric) _then) = __$CsatMetricCopyWithImpl;
 @override @useResult
 $Res call({
- double score, int totalReviews, String percentile
+ double score, int totalReviews, String? percentile
 });
 
 
@@ -534,12 +534,12 @@ class __$CsatMetricCopyWithImpl<$Res>
 
 /// Create a copy of CsatMetric
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? score = null,Object? totalReviews = null,Object? percentile = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? score = null,Object? totalReviews = null,Object? percentile = freezed,}) {
   return _then(_CsatMetric(
 score: null == score ? _self.score : score // ignore: cast_nullable_to_non_nullable
 as double,totalReviews: null == totalReviews ? _self.totalReviews : totalReviews // ignore: cast_nullable_to_non_nullable
-as int,percentile: null == percentile ? _self.percentile : percentile // ignore: cast_nullable_to_non_nullable
-as String,
+as int,percentile: freezed == percentile ? _self.percentile : percentile // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

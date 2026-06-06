@@ -13,7 +13,5 @@ export const getCreateStaffSchema = (t) => z.object({
     role: z.string({
         required_error: t('adminStaffCreate:error_role_req', 'Vui lòng chọn vai trò'),
     }).min(1, { message: t('adminStaffCreate:error_role_req', 'Vui lòng chọn vai trò') }),
-    department: z.string({
-        required_error: t('adminStaffCreate:error_department_req', 'Vui lòng chọn phòng ban'),
-    }).min(1, { message: t('adminStaffCreate:error_department_req', 'Vui lòng chọn phòng ban') })
+    department: z.string().optional(),
 });

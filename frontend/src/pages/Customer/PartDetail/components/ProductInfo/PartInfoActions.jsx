@@ -4,10 +4,10 @@ import ProductOptions from './components/ProductOptions';
 import ProductActions from './components/ProductActions';
 import TrustBadges from './components/TrustBadges';
 
-export const PartInfoActions = ({ part, selectedOptions, quantity, handleOptionSelect, handleQuantityChange, formatCurrency, handleAddToCart, handleBuyNow, t, isSubmittingAction }) => {
+export const PartInfoActions = ({ part, selectedOptions, quantity, handleOptionSelect, handleQuantityChange, formatCurrency, handleAddToCart, handleBuyNow, t, isSubmittingAction, displayPrice }) => {
     return (
         <div className="lg:col-span-5 space-y-8">
-            <ProductMeta part={part} t={t} formatCurrency={formatCurrency} />
+            <ProductMeta part={part} t={t} formatCurrency={formatCurrency} displayPrice={displayPrice} />
             
             <ProductOptions 
                 part={part} 

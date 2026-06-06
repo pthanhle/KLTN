@@ -7,19 +7,47 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../../../shared/widgets/buttons/liquid_button.dart';
 import '../../../../../../shared/widgets/toast/glass_toast.dart';
+import '../../controllers/quotation_controller.dart';
 import '../../models/quotation_model.dart';
 import '../../constants/quotation_constants.dart';
 import '../../utils/quotation_utils.dart';
 
-class QuotationSummaryCard extends ConsumerWidget {
+class QuotationSummaryCard extends ConsumerStatefulWidget {
   final QuotationModel data;
 
   const QuotationSummaryCard({super.key, required this.data});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<QuotationSummaryCard> createState() => _QuotationSummaryCardState();
+}
+
+class _QuotationSummaryCardState extends ConsumerState<QuotationSummaryCard> {
+  bool _isSubmitting = false;
+
+  Future<void> _handleSubmit(BuildContext context) async {
+    if (_isSubmitting) return;
+    HapticFeedback.mediumImpact();
+    setState(() => _isSubmitting = true);
+    try {
+      await ref.read(quotationControllerProvider.notifier).submitQuotation();
+      if (context.mounted) {
+        GlassToast.show(context, title: 'Đã gửi báo giá!'.tr(), icon: CupertinoIcons.check_mark_circled);
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (context.mounted) {
+        GlassToast.show(context, title: e.toString().replaceFirst('Exception: ', ''), icon: CupertinoIcons.xmark_circle);
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final data = widget.data;
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -121,18 +149,11 @@ class QuotationSummaryCard extends ConsumerWidget {
                   const SizedBox(height: 24),
 
                   LiquidButton(
-                    isLoading: false,
+                    isLoading: _isSubmitting,
                     isGlass: false,
-                    onPressed: () {
-                      HapticFeedback.mediumImpact();
-                      GlassToast.show(
-                        context,
-                        title: 'Đã gửi báo giá!'.tr(),
-                        icon: CupertinoIcons.check_mark_circled,
-                      );
-                    },
+                    onPressed: _isSubmitting ? null : () => _handleSubmit(context),
                     child: Text(
-                      'Trình Duyệt Báo Giá'.tr(),
+                      _isSubmitting ? 'Đang gửi...'.tr() : 'Trình Duyệt Báo Giá'.tr(),
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -149,8 +170,7 @@ class QuotationSummaryCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildRow(ThemeData theme, String label, double amount,
-      {Color? color}) {
+  Widget _buildRow(ThemeData theme, String label, double amount, {Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

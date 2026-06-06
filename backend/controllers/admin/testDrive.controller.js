@@ -44,6 +44,10 @@ const normalizeBooking = (b) => {
     priority: obj.priority || 'MEDIUM',
     assignment_note: obj.assignment_note || '',
     delivery_address: obj.delivery_address || null,
+    driverLicenseUrl: obj.driver_license_url || null,
+    signatureUrl: obj.signature_url || null,
+    interestLevel: obj.interest_level ?? null,
+    evaluationFeedback: obj.evaluation_feedback || null,
     createdAt: obj.createdAt,
   }
 }
@@ -227,6 +231,26 @@ export const assignTestDriveBooking = asyncHandler(async (req, res) => {
     .populate('requested_staff.user_id', 'full_name avatar')
 
   res.json(normalizeBooking(updated))
+})
+
+export const getTestDriveBookingById = asyncHandler(async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400)
+    throw new Error('ID không hợp lệ')
+  }
+
+  const booking = await Booking.findOne({ _id: req.params.id, booking_type: 'test_drive' })
+    .populate('user_id', 'full_name phone email avatar')
+    .populate('product_id', 'name sku images brandName price')
+    .populate('advisor_id', 'full_name avatar email phone')
+    .populate('requested_staff.user_id', 'full_name avatar')
+
+  if (!booking) {
+    res.status(404)
+    throw new Error('Lịch lái thử không tồn tại')
+  }
+
+  res.json(normalizeBooking(booking))
 })
 
 export const searchCars = asyncHandler(async (req, res) => {

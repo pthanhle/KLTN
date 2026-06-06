@@ -55,7 +55,7 @@ app.use(cookieParser())
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 
 app.use('/api/admin', adminIndexRoutes)
 app.use('/api/client', clientIndexRoutes)

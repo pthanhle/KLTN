@@ -140,6 +140,13 @@ const bookingSchema = mongoose.Schema(
 
     timeline: { type: [timelineStepSchema], default: [] },
 
+    // Test-drive checkin data (collected by sales staff on mobile)
+    driver_license_url: { type: String },
+    signature_url: { type: String },
+    // Post-drive evaluation
+    interest_level: { type: Number, min: 0, max: 2 },
+    evaluation_feedback: { type: String },
+
     customer_note: { type: String },
     reschedule_reason: { type: String },
     rating: { type: Number, min: 1, max: 5, default: null },

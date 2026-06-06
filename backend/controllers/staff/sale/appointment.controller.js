@@ -4,6 +4,7 @@ import Notification from '../../../models/notificationModel.js'
 import asyncHandler from 'express-async-handler'
 import dayjs from 'dayjs'
 import { getIO } from '../../../config/socket.js'
+import { cloudinary, ensureConfigured } from '../../../config/cloudinary.js'
 
 const STATUS_MAP = {
   PENDING: 'Pending',
@@ -42,7 +43,10 @@ const normalizeBooking = (b) => {
     priority: obj.priority || 'MEDIUM',
     assignment_note: obj.assignment_note || '',
     delivery_address: obj.delivery_address || null,
-    hasDriverLicense: obj.has_driver_license || false,
+    driverLicenseUrl: obj.driver_license_url || null,
+    signatureUrl: obj.signature_url || null,
+    interestLevel: obj.interest_level ?? null,
+    evaluationFeedback: obj.evaluation_feedback || null,
     createdAt: obj.createdAt,
   }
 }
@@ -193,6 +197,101 @@ export const requestJob = asyncHandler(async (req, res) => {
     .populate('requested_staff.user_id', 'full_name avatar')
 
   res.json(normalizeBooking(updated))
+})
+
+// POST /staff/sale/appointments/:id/checkin
+export const submitCheckin = asyncHandler(async (req, res) => {
+  const { driver_license_base64, signature_base64 } = req.body
+
+  const appointment = await Booking.findById(req.params.id)
+  if (!appointment || appointment.booking_type !== 'test_drive') {
+    res.status(404)
+    throw new Error('Lịch lái thử không tồn tại')
+  }
+
+  if (String(appointment.advisor_id) !== String(req.user._id)) {
+    res.status(403)
+    throw new Error('Bạn không được phân công cho lịch lái thử này')
+  }
+
+  try {
+    ensureConfigured()
+    if (driver_license_base64) {
+      const prefix = driver_license_base64.startsWith('data:') ? '' : 'data:image/jpeg;base64,'
+      const result = await cloudinary.uploader.upload(`${prefix}${driver_license_base64}`, {
+        folder: 'carshop/checkin/license',
+        resource_type: 'image',
+      })
+      appointment.driver_license_url = result.secure_url
+    }
+
+    if (signature_base64) {
+      const prefix = signature_base64.startsWith('data:') ? '' : 'data:image/png;base64,'
+      const result = await cloudinary.uploader.upload(`${prefix}${signature_base64}`, {
+        folder: 'carshop/checkin/signature',
+        resource_type: 'image',
+      })
+      appointment.signature_url = result.secure_url
+    }
+  } catch (uploadErr) {
+    console.error('Cloudinary upload error:', uploadErr.message)
+  }
+
+  appointment.booking_status = 'RECEIVED'
+  await appointment.save()
+
+  const final = await Booking.findById(appointment._id)
+    .populate('user_id', 'full_name phone email avatar')
+    .populate('product_id', 'name sku images')
+    .populate('advisor_id', 'full_name avatar')
+
+  res.json({ message: 'Check-in thành công', appointment: normalizeBooking(final), task: toTaskModel(final) })
+})
+
+// POST /staff/sale/appointments/:id/post-drive
+export const submitPostDrive = asyncHandler(async (req, res) => {
+  const { interest_level, feedback } = req.body
+
+  const appointment = await Booking.findById(req.params.id)
+  if (!appointment || appointment.booking_type !== 'test_drive') {
+    res.status(404)
+    throw new Error('Lịch lái thử không tồn tại')
+  }
+
+  if (String(appointment.advisor_id) !== String(req.user._id)) {
+    res.status(403)
+    throw new Error('Bạn không được phân công cho lịch lái thử này')
+  }
+
+  if (interest_level !== undefined && interest_level !== null) {
+    appointment.interest_level = Number(interest_level)
+  }
+  if (feedback !== undefined) {
+    appointment.evaluation_feedback = feedback
+  }
+  appointment.booking_status = 'COMPLETED'
+  await appointment.save()
+
+  if (appointment.user_id) {
+    try {
+      await Notification.create({
+        user_id: appointment.user_id,
+        title: 'Hoàn thành lái thử',
+        message: `Cảm ơn bạn đã lái thử xe ngày ${dayjs(appointment.booking_date).format('DD/MM/YYYY')}. Hy vọng bạn có trải nghiệm tốt!`,
+        type: 'BOOKING',
+        reference_id: appointment.booking_code,
+        reference_link: '/profile/services',
+        is_read: false,
+      })
+    } catch (_) {}
+  }
+
+  const final = await Booking.findById(appointment._id)
+    .populate('user_id', 'full_name phone email avatar')
+    .populate('product_id', 'name sku images')
+    .populate('advisor_id', 'full_name avatar')
+
+  res.json({ message: 'Đánh giá lái thử đã được lưu', appointment: normalizeBooking(final), task: toTaskModel(final) })
 })
 
 // PUT /staff/sale/appointments/:id — update status

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ttauto_staff/roles/sales/features/checkin/models/checkin_state_model.dart';
+import 'package:ttauto_staff/roles/sales/features/shared/data/test_drive_api_service.dart';
 
 class CheckInController extends Notifier<CheckInStateModel> {
   final ImagePicker _picker = ImagePicker();
@@ -18,7 +19,6 @@ class CheckInController extends Notifier<CheckInStateModel> {
         state = state.copyWith(driverLicensePath: image.path);
       }
     } catch (e) {
-      // Handle camera permission or other errors
       state = state.copyWith(error: 'Lỗi khi chụp ảnh: $e');
     }
   }
@@ -35,8 +35,17 @@ class CheckInController extends Notifier<CheckInStateModel> {
 
   Future<void> submitCheckin(String taskId) async {
     if (!isValid) return;
-    // Actual status update (RECEIVED) is handled by updateTaskStatus in onComplete callback.
-    state = state.copyWith(isSuccess: true);
+    state = state.copyWith(isSubmitting: true, error: null);
+    try {
+      await testDriveApiService.submitCheckin(
+        taskId,
+        state.driverLicensePath,
+        state.signatureBytes,
+      );
+      state = state.copyWith(isSubmitting: false, isSuccess: true);
+    } catch (e) {
+      state = state.copyWith(isSubmitting: false, error: e.toString());
+    }
   }
 }
 

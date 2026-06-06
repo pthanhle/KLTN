@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ttauto_staff/roles/sales/features/post_drive/models/post_drive_state_model.dart';
+import 'package:ttauto_staff/roles/sales/features/shared/data/test_drive_api_service.dart';
 
 class PostDriveController extends Notifier<PostDriveStateModel> {
   @override
@@ -23,12 +24,11 @@ class PostDriveController extends Notifier<PostDriveStateModel> {
     state = state.copyWith(isSubmitting: true, error: null);
 
     try {
-      // Print payload to verify BE integration readiness
-      print('Submitting post-drive for $taskId with payload: ${state.toJson()}');
-      
-      // Mock API delay
-      await Future.delayed(const Duration(milliseconds: 1200)); 
-      
+      await testDriveApiService.submitPostDrive(
+        taskId,
+        state.interestLevelId!,
+        state.feedback ?? '',
+      );
       state = state.copyWith(isSubmitting: false, isSuccess: true);
     } catch (e) {
       state = state.copyWith(isSubmitting: false, error: e.toString());

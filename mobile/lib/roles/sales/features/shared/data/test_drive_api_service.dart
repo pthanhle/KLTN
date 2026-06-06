@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ttauto_staff/core/config/api_config.dart';
@@ -86,6 +89,41 @@ class TestDriveApiService {
     await dio.put(url, data: {
       'status': status,
       if (note != null && note.isNotEmpty) 'note': note,
+    });
+  }
+
+  // POST /staff/sale/appointments/:id/checkin
+  Future<void> submitCheckin(
+      String bookingId, String? licenseImagePath, Uint8List? signatureBytes) async {
+    final token = await _getToken();
+    final dio = _buildDio(token);
+    final url = '${ApiConfig.baseUrl}/staff/sale/appointments/$bookingId/checkin';
+
+    String? licenseBase64;
+    if (licenseImagePath != null) {
+      final bytes = await File(licenseImagePath).readAsBytes();
+      licenseBase64 = base64Encode(bytes);
+    }
+
+    final String? signatureBase64 =
+        signatureBytes != null ? base64Encode(signatureBytes) : null;
+
+    await dio.post(url, data: {
+      if (licenseBase64 != null) 'driver_license_base64': licenseBase64,
+      if (signatureBase64 != null) 'signature_base64': signatureBase64,
+    });
+  }
+
+  // POST /staff/sale/appointments/:id/post-drive
+  Future<void> submitPostDrive(
+      String bookingId, int interestLevel, String feedback) async {
+    final token = await _getToken();
+    final dio = _buildDio(token);
+    final url =
+        '${ApiConfig.baseUrl}/staff/sale/appointments/$bookingId/post-drive';
+    await dio.post(url, data: {
+      'interest_level': interestLevel,
+      'feedback': feedback,
     });
   }
 }

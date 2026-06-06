@@ -109,6 +109,12 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .limit(5)
         .lean();
 
+    const recentTestDrives = await Booking.find({ booking_type: 'test_drive' })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate('product_id', 'name sku images')
+        .lean();
+
     // Monthly revenue for the current year (bar chart)
     const monthlyRevenue = await Order.aggregate([
         {
@@ -144,6 +150,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         recentOrders,
         lowStockParts,
         recentAppointments,
+        recentTestDrives,
         dateRange: {
             start: start.toISOString(),
             end: end.toISOString(),

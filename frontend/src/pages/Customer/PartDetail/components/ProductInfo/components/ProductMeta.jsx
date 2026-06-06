@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star, CheckCircle, Barcode, Package } from 'lucide-react';
 
-export const ProductMeta = ({ part, t, formatCurrency, setActiveTab }) => {
+export const ProductMeta = ({ part, t, formatCurrency, setActiveTab, displayPrice }) => {
     return (
         <div data-purpose="product-meta">
             {part.is_best_seller && (
@@ -49,7 +49,7 @@ export const ProductMeta = ({ part, t, formatCurrency, setActiveTab }) => {
             </div>
 
             <div className="flex items-baseline gap-4">
-                <span className="text-3xl font-black text-yellow-500">{formatCurrency(part.price)}</span>
+                <span className="text-3xl font-black text-yellow-500">{formatCurrency(displayPrice ?? part.price)}</span>
                 {part.original_price && part.original_price > part.price && (
                     <>
                         <span className="text-lg text-slate-400 line-through">{formatCurrency(part.original_price)}</span>

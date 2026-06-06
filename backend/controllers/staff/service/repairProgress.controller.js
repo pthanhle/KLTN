@@ -30,10 +30,11 @@ export const getRepairProgresses = asyncHandler(async (req, res) => {
         query.booking_id = { $in: bookings.map(b => b._id) }
     }
 
-    if (req.user.role_id?.role_name === 'advisor') {
+    const userRole = req.user.role_id?.role_name?.toLowerCase()
+    if (userRole === 'advisor') {
         query.advisor_id = req.user._id
-    } else if (req.user.role_id?.role_name === 'service') {
-        query.mechanic_id = req.user._id 
+    } else if (userRole === 'service') {
+        query.mechanic_id = req.user._id
     }
 
     const total = await RepairProgress.countDocuments(query)

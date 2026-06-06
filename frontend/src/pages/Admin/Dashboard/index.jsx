@@ -7,7 +7,7 @@ import { RevenueChart } from './components/RevenueChart';
 import { RecentOrders } from './components/RecentOrders';
 import { MonthlyRevenueChart } from './components/MonthlyRevenueChart';
 import { OrderStatusChart } from './components/OrderStatusChart';
-import { LowStockAlert } from './components/LowStockAlert';
+import { TestDriveWidget } from './components/TestDriveWidget';
 import { ServiceAppointmentsWidget } from './components/ServiceAppointmentsWidget';
 import { PageLoader } from '@/components/ui/page-loader';
 import { RefreshCw, ShoppingCart, Users, Box, Settings } from 'lucide-react';
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
                 {/* Section 5: Service Appointments + Low Stock */}
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <ServiceAppointmentsWidget appointments={stats.recentAppointments} />
-                    <LowStockAlert parts={stats.lowStockParts} />
+                    <TestDriveWidget bookings={stats.recentTestDrives} />
                 </div>
 
                 {/* Section 6: Quick Action Cards */}

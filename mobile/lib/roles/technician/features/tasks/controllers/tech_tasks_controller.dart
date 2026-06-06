@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/tech_task_model.dart';
 import '../data/tech_api_repository.dart';
@@ -41,6 +42,8 @@ class TechTasksController extends AsyncNotifier<TechTasksState> {
 
   @override
   Future<TechTasksState> build() async {
+    final timer = Timer.periodic(const Duration(seconds: 30), (_) => refresh());
+    ref.onDispose(timer.cancel);
     return _fetchTasksData(0);
   }
 

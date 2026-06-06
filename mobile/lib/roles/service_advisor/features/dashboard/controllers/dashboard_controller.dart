@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/repair_order_model.dart';
 import '../data/advisor_api_repository.dart';
@@ -42,6 +43,8 @@ class AdvisorDashboardController extends Notifier<AdvisorDashboardState> {
 
   @override
   AdvisorDashboardState build() {
+    final timer = Timer.periodic(const Duration(seconds: 30), (_) => _loadDashboardData());
+    ref.onDispose(timer.cancel);
     Future.microtask(_loadDashboardData);
     return AdvisorDashboardState();
   }

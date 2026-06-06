@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Drawer, Input, AutoComplete, Select, DatePicker } from 'antd';
 import { FormProvider, Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -35,10 +35,47 @@ const ErrorMsg = ({ msg }) =>
 const disabledDate = (current) => current && current.valueOf() < Date.now() - 86400000;
 
 const FormBody = ({
-    customerOptions, customerSearching, handleCustomerSearch, handleCustomerSelect,
-    carOptions, carSearching, carInputValue, handleCarSearch, handleCarSelect,
+    customerResults, customerSearching, handleCustomerSearch, handleCustomerSelect,
+    carResults, carSearching, carInputValue, handleCarSearch, handleCarSelect,
     staffOptions, timeSlots, branches, locationData, t,
 }) => {
+    const customerOptions = useMemo(() =>
+        customerResults.map((c) => ({
+            value: String(c._id),
+            label: (
+                <div className="flex items-center gap-3 py-0.5">
+                    {c.avatar
+                        ? <img src={c.avatar} alt={c.full_name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                        : <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-[12px] font-bold shrink-0">
+                            {c.full_name?.[0]?.toUpperCase() || '?'}
+                          </div>}
+                    <div className="min-w-0">
+                        <p className="text-[13px] font-bold text-slate-800 dark:text-white truncate">{c.full_name}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{c.phone || c.email}</p>
+                    </div>
+                </div>
+            ),
+            customer: c,
+        })),
+    [customerResults]);
+
+    const carOptions = useMemo(() =>
+        carResults.map((c) => ({
+            value: String(c._id),
+            label: (
+                <div className="flex items-center gap-3 py-0.5">
+                    {c.image
+                        ? <img src={c.image} alt={c.name} className="w-10 h-7 object-cover rounded-md shrink-0" />
+                        : <div className="w-10 h-7 rounded-md bg-slate-200 dark:bg-slate-700 shrink-0" />}
+                    <div className="min-w-0">
+                        <p className="text-[13px] font-bold text-slate-800 dark:text-white truncate">{c.name}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{c.sku} · {c.brandName}</p>
+                    </div>
+                </div>
+            ),
+            car: c,
+        })),
+    [carResults]);
     const { control, formState: { errors }, setValue } = useFormContext();
     const { i18n } = useTranslation();
     const currentLocale = i18n.language === 'vi' ? viVN.DatePicker : enUS.DatePicker;
@@ -289,11 +326,11 @@ const AdminCreateBookingDrawer = ({ open, onClose }) => {
                 <FormProvider {...logic.methods}>
                     <form onSubmit={logic.onSubmit}>
                         <FormBody
-                            customerOptions={logic.customerOptions}
+                            customerResults={logic.customerResults}
                             customerSearching={logic.customerSearching}
                             handleCustomerSearch={logic.handleCustomerSearch}
                             handleCustomerSelect={logic.handleCustomerSelect}
-                            carOptions={logic.carOptions}
+                            carResults={logic.carResults}
                             carSearching={logic.carSearching}
                             carInputValue={logic.carInputValue}
                             handleCarSearch={logic.handleCarSearch}

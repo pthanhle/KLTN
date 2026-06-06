@@ -8,7 +8,7 @@ export const useOptionsBuilder = () => {
     });
 
     const handleAddOption = () => {
-        append({ type: '', choices: [] });
+        append({ type: '', choices: [{ label: '', price_modifier: 0, image_url: '' }] });
     };
 
     return {

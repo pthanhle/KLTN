@@ -106,6 +106,8 @@ const BookingConfirmationCard = ({ bookingDraft, defaultPhone, onConfirm }) => {
         if (!form.time_slot) errs.time_slot = 'Vui lòng chọn khung giờ';
         if (!selectedCategory) errs.category = 'Vui lòng chọn nhóm dịch vụ';
         if (!form.contact_phone.trim()) errs.contact_phone = 'Vui lòng nhập số điện thoại';
+        if (!form.vehicle_brand.trim()) errs.vehicle_brand = 'Vui lòng nhập thương hiệu xe';
+        if (!form.vehicle_license_plate.trim()) errs.vehicle_license_plate = 'Vui lòng nhập biển số xe';
         setFieldErrors(errs);
         return Object.keys(errs).length === 0;
     };
@@ -273,14 +275,15 @@ const BookingConfirmationCard = ({ bookingDraft, defaultPhone, onConfirm }) => {
             {/* --- Vehicle info --- */}
             <div className="grid grid-cols-2 gap-2">
                 <div>
-                    <Label>Thương hiệu xe</Label>
+                    <Label required>Thương hiệu xe</Label>
                     <input
                         type="text"
                         placeholder="Toyota, Honda..."
                         value={form.vehicle_brand}
                         onChange={set('vehicle_brand')}
-                        className={inputCls(false)}
+                        className={inputCls(!!fieldErrors.vehicle_brand)}
                     />
+                    <FieldError msg={fieldErrors.vehicle_brand} />
                 </div>
                 <div>
                     <Label>Dòng xe</Label>
@@ -293,24 +296,26 @@ const BookingConfirmationCard = ({ bookingDraft, defaultPhone, onConfirm }) => {
                     />
                 </div>
                 <div>
-                    <Label>Biển số xe</Label>
+                    <Label required>Biển số xe</Label>
                     <input
                         type="text"
                         placeholder="51A-123.45"
                         value={form.vehicle_license_plate}
                         onChange={set('vehicle_license_plate')}
-                        className={inputCls(false)}
+                        className={inputCls(!!fieldErrors.vehicle_license_plate)}
                     />
+                    <FieldError msg={fieldErrors.vehicle_license_plate} />
                 </div>
                 <div>
-                    <Label>Số điện thoại</Label>
+                    <Label required>Số điện thoại</Label>
                     <input
                         type="tel"
                         placeholder="0901234567"
                         value={form.contact_phone}
                         onChange={set('contact_phone')}
-                        className={inputCls(false)}
+                        className={inputCls(!!fieldErrors.contact_phone)}
                     />
+                    <FieldError msg={fieldErrors.contact_phone} />
                 </div>
             </div>
 

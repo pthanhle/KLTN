@@ -13,6 +13,7 @@ import '../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../shared/widgets/buttons/glass_nav_back_button.dart';
 import 'widgets/buttons/job_danger_fab.dart';
 import 'widgets/modals/supplement_modal/supplement_modal.dart';
+import '../../tasks/data/tech_api_repository.dart';
 
 class JobExecutionPage extends ConsumerStatefulWidget {
   final String plate;
@@ -31,6 +32,7 @@ class JobExecutionPage extends ConsumerStatefulWidget {
 class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
   late PageController _pageController;
   int _currentTab = 0;
+  bool _isMarkingDone = false;
 
   @override
   void initState() {
@@ -107,6 +109,45 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
       orderId: widget.progressId,
       taskId: widget.progressId,
     );
+  }
+
+  Future<void> _handleMarkJobDone() async {
+    if (_isMarkingDone) return;
+    final confirmed = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: Text('Hoàn tất thi công?'.tr()),
+        content: Text('Xe sẽ được chuyển sang giai đoạn QC nghiệm thu. Bạn không thể hoàn tác.'.tr()),
+        actions: [
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: Text('Hủy'.tr()),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: Text('Xác nhận'.tr()),
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+    setState(() => _isMarkingDone = true);
+    try {
+      await techApiRepository.markJobDone(progressId: widget.progressId);
+      if (mounted) {
+        GlassToast.show(context, title: 'Hoàn tất! Chờ SA nghiệm thu.'.tr(), icon: CupertinoIcons.check_mark_circled_solid);
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        GlassToast.show(context, title: e.toString().replaceFirst('Exception: ', ''), icon: CupertinoIcons.xmark_circle);
+      }
+    } finally {
+      if (mounted) setState(() => _isMarkingDone = false);
+    }
   }
 
   @override
@@ -218,6 +259,31 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
           ),
           JobDangerFab(
             onTap: _handleReportIssue,
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                child: FilledButton.icon(
+                  onPressed: _isMarkingDone ? null : _handleMarkJobDone,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  ),
+                  icon: _isMarkingDone
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(CupertinoIcons.checkmark_shield_fill, size: 18),
+                  label: Text(
+                    _isMarkingDone ? 'Đang xử lý...'.tr() : 'Hoàn tất thi công'.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
         ),

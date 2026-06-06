@@ -1,6 +1,7 @@
 import React from 'react';
 import { useWatch } from 'react-hook-form';
 import FormInput from '../../../ui/FormInput';
+import ImageUploadField from '../../../ui/ImageUploadField';
 import { PlayCircle } from 'lucide-react';
 import { Image } from 'antd';
 
@@ -14,10 +15,24 @@ const VideoBlockEditor = ({ control, index, t }) => {
             </div>
 
             {/* Left: Input Form */}
-            <div className="col-span-1 xl:col-span-4 space-y-6">
-                <FormInput name={`landing_blocks.${index}.title`} control={control} placeholder={t('adminPartForm:phH2Title')} />
-                <FormInput name={`landing_blocks.${index}.video_url`} control={control} placeholder={t('adminPartForm:phVideoUrl')} />
-                <FormInput name={`landing_blocks.${index}.cover_image`} control={control} placeholder={t('adminPartForm:phCoverImage')} />
+            <div className="col-span-1 xl:col-span-4 space-y-5">
+                <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-2 font-bold select-none">
+                        {t('adminPartForm:lblH2Title')}
+                    </label>
+                    <FormInput name={`landing_blocks.${index}.title`} control={control} placeholder={t('adminPartForm:phH2Title')} />
+                </div>
+                <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-2 font-bold select-none">
+                        {t('adminPartForm:phVideoUrl') || 'Video URL'}
+                    </label>
+                    <FormInput name={`landing_blocks.${index}.video_url`} control={control} placeholder={t('adminPartForm:phVideoUrl')} />
+                </div>
+                <ImageUploadField
+                    name={`landing_blocks.${index}.cover_image`}
+                    control={control}
+                    label={t('adminPartForm:phCoverImage') || 'Ảnh bìa'}
+                />
             </div>
 
             {/* Right: Live Preview Panel */}

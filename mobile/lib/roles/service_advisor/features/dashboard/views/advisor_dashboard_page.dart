@@ -131,6 +131,8 @@ class _AdvisorDashboardPageState extends ConsumerState<AdvisorDashboardPage> {
                           onTap: () {
                             if (order.stage == ROStage.quotation) {
                               context.go('/advisor/quotation/${order.id}');
+                            } else if (order.stage == ROStage.qc) {
+                              context.go('/advisor/qc/${order.id}');
                             } else if (order.stage == ROStage.inProgress) {
                               if (order.pendingSupplementId != null) {
                                 context.go('/advisor/supplement/${order.id}');

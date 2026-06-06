@@ -22,7 +22,7 @@ export const AdminStaffAPI = {
         return response;
     },
     resetPassword: async (id, data) => {
-        const response = await axiosClient.post(`/admin/staff/${id}/reset-password`, data);
+        const response = await axiosClient.post(`/admin/staff/${id}/reset-password`, data ?? {});
         return response;
     },
     getDepartments: async () => {

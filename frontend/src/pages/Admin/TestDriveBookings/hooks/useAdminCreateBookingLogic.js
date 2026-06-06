@@ -85,24 +85,6 @@ export const useAdminCreateBookingLogic = ({ onSuccess }) => {
         finally { setCarSearching(false); }
     }, []);
 
-    const carOptions = useMemo(() =>
-        carResults.map((c) => ({
-            value: String(c._id),
-            label: (
-                <div className="flex items-center gap-3 py-0.5">
-                    {c.image
-                        ? <img src={c.image} alt={c.name} className="w-10 h-7 object-cover rounded-md shrink-0" />
-                        : <div className="w-10 h-7 rounded-md bg-slate-200 dark:bg-slate-700 shrink-0" />}
-                    <div className="min-w-0">
-                        <p className="text-[13px] font-bold text-slate-800 dark:text-white truncate">{c.name}</p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{c.sku} · {c.brandName}</p>
-                    </div>
-                </div>
-            ),
-            car: c,
-        })),
-    [carResults]);
-
     const handleCarSelect = useCallback((value, option) => {
         methods.setValue('carId', value, { shouldValidate: true });
         setCarInputValue(option.car.name);
@@ -121,26 +103,6 @@ export const useAdminCreateBookingLogic = ({ onSuccess }) => {
         } catch (_) { setCustomerResults([]); }
         finally { setCustomerSearching(false); }
     }, []);
-
-    const customerOptions = useMemo(() =>
-        customerResults.map((c) => ({
-            value: String(c._id),
-            label: (
-                <div className="flex items-center gap-3 py-0.5">
-                    {c.avatar
-                        ? <img src={c.avatar} alt={c.full_name} className="w-8 h-8 rounded-full object-cover shrink-0" />
-                        : <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-[12px] font-bold shrink-0">
-                            {c.full_name?.[0]?.toUpperCase() || '?'}
-                          </div>}
-                    <div className="min-w-0">
-                        <p className="text-[13px] font-bold text-slate-800 dark:text-white truncate">{c.full_name}</p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{c.phone || c.email}</p>
-                    </div>
-                </div>
-            ),
-            customer: c,
-        })),
-    [customerResults]);
 
     const handleCustomerSelect = useCallback((_value, option) => {
         const c = option.customer;
@@ -188,8 +150,9 @@ export const useAdminCreateBookingLogic = ({ onSuccess }) => {
     return {
         methods,
         locationData,
-        carOptions, carSearching, carInputValue, handleCarSearch, handleCarSelect,
-        customerOptions, customerSearching, handleCustomerSearch, handleCustomerSelect,
+        // raw results — component builds JSX labels
+        carResults, carSearching, carInputValue, handleCarSearch, handleCarSelect,
+        customerResults, customerSearching, handleCustomerSearch, handleCustomerSelect,
         staffOptions,
         timeSlots: TIME_SLOTS,
         branches: SHOWROOM_BRANCHES,

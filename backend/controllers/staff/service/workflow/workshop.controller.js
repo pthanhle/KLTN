@@ -63,6 +63,55 @@ export const updateDiagnostics = asyncHandler(async (req, res) => {
     })
 })
 
+export const markJobDone = asyncHandler(async (req, res) => {
+    const { progress_id } = req.body
+
+    const progress = await RepairProgress.findById(progress_id)
+    if (!progress) {
+        res.status(404)
+        throw new Error('Không tìm thấy RepairProgress')
+    }
+
+    if (progress.status !== 'IN_PROGRESS') {
+        res.status(400)
+        throw new Error(`Không thể hoàn tất: trạng thái hiện tại là ${progress.status}`)
+    }
+
+    progress.current_step = 'QC_TESTING'
+    progress.status = 'QC_TESTING'
+
+    const stepExists = progress.timeline.some(t => t.step === 'QC_TESTING')
+    if (!stepExists) {
+        progress.timeline.push({
+            step: 'QC_TESTING',
+            status: 'IN_PROGRESS',
+            time: new Date(),
+            note: 'KTV đã hoàn tất thi công, chờ SA nghiệm thu QC',
+        })
+    }
+
+    await progress.save()
+
+    try {
+        const io = getIO()
+        if (progress.advisor_id) {
+            io.to(`user_${progress.advisor_id}`).emit('job_completed', {
+                progress_id: progress._id,
+                message: 'KTV đã hoàn tất thi công. Vui lòng thực hiện QC nghiệm thu.',
+            })
+        }
+        io.to('room_admin').emit('job_completed', {
+            progress_id: progress._id,
+            message: 'KTV hoàn tất thi công. Xe đợi QC.',
+        })
+    } catch (_) {}
+
+    res.json({
+        message: 'Đã đánh dấu hoàn tất thi công',
+        repairProgress: progress,
+    })
+})
+
 export const createQuotation = asyncHandler(async (req, res) => {
     const { progress_id, parts, labors, vat_rate, deposit_amount } = req.body
 
@@ -150,6 +199,23 @@ export const approveQuotation = asyncHandler(async (req, res) => {
     }
 
     await progress.save()
+
+    // Notify tech and SA via socket
+    try {
+        const io = getIO()
+        if (progress.mechanic_id) {
+            io.to(`user_${progress.mechanic_id}`).emit('quotation_approved', {
+                progress_id: progress._id,
+                message: 'Báo giá đã được duyệt. Bắt đầu thi công!',
+            })
+        }
+        if (progress.advisor_id) {
+            io.to(`user_${progress.advisor_id}`).emit('quotation_approved', {
+                progress_id: progress._id,
+                message: 'Báo giá đã được phê duyệt thành công.',
+            })
+        }
+    } catch (_) {}
 
     res.json({
         message: 'Phê duyệt báo giá và xuất kho thành công',

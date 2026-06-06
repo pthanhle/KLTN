@@ -64,7 +64,7 @@ const PartDetail = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
-                    <PartGallery images={logic.part.images} t={logic.t} />
+                    <PartGallery images={logic.part.images} variantImageUrl={logic.variantImageUrl} t={logic.t} />
                     <PartInfoActions {...logic} />
                 </div>
             )}

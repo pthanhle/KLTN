@@ -122,8 +122,8 @@ class MpiCategory {
     );
   }
 
-  int get warningCount => items.where((i) => i['status'] == 'warning').length;
-  int get criticalCount => items.where((i) => i['status'] == 'critical').length;
+  int get warningCount => items.where((i) => i['status'] == 'MONITOR').length;
+  int get criticalCount => items.where((i) => i['status'] == 'FAIL').length;
 }
 
 class RepairOrderModel {

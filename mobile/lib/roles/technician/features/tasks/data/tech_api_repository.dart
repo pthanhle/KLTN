@@ -86,6 +86,28 @@ class TechApiRepository {
     }
   }
 
+  Future<void> markJobDone({required String progressId}) async {
+    final token = await _getToken();
+    if (token == null) throw Exception('SESSION_EXPIRED');
+
+    try {
+      await _dio.post(
+        '${ApiConfig.baseUrl}/staff/service/repair-progress/job-done',
+        data: {'progress_id': progressId},
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('access_token');
+        throw Exception('SESSION_EXPIRED');
+      }
+      throw Exception(
+        e.response?.data?['message'] ?? 'Không thể hoàn tất công việc: ${e.message}',
+      );
+    }
+  }
+
   TechTaskModel _mapToTask(Map<String, dynamic> json) {
     final booking = json['booking_id'] ?? {};
     final vehicle = booking['vehicle_info'] ?? {};

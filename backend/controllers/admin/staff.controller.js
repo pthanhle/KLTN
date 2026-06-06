@@ -483,7 +483,7 @@ export const resetStaffPassword = asyncHandler(async (req, res) => {
         throw new Error('Người dùng này không phải là nhân viên')
     }
 
-    const { newPassword: customPassword } = req.body
+    const { newPassword: customPassword } = req.body || {}
     if (customPassword !== undefined && customPassword.length < 6) {
         res.status(400)
         throw new Error('Mật khẩu phải có ít nhất 6 ký tự')

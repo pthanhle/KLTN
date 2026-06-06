@@ -9,7 +9,6 @@ import {
     Wrench,
     UserCog,
     TicketPercent,
-    TrendingUp,
     Tag,
     Settings,
     Car,
@@ -89,11 +88,6 @@ export const useSiderMenu = (collapsed) => {
             key: '/admin/staff',
             icon: <UserCog size={iconSize} />,
             label: t('admin.sider.staff'),
-        },
-        {
-            key: '/admin/revenue-reports',
-            icon: <TrendingUp size={iconSize} />,
-            label: t('admin.sider.revenue-reports'),
         }
     ];
 

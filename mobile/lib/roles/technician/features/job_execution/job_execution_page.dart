@@ -13,7 +13,7 @@ import '../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../shared/widgets/buttons/glass_nav_back_button.dart';
 import 'widgets/buttons/job_danger_fab.dart';
 import 'widgets/modals/supplement_modal/supplement_modal.dart';
-import '../../tasks/data/tech_api_repository.dart';
+import '../tasks/data/tech_api_repository.dart';
 
 class JobExecutionPage extends ConsumerStatefulWidget {
   final String plate;

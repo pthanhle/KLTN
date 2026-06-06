@@ -9,11 +9,10 @@ import {
     LogOut,
     Settings,
     User,
-    Menu
 } from 'lucide-react';
 import { getAvatarUrl } from '../../../utils/imageUtils';
 
-const Header = ({ collapsed, onToggle, hideToggle }) => {
+const Header = () => {
     const navigate = useNavigate();
     const { t } = useTranslation('layout');
     const { user } = useSelector((state) => state.auth);
@@ -31,16 +30,7 @@ const Header = ({ collapsed, onToggle, hideToggle }) => {
     return (
         <header className="sticky top-0 z-50 w-full h-20 flex items-center justify-between px-6 lg:px-10 bg-white/80 dark:bg-[#0a0a0b]/80 backdrop-blur-md dark:backdrop-blur-xl border-b border-slate-200/80 dark:border-white/5 transition-all shadow-sm dark:shadow-none">
 
-            <div className="flex-1 flex items-center">
-                {!hideToggle && (
-                    <button
-                        onClick={onToggle}
-                        className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
-                    >
-                        <Menu size={20} className="text-slate-600 dark:text-slate-300" />
-                    </button>
-                )}
-            </div>
+            <div className="flex-1 flex items-center"></div>
 
             <div className="flex items-center space-x-2 md:space-x-4">
                 <HeaderUtilities />

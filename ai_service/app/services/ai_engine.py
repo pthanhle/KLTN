@@ -467,17 +467,18 @@ async def generate_response(user_id: str, message: str, conversation_id: str = N
         system_prompt = SYSTEM_GREETING
     elif is_booking:
         booking_info = await _extract_booking_details(message)
+        booking_draft = booking_info or {}
         if booking_info and booking_info.get("is_complete"):
-            booking_draft = booking_info
-            system_prompt = BOOKING_CONFIRM_SYSTEM
-        elif booking_info and not booking_info.get("is_complete"):
-            missing = ", ".join(booking_info.get("missing_info", []))
-            system_prompt = BOOKING_ASK_TEMPLATE.format(missing_info=missing)
+            system_prompt = (
+                "Bạn là trợ lý ảo của CarsShop. Khách vừa yêu cầu đặt lịch dịch vụ và đã cung cấp đủ thông tin cơ bản. "
+                "Thông báo ngắn gọn rằng phiếu đặt lịch đã hiện bên dưới, khách kiểm tra lại và nhấn xác nhận. "
+                "Không dùng Markdown."
+            )
         else:
             system_prompt = (
-                "Bạn là trợ lý ảo của CarsShop hỗ trợ đặt lịch dịch vụ. "
-                "Hỏi khách hàng về ngày giờ mong muốn, loại dịch vụ cần và thông tin xe. "
-                "Không dùng Markdown."
+                "Bạn là trợ lý ảo của CarsShop. Khách vừa yêu cầu đặt lịch dịch vụ. "
+                "Thông báo thân thiện rằng phiếu đặt lịch đã hiện bên dưới với thông tin đã điền sẵn, "
+                "khách vui lòng bổ sung các thông tin còn thiếu rồi nhấn xác nhận. Không dùng Markdown."
             )
     else:
         context = await _fetch_context(message)

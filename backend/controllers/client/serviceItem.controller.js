@@ -17,6 +17,9 @@ export const getPublicServiceItems = asyncHandler(async (req, res) => {
             { description: { $regex: search, $options: 'i' } }
         ];
     }
+    if (req.query.category) {
+        query.category = new mongoose.Types.ObjectId(req.query.category);
+    }
 
     const total = await ServiceItem.countDocuments(query);
     const services = await ServiceItem.find(query)

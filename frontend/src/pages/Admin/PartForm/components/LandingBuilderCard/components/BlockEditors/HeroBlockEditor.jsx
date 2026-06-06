@@ -5,6 +5,7 @@ import { useWatch } from 'react-hook-form';
 import FormInput from '../../../ui/FormInput';
 import FormSelect from '../../../ui/FormSelect';
 import { getAlignOptions } from '../../constants/index.jsx';
+import axiosClient from '../../../../../../utils/axiosClient';
 
 const HeroBlockEditor = ({ control, index, handleImageUpload, t }) => {
     const blockData = useWatch({ control, name: `landing_blocks.${index}` }) || {};
@@ -36,7 +37,19 @@ const HeroBlockEditor = ({ control, index, handleImageUpload, t }) => {
                             <Upload
                                 accept="image/*"
                                 showUploadList={false}
-                                customRequest={({ onSuccess }) => setTimeout(() => onSuccess("ok"), 0)}
+                                customRequest={async ({ file, onSuccess, onError }) => {
+                                    try {
+                                        const formData = new FormData();
+                                        formData.append('image', file);
+                                        const res = await axiosClient.post('/upload/image', formData, {
+                                            headers: { 'Content-Type': 'multipart/form-data' }
+                                        });
+                                        const url = res?.url || res?.data?.url || res;
+                                        onSuccess(url);
+                                    } catch (err) {
+                                        onError(err);
+                                    }
+                                }}
                                 onChange={(info) => handleImageUpload(index, info)}
                             >
                                 <button type="button" className="text-[10px] flex items-center gap-1 font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded hover:bg-indigo-100 hover:text-indigo-700 transition-colors">

@@ -94,12 +94,12 @@ export const getAllParts = asyncHandler(async (req, res) => {
       }
     }
   ];
-  
+
   const [globalStatsResult, absoluteCategoryCount] = await Promise.all([
-      Part.aggregate(globalStatsPipeline),
-      PartCategory.countDocuments()
+    Part.aggregate(globalStatsPipeline),
+    PartCategory.countDocuments()
   ]);
-  
+
   const rawStats = globalStatsResult[0] || { totalParts: 0, outOfStock: 0, totalValue: 0 };
 
   const stats = {
@@ -189,7 +189,7 @@ export const updatePart = asyncHandler(async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).json({ success: false, message: `Mã SKU hoặc thông tin bị trùng lặp: ${Object.keys(error.keyValue).join(', ')}` });
     }
-    throw error; // Let the async handler catch it
+    throw error;
   }
 });
 
@@ -257,6 +257,64 @@ export const bulkDeleteParts = asyncHandler(async (req, res) => {
   await Part.deleteMany({ _id: { $in: ids } });
 
   res.json({ success: true, message: `Đã xóa thành công ${ids.length} phụ tùng` });
+});
+
+
+export const getPartReviews = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status, page = 1, limit = 20 } = req.query;
+
+  const query = { part_id: id };
+  if (status && status !== 'all') query.status = status;
+
+  const mongoose = await import('mongoose');
+  import('../../models/partReviewModel.js');
+  const PartReview = mongoose.model('PartReview');
+
+  const [reviews, total] = await Promise.all([
+    PartReview.find(query)
+      .populate('user_id', 'full_name avatar email')
+      .populate('replies.user_id', 'full_name avatar role')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .lean(),
+    PartReview.countDocuments(query)
+  ]);
+
+  res.json({
+    success: true,
+    data: reviews,
+    pagination: { current: Number(page), pageSize: Number(limit), total }
+  });
+});
+
+
+export const updateReviewStatus = asyncHandler(async (req, res) => {
+  const { reviewId } = req.params;
+  const { status } = req.body;
+
+  if (!['pending', 'approved', 'rejected'].includes(status)) {
+    res.status(400);
+    throw new Error('Trạng thái không hợp lệ');
+  }
+
+  const mongoose = await import('mongoose');
+  import('../../models/partReviewModel.js');
+  const PartReview = mongoose.model('PartReview');
+
+  const review = await PartReview.findByIdAndUpdate(
+    reviewId,
+    { status },
+    { new: true }
+  );
+
+  if (!review) {
+    res.status(404);
+    throw new Error('Không tìm thấy đánh giá');
+  }
+
+  res.json({ success: true, data: review, message: `Đã cập nhật trạng thái thành ${status}` });
 });
 
 

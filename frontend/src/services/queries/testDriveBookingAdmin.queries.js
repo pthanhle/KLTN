@@ -25,3 +25,14 @@ export const useAssignBookingMutation = () => {
         }
     });
 };
+
+export const useCreateTestDriveBookingMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (payload) => bookingApi.createBooking(payload),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['adminBookings'] });
+            queryClient.invalidateQueries({ queryKey: ['adminSalesStaff'] });
+        },
+    });
+};

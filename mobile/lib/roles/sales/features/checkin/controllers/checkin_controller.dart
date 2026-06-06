@@ -35,20 +35,8 @@ class CheckInController extends Notifier<CheckInStateModel> {
 
   Future<void> submitCheckin(String taskId) async {
     if (!isValid) return;
-
-    state = state.copyWith(isSubmitting: true, error: null);
-
-    try {
-      // print payload to verify BE integration readiness
-      print('Submitting checkin for $taskId with payload: ${state.toJson()}');
-      
-      // Mock API delay
-      await Future.delayed(const Duration(milliseconds: 1200));
-
-      state = state.copyWith(isSubmitting: false, isSuccess: true);
-    } catch (e) {
-      state = state.copyWith(isSubmitting: false, error: e.toString());
-    }
+    // Actual status update (RECEIVED) is handled by updateTaskStatus in onComplete callback.
+    state = state.copyWith(isSuccess: true);
   }
 }
 

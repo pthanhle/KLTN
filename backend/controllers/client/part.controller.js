@@ -224,13 +224,30 @@ export const createPartReview = asyncHandler(async (req, res) => {
     comment: comment || '',
     variant: variant || '',
     images: images || [],
-    status: 'pending' // pending approval from Admin out-of-the-box!
   });
+
+  const populated = await PartReview.findById(review._id)
+    .populate('user_id', 'full_name avatar')
+    .lean();
+
+  const reviewData = {
+    id: populated._id,
+    user_id: populated.user_id?._id,
+    user: populated.user_id?.full_name || 'Khách Hàng',
+    avatar: populated.user_id?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(populated.user_id?.full_name || 'K')}&background=random`,
+    rating: populated.rating,
+    date: new Date(populated.createdAt).toLocaleDateString('vi-VN'),
+    variant: populated.variant || 'Tiêu chuẩn',
+    content: populated.comment,
+    images: populated.images || [],
+    likes: 0,
+    replies: []
+  };
 
   res.status(201).json({
     success: true,
-    message: 'Gửi đánh giá thành công. Đánh giá sẽ hiển thị ngay sau khi được hệ thống duyệt.',
-    data: review
+    message: 'Gửi đánh giá thành công!',
+    data: reviewData
   });
 });
 

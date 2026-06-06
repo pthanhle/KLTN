@@ -1,8 +1,10 @@
 import Booking from '../../models/bookingModel.js'
 import User from '../../models/userModel.js'
+import Car from '../../models/carModel.js'
 import Role from '../../models/roleModel.js'
 import Notification from '../../models/notificationModel.js'
 import asyncHandler from 'express-async-handler'
+import mongoose from 'mongoose'
 import dayjs from 'dayjs'
 import { getIO } from '../../config/socket.js'
 
@@ -225,4 +227,134 @@ export const assignTestDriveBooking = asyncHandler(async (req, res) => {
     .populate('requested_staff.user_id', 'full_name avatar')
 
   res.json(normalizeBooking(updated))
+})
+
+export const searchCars = asyncHandler(async (req, res) => {
+  const q = (req.query.q || '').trim()
+  if (q.length < 1) return res.json([])
+
+  const cars = await Car.find({
+    $or: [
+      { name: { $regex: q, $options: 'i' } },
+      { sku: { $regex: q, $options: 'i' } },
+      { brandName: { $regex: q, $options: 'i' } },
+    ],
+  })
+    .select('_id name sku images brandName price')
+    .limit(10)
+
+  res.json(
+    cars.map((c) => ({
+      _id: c._id,
+      name: c.name,
+      sku: c.sku,
+      brandName: c.brandName || '',
+      image: c.images?.[0] || '',
+      price: c.price || 0,
+    }))
+  )
+})
+
+export const createTestDriveBookingByAdmin = asyncHandler(async (req, res) => {
+  const {
+    full_name, contact_phone, email,
+    product_id,
+    test_drive_type, showroom_branch, delivery_address,
+    booking_date, time_slot,
+    advisor_id, priority, note,
+  } = req.body
+
+  if (!full_name || !contact_phone) {
+    res.status(400)
+    throw new Error('Vui lòng nhập tên và số điện thoại khách hàng')
+  }
+  if (!product_id || !mongoose.Types.ObjectId.isValid(product_id)) {
+    res.status(400)
+    throw new Error('Vui lòng chọn xe lái thử hợp lệ')
+  }
+  if (!booking_date || !time_slot) {
+    res.status(400)
+    throw new Error('Vui lòng chọn ngày và khung giờ')
+  }
+
+  const car = await Car.findById(product_id).select('name sku')
+  if (!car) {
+    res.status(404)
+    throw new Error('Xe không tồn tại trong hệ thống')
+  }
+
+  // Try to link booking to an existing user account via phone
+  let userId = null
+  try {
+    const existingUser = await User.findOne({ phone: contact_phone.trim() }).select('_id')
+    if (existingUser) userId = existingUser._id
+  } catch (_) {}
+
+  // Validate optional staff assignment
+  let assignedAdvisorId = null
+  if (advisor_id && mongoose.Types.ObjectId.isValid(advisor_id)) {
+    const staffUser = await User.findById(advisor_id).select('_id full_name')
+    if (staffUser) assignedAdvisorId = staffUser._id
+  }
+
+  const rand = Math.random().toString(36).substring(2, 8).toUpperCase()
+  const booking_code = `TD-${Date.now()}-${rand}`
+
+  const deliveryAddressObj =
+    test_drive_type === 'home' && delivery_address && typeof delivery_address === 'object'
+      ? delivery_address
+      : null
+
+  const booking = await Booking.create({
+    booking_code,
+    user_id: userId,
+    customer_info: {
+      full_name: full_name.trim(),
+      contact_phone: contact_phone.trim(),
+      email: (email || '').trim(),
+    },
+    booking_type: 'test_drive',
+    product_id,
+    booking_date: new Date(booking_date),
+    time_slot,
+    test_drive_type: test_drive_type || 'showroom',
+    showroom_branch: test_drive_type !== 'home' ? (showroom_branch || '') : null,
+    delivery_address: deliveryAddressObj || '',
+    advisor_id: assignedAdvisorId,
+    booking_status: assignedAdvisorId ? 'CONFIRMED' : 'PENDING',
+    priority: priority || 'MEDIUM',
+    assignment_note: note || '',
+    customer_note: '',
+  })
+
+  // Notify linked user account if found
+  if (userId) {
+    try {
+      const dateStr = dayjs(booking_date).format('DD/MM/YYYY')
+      await Notification.create({
+        user_id: userId,
+        title: 'Lịch lái thử đã được đặt',
+        message: `Admin đã tạo lịch lái thử xe ${car.name} cho bạn vào ${dateStr} (${time_slot}). Mã: ${booking_code}.`,
+        type: 'BOOKING',
+        reference_id: booking_code,
+        reference_link: '/profile/services',
+        is_read: false,
+      })
+    } catch (_) {}
+  }
+
+  try {
+    const io = getIO()
+    if (assignedAdvisorId) {
+      io.to('room_sale').emit('test_drive_assigned', { bookingId: booking._id, staffId: assignedAdvisorId })
+    }
+    io.to('room_admin').emit('booking_updated', { bookingId: booking._id })
+  } catch (_) {}
+
+  const populated = await Booking.findById(booking._id)
+    .populate('product_id', 'name sku images')
+    .populate('advisor_id', 'full_name avatar')
+    .populate('user_id', 'full_name phone email')
+
+  res.status(201).json(normalizeBooking(populated))
 })

@@ -23,4 +23,18 @@ export const bookingApi = {
             note: note || '',
         });
     },
+
+    searchCars: async (q) => {
+        if (!q || q.trim().length < 1) return [];
+        return axiosClient.get('/admin/test-drives/cars/search', { params: { q: q.trim() } });
+    },
+
+    searchCustomers: async (q) => {
+        if (!q || q.trim().length < 1) return { users: [] };
+        return axiosClient.get('/admin/customers', { params: { search: q.trim(), limit: 8, page: 1 } });
+    },
+
+    createBooking: async (payload) => {
+        return axiosClient.post('/admin/test-drives', payload);
+    },
 };

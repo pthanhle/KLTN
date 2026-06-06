@@ -32,11 +32,11 @@ export const useLandingBuilderLogic = (control) => {
     };
 
     const handleImageUpload = (index, info) => {
-        if (info.file.status === 'done' || info.file.status === 'error') {
-            const mockUrl = info.file.thumbUrl || URL.createObjectURL(info.file.originFileObj);
-            setValue(`landing_blocks.${index}.image_url`, mockUrl, { shouldValidate: true, shouldDirty: true });
-        } else if (info.file.thumbUrl) {
-            setValue(`landing_blocks.${index}.image_url`, info.file.thumbUrl, { shouldValidate: true, shouldDirty: true });
+        if (info.file.status === 'done') {
+            const url = info.file.response;
+            if (url && typeof url === 'string') {
+                setValue(`landing_blocks.${index}.image_url`, url, { shouldValidate: true, shouldDirty: true });
+            }
         }
     };
 

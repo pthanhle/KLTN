@@ -136,24 +136,25 @@ export const useAIChatbotLogic = (isOpen) => {
         if (newConvId) setCurrentSessionId(newConvId);
     };
 
-    const handleConfirmBooking = async (bookingDraft) => {
+    const handleConfirmBooking = async (formData) => {
         if (!user) {
             throw new Error('Bạn cần đăng nhập để đặt lịch dịch vụ.');
         }
         const payload = {
             booking_type: 'service',
-            booking_date: bookingDraft.booking_date,
-            time_slot: bookingDraft.time_slot,
-            service_type: bookingDraft.service_type || 'OTHER',
+            booking_date: formData.booking_date,
+            time_slot: formData.time_slot,
+            service_type: formData.service_type || 'OTHER',
+            services: formData.services || [],
             vehicle_info: {
-                brand: bookingDraft.vehicle_brand || '',
-                model: bookingDraft.vehicle_model || '',
-                license_plate: bookingDraft.vehicle_license_plate || '',
+                brand: formData.vehicle_brand || '',
+                model: formData.vehicle_model || '',
+                license_plate: formData.vehicle_license_plate || '',
             },
-            customer_note: bookingDraft.notes || '',
+            customer_note: formData.notes || '',
+            contact_phone: formData.contact_phone || '',
         };
-        const result = await BookingAPI.submitServiceBooking(payload);
-        return result;
+        return await BookingAPI.submitServiceBooking(payload);
     };
 
     const handleSendMessage = async (e) => {
@@ -188,11 +189,12 @@ export const useAIChatbotLogic = (isOpen) => {
                     { sender: 'bot', text: res.answer },
                 ];
 
-                if (res.booking_draft && res.booking_draft.is_complete) {
+                if (res.booking_draft) {
                     newMessages.push({
                         sender: 'bot',
                         type: 'booking_card',
                         bookingDraft: res.booking_draft,
+                        defaultPhone: user?.phone || '',
                     });
                 }
 

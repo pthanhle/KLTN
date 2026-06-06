@@ -29,6 +29,7 @@ const MessageBubble = ({ msg, t, onConfirmBooking }) => {
                 </div>
                 <BookingConfirmationCard
                     bookingDraft={msg.bookingDraft}
+                    defaultPhone={msg.defaultPhone}
                     onConfirm={onConfirmBooking}
                 />
             </div>

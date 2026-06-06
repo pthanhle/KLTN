@@ -57,17 +57,8 @@ class CancelBookingController extends Notifier<CancelBookingState> {
 
   Future<void> submitCancelBooking(String taskId) async {
     if (!isValid) return;
-
-    state = state.copyWith(isSubmitting: true, error: null);
-
-    try {
-      // TODO: Call API to submit cancellation
-      await Future.delayed(const Duration(milliseconds: 600)); // Mock API delay
-
-      state = state.copyWith(isSubmitting: false, isSuccess: true);
-    } catch (e) {
-      state = state.copyWith(isSubmitting: false, error: e.toString());
-    }
+    // Actual API call (CANCELLED + note) is handled by updateTaskStatus in onComplete callback.
+    state = state.copyWith(isSuccess: true);
   }
 }
 

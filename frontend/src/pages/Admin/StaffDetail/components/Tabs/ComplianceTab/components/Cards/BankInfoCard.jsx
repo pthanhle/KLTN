@@ -3,7 +3,7 @@ import { Landmark, Edit2, Check, X } from 'lucide-react';
 import MaskedField from '../Shared/MaskedField';
 import BankSelect from '../Shared/BankSelect';
 import { Controller } from 'react-hook-form';
-import { Button, Input, Form } from 'antd';
+import { Button, Input } from 'antd';
 import { useFinancialForm } from '../../hooks/useFinancialForm';
 import { InfoRow, FieldWrapper } from '../Shared/FormHelpers';
 
@@ -41,7 +41,7 @@ const BankInfoCard = ({ staffId, data, t, onUnmask, onUpdateSuccess }) => {
             </div>
 
             {isEditing ? (
-                <Form component="form" onSubmit={handleEditSubmit} className="animate-fade-in flex flex-col">
+                <form onSubmit={handleEditSubmit} className="animate-fade-in flex flex-col">
                     <Controller name="bankAccount" control={control} render={({ field: { onChange, ...field } }) => (
                         <FieldWrapper label={t('adminStaffCompliance:label_bank_account', 'Số tài khoản')} error={errors.bankAccount}>
                             <Input
@@ -110,7 +110,7 @@ const BankInfoCard = ({ staffId, data, t, onUnmask, onUpdateSuccess }) => {
                             {isSubmitting ? t('adminStaffCompliance:btn_saving', 'Đang lưu...') : t('adminStaffCompliance:btn_save', 'Lưu thay đổi')}
                         </button>
                     </div>
-                </Form>
+                </form>
             ) : (
                 <div className="flex flex-col animate-fade-in">
                     <InfoRow label={t('adminStaffCompliance:label_bank_account', 'Số tài khoản')}>

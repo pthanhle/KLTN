@@ -1,5 +1,5 @@
 import Booking from '../../models/bookingModel.js'
-import Part from '../../models/partModel.js'
+import Car from '../../models/carModel.js'
 import Notification from '../../models/notificationModel.js'
 import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
@@ -21,7 +21,7 @@ export const getBookings = asyncHandler(async (req, res) => {
 
     const total = await Booking.countDocuments(query)
     const bookings = await Booking.find(query)
-        .populate('product_id', 'product_name brandName images price isDemoAvailable')
+        .populate('product_id', 'name sku brandName images price')
         .populate('advisor_id', 'full_name phone avatar')
         .populate('mechanic_id', 'full_name phone avatar')
         .sort({ booking_date: -1 })
@@ -41,7 +41,7 @@ export const getBookings = asyncHandler(async (req, res) => {
 
 export const getBookingById = asyncHandler(async (req, res) => {
     const booking = await Booking.findById(req.params.id)
-        .populate('product_id', 'product_name brandName images price isDemoAvailable')
+        .populate('product_id', 'name sku brandName images price')
         .populate('advisor_id', 'full_name phone avatar')
         .populate('mechanic_id', 'full_name phone avatar')
         .populate('user_id', 'full_name email phone')
@@ -51,7 +51,7 @@ export const getBookingById = asyncHandler(async (req, res) => {
         throw new Error('Booking không tồn tại')
     }
 
-    if (booking.user_id._id.toString() !== req.user._id.toString()) {
+    if (!booking.user_id || booking.user_id._id.toString() !== req.user._id.toString()) {
         res.status(403)
         throw new Error('Không có quyền xem booking này')
     }
@@ -96,8 +96,8 @@ export const createBooking = asyncHandler(async (req, res) => {
             throw new Error('Vui lòng chọn xe để lái thử')
         }
 
-        const car = await Product.findById(product_id)
-        if (!car || car.type !== 'car') {
+        const car = await Car.findById(product_id)
+        if (!car) {
             res.status(404)
             throw new Error('Xe không tồn tại hoặc không hợp lệ')
         }
@@ -147,7 +147,7 @@ export const createBooking = asyncHandler(async (req, res) => {
     res.status(201).json({
         message: 'Đặt lịch thành công',
         booking: await Booking.findById(booking._id)
-            .populate('product_id', 'product_name brandName images price'),
+            .populate('product_id', 'name sku brandName images price'),
     })
 })
 
@@ -161,7 +161,7 @@ export const rescheduleBooking = asyncHandler(async (req, res) => {
         throw new Error('Booking không tồn tại')
     }
 
-    if (booking.user_id.toString() !== req.user._id.toString()) {
+    if (!booking.user_id || booking.user_id.toString() !== req.user._id.toString()) {
         res.status(403)
         throw new Error('Không có quyền dời lịch này')
     }
@@ -195,7 +195,7 @@ export const cancelBooking = asyncHandler(async (req, res) => {
         throw new Error('Booking không tồn tại')
     }
 
-    if (booking.user_id.toString() !== req.user._id.toString()) {
+    if (!booking.user_id || booking.user_id.toString() !== req.user._id.toString()) {
         res.status(403)
         throw new Error('Không có quyền hủy booking này')
     }
@@ -226,7 +226,7 @@ export const rateBooking = asyncHandler(async (req, res) => {
         throw new Error('Booking không tồn tại')
     }
 
-    if (booking.user_id.toString() !== req.user._id.toString()) {
+    if (!booking.user_id || booking.user_id.toString() !== req.user._id.toString()) {
         res.status(403)
         throw new Error('Không có quyền đánh giá booking này')
     }

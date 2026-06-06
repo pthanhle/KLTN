@@ -76,7 +76,13 @@ class AdvisorApiRepository {
 
     final timelineList = json['timeline'] as List<dynamic>? ?? [];
     for (var step in timelineList) {
-      if (step['step'] == 'RECEIVED' && step['reception_info'] != null) {
+      // Only treat reception as done when the RECEIVED step is COMPLETED.
+      // The initial timeline entry (created when admin assigns an advisor) has
+      // status 'IN_PROGRESS' and may carry an empty reception_info object from
+      // Mongoose schema defaults. We must not mistake that for a real walkaround.
+      if (step['step'] == 'RECEIVED' &&
+          step['status'] == 'COMPLETED' &&
+          step['reception_info'] != null) {
         parsedReceptionInfo = ReceptionInfo.fromJson(
           step['reception_info'],
           step['signatures'] ?? {},

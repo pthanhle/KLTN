@@ -74,10 +74,30 @@ const mapOverviewData = (realProgress, ri, advisorSignatureUrl, customerSignatur
 
 const mapQuotationData = (realProgress, ri, advisorSignatureUrl, customerSignatureUrl) => {
     const q = realProgress.quotation;
-    if (!q?.parts?.length && !q?.labors?.length) return null;
+    // Show quotation tab whenever advisor has submitted a quotation (PENDING/APPROVED) with any amount
+    const hasQuotation = q?.status && (q.deposit_amount > 0 || q.final_amount > 0 || q.service_package_total > 0 || q.parts?.length || q.labors?.length);
+    if (!hasQuotation) return null;
+    const booking = realProgress.booking_id || {};
+    const creationDate = q.approved_at || realProgress.updatedAt || realProgress.createdAt;
     return {
-        booking_code: realProgress.booking_id?.booking_code || realProgress._id,
+        progress_id: realProgress._id,
+        booking_code: booking.booking_code || realProgress._id,
+        customer_info: {
+            full_name: booking.customer_info?.full_name || '',
+            phone: booking.customer_info?.contact_phone || '',
+            address: booking.customer_info?.address || '',
+        },
+        vehicle_info: {
+            brand: booking.vehicle_info?.brand || '',
+            model: booking.vehicle_info?.model || '',
+            license_plate: booking.vehicle_info?.license_plate || '',
+            vin_number: booking.vehicle_info?.vin_number || '',
+            current_odometer: booking.vehicle_info?.current_odometer || 0,
+        },
+        advisor_name: realProgress.advisor_id?.full_name || '',
+        creation_date: creationDate ? new Date(creationDate).toLocaleDateString('vi-VN') : '',
         status: q.status || 'PENDING',
+        service_package_total: q.service_package_total || 0,
         parts: (q.parts || []).map((p) => ({
             sku: p.sku,
             name: p.name,
@@ -90,9 +110,11 @@ const mapQuotationData = (realProgress, ri, advisorSignatureUrl, customerSignatu
             rate: l.rate || 0,
         })),
         vat_rate: q.vat_rate ?? 0.1,
+        deposit_amount: q.deposit_amount || 0,
+        final_amount: q.final_amount || 0,
         payment_terms: {
             required_deposit: q.deposit_amount || 0,
-            deposit_status: q.deposit_amount > 0 ? 'PENDING' : 'PAID',
+            deposit_status: q.status === 'APPROVED' ? 'PAID' : 'PENDING',
         },
         reception_snapshot: ri
             ? {
@@ -121,6 +143,7 @@ export const useTrackingDetailLogic = () => {
     const [overviewData, setOverviewData] = useState(null);
     const [quotationData, setQuotationData] = useState(null);
     const [repairStatus, setRepairStatus] = useState('RECEIVED');
+    const [progressId, setProgressId] = useState(null);
     const { userInfo } = useSelector((state) => state.auth);
 
     useEffect(() => {
@@ -153,6 +176,7 @@ export const useTrackingDetailLogic = () => {
                 const advisorSignatureUrl = normalizeSignatureDataUrl(receivedStep?.signatures?.advisor?.signature_url);
                 const customerSignatureUrl = normalizeSignatureDataUrl(receivedStep?.signatures?.customer?.signature_url);
 
+                setProgressId(realProgress._id);
                 setRepairStatus(realProgress.status || 'RECEIVED');
                 setOverviewData(ri ? mapOverviewData(realProgress, ri, advisorSignatureUrl, customerSignatureUrl) : null);
                 setDiagnosticData(realProgress.timeline ? mapDiagnosticData(realProgress.timeline) : null);
@@ -183,6 +207,7 @@ export const useTrackingDetailLogic = () => {
         quotationData,
         setQuotationData,
         repairStatus,
+        progressId,
         t,
     };
 };

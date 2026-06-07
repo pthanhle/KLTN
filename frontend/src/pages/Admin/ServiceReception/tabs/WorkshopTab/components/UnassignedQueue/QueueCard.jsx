@@ -25,7 +25,9 @@ const QueueCard = ({ booking }) => {
     const tooltipContent = (
         <div className="flex flex-col gap-2 p-1 min-w-[200px] text-slate-800 dark:text-slate-200">
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-1">
-                <span className="font-bold text-yellow-600 dark:text-yellow-500">{booking._id}</span>
+                <span className="font-bold text-yellow-600 dark:text-yellow-500">
+                    {booking.sequence_number != null ? `#${booking.sequence_number}` : booking.booking_code || booking._id}
+                </span>
                 <span className="bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300">
                     {t(`status_${booking.status}`, booking.status)}
                 </span>
@@ -63,7 +65,14 @@ const QueueCard = ({ booking }) => {
                     <Car className="w-3 h-3 text-slate-400" />
                     {booking.license_plate}
                 </div>
-                <MoreVertical className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="flex items-center gap-1.5">
+                    {booking.sequence_number != null && (
+                        <span className="font-mono text-[10px] font-bold text-yellow-600 dark:text-yellow-500">
+                            #{booking.sequence_number}
+                        </span>
+                    )}
+                    <MoreVertical className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
             </div>
             
             <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-snug line-clamp-2">

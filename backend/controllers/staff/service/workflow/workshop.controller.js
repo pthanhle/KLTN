@@ -113,20 +113,34 @@ export const markJobDone = asyncHandler(async (req, res) => {
 })
 
 export const createQuotation = asyncHandler(async (req, res) => {
-    const { progress_id, parts, labors, vat_rate, deposit_amount } = req.body
+    const { progress_id, parts, labors, vat_rate, service_package_total } = req.body
 
-    const progress = await RepairProgress.findById(progress_id)
+    const progress = await RepairProgress.findById(progress_id).populate('booking_id')
     if (!progress) {
         res.status(404)
         throw new Error('Không tìm thấy RepairProgress')
     }
 
+    const vatRate = vat_rate || 0.1
+    const pkgTotal = service_package_total != null
+        ? Number(service_package_total)
+        : (progress.booking_id?.total_cost || 0)
+
+    const partsTotal = (parts || []).reduce((s, p) => s + (p.quantity || 0) * (p.unit_price || 0), 0)
+    const laborsTotal = (labors || []).reduce((s, l) => s + (l.hours || 0) * (l.rate || 0), 0)
+    const subtotal = pkgTotal + partsTotal + laborsTotal
+    const vat = subtotal * vatRate
+    const finalAmount = subtotal + vat
+    const depositAmount = Math.round(finalAmount * 0.5)
+
     progress.quotation = {
+        service_package_total: pkgTotal,
         parts: parts || [],
         labors: labors || [],
-        vat_rate: vat_rate || 0.1,
-        deposit_amount: deposit_amount || 0,
-        status: 'PENDING'
+        vat_rate: vatRate,
+        deposit_amount: depositAmount,
+        final_amount: finalAmount,
+        status: 'PENDING',
     }
     progress.current_step = 'QUOTING'
     progress.status = 'QUOTING'
@@ -135,7 +149,7 @@ export const createQuotation = asyncHandler(async (req, res) => {
 
     res.json({
         message: 'Tạo báo giá thành công',
-        repairProgress: progress
+        repairProgress: progress,
     })
 })
 

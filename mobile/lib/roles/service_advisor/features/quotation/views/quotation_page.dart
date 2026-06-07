@@ -12,7 +12,6 @@ import '../widgets/shared/quotation_skeleton.dart';
 import '../widgets/sections/technician_diagnosis_section.dart';
 import '../widgets/sections/reception_review_section.dart';
 import '../widgets/sections/service_cart_section.dart';
-import '../widgets/sections/promotions_section.dart';
 import '../widgets/shared/quotation_summary_card.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
 import '../widgets/reception_summary_modal.dart';
@@ -29,6 +28,8 @@ class QuotationPage extends ConsumerStatefulWidget {
 }
 
 class _QuotationPageState extends ConsumerState<QuotationPage> {
+  bool _hasViewedDiagnosis = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,13 +52,25 @@ class _QuotationPageState extends ConsumerState<QuotationPage> {
       order = null;
     }
 
+    final hasDiagnosis = order != null && order.mpiDiagnostics.isNotEmpty;
+    final canSubmitQuote = hasDiagnosis && _hasViewedDiagnosis;
+    final lockedHint = !hasDiagnosis
+        ? 'Đang chờ KTV gửi kết quả chẩn đoán...'.tr()
+        : (!_hasViewedDiagnosis
+            ? 'Vui lòng xem chi tiết chẩn đoán của KTV trước khi lập báo giá'.tr()
+            : null);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           const MeshBackground(child: SizedBox()),
 
-          CustomScrollView(
+          RefreshIndicator(
+            onRefresh: () async {
+              ref.read(quotationControllerProvider.notifier).refresh();
+            },
+            child: CustomScrollView(
             physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),
@@ -128,13 +141,22 @@ class _QuotationPageState extends ConsumerState<QuotationPage> {
                       const SizedBox(height: 16),
                       ReceptionReviewSection(snapshot: data.receptionSnapshot),
                       const SizedBox(height: 32),
-                      TechnicianDiagnosisSection(data: data, orderId: widget.orderId),
+                      TechnicianDiagnosisSection(
+                        data: data,
+                        orderId: widget.orderId,
+                        mpiDiagnostics: order?.mpiDiagnostics ?? const [],
+                        mpiConclusion: order?.mpiConclusion ?? '',
+                        hasViewedDiagnosis: _hasViewedDiagnosis,
+                        onViewDetail: () {
+                          if (!_hasViewedDiagnosis) {
+                            setState(() => _hasViewedDiagnosis = true);
+                          }
+                        },
+                      ),
                       const SizedBox(height: 32),
                       ServiceCartSection(data: data),
                       const SizedBox(height: 32),
-                      PromotionsSection(data: data),
-                      const SizedBox(height: 32),
-                      QuotationSummaryCard(data: data),
+                      QuotationSummaryCard(data: data, canSubmit: canSubmitQuote, lockedHint: lockedHint),
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -142,6 +164,7 @@ class _QuotationPageState extends ConsumerState<QuotationPage> {
               ),
             ],
           ),
+          ), // RefreshIndicator
         ],
       ),
     );

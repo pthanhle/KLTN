@@ -3,6 +3,7 @@ import User from '../../models/userModel.js'
 import Car from '../../models/carModel.js'
 import Role from '../../models/roleModel.js'
 import Notification from '../../models/notificationModel.js'
+import { getNextSequence } from '../../models/counterModel.js'
 import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
 import dayjs from 'dayjs'
@@ -25,6 +26,7 @@ const normalizeBooking = (b) => {
   return {
     _id: obj._id,
     booking_code: obj.booking_code,
+    sequence_number: obj.sequence_number,
     fullName: obj.customer_info?.full_name || obj.user_id?.full_name || '',
     phoneNumber: obj.customer_info?.contact_phone || obj.user_id?.phone || '',
     email: obj.customer_info?.email || obj.user_id?.email || '',
@@ -137,6 +139,7 @@ const toKanbanTask = (b) => {
     : ''
   return {
     id: String(obj._id),
+    sequence_number: obj.sequence_number,
     title: `Lịch lái thử xe ${car?.name || car?.sku || ''}`,
     priority: obj.priority || 'MEDIUM',
     sla: null,
@@ -333,6 +336,7 @@ export const createTestDriveBookingByAdmin = asyncHandler(async (req, res) => {
 
   const rand = Math.random().toString(36).substring(2, 8).toUpperCase()
   const booking_code = `TD-${Date.now()}-${rand}`
+  const sequence_number = await getNextSequence('booking_seq_test_drive')
 
   const deliveryAddressObj =
     test_drive_type === 'home' && delivery_address && typeof delivery_address === 'object'
@@ -341,6 +345,7 @@ export const createTestDriveBookingByAdmin = asyncHandler(async (req, res) => {
 
   const booking = await Booking.create({
     booking_code,
+    sequence_number,
     user_id: userId,
     customer_info: {
       full_name: full_name.trim(),

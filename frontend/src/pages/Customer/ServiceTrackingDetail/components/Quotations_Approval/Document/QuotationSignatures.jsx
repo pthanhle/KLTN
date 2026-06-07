@@ -27,7 +27,7 @@ const QuotationSignatures = ({ quotation, t }) => (
     <footer className="mt-16 grid grid-cols-2 gap-10 text-center">
         <SignatureBox
             title={t('quote_sign_customer', 'Xác nhận của Khách Hàng')}
-            name={quotation.customer_info.full_name}
+            name={quotation.customer_info?.full_name}
             signature={quotation.customer_signature}
             t={t}
         />

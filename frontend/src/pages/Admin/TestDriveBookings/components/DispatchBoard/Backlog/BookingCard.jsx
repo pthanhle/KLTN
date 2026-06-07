@@ -31,9 +31,16 @@ export const BookingCardUI = ({ booking, t, isDragging, style, setNodeRef, liste
                     <p className="font-bold text-slate-800 dark:text-white text-base truncate">{booking.fullName}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{booking.phoneNumber}</p>
                 </div>
-                <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider shrink-0 ml-2 ${typeTheme.badge}`}>
-                    {typeBadgeLabel}
-                </span>
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                    {booking.sequence_number != null && (
+                        <span className="font-mono text-[10px] font-bold text-yellow-600 dark:text-yellow-500">
+                            #{booking.sequence_number}
+                        </span>
+                    )}
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${typeTheme.badge}`}>
+                        {typeBadgeLabel}
+                    </span>
+                </div>
             </div>
 
             <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 mb-3 border border-slate-200 dark:border-white/5 relative z-10">

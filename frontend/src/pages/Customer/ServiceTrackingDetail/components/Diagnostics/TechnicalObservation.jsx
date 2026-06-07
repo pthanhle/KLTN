@@ -34,14 +34,16 @@ const TechnicalObservation = ({ conclusion, technician, lastDate }) => {
                             {t('label_signature', 'Chữ ký Kỹ Thuật Viên Trưởng')}
                         </p>
                         <div className="w-40 md:w-48 h-12 md:h-16 border-b border-slate-300 dark:border-white/30 mb-2 overflow-hidden flex justify-start lg:justify-end">
-                            <Image 
-                                src={technician.signature} 
-                                alt="Signature" 
-                                preview={false}
-                                className="h-full object-contain opacity-70 grayscale dark:invert" 
-                            />
+                            {technician?.signature && (
+                                <Image
+                                    src={technician.signature}
+                                    alt="Signature"
+                                    preview={false}
+                                    className="h-full object-contain opacity-70 grayscale dark:invert"
+                                />
+                            )}
                         </div>
-                        <p className="text-slate-900 dark:text-white font-bold">{technician.name}</p>
+                        <p className="text-slate-900 dark:text-white font-bold">{technician?.name || ''}</p>
                     </div>
                 </div>
             </div>

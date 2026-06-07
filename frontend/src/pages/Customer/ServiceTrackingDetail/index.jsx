@@ -1,7 +1,18 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, CreditCard } from 'lucide-react';
+
+const STATUS_META = {
+    RECEIVED:      { label: 'Đã tiếp nhận', color: 'text-slate-600 dark:text-slate-400', dot: 'bg-slate-400' },
+    DIAGNOSING:    { label: 'Đang chẩn đoán', color: 'text-blue-600 dark:text-blue-400', dot: 'bg-blue-400' },
+    QUOTING:       { label: 'Đang lập báo giá', color: 'text-yellow-600 dark:text-yellow-400', dot: 'bg-yellow-400 animate-pulse' },
+    WAITING_PARTS: { label: 'Đang chuẩn bị phụ tùng', color: 'text-orange-600 dark:text-orange-400', dot: 'bg-orange-400 animate-pulse' },
+    IN_PROGRESS:   { label: 'Đang thi công', color: 'text-indigo-600 dark:text-indigo-400', dot: 'bg-indigo-500 animate-pulse' },
+    QC_TESTING:    { label: 'Đang kiểm định chất lượng', color: 'text-purple-600 dark:text-purple-400', dot: 'bg-purple-500 animate-pulse' },
+    COMPLETED:     { label: 'Hoàn thành — Sẵn sàng nhận xe', color: 'text-emerald-600 dark:text-emerald-400', dot: 'bg-emerald-500' },
+    CANCELLED:     { label: 'Đã huỷ', color: 'text-red-600 dark:text-red-400', dot: 'bg-red-400' },
+};
 import SideNavBar from './components/Layout/SideNavBar';
 import BottomNavBar from './components/Layout/BottomNavBar';
 import DiagnosticTab from './components/Diagnostics/DiagnosticTab';
@@ -10,8 +21,9 @@ import OverviewTab from './components/Overview_Reception/OverviewTab';
 import QuotationTab from './components/Quotations_Approval/QuotationTab';
 import ProgressTab from './components/Progress_Tracking/ProgressTab';
 import DeliveryTab from './components/Delivery_Invoices/DeliveryTab';
-import { Skeleton } from 'antd';
+import { Skeleton, message } from 'antd';
 import { useTrackingDetailLogic } from './hooks/useTrackingDetailLogic';
+import { CheckoutAPI } from '../../../services/api/checkout';
 
 const ErrorState = ({ message, t }) => {
     const navigate = useNavigate();
@@ -59,8 +71,26 @@ const ServiceTrackingDetail = () => {
         quotationData,
         setQuotationData,
         repairStatus,
+        progressId,
         t,
     } = useTrackingDetailLogic();
+
+    const [isFinalPaymentRedirecting, setIsFinalPaymentRedirecting] = useState(false);
+    const handleFinalPayment = useCallback(async () => {
+        if (!progressId || isFinalPaymentRedirecting) return;
+        setIsFinalPaymentRedirecting(true);
+        try {
+            const response = await CheckoutAPI.createServiceFinalPayment(progressId);
+            if (response?.url) {
+                window.location.href = response.url;
+            } else {
+                throw new Error(response?.message || 'Không thể tạo liên kết thanh toán');
+            }
+        } catch (err) {
+            message.error(err?.response?.data?.message || err?.message || 'Có lỗi khi kết nối VNPay');
+            setIsFinalPaymentRedirecting(false);
+        }
+    }, [progressId, isFinalPaymentRedirecting]);
 
     return (
         <div className="bg-slate-50 dark:bg-[#0A0A0B] text-slate-900 dark:text-[#dce1fb] min-h-screen flex flex-col lg:flex-row selection:bg-yellow-500 selection:text-[#0A0A0B] font-sans antialiased">
@@ -77,6 +107,18 @@ const ServiceTrackingDetail = () => {
 
             <div className="flex-1 flex flex-col relative w-full lg:w-[calc(100%-18rem)]">
                 <main className="p-4 md:p-10 lg:p-16 w-full mx-auto max-w-7xl">
+                    {!isLoading && !error && repairStatus && (() => {
+                        const meta = STATUS_META[repairStatus];
+                        if (!meta) return null;
+                        return (
+                            <div className="flex items-center gap-2 mb-6 animate-in fade-in duration-500">
+                                <span className={`inline-block w-2 h-2 rounded-full ${meta.dot}`} />
+                                <span className={`text-xs font-bold uppercase tracking-[0.15em] ${meta.color}`}>
+                                    {meta.label}
+                                </span>
+                            </div>
+                        );
+                    })()}
                     {isLoading ? (
                         <div className="space-y-10">
                             <Skeleton active paragraph={{ rows: 2 }} className="dark:opacity-20" />
@@ -109,6 +151,44 @@ const ServiceTrackingDetail = () => {
                         </>
                     )}
                 </main>
+
+                {/* Final payment bar — shown when QC done */}
+                {repairStatus === 'QC_TESTING' && progressId && !isLoading && (
+                    <div className="sticky bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-[#141416]/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 shadow-2xl z-30 lg:hidden">
+                        <button
+                            onClick={handleFinalPayment}
+                            disabled={isFinalPaymentRedirecting}
+                            className="w-full py-4 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-400 text-slate-900 font-black uppercase tracking-widest text-sm shadow-[0_10px_30px_rgba(234,179,8,0.3)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                        >
+                            <CreditCard size={18} />
+                            {isFinalPaymentRedirecting ? 'Đang chuyển hướng...' : 'Thanh toán phần còn lại qua VNPay'}
+                        </button>
+                    </div>
+                )}
+
+                {/* Desktop final payment bar */}
+                {repairStatus === 'QC_TESTING' && progressId && !isLoading && (
+                    <div className="hidden lg:block mx-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="max-w-7xl mx-auto bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-widest text-yellow-700 dark:text-yellow-400 mb-1">
+                                    Xe đã hoàn thành kiểm định QC
+                                </p>
+                                <p className="text-sm text-slate-600 dark:text-[#a0a0a0]">
+                                    Vui lòng thanh toán phần còn lại để nhận xe.
+                                </p>
+                            </div>
+                            <button
+                                onClick={handleFinalPayment}
+                                disabled={isFinalPaymentRedirecting}
+                                className="flex-shrink-0 px-8 py-3 rounded-full bg-yellow-500 hover:bg-yellow-400 disabled:opacity-70 text-slate-900 font-bold text-sm flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95 shadow-md"
+                            >
+                                <CreditCard size={18} />
+                                {isFinalPaymentRedirecting ? 'Đang chuyển hướng...' : 'Thanh toán qua VNPay'}
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <div className="h-24 lg:hidden" />
                 <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} repairStatus={repairStatus} />

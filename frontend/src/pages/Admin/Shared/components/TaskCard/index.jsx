@@ -29,6 +29,11 @@ const TaskCard = ({ task, status, onClick }) => {
         >
             <div className="flex justify-between items-start p-4 pb-2">
                 <div className="flex items-center gap-2">
+                    {task.sequence_number != null && (
+                        <span className="font-mono text-[10px] font-bold text-yellow-600 dark:text-yellow-500">
+                            #{task.sequence_number}
+                        </span>
+                    )}
                     <span className="font-mono text-[10px] font-bold text-slate-500 dark:text-gray-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md uppercase tracking-wider border border-slate-200 dark:border-white/5">
                         {task.id}
                     </span>

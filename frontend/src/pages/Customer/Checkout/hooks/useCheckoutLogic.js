@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { App } from 'antd';
 
@@ -14,6 +14,21 @@ export const useCheckoutLogic = () => {
     const { t } = useTranslation(['checkout']);
     const { message } = App.useApp();
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
+    // Redirect service deposit payments to the service tracking page
+    useEffect(() => {
+        const type = searchParams.get('type');
+        const orderId = searchParams.get('order_id');
+        const pathname = window.location.pathname;
+        if ((pathname.includes('/payment/success') || pathname.includes('/payment/failed')) && type === 'quotation' && orderId) {
+            if (pathname.includes('/payment/success')) {
+                navigate(`/tracking/${orderId}`, { replace: true });
+            } else {
+                navigate(`/tracking/${orderId}?deposit_failed=1`, { replace: true });
+            }
+        }
+    }, [searchParams, navigate]);
 
     const [currentStep, setCurrentStep] = useState(() => {
         const pathname = window.location.pathname;

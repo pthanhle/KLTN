@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from 'antd';
-import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, UserCog } from 'lucide-react';
 import { ORDER_STATUSES } from '../../../Orders/constants/statusConfig';
 
 export const HeaderActions = ({ order, loading, t, onAction }) => {
@@ -55,32 +55,13 @@ export const HeaderActions = ({ order, loading, t, onAction }) => {
                     </>
                 )}
 
-                {order.order_status === ORDER_STATUSES.CONFIRMED.value && (
-                    <>
-                        <button
-                            onClick={() => onAction('pack_order')}
-                            className="px-6 py-2.5 rounded-full bg-indigo-500 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-indigo-600 transition-colors"
-                        >
-                            {t('pack_order', 'Đã đóng gói')}
-                        </button>
-                    </>
-                )}
-
-                {order.order_status === ORDER_STATUSES.PACKED.value && (
-                    <>
-                        <button
-                            onClick={() => onAction('print_order')}
-                            className="px-6 py-2.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-[11px] uppercase tracking-widest border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
-                        >
-                            {t('print_waybill')}
-                        </button>
-                        <button
-                            onClick={() => onAction('ship_order')}
-                            className="px-6 py-2.5 rounded-full bg-yellow-500 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-yellow-600 transition-colors"
-                        >
-                            {t('ship_order')}
-                        </button>
-                    </>
+                {(order.order_status === ORDER_STATUSES.CONFIRMED.value || order.order_status === ORDER_STATUSES.PACKED.value) && (
+                    <button
+                        onClick={() => onAction('reassign_staff')}
+                        className="px-6 py-2.5 rounded-full bg-indigo-500 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-indigo-600 transition-colors flex items-center gap-2"
+                    >
+                        <UserCog size={16} /> {t('assign_staff', 'Phân công nhân viên')}
+                    </button>
                 )}
 
                 {order.order_status === ORDER_STATUSES.SHIPPING.value && (

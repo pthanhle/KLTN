@@ -36,16 +36,8 @@ class _AddServicePackageModalState
 
   @override
   Widget build(BuildContext context) {
-    final catalog = ref.watch(serviceCatalogProvider);
+    final catalogAsync = ref.watch(serviceCatalogProvider);
     final theme = Theme.of(context);
-
-    final categories = [
-      'Tất cả',
-      ...catalog.map((e) => e.category).toSet(),
-    ];
-    final displayedPackages = selectedCategory == 'Tất cả'
-        ? catalog
-        : catalog.where((p) => p.category == selectedCategory).toList();
 
     // Apple §2: ShapeDecoration ngoài → ClipSmoothRect → BackdropFilter
     return Container(
@@ -115,50 +107,91 @@ class _AddServicePackageModalState
               ),
               const SizedBox(height: 20),
 
-              // Category filter chips
-              SizedBox(
-                height: 36,
-                child: ListView.separated(
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  itemCount: categories.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (context, index) {
-                    final cat = categories[index];
-                    final isSelected = cat == selectedCategory;
-                    return _CategoryChip(
-                      title: cat.tr(),
-                      isSelected: isSelected,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        setState(() => selectedCategory = cat);
-                      },
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Divider
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Container(
-                  height: 0.5,
-                  color: Colors.white.withValues(alpha: 0.15),
-                ),
-              ),
-
-              // Package list
+              // Catalog content (category chips + package list), driven by real backend data
               Expanded(
-                child: ListView.separated(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                  itemCount: displayedPackages.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    return _ServicePackageCard(
-                      package: displayedPackages[index],
+                child: catalogAsync.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(
+                        'Không thể tải danh mục dịch vụ. Vui lòng thử lại.'.tr(),
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                  data: (catalog) {
+                    final categories = [
+                      'Tất cả',
+                      ...catalog.map((e) => e.category).where((c) => c.isNotEmpty).toSet(),
+                    ];
+                    final displayedPackages = selectedCategory == 'Tất cả'
+                        ? catalog
+                        : catalog.where((p) => p.category == selectedCategory).toList();
+
+                    return Column(
+                      children: [
+                        // Category filter chips
+                        SizedBox(
+                          height: 36,
+                          child: ListView.separated(
+                            physics: const BouncingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            itemCount: categories.length,
+                            separatorBuilder: (_, __) => const SizedBox(width: 8),
+                            itemBuilder: (context, index) {
+                              final cat = categories[index];
+                              final isSelected = cat == selectedCategory;
+                              return _CategoryChip(
+                                title: cat.tr(),
+                                isSelected: isSelected,
+                                onTap: () {
+                                  HapticFeedback.selectionClick();
+                                  setState(() => selectedCategory = cat);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Divider
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Container(
+                            height: 0.5,
+                            color: Colors.white.withValues(alpha: 0.15),
+                          ),
+                        ),
+
+                        // Package list
+                        Expanded(
+                          child: displayedPackages.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'Không có gói dịch vụ nào'.tr(),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                )
+                              : ListView.separated(
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                                  itemCount: displayedPackages.length,
+                                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                  itemBuilder: (context, index) {
+                                    return _ServicePackageCard(
+                                      package: displayedPackages[index],
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
                     );
                   },
                 ),

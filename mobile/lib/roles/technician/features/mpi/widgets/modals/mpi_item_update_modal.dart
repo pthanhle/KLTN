@@ -261,9 +261,16 @@ class _MpiItemUpdateModalState extends State<MpiItemUpdateModal> {
       final token = prefs.getString('access_token');
       if (token == null) throw Exception('SESSION_EXPIRED');
 
-      final dio = Dio();
+      final dio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+      ));
+      // Use readAsBytes() for cross-platform (web + mobile) compatibility.
+      // MultipartFile.fromFile() relies on dart:io which is unavailable on web.
+      final bytes = await file.readAsBytes();
+      final filename = file.name.isNotEmpty ? file.name : 'image.jpg';
       final formData = FormData.fromMap({
-        'image': await MultipartFile.fromFile(file.path, filename: File(file.path).uri.pathSegments.last),
+        'image': MultipartFile.fromBytes(bytes, filename: filename),
       });
 
       final response = await dio.post(
@@ -279,12 +286,33 @@ class _MpiItemUpdateModalState extends State<MpiItemUpdateModal> {
           _isUploading = false;
         });
       }
-    } catch (_) {
+    } on DioException catch (e) {
+      final statusCode = e.response?.statusCode;
+      print('[MPI Upload] DioException: $statusCode ${e.message}');
+      print('[MPI Upload] Response: ${e.response?.data}');
+      String msg;
+      if (statusCode == 401) {
+        msg = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.';
+      } else if (statusCode != null && statusCode >= 500) {
+        msg = 'Lỗi máy chủ ($statusCode). Vui lòng thử lại.';
+      } else {
+        msg = 'Không thể tải ảnh lên. Vui lòng thử lại.';
+      }
       if (mounted) {
         HapticFeedback.heavyImpact();
         setState(() {
           _isUploading = false;
-          _errorMessage = 'Không thể tải ảnh lên. Vui lòng thử lại.'.tr();
+          _errorMessage = msg;
+          _errorShakeKey++;
+        });
+      }
+    } catch (e) {
+      print('[MPI Upload] Unexpected error: $e');
+      if (mounted) {
+        HapticFeedback.heavyImpact();
+        setState(() {
+          _isUploading = false;
+          _errorMessage = 'Không thể tải ảnh lên. Vui lòng thử lại.';
           _errorShakeKey++;
         });
       }

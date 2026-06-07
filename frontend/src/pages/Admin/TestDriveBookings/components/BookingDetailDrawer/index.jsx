@@ -93,6 +93,9 @@ const BookingDetailDrawer = ({ bookingId, open, onClose }) => {
                             <p className="text-[12px] text-slate-400">Mã lịch hẹn</p>
                             <p className="text-[15px] font-black text-slate-800 dark:text-white tracking-wider">
                                 {booking.booking_code || '—'}
+                                {booking.sequence_number != null && (
+                                    <span className="ml-2 text-yellow-600 dark:text-yellow-500">#{booking.sequence_number}</span>
+                                )}
                             </p>
                         </div>
                         <Tag color={priorityCfg.color} className="text-[12px] font-bold px-3 py-1">

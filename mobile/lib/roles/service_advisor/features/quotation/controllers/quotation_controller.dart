@@ -39,7 +39,21 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   void init(String orderId) {
     _orderId = orderId;
     ref.read(activeQuotationOrderIdProvider.notifier).state = orderId;
-    _loadForOrder(orderId);
+    state = const AsyncLoading();
+    // Force a fresh dashboard fetch so a just-completed KTV diagnosis is reflected
+    // immediately instead of relying on the cached (up to 30s stale) dashboard state.
+    ref.read(advisorDashboardProvider.notifier).refresh().then((_) {
+      _loadForOrder(orderId);
+    });
+  }
+
+  /// Called when advisor pulls to refresh or receives diagnosis_completed socket event.
+  void refresh() {
+    state = const AsyncLoading();
+    // Re-fetch dashboard first so diagnosis data is up-to-date
+    ref.read(advisorDashboardProvider.notifier).refresh().then((_) {
+      _loadForOrder(_orderId);
+    });
   }
 
   Future<void> _loadForOrder(String orderId) async {
@@ -86,6 +100,9 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
         );
       }
 
+      // Preserve existing cart items if already loaded (pull-to-refresh scenario)
+      final existing = state.value;
+
       state = AsyncData(QuotationModel(
         orderId: orderId,
         diagnosis: DiagnosticItem(
@@ -94,6 +111,9 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
           imageUrl: '',
         ),
         receptionSnapshot: snapshot,
+        servicePackageTotal: order.servicePackageTotal,
+        parts: existing?.parts ?? [],
+        labor: existing?.labor ?? [],
       ));
     } catch (_) {
       state = AsyncData(QuotationModel(
@@ -110,12 +130,6 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   void updateAdvisorNote(String note) {
     if (state.hasValue && state.value != null) {
       state = AsyncData(state.value!.copyWith(advisorNote: note));
-    }
-  }
-
-  void applyPromoCode(String code) {
-    if (state.hasValue && state.value != null) {
-      state = AsyncData(state.value!.copyWith(promoCode: code));
     }
   }
 
@@ -173,12 +187,36 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
     }
   }
 
+  void addManualLabor({required String description, required double price, double hours = 1}) {
+    if (state.hasValue && state.value != null) {
+      final currentLabor = List<CartLaborItem>.from(state.value!.labor);
+      currentLabor.add(CartLaborItem(
+        id: 'manual_${DateTime.now().millisecondsSinceEpoch}',
+        name: description,
+        hours: hours,
+        rate: hours > 0 ? price / hours : price,
+      ));
+      state = AsyncData(state.value!.copyWith(labor: currentLabor));
+    }
+  }
+
+  void removeLabor(String id) {
+    if (state.hasValue && state.value != null) {
+      final updated = state.value!.labor.where((l) => l.id != id).toList();
+      state = AsyncData(state.value!.copyWith(labor: updated));
+    }
+  }
+
+  void removePart(String id) {
+    if (state.hasValue && state.value != null) {
+      final updated = state.value!.parts.where((p) => p.id != id).toList();
+      state = AsyncData(state.value!.copyWith(parts: updated));
+    }
+  }
+
   Future<void> submitQuotation() async {
     if (!state.hasValue || state.value == null) return;
     final quotation = state.value!;
-    if (quotation.parts.isEmpty && quotation.labor.isEmpty) {
-      throw Exception('Vui lòng thêm ít nhất một phụ tùng hoặc dịch vụ');
-    }
 
     final token = await _getToken();
     final url = '${ApiConfig.baseUrl}/staff/service/repair-progress/quotation';
@@ -203,7 +241,7 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
         'parts': backendParts,
         'labors': backendLabors,
         'vat_rate': 0.1,
-        'deposit_amount': quotation.depositRequired,
+        'service_package_total': quotation.servicePackageTotal,
       }),
       options: Options(headers: {
         'Authorization': 'Bearer $token',
@@ -213,24 +251,6 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
 
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(response.data['message'] ?? 'Gửi báo giá thất bại');
-    }
-  }
-
-  Future<void> approveQuotation() async {
-    final token = await _getToken();
-    final url = '${ApiConfig.baseUrl}/staff/service/repair-progress/quotation/approve';
-
-    final response = await _dio.post(
-      url,
-      data: jsonEncode({'progress_id': _orderId}),
-      options: Options(headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      }),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception(response.data['message'] ?? 'Phê duyệt báo giá thất bại');
     }
   }
 }

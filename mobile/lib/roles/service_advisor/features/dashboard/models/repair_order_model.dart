@@ -122,8 +122,8 @@ class MpiCategory {
     );
   }
 
-  int get warningCount => items.where((i) => i['status'] == 'MONITOR').length;
-  int get criticalCount => items.where((i) => i['status'] == 'FAIL').length;
+  int get warningCount => items.where((i) => i['status'] == 'warning').length;
+  int get criticalCount => items.where((i) => i['status'] == 'critical').length;
 }
 
 class RepairOrderModel {
@@ -146,6 +146,7 @@ class RepairOrderModel {
   final List<MpiCategory> mpiDiagnostics;
   final String mpiConclusion;
   final String? pendingSupplementId;
+  final double servicePackageTotal;
 
   RepairOrderModel({
     required this.id,
@@ -167,6 +168,7 @@ class RepairOrderModel {
     this.mpiDiagnostics = const [],
     this.mpiConclusion = '',
     this.pendingSupplementId,
+    this.servicePackageTotal = 0.0,
   });
 
   factory RepairOrderModel.fromJson(Map<String, dynamic> json) {

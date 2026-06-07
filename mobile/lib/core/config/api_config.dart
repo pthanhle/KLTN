@@ -22,4 +22,7 @@ class ApiConfig {
 
   static const int connectTimeout = 15000;
   static const int receiveTimeout = 15000;
+
+
+  static const String validTrackingCode = 'GHN-WAREHOUSE-TEST-001';
 }

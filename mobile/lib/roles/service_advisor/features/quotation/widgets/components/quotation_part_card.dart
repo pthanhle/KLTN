@@ -9,8 +9,9 @@ import '../shared/glass_card.dart';
 
 class QuotationPartCard extends StatelessWidget {
   final CartPartItem part;
+  final VoidCallback? onRemove;
 
-  const QuotationPartCard({super.key, required this.part});
+  const QuotationPartCard({super.key, required this.part, this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +20,8 @@ class QuotationPartCard extends StatelessWidget {
 
     return GlassCard(
       margin: const EdgeInsets.only(
-        left: QuotationConstants.paddingHorizontal, 
-        right: QuotationConstants.paddingHorizontal, 
+        left: QuotationConstants.paddingHorizontal,
+        right: QuotationConstants.paddingHorizontal,
         bottom: 12,
       ),
       padding: const EdgeInsets.all(QuotationConstants.itemPadding),
@@ -42,7 +43,7 @@ class QuotationPartCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${QuotationUtils.formatCurrency(part.price).replaceAll('\$', '')} x ${part.quantity}',
+                      '${QuotationUtils.formatCurrency(part.price)} x ${part.quantity}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -50,6 +51,13 @@ class QuotationPartCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (onRemove != null)
+                IconButton(
+                  icon: Icon(CupertinoIcons.trash, size: 18, color: theme.colorScheme.error),
+                  onPressed: onRemove,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                ),
               if (part.isBackorder)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

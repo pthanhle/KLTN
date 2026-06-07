@@ -41,6 +41,16 @@ export const CheckoutAPI = {
         return data || null;
     },
 
+    createServiceDepositPayment: async (progressId) => {
+        const data = await axiosClient.post('/client/payments/vnpay', { progress_id: progressId, payment_type: 'quotation_deposit' });
+        return data || null;
+    },
+
+    createServiceFinalPayment: async (progressId) => {
+        const data = await axiosClient.post('/client/payments/vnpay', { progress_id: progressId, payment_type: 'final_payment' });
+        return data || null;
+    },
+
     cancelOrder: async (id) => {
         const data = await axiosClient.put(`/client/orders/${id}/cancel`);
         return data;

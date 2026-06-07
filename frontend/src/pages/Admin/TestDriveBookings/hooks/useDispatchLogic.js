@@ -92,6 +92,7 @@ export const useDispatchLogic = (t) => {
                         if (String(staff._id) !== String(targetStaffId)) return staff;
                         const newTask = {
                             id: String(booking._id),
+                            sequence_number: booking.sequence_number,
                             title: `Lịch lái thử xe ${booking.targetCar?.name || booking.targetCarSku || ''}`,
                             priority: values.priority || 'MEDIUM',
                             vehicleModel: booking.targetCar?.name || booking.targetCarSku || '',

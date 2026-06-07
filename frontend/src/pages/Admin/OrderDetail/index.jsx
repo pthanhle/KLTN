@@ -85,10 +85,11 @@ const AdminOrderDetail = () => {
                         ) : (
                             <>
                                 <CustomerInfo delivery={order?.delivery} t={t} />
-                                <StaffAssignmentInfo 
-                                    assignment={order?.assignment} 
-                                    t={t} 
-                                    onReassign={() => handleAction('reassign_staff')} 
+                                <StaffAssignmentInfo
+                                    assignment={order?.assignment}
+                                    t={t}
+                                    onReassign={() => handleAction('reassign_staff')}
+                                    orderStatus={order?.order_status}
                                 />
                                 <div className="h-8"></div>
                                 <ShippingInfo shipping={order?.shipping} status={order?.order_status} t={t} />

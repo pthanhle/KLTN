@@ -3,7 +3,7 @@ import { Truck, FileText, Copy } from 'lucide-react';
 import { getShippingMethodConfig } from '../../constants/shippingMethods';
 
 export const ShippingInfo = ({ shipping, status, t }) => {
-    const isShipped = status === 'SHIPPING' || status === 'DELIVERED' || status === 'COMPLETED';
+    const isShipped = ['SHIPPED', 'SHIPPING', 'DELIVERED', 'COMPLETED'].includes(status);
 
     return (
         <section className={`bg-white dark:bg-[#141416] rounded-2xl p-6 border border-slate-200 dark:border-white/5`}>

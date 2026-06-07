@@ -25,6 +25,7 @@ const mapProgressToBooking = (p) => {
         _id: p._id,
         progress_id: p._id,
         booking_code: booking.booking_code || '',
+        sequence_number: booking.sequence_number,
         customer_name: customer.full_name || booking.customer_info?.full_name || '',
         customer_phone: customer.phone || booking.customer_info?.contact_phone || '',
         vehicle_brand: vehicle.brand || '',

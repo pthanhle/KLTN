@@ -104,7 +104,10 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
     const tooltipContent = (
         <div className="flex flex-col gap-2 p-1 min-w-[200px] text-slate-800 dark:text-slate-200">
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-1">
-                <span className="font-bold text-yellow-600 dark:text-yellow-500">{displayCode}</span>
+                <span className="font-bold text-yellow-600 dark:text-yellow-500">
+                    {displayCode}
+                    {booking.sequence_number != null && <span className="ml-1.5">#{booking.sequence_number}</span>}
+                </span>
                 <span className="bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300">
                     {t(`status_${booking.status}`, booking.status)}
                 </span>
@@ -240,7 +243,9 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                 <div className="flex justify-between items-start pointer-events-auto">
                     <div className="flex flex-col gap-1">
                         <span className={`text-[9px] font-bold uppercase tracking-widest ${isOverdue ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                            {displayCode} {isOverdue && t('status_overdue')}
+                            {displayCode}
+                            {booking.sequence_number != null && <span className="text-yellow-600 dark:text-yellow-500 normal-case"> #{booking.sequence_number}</span>}
+                            {isOverdue && ` ${t('status_overdue')}`}
                         </span>
                         <div className={`flex items-center gap-1.5 text-[10px] w-fit uppercase font-black tracking-wider px-2 py-0.5 rounded border shadow-inner ${isConflict
                             ? 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/20'

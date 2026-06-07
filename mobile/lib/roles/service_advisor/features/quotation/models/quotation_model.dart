@@ -211,8 +211,7 @@ class QuotationModel {
   final String advisorNote;
   final List<CartPartItem> parts;
   final List<CartLaborItem> labor;
-  final String promoCode;
-  final double depositRequired;
+  final double servicePackageTotal;
   final ReceptionSnapshot? receptionSnapshot;
 
   const QuotationModel({
@@ -221,16 +220,16 @@ class QuotationModel {
     this.advisorNote = '',
     this.parts = const [],
     this.labor = const [],
-    this.promoCode = '',
-    this.depositRequired = 0.0,
+    this.servicePackageTotal = 0.0,
     this.receptionSnapshot,
   });
 
   double get partsTotal => parts.fold(0, (sum, part) => sum + (part.price * part.quantity));
   double get laborTotal => labor.fold(0, (sum, item) => sum + item.total);
-  double get discountAmount => promoCode.isNotEmpty ? (partsTotal + laborTotal) * 0.1 : 0.0; // Mock 10% discount
-  double get vatAmount => (partsTotal + laborTotal - discountAmount) * 0.1; // 10% VAT
-  double get grandTotal => partsTotal + laborTotal - discountAmount + vatAmount;
+  double get subtotal => servicePackageTotal + partsTotal + laborTotal;
+  double get vatAmount => subtotal * 0.1;
+  double get grandTotal => subtotal + vatAmount;
+  double get depositAmount => (grandTotal * 0.5).roundToDouble();
 
   QuotationModel copyWith({
     String? orderId,
@@ -238,8 +237,7 @@ class QuotationModel {
     String? advisorNote,
     List<CartPartItem>? parts,
     List<CartLaborItem>? labor,
-    String? promoCode,
-    double? depositRequired,
+    double? servicePackageTotal,
     ReceptionSnapshot? receptionSnapshot,
   }) {
     return QuotationModel(
@@ -248,8 +246,7 @@ class QuotationModel {
       advisorNote: advisorNote ?? this.advisorNote,
       parts: parts ?? this.parts,
       labor: labor ?? this.labor,
-      promoCode: promoCode ?? this.promoCode,
-      depositRequired: depositRequired ?? this.depositRequired,
+      servicePackageTotal: servicePackageTotal ?? this.servicePackageTotal,
       receptionSnapshot: receptionSnapshot ?? this.receptionSnapshot,
     );
   }
@@ -267,8 +264,7 @@ class QuotationModel {
               ?.map((e) => CartLaborItem.fromJson(e))
               .toList() ??
           [],
-      promoCode: json['promo_code'] ?? '',
-      depositRequired: (json['deposit_required'] ?? 0).toDouble(),
+      servicePackageTotal: (json['service_package_total'] ?? 0).toDouble(),
       receptionSnapshot: json['reception_snapshot'] != null
           ? ReceptionSnapshot.fromJson(json['reception_snapshot'])
           : null,
@@ -281,8 +277,7 @@ class QuotationModel {
     'advisor_note': advisorNote,
     'parts': parts.map((e) => e.toJson()).toList(),
     'labor': labor.map((e) => e.toJson()).toList(),
-    'promo_code': promoCode,
-    'deposit_required': depositRequired,
+    'service_package_total': servicePackageTotal,
     'reception_snapshot': receptionSnapshot?.toJson(),
   };
 }

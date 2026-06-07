@@ -43,7 +43,7 @@ class PartSearchController extends Notifier<PartSearchState> {
 
   @override
   PartSearchState build() {
-    _fetchParts('');
+    Future.microtask(() => _fetchParts(''));
     return const PartSearchState(isLoading: true);
   }
 

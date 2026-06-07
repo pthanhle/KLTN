@@ -1,8 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../../core/config/api_config.dart';
 import '../../../models/labor_item_model.dart';
+import '../../../data/mocks/labor_master_data.dart';
 import 'quotation_controller.dart';
 
 class LaborSearchState {
@@ -42,60 +40,20 @@ class LaborSearchState {
 }
 
 class LaborSearchController extends Notifier<LaborSearchState> {
-  final Dio _dio = Dio(BaseOptions(
-    connectTimeout: const Duration(milliseconds: ApiConfig.connectTimeout),
-    receiveTimeout: const Duration(milliseconds: ApiConfig.receiveTimeout),
-  ));
-
-  List<LaborItemModel> _allItems = [];
+  // Danh mục tiền công dùng dữ liệu chuẩn (master data) cố định, đảm bảo
+  // các hạng mục báo giá luôn khớp 1-1 với "Hạng mục thi công" bên role kỹ thuật.
+  List<LaborItemModel> _allItems = mockLaborMasterData;
 
   @override
   LaborSearchState build() {
-    _fetchServiceItems('');
-    return const LaborSearchState(isLoading: true);
+    return LaborSearchState(items: _allItems);
   }
 
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token');
-  }
-
-  Future<void> _fetchServiceItems(String query) async {
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final token = await _getToken();
-      final url = '${ApiConfig.baseUrl}/staff/service/repair-progress/catalog/service-items';
-      final response = await _dio.get(
-        url,
-        queryParameters: {
-          if (query.isNotEmpty) 'search': query,
-          'limit': 100,
-        },
-        options: Options(headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        }),
-      );
-
-      final data = response.data;
-      final List rawItems = data['serviceItems'] ?? [];
-      final items = rawItems.map((item) => LaborItemModel.fromJson({
-        'id': item['id']?.toString() ?? '',
-        'category': item['category']?.toString() ?? '',
-        'name': item['name']?.toString() ?? '',
-        'price': (item['price'] as num?)?.toDouble() ?? 0.0,
-        'estimated_hours': (item['estimated_hours'] as num?)?.toDouble() ?? 1.0,
-      })).toList();
-
-      _allItems = items;
-      state = state.copyWith(
-        items: _filterItems(items, state.selectedCategory, query),
-        isLoading: false,
-        searchQuery: query,
-      );
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Không thể tải danh sách dịch vụ');
-    }
+  void _loadItems(String query) {
+    state = state.copyWith(
+      items: _filterItems(_allItems, state.selectedCategory, query),
+      searchQuery: query,
+    );
   }
 
   List<LaborItemModel> _filterItems(List<LaborItemModel> source, String category, String query) {
@@ -127,8 +85,7 @@ class LaborSearchController extends Notifier<LaborSearchState> {
   }
 
   void search(String query) {
-    state = state.copyWith(searchQuery: query);
-    _fetchServiceItems(query);
+    _loadItems(query);
   }
 
   List<String> getCategories() {

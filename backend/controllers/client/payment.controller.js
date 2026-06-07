@@ -9,16 +9,77 @@ import { isVNPayMethod, validatePaymentMethodDetailed } from '../../utils/paymen
 import crypto from 'crypto'
 import moment from 'moment'
 import { createAndEmitNotification } from '../../utils/notificationHelper.js'
-
+import { getIO } from '../../config/socket.js'
 
 export const createVNPayPayment = asyncHandler(async (req, res) => {
-  const { order_id, amount } = req.body
+  const { order_id, progress_id, amount } = req.body
 
+  // --- Repair progress payment flow (deposit or final) ---
+  if (progress_id) {
+    const paymentTypeReq = req.body.payment_type || 'quotation_deposit'
+    const progress = await RepairProgress.findById(progress_id)
+    if (!progress) {
+      res.status(404)
+      throw new Error('Không tìm thấy đơn sửa chữa')
+    }
+
+    let validAmount, orderInfo, paymentType
+    if (paymentTypeReq === 'final_payment') {
+      if (progress.status !== 'QC_TESTING') {
+        res.status(400)
+        throw new Error('Xe chưa hoàn thành kiểm định QC')
+      }
+      const remaining = (progress.quotation?.final_amount || 0) - (progress.quotation?.deposit_amount || 0)
+      validAmount = Math.floor(remaining)
+      orderInfo = `Thanh toan con lai dich vu ${progress_id}`
+      paymentType = 'final_payment'
+    } else {
+      if (progress.status !== 'QUOTING') {
+        res.status(400)
+        throw new Error('Báo giá chưa được lập hoặc đã xử lý')
+      }
+      if (!progress.quotation?.deposit_amount || progress.quotation.deposit_amount <= 0) {
+        res.status(400)
+        throw new Error('Báo giá chưa có số tiền cọc')
+      }
+      validAmount = Math.floor(progress.quotation.deposit_amount)
+      orderInfo = `Dat coc bao gia ${progress_id}`
+      paymentType = 'quotation_deposit'
+    }
+
+    if (validAmount < 5000 || validAmount >= 1000000000) {
+      res.status(400)
+      throw new Error('Số tiền không hợp lệ')
+    }
+
+    const paymentValidation = validatePaymentMethodDetailed('vnpay')
+    if (!paymentValidation.isValid) {
+      res.status(400)
+      throw new Error('Phương thức thanh toán không hợp lệ')
+    }
+
+    const payment = await Payment.create({
+      progress_id,
+      payment_type: paymentType,
+      amount: validAmount,
+      method: paymentValidation.normalizedMethod,
+      status: 'pending',
+    })
+
+    const paymentUrl = _buildVNPayUrl(req, payment._id.toString(), validAmount, orderInfo)
+    return res.status(200).json({
+      message: 'Tạo URL VNPay thành công',
+      progress_id,
+      payment_id: payment._id,
+      url: paymentUrl,
+    })
+  }
+
+  // --- Product order flow ---
   console.log(`VNPay payment request received:`, {
     orderId: order_id,
     amount: amount,
     timestamp: new Date().toISOString(),
-    userAgent: req.headers['user-agent'],
     ip: req.headers['x-forwarded-for'] || req.connection?.remoteAddress || '127.0.0.1'
   })
 
@@ -33,207 +94,92 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
     const validAmount = Math.floor(Number(amount))
 
     if (validAmount < 5000 || validAmount >= 1000000000) {
-      console.error(`VNPay payment failed: Invalid amount`, {
-        orderId: order_id,
-        requestedAmount: amount,
-        validAmount: validAmount
-      })
       res.status(400)
       throw new Error('Số tiền phải từ 5,000đ đến dưới 1 tỷ đồng')
     }
 
     const paymentValidation = validatePaymentMethodDetailed('vnpay')
-
-    console.log(`Payment method validation for VNPay:`, {
-      originalMethod: 'vnpay',
-      isValid: paymentValidation.isValid,
-      isVNPay: paymentValidation.isVNPay,
-      normalizedMethod: paymentValidation.normalizedMethod,
-      displayName: paymentValidation.displayName,
-      errors: paymentValidation.errors,
-      orderId: order_id
-    })
-
     if (!paymentValidation.isValid) {
-      console.error(`VNPay payment failed: Invalid payment method`, {
-        orderId: order_id,
-        errors: paymentValidation.errors
-      })
       res.status(400)
       throw new Error('Phương thức thanh toán không hợp lệ')
     }
 
     const payment = await Payment.create({
       order_id,
+      payment_type: 'order',
       amount: validAmount,
       method: paymentValidation.normalizedMethod,
       status: 'pending',
     })
 
-    let ipAddr = req.headers['x-forwarded-for'] ||
-      req.connection.remoteAddress ||
-      req.socket.remoteAddress ||
-      req.connection.socket?.remoteAddress ||
-      '127.0.0.1'
-
-    if (ipAddr === '::1' || ipAddr === '::ffff:127.0.0.1') {
-      ipAddr = '127.0.0.1'
-    }
-
-    const createDate = moment().format('YYYYMMDDHHmmss')
-
     if (!vnpayConfig.vnp_TmnCode || !vnpayConfig.vnp_HashSecret || !vnpayConfig.vnp_Url) {
-      console.error(`VNPay payment failed: Missing VNPay configuration`, {
-        orderId: order_id,
-        paymentId: payment._id,
-        hasTmnCode: !!vnpayConfig.vnp_TmnCode,
-        hasHashSecret: !!vnpayConfig.vnp_HashSecret,
-        hasUrl: !!vnpayConfig.vnp_Url
-      })
-
       payment.status = 'failed'
       await payment.save()
-
       res.status(500)
       throw new Error('Cấu hình VNPay không hợp lệ. Vui lòng thử lại sau hoặc chọn phương thức thanh toán khác.')
     }
 
-    let vnp_Params = {}
-    vnp_Params['vnp_Version'] = '2.1.0'
-    vnp_Params['vnp_Command'] = 'pay'
-    vnp_Params['vnp_TmnCode'] = vnpayConfig.vnp_TmnCode
-    vnp_Params['vnp_Locale'] = 'vn'
-    vnp_Params['vnp_CurrCode'] = 'VND'
-    vnp_Params['vnp_TxnRef'] = payment._id.toString()
-    vnp_Params['vnp_OrderInfo'] = 'Thanh toan don hang ' + order_id
-    vnp_Params['vnp_OrderType'] = 'other'
-    vnp_Params['vnp_Amount'] = validAmount * 100
-    vnp_Params['vnp_ReturnUrl'] = vnpayConfig.vnp_ReturnUrl
-    vnp_Params['vnp_IpAddr'] = ipAddr
-    vnp_Params['vnp_CreateDate'] = createDate
+    const paymentUrl = _buildVNPayUrl(req, payment._id.toString(), validAmount, `Thanh toan don hang ${order_id}`)
 
-    vnp_Params = sortObject(vnp_Params)
-
-    const signData = Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
-
-    try {
-      const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
-      const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
-      vnp_Params['vnp_SecureHash'] = signed
-
-      const paymentUrl = vnpayConfig.vnp_Url + '?' + Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
-
-      if (!paymentUrl || paymentUrl.length < 100) {
-        throw new Error('Generated VNPay URL is invalid')
-      }
-
-      console.log(`VNPay payment URL created successfully for order ${order_id}`, {
-        paymentId: payment._id,
-        orderId: order._id,
-        amount: validAmount,
-        paymentMethod: paymentValidation.normalizedMethod,
-        urlLength: paymentUrl.length,
-        timestamp: new Date().toISOString()
-      })
-
-      res.status(200).json({
-        message: 'Tạo URL VNPay thành công',
-        order_id: order._id,
-        payment_id: payment._id,
-        url: paymentUrl,
-      })
-
-    } catch (signatureError) {
-      console.error(`VNPay payment failed: Signature generation error`, {
-        orderId: order_id,
-        paymentId: payment._id,
-        error: signatureError.message,
-        signData: signData
-      })
-
-      payment.status = 'failed'
-      await payment.save()
-
-      res.status(500)
-      throw new Error('Không thể tạo chữ ký VNPay. Vui lòng thử lại sau.')
-    }
-
-  } catch (error) {
-    console.error(`VNPay payment creation failed:`, {
-      orderId: order_id,
-      amount: amount,
-      error: error.message,
-      stack: error.stack,
-      timestamp: new Date().toISOString()
+    console.log(`VNPay payment URL created successfully for order ${order_id}`, {
+      paymentId: payment._id, orderId: order._id, amount: validAmount
     })
 
-    if (error.message.includes('Không tìm thấy đơn hàng')) {
-      res.status(404).json({
-        success: false,
-        message: error.message,
-        errorCode: 'ORDER_NOT_FOUND',
-        suggestion: 'Vui lòng kiểm tra lại đơn hàng và thử lại.'
-      })
-      return
-    }
+    return res.status(200).json({
+      message: 'Tạo URL VNPay thành công',
+      order_id: order._id,
+      payment_id: payment._id,
+      url: paymentUrl,
+    })
 
-    if (error.message.includes('Số tiền phải')) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-        errorCode: 'INVALID_AMOUNT',
-        suggestion: 'Vui lòng kiểm tra lại số tiền thanh toán.'
-      })
-      return
-    }
+  } catch (error) {
+    console.error(`VNPay payment creation failed:`, { orderId: order_id, error: error.message })
 
-    if (error.message.includes('Cấu hình VNPay')) {
-      res.status(500).json({
-        success: false,
-        message: 'Dịch vụ VNPay tạm thời không khả dụng.',
-        errorCode: 'VNPAY_CONFIG_ERROR',
-        suggestion: 'Vui lòng thử lại sau hoặc chọn phương thức thanh toán khác.'
-      })
-      return
-    }
-
-    if (error.message.includes('chữ ký VNPay')) {
-      res.status(500).json({
-        success: false,
-        message: 'Có lỗi khi xử lý thanh toán VNPay.',
-        errorCode: 'VNPAY_SIGNATURE_ERROR',
-        suggestion: 'Vui lòng thử lại sau hoặc chọn phương thức thanh toán khác.'
-      })
-      return
-    }
-
-    res.status(500).json({
+    if (res.statusCode === 200) res.status(500)
+    return res.json({
       success: false,
-      message: 'Có lỗi xảy ra khi tạo thanh toán VNPay.',
+      message: error.message || 'Có lỗi xảy ra khi tạo thanh toán VNPay.',
       errorCode: 'VNPAY_GENERAL_ERROR',
-      suggestion: 'Vui lòng thử lại sau hoặc liên hệ hỗ trợ khách hàng.'
     })
   }
 })
 
+function _buildVNPayUrl(req, txnRef, amount, orderInfo) {
+  if (!vnpayConfig.vnp_TmnCode || !vnpayConfig.vnp_HashSecret || !vnpayConfig.vnp_Url) {
+    throw new Error('Cấu hình VNPay không hợp lệ. Vui lòng thử lại sau hoặc chọn phương thức thanh toán khác.')
+  }
+
+  let ipAddr = req.headers['x-forwarded-for'] ||
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    '127.0.0.1'
+  if (ipAddr === '::1' || ipAddr === '::ffff:127.0.0.1') ipAddr = '127.0.0.1'
+
+  let vnp_Params = {
+    vnp_Version: '2.1.0',
+    vnp_Command: 'pay',
+    vnp_TmnCode: vnpayConfig.vnp_TmnCode,
+    vnp_Locale: 'vn',
+    vnp_CurrCode: 'VND',
+    vnp_TxnRef: txnRef,
+    vnp_OrderInfo: orderInfo,
+    vnp_OrderType: 'other',
+    vnp_Amount: amount * 100,
+    vnp_ReturnUrl: vnpayConfig.vnp_ReturnUrl,
+    vnp_IpAddr: ipAddr,
+    vnp_CreateDate: moment().format('YYYYMMDDHHmmss'),
+  }
+  vnp_Params = sortObject(vnp_Params)
+  const signData = Object.keys(vnp_Params).map(k => k + '=' + vnp_Params[k]).join('&')
+  const signed = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
+    .update(Buffer.from(signData, 'utf-8')).digest('hex')
+  vnp_Params['vnp_SecureHash'] = signed
+  return vnpayConfig.vnp_Url + '?' + Object.keys(vnp_Params).map(k => k + '=' + vnp_Params[k]).join('&')
+}
+
 
 export const vnpayReturn = asyncHandler(async (req, res) => {
   const frontendUrl = process.env.CLIENT_URL || 'http://localhost:3000'
-
-  console.log(`VNPay return callback received:`, {
-    queryParams: req.query,
-    timestamp: new Date().toISOString(),
-    userAgent: req.headers['user-agent'],
-    referer: req.headers['referer']
-  })
-
-  import('fs').then(fs => {
-    fs.appendFileSync('vnpay_debug.log', JSON.stringify({
-      time: new Date().toISOString(),
-      event: 'vnpayReturn',
-      query: req.query
-    }) + '\n');
-  }).catch(console.error);
 
   try {
     let vnp_Params = { ...req.query }
@@ -241,146 +187,184 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
     const paymentId = vnp_Params['vnp_TxnRef']
     const rspCode = vnp_Params['vnp_ResponseCode']
     const transactionNo = vnp_Params['vnp_TransactionNo']
-    const vnpAmount = vnp_Params['vnp_Amount']
 
     delete vnp_Params['vnp_SecureHash']
     delete vnp_Params['vnp_SecureHashType']
-
     vnp_Params = sortObject(vnp_Params)
 
     const signData = Object.keys(vnp_Params).map(key => key + '=' + vnp_Params[key]).join('&')
-
-    const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
-    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
-
-    import('fs').then(fs => {
-      fs.appendFileSync('vnpay_debug.log', JSON.stringify({
-        event: 'vnpayReturn_signature',
-        signData,
-        expectedHash: secureHash,
-        actualHash: signed
-      }) + '\n');
-    }).catch(console.error);
+    const signed = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret)
+      .update(Buffer.from(signData, 'utf-8')).digest('hex')
 
     if (secureHash !== signed) {
-      console.error('VNPay return: Invalid signature', {
-        expectedSignature: signed,
-        receivedSignature: secureHash,
-        signData: signData
-      })
+      console.error('VNPay return: Invalid signature')
       return res.redirect(`${frontendUrl}/payment/failed?reason=invalid_signature`)
     }
 
-    console.log(`VNPay return processing:`, {
-      paymentId, responseCode: rspCode, transactionNo, amount: vnpAmount
-    })
-
-    let payment = null
-    let order = null
-    let repairProgress = null
-
-    if (mongoose.Types.ObjectId.isValid(paymentId)) {
-      payment = await Payment.findById(paymentId)
-
-      if (!payment) {
-        repairProgress = await RepairProgress.findById(paymentId).populate('booking_id')
-      }
+    if (!mongoose.Types.ObjectId.isValid(paymentId)) {
+      return res.redirect(`${frontendUrl}/payment/failed?reason=payment_not_found`)
     }
 
-    if (payment) {
-      order = await Order.findById(payment.order_id)
-    } else if (!repairProgress) {
-      if (mongoose.Types.ObjectId.isValid(paymentId)) {
-        order = await Order.findById(paymentId)
-        if (order) {
-          payment = await Payment.findOne({ order_id: order._id })
-          if (!payment) {
-            payment = await Payment.create({
-              order_id: order._id,
-              amount: order.financials?.grand_total || 0,
-              method: 'vnpay',
-              status: 'pending',
-            })
-          }
-        }
-      }
-    }
-
-    if (!payment && !order && !repairProgress) {
-      console.error(`VNPay return: Payment/Order/Quotation not found`, {
-        paymentId, rspCode, paymentFound: !!payment, orderFound: !!order, progressFound: !!repairProgress
-      })
+    const payment = await Payment.findById(paymentId)
+    if (!payment) {
       return res.redirect(`${frontendUrl}/payment/failed?reason=payment_not_found&order_id=${paymentId}`)
     }
 
-    if (repairProgress) {
-      if (rspCode === '00') {
-        repairProgress.quotation.status = 'APPROVED'
-        repairProgress.quotation.approved_at = Date.now()
-
-        if (repairProgress.current_step === 'QUOTING') {
-          repairProgress.current_step = 'IN_PROGRESS'
-        }
-
-        repairProgress.system_logs.push({
-          time: Date.now(),
-          type: 'INF',
-          message: 'Khách hàng đã thanh toán và phê duyệt báo giá. Hệ thống đã tạo lệnh xuất kho.'
-        })
-
-
-        for (const qPart of repairProgress.quotation.parts) {
-          const partDB = await Part.findOne({ sku: qPart.sku });
-          let isBackordered = false;
-
-          if (partDB) {
-            if (partDB.inventory.available_stock < qPart.quantity) {
-              isBackordered = true;
-            }
-
-            partDB.inventory.allocated += qPart.quantity;
-            partDB.inventory.available_stock -= qPart.quantity;
-            await partDB.save();
-          } else {
-            isBackordered = true;
-          }
-
-          const etaDate = isBackordered ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) : new Date();
-
-          repairProgress.parts_usage.push({
-            name: qPart.name,
-            sku: qPart.sku,
-            quantity: qPart.quantity,
-            progress: 0,
-            status: 'WAITING',
-            eta: etaDate
-          });
-        }
-
-        await repairProgress.save();
-
-        console.log(`VNPay quotation payment completed successfully`, {
-          progressId: repairProgress._id,
-          transactionNo, amount: vnpAmount
-        })
-
-        return res.redirect(
-          `${frontendUrl}/payment/success?order_id=${repairProgress._id}&type=quotation`
-        )
-      } else {
-        repairProgress.system_logs.push({
-          time: Date.now(),
-          type: 'ERR',
-          message: 'Thanh toán báo giá thất bại. Vui lòng thử lại.'
-        })
-        await repairProgress.save()
-
-        return res.redirect(
-          `${frontendUrl}/payment/failed?reason=payment_failed&code=${rspCode}&order_id=${repairProgress._id}&type=quotation`
-        )
+    // --- Repair progress payment flow (deposit or final) ---
+    if (payment.progress_id) {
+      const progress = await RepairProgress.findById(payment.progress_id).populate('booking_id')
+      if (!progress) {
+        return res.redirect(`${frontendUrl}/payment/failed?reason=payment_not_found`)
       }
+
+      if (rspCode !== '00') {
+        payment.status = 'failed'
+        await payment.save()
+        progress.system_logs.push({
+          time: new Date(),
+          type: 'ERR',
+          message: `Thanh toán VNPay thất bại (${payment.payment_type}). Mã lỗi: ${rspCode}`,
+        })
+        await progress.save()
+        return res.redirect(`${frontendUrl}/payment/failed?reason=payment_failed&code=${rspCode}&order_id=${progress.booking_id?.booking_code || progress._id}&type=quotation`)
+      }
+
+      payment.status = 'completed'
+      await payment.save()
+
+      if (payment.payment_type === 'final_payment') {
+        // Final payment — mark COMPLETED
+        progress.current_step = 'COMPLETED'
+        progress.status = 'COMPLETED'
+        if (progress.timeline) {
+          const completedStep = progress.timeline.find(t => t.step === 'COMPLETED')
+          if (!completedStep) {
+            progress.timeline.push({
+              step: 'COMPLETED',
+              status: 'COMPLETED',
+              time: new Date(),
+              note: 'Khách hàng đã thanh toán toàn bộ. Xe sẵn sàng bàn giao.',
+            })
+          }
+        }
+        if (!progress.delivery) progress.delivery = {}
+        if (!progress.delivery.invoice_ledger) progress.delivery.invoice_ledger = {}
+        progress.delivery.invoice_ledger.payment_status = 'PAID'
+        progress.delivery.invoice_ledger.paid_amount = progress.quotation?.final_amount || 0
+        progress.delivery.invoice_ledger.total_amount = progress.quotation?.final_amount || 0
+
+        progress.system_logs.push({
+          time: new Date(),
+          type: 'INF',
+          message: 'Khách hàng đã thanh toán toàn bộ. Xe sẵn sàng bàn giao.',
+        })
+        await progress.save()
+
+        try {
+          const io = getIO()
+          if (progress.advisor_id) {
+            io.to(`user_${progress.advisor_id}`).emit('final_payment_received', {
+              progress_id: progress._id,
+              message: 'Khách hàng đã thanh toán toàn bộ. Tiến hành bàn giao xe.',
+            })
+          }
+        } catch (_) {}
+
+        if (progress.booking_id?.user_id) {
+          await createAndEmitNotification(progress.booking_id.user_id, {
+            title: 'Thanh toán thành công',
+            message: 'Cảm ơn bạn đã thanh toán. Vui lòng đến nhận xe.',
+            type: 'SERVICE',
+            reference_id: progress._id.toString(),
+            reference_link: `/tracking/${progress.booking_id?.booking_code || progress._id}`,
+          }).catch(() => {})
+        }
+
+        return res.redirect(`${frontendUrl}/payment/success?order_id=${progress.booking_id?.booking_code || progress._id}&type=quotation`)
+      }
+
+      // Deposit flow
+      progress.quotation.status = 'APPROVED'
+      progress.quotation.approved_at = new Date()
+      progress.current_step = 'WAITING_PARTS'
+      progress.status = 'WAITING_PARTS'
+
+      progress.timeline.push({
+        step: 'WAITING_PARTS',
+        status: 'IN_PROGRESS',
+        time: new Date(),
+        note: 'Khách hàng đã thanh toán cọc. Chờ xuất kho phụ tùng.',
+      })
+
+      progress.system_logs.push({
+        time: new Date(),
+        type: 'INF',
+        message: 'Khách hàng đã thanh toán tiền cọc báo giá. Đang chờ xuất kho phụ tùng.',
+      })
+
+      progress.parts_usage = []
+      for (const qPart of progress.quotation.parts) {
+        const partDB = await Part.findOne({ sku: qPart.sku })
+        let isBackordered = false
+        if (partDB) {
+          if (partDB.inventory.available_stock < qPart.quantity) isBackordered = true
+          partDB.inventory.allocated += qPart.quantity
+          partDB.inventory.available_stock -= qPart.quantity
+          await partDB.save()
+        } else {
+          isBackordered = true
+        }
+        progress.parts_usage.push({
+          name: qPart.name,
+          sku: qPart.sku,
+          quantity: qPart.quantity,
+          progress: 0,
+          status: 'WAITING',
+          eta: isBackordered ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) : new Date(),
+        })
+      }
+
+      await progress.save()
+
+      try {
+        const io = getIO()
+        io.to('room_inventory').emit('parts_request', {
+          progress_id: progress._id,
+          message: 'Đơn sửa chữa cần xuất kho phụ tùng.',
+        })
+        if (progress.advisor_id) {
+          io.to(`user_${progress.advisor_id}`).emit('quotation_paid', {
+            progress_id: progress._id,
+            message: 'Khách hàng đã thanh toán cọc. Đang chờ xuất kho phụ tùng.',
+          })
+        }
+        if (progress.mechanic_id) {
+          io.to(`user_${progress.mechanic_id}`).emit('quotation_paid', {
+            progress_id: progress._id,
+            message: 'Báo giá đã được thanh toán. Xe sẽ vào xưởng sau khi có đủ phụ tùng.',
+          })
+        }
+      } catch (_) {}
+
+      if (progress.booking_id?.user_id) {
+        await createAndEmitNotification(progress.booking_id.user_id, {
+          title: 'Thanh toán cọc thành công',
+          message: 'Bạn đã đặt cọc thành công. Chúng tôi đang chuẩn bị phụ tùng cho xe của bạn.',
+          type: 'SERVICE',
+          reference_id: progress._id.toString(),
+          reference_link: `/tracking/${progress.booking_id?.booking_code || progress._id}`,
+        }).catch(() => {})
+      }
+
+      console.log(`VNPay quotation deposit completed`, { progressId: progress._id, transactionNo })
+      return res.redirect(`${frontendUrl}/payment/success?order_id=${progress.booking_id?.booking_code || progress._id}&type=quotation`)
     }
 
+    // --- Product order flow ---
+    const order = await Order.findById(payment.order_id)
+    if (!order) {
+      return res.redirect(`${frontendUrl}/payment/failed?reason=payment_not_found`)
+    }
 
     if (rspCode === '00') {
       payment.status = 'completed'
@@ -405,31 +389,14 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
         }).catch(() => {})
       }
 
-      console.log(`VNPay payment completed successfully`, {
-        paymentId: payment._id,
-        orderId: order._id,
-        orderCode: order.order_code,
-        transactionNo, amount: vnpAmount
-      })
+      return res.redirect(`${frontendUrl}/payment/success?order_id=${order._id}&payment_id=${payment._id}`)
 
-      return res.redirect(
-        `${frontendUrl}/payment/success?order_id=${order._id}&payment_id=${payment._id}`
-      )
     } else {
       payment.status = 'failed'
       await payment.save()
-
-      console.error(`VNPay payment failed`, {
-        paymentId: payment._id,
-        orderId: order._id,
-        responseCode: rspCode,
-        errorMessage: getVNPayErrorMessage(rspCode)
-      })
-
-      return res.redirect(
-        `${frontendUrl}/payment/failed?reason=payment_failed&code=${rspCode}&order_id=${order._id}`
-      )
+      return res.redirect(`${frontendUrl}/payment/failed?reason=payment_failed&code=${rspCode}&order_id=${order._id}`)
     }
+
   } catch (error) {
     console.error('VNPay return handler error:', error)
     return res.redirect(`${frontendUrl}/payment/failed?reason=server_error`)

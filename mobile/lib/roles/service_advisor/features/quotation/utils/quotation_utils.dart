@@ -2,14 +2,14 @@ import 'package:intl/intl.dart';
 
 class QuotationUtils {
   static final _currencyFormat = NumberFormat.currency(
-    symbol: '\$',
-    decimalDigits: 2,
-    customPattern: '\$#,##0.00',
+    locale: 'vi_VN',
+    symbol: '₫',
+    decimalDigits: 0,
   );
 
   static String formatCurrency(double amount) {
     if (amount < 0) {
-      return '-\${_currencyFormat.format(amount.abs()).replaceAll("\$", "")}';
+      return '-${_currencyFormat.format(amount.abs())}';
     }
     return _currencyFormat.format(amount);
   }

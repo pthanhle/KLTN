@@ -1,3 +1,4 @@
+import './counterModel.js'
 import './userModel.js'
 import './roleModel.js'
 import './categoryModel.js'

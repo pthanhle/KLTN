@@ -1,25 +1,35 @@
 import asyncHandler from 'express-async-handler'
 import RepairProgress from '../../models/repairprogressModel.js'
 import Part from '../../models/partModel.js'
+import ServiceBay from '../../models/serviceBayModel.js'
 import { getIO } from '../../config/socket.js'
 
 export const getPickLists = asyncHandler(async (req, res) => {
-    const progresses = await RepairProgress.find({
-        'parts_usage.status': 'WAITING',
-    }).populate([
-        {
-            path: 'booking_id',
-            select: 'booking_code vehicle_info customer_info',
-        },
-        {
-            path: 'mechanic_id',
-            select: 'full_name avatar',
-        },
+    const [progresses, bays] = await Promise.all([
+        RepairProgress.find({
+            'parts_usage.status': 'WAITING',
+        }).populate([
+            {
+                path: 'booking_id',
+                select: 'booking_code vehicle_info customer_info sequence_number',
+            },
+            {
+                path: 'mechanic_id',
+                select: 'full_name avatar',
+            },
+        ]),
+        ServiceBay.find({}, '_id bay_number'),
     ])
+
+    const bayMap = {}
+    for (const bay of bays) {
+        bayMap[bay._id.toString()] = bay.bay_number
+    }
 
     const pickLists = progresses.map(p => ({
         progress_id: p._id,
         booking_code: p.booking_id?.booking_code,
+        sequence_number: p.booking_id?.sequence_number ?? null,
         license_plate: p.booking_id?.vehicle_info?.license_plate,
         vehicle_model: p.booking_id?.vehicle_info?.model || p.booking_id?.vehicle_info?.brand || '',
         customer_name: p.booking_id?.customer_info?.full_name || '',
@@ -28,7 +38,7 @@ export const getPickLists = asyncHandler(async (req, res) => {
                   id: p.mechanic_id._id,
                   name: p.mechanic_id.full_name,
                   avatar: p.mechanic_id.avatar || '',
-                  bay_number: p.bay_id || 'N/A',
+                  bay_number: bayMap[p.bay_id] || p.bay_id || 'N/A',
               }
             : null,
         bay_id: p.bay_id || '',

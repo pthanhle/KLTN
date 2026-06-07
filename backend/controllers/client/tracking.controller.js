@@ -1,9 +1,11 @@
 import RepairProgress from '../../models/repairprogressModel.js'
 import Booking from '../../models/bookingModel.js'
+import Part from '../../models/partModel.js'
 import asyncHandler from 'express-async-handler'
 import crypto from 'crypto'
 import moment from 'moment'
 import { vnpayConfig } from '../../config/vnpayConfig.js'
+import { getIO } from '../../config/socket.js'
 
 
 export const getMyProgressList = asyncHandler(async (req, res) => {
@@ -269,6 +271,96 @@ export const confirmPayment = asyncHandler(async (req, res) => {
     }
 
     res.json({ message: 'Đã gửi xác nhận thanh toán thành công', progress })
+})
+
+export const approveSupplementRequest = asyncHandler(async (req, res) => {
+    const { bookingCode, supplementId } = req.params
+    const userId = req.user._id
+
+    const booking = await Booking.findOne({ booking_code: bookingCode, user_id: userId })
+    if (!booking) { res.status(404); throw new Error('Không tìm thấy đơn hàng') }
+
+    const progress = await RepairProgress.findOne({ booking_id: booking._id })
+    if (!progress) { res.status(404); throw new Error('Không tìm thấy tiến độ') }
+
+    const supplement = progress.supplement_requests.id(supplementId)
+    if (!supplement) { res.status(404); throw new Error('Không tìm thấy yêu cầu phát sinh') }
+    if (supplement.status !== 'PENDING') { res.status(400); throw new Error('Yêu cầu này đã được xử lý') }
+
+    supplement.status = 'APPROVED'
+    supplement.resolved_at = new Date()
+
+    // Append new parts to quotation and allocate from inventory
+    for (const p of (supplement.parts || [])) {
+        progress.quotation.parts.push(p)
+        const partDB = await Part.findOne({ sku: p.sku })
+        let isBackordered = true
+        if (partDB && partDB.inventory.available_stock >= p.quantity) {
+            partDB.inventory.allocated += p.quantity
+            partDB.inventory.available_stock -= p.quantity
+            await partDB.save()
+            isBackordered = false
+        }
+        progress.parts_usage.push({
+            name: p.name, sku: p.sku, quantity: p.quantity,
+            progress: 0, status: 'WAITING',
+            eta: isBackordered ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) : new Date()
+        })
+    }
+
+    for (const l of (supplement.labors || [])) {
+        progress.quotation.labors.push(l)
+    }
+
+    progress.system_logs.push({
+        time: new Date(), type: 'INF',
+        message: `Khách hàng đã duyệt phát sinh: ${supplement.title}`
+    })
+
+    await progress.save()
+
+    try {
+        const io = getIO()
+        const payload = { progress_id: progress._id, supplement_id: supplementId, message: `Khách hàng đã duyệt phát sinh: ${supplement.title}` }
+        if (progress.mechanic_id) io.to(`user_${progress.mechanic_id}`).emit('supplement_approved', payload)
+        if (progress.advisor_id) io.to(`user_${progress.advisor_id}`).emit('supplement_approved', payload)
+    } catch (_) {}
+
+    res.json({ message: 'Đã phê duyệt yêu cầu phát sinh', progress })
+})
+
+export const rejectSupplementRequest = asyncHandler(async (req, res) => {
+    const { bookingCode, supplementId } = req.params
+    const userId = req.user._id
+
+    const booking = await Booking.findOne({ booking_code: bookingCode, user_id: userId })
+    if (!booking) { res.status(404); throw new Error('Không tìm thấy đơn hàng') }
+
+    const progress = await RepairProgress.findOne({ booking_id: booking._id })
+    if (!progress) { res.status(404); throw new Error('Không tìm thấy tiến độ') }
+
+    const supplement = progress.supplement_requests.id(supplementId)
+    if (!supplement) { res.status(404); throw new Error('Không tìm thấy yêu cầu phát sinh') }
+    if (supplement.status !== 'PENDING') { res.status(400); throw new Error('Yêu cầu này đã được xử lý') }
+
+    supplement.status = 'REJECTED'
+    supplement.resolved_at = new Date()
+
+    progress.system_logs.push({
+        time: new Date(), type: 'WRN',
+        message: `Khách hàng đã từ chối phát sinh: ${supplement.title}`
+    })
+
+    await progress.save()
+
+    try {
+        const io = getIO()
+        const payload = { progress_id: progress._id, supplement_id: supplementId, message: `Khách hàng đã từ chối phát sinh: ${supplement.title}` }
+        if (progress.mechanic_id) io.to(`user_${progress.mechanic_id}`).emit('supplement_rejected', payload)
+        if (progress.advisor_id) io.to(`user_${progress.advisor_id}`).emit('supplement_rejected', payload)
+    } catch (_) {}
+
+    res.json({ message: 'Đã từ chối yêu cầu phát sinh', progress })
 })
 
 export const getTrackingStats = asyncHandler(async (req, res) => {

@@ -8,11 +8,15 @@ import 'package:ttauto_staff/roles/warehouse/features/service_orders/models/serv
 class PackingTechInfoCard extends StatelessWidget {
   final AssignedTechnician technician;
   final String licensePlate;
+  final String? bookingCode;
+  final int? sequenceNumber;
 
   const PackingTechInfoCard({
     super.key,
     required this.technician,
     required this.licensePlate,
+    this.bookingCode,
+    this.sequenceNumber,
   });
 
   @override
@@ -108,12 +112,39 @@ class PackingTechInfoCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            licensePlate,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.5,
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  licensePlate,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                              ),
+                              if (sequenceNumber != null)
+                                Container(
+                                  margin: const EdgeInsets.only(left: 6),
+                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '#$sequenceNumber',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                           Text(
                             'KTV: '.tr() + technician.name,
@@ -121,6 +152,15 @@ class PackingTechInfoCard extends StatelessWidget {
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
+                          if (bookingCode != null && bookingCode!.isNotEmpty)
+                            Text(
+                              bookingCode!,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
                         ],
                       ),
                     ),

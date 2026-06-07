@@ -113,6 +113,7 @@ const timelineStepSchema = new mongoose.Schema(
         checked_at: Date
       }
     ],
+    qc_advisor_signature: { type: String, default: '' },
     delivery: {
       handover_brief: {
         odometer_at_delivery: Number,
@@ -254,6 +255,16 @@ const repairProgressSchema = mongoose.Schema(
         resolved_at: Date,
       },
     ],
+
+    qc_checklist: [
+      {
+        task: String,
+        status: { type: String, enum: ['passed', 'failed', 'pending'], default: 'pending' },
+        checked_at: Date,
+      },
+    ],
+
+    qc_advisor_signature: { type: String, default: '' },
 
     notes: { type: String, default: '' },
 

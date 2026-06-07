@@ -2,7 +2,7 @@ import React from 'react';
 import RoadmapStep from './RoadmapStep';
 import { useTranslation } from 'react-i18next';
 
-const RepairRoadmap = ({ steps }) => {
+const RepairRoadmap = ({ steps, setProgressData }) => {
     const { t } = useTranslation('tracking');
 
     return (
@@ -21,7 +21,7 @@ const RepairRoadmap = ({ steps }) => {
 
                 {/* Iterate through timeline steps */}
                 {steps.map((step) => (
-                    <RoadmapStep key={step.id} step={step} />
+                    <RoadmapStep key={step.id} step={step} setProgressData={setProgressData} />
                 ))}
             </div>
         </div>

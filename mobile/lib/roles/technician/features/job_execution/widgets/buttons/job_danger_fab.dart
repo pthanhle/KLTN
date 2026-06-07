@@ -19,12 +19,8 @@ class JobDangerFab extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     // §8: Apple HIG destructive red
     final appleRed = isDark ? const Color(0xFFFF453A) : const Color(0xFFFF3B30);
-    return Positioned(
-      bottom: 24,
-      left: 24,
-      right: 24,
-      child: Center(
-        child: GestureDetector(
+    return Center(
+      child: GestureDetector(
           onTap: () {
             HapticFeedback.heavyImpact();
             onTap();
@@ -83,7 +79,6 @@ class JobDangerFab extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }

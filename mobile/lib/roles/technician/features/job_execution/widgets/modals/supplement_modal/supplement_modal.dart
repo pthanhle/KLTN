@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
 import 'components/layout/supplement_drag_handle.dart';
 import 'components/layout/supplement_header.dart';
@@ -12,6 +16,7 @@ import 'components/inputs/supplement_text_area.dart';
 import 'components/buttons/supplement_submit_button.dart';
 import '../../../controllers/supplement_controller.dart';
 import 'package:ttauto_staff/shared/widgets/toast/glass_toast.dart';
+import 'package:ttauto_staff/core/config/api_config.dart';
 
 class SupplementModal extends ConsumerStatefulWidget {
   final String orderId;
@@ -45,12 +50,167 @@ class SupplementModal extends ConsumerStatefulWidget {
 class _SupplementModalState extends ConsumerState<SupplementModal> {
   final _descriptionController = TextEditingController();
   final _solutionController = TextEditingController();
+  final _picker = ImagePicker();
+  final List<String> _mediaUrls = [];
+  bool _isUploading = false;
 
   @override
   void dispose() {
     _descriptionController.dispose();
     _solutionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    HapticFeedback.selectionClick();
+    // Show camera / gallery picker
+    final source = await showCupertinoModalPopup<ImageSource>(
+      context: context,
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        final isDark = theme.brightness == Brightness.dark;
+
+        Widget glassBlock({required Widget child}) => Container(
+              width: double.infinity,
+              decoration: ShapeDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.white.withValues(alpha: 0.72),
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                  side: BorderSide(
+                    color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.80),
+                    width: 0.5,
+                  ),
+                ),
+              ),
+              child: ClipSmoothRect(
+                radius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                    child: child,
+                  ),
+                ),
+              ),
+            );
+
+        Widget row({required IconData icon, required String label, required ImageSource src}) =>
+            GestureDetector(
+              onTap: () => Navigator.pop(ctx, src),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                color: Colors.transparent,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, size: 20, color: theme.colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Text(label,
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ],
+                ),
+              ),
+            );
+
+        return Material(
+          type: MaterialType.transparency,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  glassBlock(
+                    child: Column(children: [
+                      row(icon: CupertinoIcons.camera, label: 'Chụp ảnh mới'.tr(), src: ImageSource.camera),
+                      Container(height: 0.5, color: theme.dividerColor.withValues(alpha: 0.15)),
+                      row(icon: CupertinoIcons.photo_on_rectangle, label: 'Chọn từ thư viện'.tr(), src: ImageSource.gallery),
+                    ]),
+                  ),
+                  const SizedBox(height: 10),
+                  glassBlock(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(ctx),
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        color: Colors.transparent,
+                        child: Text('Hủy'.tr(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            )),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (source == null || !mounted) return;
+    await _doUpload(source);
+  }
+
+  Future<void> _doUpload(ImageSource source) async {
+    try {
+      final file = await _picker.pickImage(source: source, imageQuality: 80, maxWidth: 1920);
+      if (file == null || !mounted) return;
+
+      setState(() => _isUploading = true);
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+      if (token == null) throw Exception('SESSION_EXPIRED');
+
+      final bytes = await file.readAsBytes();
+      final filename = file.name.isNotEmpty ? file.name : 'image.jpg';
+      final dio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+      ));
+      final formData = FormData.fromMap({
+        'image': MultipartFile.fromBytes(bytes, filename: filename),
+      });
+      final response = await dio.post(
+        '${ApiConfig.baseUrl}/upload/image',
+        data: formData,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      final url = response.data['url'] as String?;
+      if (url != null && mounted) {
+        setState(() {
+          _mediaUrls.add(url);
+          _isUploading = false;
+        });
+      }
+    } on DioException catch (e) {
+      if (!mounted) return;
+      setState(() => _isUploading = false);
+      GlassToast.show(
+        context,
+        title: e.response?.statusCode == 401
+            ? 'Phiên đăng nhập hết hạn.'
+            : 'Không thể tải ảnh lên. Vui lòng thử lại.',
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isUploading = false);
+      GlassToast.show(context, title: 'Không thể tải ảnh lên. Vui lòng thử lại.');
+    }
   }
 
   Future<void> _handleSubmit() async {
@@ -61,9 +221,9 @@ class _SupplementModalState extends ConsumerState<SupplementModal> {
         taskId: widget.taskId,
         description: _descriptionController.text,
         proposedSolution: _solutionController.text,
-        evidenceUrls: ['dummy_url'],
+        evidenceUrls: _mediaUrls,
       );
-      
+
       if (mounted) {
         Navigator.of(context).pop();
         GlassToast.show(context, title: 'Đã gửi báo cáo thành công'.tr());
@@ -98,7 +258,9 @@ class _SupplementModalState extends ConsumerState<SupplementModal> {
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
-        bottom: viewInsets.bottom > 0 ? viewInsets.bottom + 16 : MediaQuery.of(context).padding.bottom + 16,
+        bottom: viewInsets.bottom > 0
+            ? viewInsets.bottom + 16
+            : MediaQuery.of(context).padding.bottom + 16,
       ),
       child: Container(
         decoration: ShapeDecoration(
@@ -125,14 +287,17 @@ class _SupplementModalState extends ConsumerState<SupplementModal> {
                 children: [
                   const SupplementDragHandle(),
                   const SupplementHeader(),
-                  
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        const SupplementMediaPicker(),
+                        SupplementMediaPicker(
+                          mediaUrls: _mediaUrls,
+                          onPickImage: _pickImage,
+                          onRemoveImage: (i) => setState(() => _mediaUrls.removeAt(i)),
+                          isUploading: _isUploading,
+                        ),
                         const SizedBox(height: 24),
-                        
                         SupplementTextArea(
                           label: 'Mô tả tình trạng lỗi'.tr(),
                           placeholder: 'Nhập chi tiết bộ phận hỏng hóc, âm thanh bất thường...'.tr(),
@@ -140,7 +305,6 @@ class _SupplementModalState extends ConsumerState<SupplementModal> {
                           maxLines: 4,
                         ),
                         const SizedBox(height: 16),
-                        
                         SupplementTextArea(
                           label: 'Giải pháp đề xuất (vd: Cần rã máy)'.tr(),
                           placeholder: 'Đề xuất hướng xử lý kỹ thuật...'.tr(),
@@ -148,9 +312,8 @@ class _SupplementModalState extends ConsumerState<SupplementModal> {
                           maxLines: 3,
                         ),
                         const SizedBox(height: 32),
-                        
                         SupplementSubmitButton(
-                          onPressed: _handleSubmit,
+                          onPressed: _isUploading ? null : _handleSubmit,
                           isLoading: state.isLoading,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

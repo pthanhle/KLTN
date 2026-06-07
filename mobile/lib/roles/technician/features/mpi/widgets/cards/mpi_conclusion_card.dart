@@ -7,11 +7,13 @@ import 'package:figma_squircle/figma_squircle.dart';
 class MpiConclusionCard extends StatelessWidget {
   final TextEditingController controller;
   final Function(String) onChanged;
+  final bool readOnly;
 
   const MpiConclusionCard({
     super.key,
     required this.controller,
     required this.onChanged,
+    this.readOnly = false,
   });
 
   @override
@@ -80,7 +82,8 @@ class MpiConclusionCard extends StatelessWidget {
                 ),
                 CupertinoTextField(
                   controller: controller,
-                  onChanged: onChanged,
+                  onChanged: readOnly ? null : onChanged,
+                  readOnly: readOnly,
                   maxLines: 5,
                   minLines: 3,
                   style: theme.textTheme.bodyMedium?.copyWith(

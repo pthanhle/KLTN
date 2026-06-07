@@ -1,4 +1,3 @@
-import { MessageCircle } from 'lucide-react';
 import { Image } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { formatDateTimeShort } from '../../../utils/trackingDataUtils';
@@ -77,13 +76,9 @@ const ProgressHero = ({ data }) => {
                                         {t('prog_eta', 'Dự kiến hoàn thành')}
                                     </span>
                                     <span className="text-sm font-bold text-emerald-600 dark:text-[#4edea3]">
-                                        {formatDateTimeShort(data.estimated_ready_at)}
+                                        {formatDateTimeShort(data.estimated_ready_at) || t('prog_eta_unknown', 'Chưa xác định')}
                                     </span>
                                 </div>
-                                <button className="bg-gradient-to-r from-yellow-500 to-yellow-400 dark:from-[#d4af37] dark:to-[#eab308] text-white dark:text-slate-900 font-bold px-8 py-4 rounded-full shadow-md dark:shadow-[0_4px_15px_rgba(212,175,55,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-                                    <MessageCircle size={18} />
-                                    {t('prog_btn_chat', 'Nhắn tin cho Kỹ Thuật Viên')}
-                                </button>
                             </div>
                         </>
                     )}

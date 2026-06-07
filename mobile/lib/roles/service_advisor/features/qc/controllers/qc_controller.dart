@@ -21,21 +21,30 @@ class QcState {
   final String progressId;
   final List<QcCheckItem> checklist;
   final bool isSubmitting;
+  final String advisorSignature; // base64-encoded PNG
 
   const QcState({
     this.progressId = '',
     this.checklist = const [],
     this.isSubmitting = false,
+    this.advisorSignature = '',
   });
 
-  QcState copyWith({String? progressId, List<QcCheckItem>? checklist, bool? isSubmitting}) =>
+  QcState copyWith({
+    String? progressId,
+    List<QcCheckItem>? checklist,
+    bool? isSubmitting,
+    String? advisorSignature,
+  }) =>
       QcState(
         progressId: progressId ?? this.progressId,
         checklist: checklist ?? this.checklist,
         isSubmitting: isSubmitting ?? this.isSubmitting,
+        advisorSignature: advisorSignature ?? this.advisorSignature,
       );
 
   bool get allChecked => checklist.isNotEmpty && checklist.every((c) => c.checked);
+  bool get canSubmit => allChecked && advisorSignature.isNotEmpty;
 }
 
 class QcController extends Notifier<QcState> {
@@ -70,8 +79,17 @@ class QcController extends Notifier<QcState> {
     state = state.copyWith(checklist: updated);
   }
 
+  void setSignature(String base64Sig) {
+    state = state.copyWith(advisorSignature: base64Sig);
+  }
+
+  void clearSignature() {
+    state = state.copyWith(advisorSignature: '');
+  }
+
   Future<void> submitQc() async {
     if (state.progressId.isEmpty) throw Exception('Không có lệnh sửa chữa');
+    if (!state.canSubmit) throw Exception('Vui lòng hoàn thành checklist và ký tên trước khi xác nhận');
 
     state = state.copyWith(isSubmitting: true);
     try {
@@ -83,6 +101,7 @@ class QcController extends Notifier<QcState> {
         data: jsonEncode({
           'progress_id': state.progressId,
           'qc_checklist': state.checklist.map((c) => c.toJson()).toList(),
+          'advisor_signature': state.advisorSignature,
           'qc_metrics': {
             'items_passed': state.checklist.where((c) => c.checked).length,
             'items_total': state.checklist.length,

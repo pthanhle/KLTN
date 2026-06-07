@@ -13,6 +13,7 @@ import '../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../shared/widgets/buttons/glass_nav_back_button.dart';
 import 'widgets/buttons/job_danger_fab.dart';
 import 'widgets/modals/supplement_modal/supplement_modal.dart';
+import 'widgets/sheets/job_image_picker_sheet.dart';
 import '../tasks/data/tech_api_repository.dart';
 
 class JobExecutionPage extends ConsumerStatefulWidget {
@@ -80,37 +81,7 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
   }
 
   void _handleCameraTap(String taskId) {
-    HapticFeedback.heavyImpact();
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) => CupertinoActionSheet(
-        title: Text('Yêu cầu chụp ảnh minh chứng'.tr()),
-        message: Text('Vui lòng chụp ảnh hoặc quay video kết quả sau khi thi công xong để hoàn tất hạng mục.'.tr()),
-        actions: [
-          CupertinoActionSheetAction(
-            child: Text('Chụp ảnh mới'.tr()),
-            onPressed: () {
-              Navigator.pop(context);
-              ref.read(jobExecutionControllerProvider.notifier).completeTask(taskId);
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: Text('Chọn từ thư viện'.tr()),
-            onPressed: () {
-              Navigator.pop(context);
-              ref.read(jobExecutionControllerProvider.notifier).completeTask(taskId);
-            },
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          isDestructiveAction: true,
-          child: Text('Hủy'.tr()),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-    );
+    JobImagePickerSheet.show(context, taskId: taskId, ref: ref);
   }
 
   void _handleReportIssue() {
@@ -228,7 +199,7 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
                           SingleChildScrollView(
                             physics: const BouncingScrollPhysics(),
                             child: Padding(
-                              padding: const EdgeInsets.only(bottom: 120),
+                              padding: const EdgeInsets.only(bottom: 180),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
@@ -237,6 +208,7 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
                                   JobTasksSection(
                                     tasks: state.tasks,
                                     isDark: isDark,
+                                    isLoading: state.isLoading,
                                     onToggleStatus: (id) {
                                       final task = state.tasks.firstWhere((t) => t.id == id);
                                       _handleTaskAction(id, task.status);
@@ -250,10 +222,11 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
                           SingleChildScrollView(
                             physics: const BouncingScrollPhysics(),
                             child: Padding(
-                              padding: const EdgeInsets.only(bottom: 120),
+                              padding: const EdgeInsets.only(bottom: 180),
                               child: JobPartsSection(
                                 parts: state.parts,
                                 isDark: isDark,
+                                isLoading: state.isLoading,
                               ),
                             ),
                           ),
@@ -266,13 +239,31 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
                   child: Center(child: CupertinoActivityIndicator()),
                 ),
                 error: (err, stack) => SliverFillRemaining(
-                  child: Center(child: Text('Lỗi: $err')),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(CupertinoIcons.exclamationmark_circle, size: 40, color: Color(0xFFFF3B30)),
+                          const SizedBox(height: 12),
+                          Text(
+                            err.toString().replaceFirst('Exception: ', ''),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: 16),
+                          CupertinoButton(
+                            onPressed: () => ref.read(jobExecutionControllerProvider.notifier).init(widget.progressId),
+                            child: const Text('Thử lại'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
-          ),
-          JobDangerFab(
-            onTap: _handleReportIssue,
           ),
           Positioned(
             bottom: 0,
@@ -282,19 +273,26 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
               top: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                child: FilledButton.icon(
-                  onPressed: _isMarkingDone ? null : _handleMarkJobDone,
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                  ),
-                  icon: _isMarkingDone
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Icon(CupertinoIcons.checkmark_shield_fill, size: 18),
-                  label: Text(
-                    _isMarkingDone ? 'Đang xử lý...'.tr() : 'Hoàn tất thi công'.tr(),
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    JobDangerFab(onTap: _handleReportIssue),
+                    const SizedBox(height: 10),
+                    FilledButton.icon(
+                      onPressed: _isMarkingDone ? null : _handleMarkJobDone,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                      ),
+                      icon: _isMarkingDone
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Icon(CupertinoIcons.checkmark_shield_fill, size: 18),
+                      label: Text(
+                        _isMarkingDone ? 'Đang xử lý...'.tr() : 'Hoàn tất thi công'.tr(),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

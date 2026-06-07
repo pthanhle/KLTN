@@ -119,6 +119,7 @@ class ServicePartItem {
 class ServiceOrderModel {
   final String id;
   final String quotationId;
+  final int? sequenceNumber;
   final OrderPriority priority;
   final ServiceOrderStatus status;
   final DateTime createdAt;
@@ -129,6 +130,7 @@ class ServiceOrderModel {
   const ServiceOrderModel({
     required this.id,
     required this.quotationId,
+    this.sequenceNumber,
     required this.priority,
     required this.status,
     required this.createdAt,
@@ -143,6 +145,7 @@ class ServiceOrderModel {
     return ServiceOrderModel(
       id: json['id'] as String,
       quotationId: json['quotation_id'] as String,
+      sequenceNumber: (json['sequence_number'] as num?)?.toInt(),
       priority: OrderPriority.values.firstWhere(
         (e) => e.toString() == 'OrderPriority.${json['priority']}',
         orElse: () => OrderPriority.standard,
@@ -164,6 +167,7 @@ class ServiceOrderModel {
     return {
       'id': id,
       'quotation_id': quotationId,
+      'sequence_number': sequenceNumber,
       'priority': priority.toString().split('.').last,
       'status': status.toString().split('.').last,
       'created_at': createdAt.toIso8601String(),

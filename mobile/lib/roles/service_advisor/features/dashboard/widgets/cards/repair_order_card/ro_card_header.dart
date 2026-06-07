@@ -6,12 +6,14 @@ class ROCardHeader extends StatelessWidget {
   final VehicleInfo vehicleInfo;
   final String serviceType;
   final String bookingCode;
+  final int? sequenceNumber;
 
   const ROCardHeader({
     super.key,
     required this.vehicleInfo,
     required this.serviceType,
     this.bookingCode = '',
+    this.sequenceNumber,
   });
 
   @override
@@ -27,20 +29,49 @@ class ROCardHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                vehicleInfo.licensePlate,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.5,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      vehicleInfo.licensePlate,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ),
+                  if (sequenceNumber != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Text(
+                        '#$sequenceNumber',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              const SizedBox(height: 2),
-              Text(
-                '${vehicleInfo.model} - ${vehicleInfo.color}',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+              if (vehicleInfo.model.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  vehicleInfo.model,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
+              ],
               if (bookingCode.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(

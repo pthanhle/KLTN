@@ -70,6 +70,8 @@ const ServiceTrackingDetail = () => {
         qcData,
         quotationData,
         setQuotationData,
+        progressData,
+        setProgressData,
         repairStatus,
         progressId,
         t,
@@ -140,7 +142,7 @@ const ServiceTrackingDetail = () => {
                             {activeTab === 'quotations' && (
                                 <QuotationTab quotationData={quotationData} setQuotationData={setQuotationData} />
                             )}
-                            {activeTab === 'progress' && <ProgressTab />}
+                            {activeTab === 'progress' && <ProgressTab progressData={progressData} setProgressData={setProgressData} />}
                             {activeTab === 'delivery' && <DeliveryTab />}
 
                             {!['overview', 'diagnostics', 'qc', 'quotations', 'progress', 'delivery'].includes(activeTab) && (
@@ -153,7 +155,7 @@ const ServiceTrackingDetail = () => {
                 </main>
 
                 {/* Final payment bar — shown when QC done */}
-                {repairStatus === 'QC_TESTING' && progressId && !isLoading && (
+                {repairStatus === 'QC_TESTING' && activeTab === 'qc' && progressId && !isLoading && (
                     <div className="sticky bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-[#141416]/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 shadow-2xl z-30 lg:hidden">
                         <button
                             onClick={handleFinalPayment}
@@ -167,7 +169,7 @@ const ServiceTrackingDetail = () => {
                 )}
 
                 {/* Desktop final payment bar */}
-                {repairStatus === 'QC_TESTING' && progressId && !isLoading && (
+                {repairStatus === 'QC_TESTING' && activeTab === 'qc' && progressId && !isLoading && (
                     <div className="hidden lg:block mx-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="max-w-7xl mx-auto bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                             <div>

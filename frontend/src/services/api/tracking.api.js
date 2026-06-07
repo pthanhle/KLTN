@@ -18,8 +18,20 @@ const getStats = async () => {
     return response;
 };
 
+const approveSupplementRequest = async (bookingCode, supplementId) => {
+    const response = await axiosClient.put(`/client/tracking/${bookingCode}/supplement/${supplementId}/approve`);
+    return response;
+};
+
+const rejectSupplementRequest = async (bookingCode, supplementId) => {
+    const response = await axiosClient.put(`/client/tracking/${bookingCode}/supplement/${supplementId}/reject`);
+    return response;
+};
+
 export default {
     getTrackingDetail,
     lookupTracking,
     getStats,
+    approveSupplementRequest,
+    rejectSupplementRequest,
 };

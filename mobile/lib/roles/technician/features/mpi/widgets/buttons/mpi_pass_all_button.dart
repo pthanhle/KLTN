@@ -5,12 +5,12 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class MpiPassAllButton extends StatelessWidget {
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool isAllPassed;
 
   const MpiPassAllButton({
     super.key,
-    required this.onTap,
+    this.onTap,
     required this.isAllPassed,
   });
 
@@ -22,9 +22,9 @@ class MpiPassAllButton extends StatelessWidget {
         : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.50);
 
     return GestureDetector(
-      onTap: () {
+      onTap: onTap == null ? null : () {
         HapticFeedback.selectionClick();
-        onTap();
+        onTap!();
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),

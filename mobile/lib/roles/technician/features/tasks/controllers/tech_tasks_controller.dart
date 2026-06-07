@@ -93,6 +93,9 @@ class TechTasksController extends AsyncNotifier<TechTasksState> {
       case 2:
         filter = TechTaskStatus.inProgress;
         break;
+      case 3:
+        filter = TechTaskStatus.completed;
+        break;
       default:
         filter = null;
     }

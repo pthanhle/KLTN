@@ -25,7 +25,7 @@ class AdvisorKanbanTabs extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
-        children: ROStage.values.map((stage) {
+        children: ROStage.values.where((s) => s != ROStage.delivery).map((stage) {
           final isSelected = selectedStage == stage;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -71,7 +71,7 @@ class _TabChipState extends State<_TabChip> {
     switch (widget.stage) {
       case ROStage.pending:    return 'Cần Đón'.tr();
       case ROStage.quotation:  return 'Báo Giá'.tr();
-      case ROStage.inProgress: return 'Đang Sửa'.tr();
+      case ROStage.inProgress: return 'Phát Sinh'.tr();
       case ROStage.qc:         return 'Chờ QC'.tr();
       case ROStage.delivery:   return 'Giao Xe'.tr();
     }
@@ -81,7 +81,7 @@ class _TabChipState extends State<_TabChip> {
     switch (widget.stage) {
       case ROStage.pending:    return CupertinoIcons.time;
       case ROStage.quotation:  return CupertinoIcons.doc_text;
-      case ROStage.inProgress: return CupertinoIcons.wrench;
+      case ROStage.inProgress: return CupertinoIcons.exclamationmark_triangle;
       case ROStage.qc:         return CupertinoIcons.check_mark_circled;
       case ROStage.delivery:   return CupertinoIcons.car;
     }

@@ -136,10 +136,11 @@ class AdvisorApiRepository {
       id: json['_id']?.toString() ?? '',
       bookingId: booking['_id']?.toString() ?? '',
       bookingCode: booking['booking_code']?.toString() ?? '',
+      sequenceNumber: (booking['sequence_number'] as num?)?.toInt(),
       customerNote: booking['customer_note']?.toString() ?? '',
       vehicleInfo: VehicleInfo(
         licensePlate: vehicle['license_plate']?.toString() ?? '',
-        model: vehicle['model']?.toString() ?? vehicle['brand']?.toString() ?? '',
+        model: '${vehicle['brand'] ?? ''} ${vehicle['model'] ?? ''}'.trim(),
         color: vehicle['color']?.toString() ?? '',
       ),
       customerInfo: CustomerInfo(

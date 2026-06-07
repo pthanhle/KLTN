@@ -9,13 +9,13 @@ import '../../models/mpi_item_model.dart';
 class MpiGhostButton extends StatefulWidget {
   final MpiItemStatus type;
   final bool isSelected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const MpiGhostButton({
     super.key,
     required this.type,
     required this.isSelected,
-    required this.onTap,
+    this.onTap,
   });
 
   @override
@@ -57,15 +57,15 @@ class _MpiGhostButtonState extends State<MpiGhostButton> {
     final color = _getColor(context);
 
     return GestureDetector(
-      onTapDown: (_) {
+      onTapDown: widget.onTap == null ? null : (_) {
         HapticFeedback.selectionClick();
         setState(() => _isPressed = true);
       },
-      onTapUp: (_) {
+      onTapUp: widget.onTap == null ? null : (_) {
         setState(() => _isPressed = false);
-        widget.onTap();
+        widget.onTap!();
       },
-      onTapCancel: () => setState(() => _isPressed = false),
+      onTapCancel: widget.onTap == null ? null : () => setState(() => _isPressed = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: 36,

@@ -3,7 +3,7 @@ import { Image } from 'antd';
 import { formatTimeHHMM } from '../../../utils/trackingDataUtils';
 import ApprovalRequestCard from './ApprovalRequestCard';
 
-const RoadmapStep = ({ step }) => {
+const RoadmapStep = ({ step, setProgressData }) => {
     const isDone = step.status === 'done';
     const isActive = step.status === 'active';
     const isPending = step.status === 'pending';
@@ -86,7 +86,7 @@ const RoadmapStep = ({ step }) => {
                 
                 {/* Edge Case: Mid-Service Approval Card */}
                 {isWarning && step.approval_request && (
-                    <ApprovalRequestCard request={step.approval_request} />
+                    <ApprovalRequestCard request={step.approval_request} setProgressData={setProgressData} />
                 )}
             </div>
         </div>

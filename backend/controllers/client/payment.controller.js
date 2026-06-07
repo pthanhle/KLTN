@@ -283,24 +283,9 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
         return res.redirect(`${frontendUrl}/payment/success?order_id=${progress.booking_id?.booking_code || progress._id}&type=quotation`)
       }
 
-      // Deposit flow
+      // Deposit flow — build parts_usage first to decide if warehouse step is needed
       progress.quotation.status = 'APPROVED'
       progress.quotation.approved_at = new Date()
-      progress.current_step = 'WAITING_PARTS'
-      progress.status = 'WAITING_PARTS'
-
-      progress.timeline.push({
-        step: 'WAITING_PARTS',
-        status: 'IN_PROGRESS',
-        time: new Date(),
-        note: 'Khách hàng đã thanh toán cọc. Chờ xuất kho phụ tùng.',
-      })
-
-      progress.system_logs.push({
-        time: new Date(),
-        type: 'INF',
-        message: 'Khách hàng đã thanh toán tiền cọc báo giá. Đang chờ xuất kho phụ tùng.',
-      })
 
       progress.parts_usage = []
       for (const qPart of progress.quotation.parts) {
@@ -324,39 +309,91 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
         })
       }
 
+      // No physical parts → skip warehouse and start repair immediately
+      if (progress.parts_usage.length === 0) {
+        progress.current_step = 'IN_PROGRESS'
+        progress.status = 'IN_PROGRESS'
+        progress.timeline.push({
+          step: 'IN_PROGRESS',
+          status: 'IN_PROGRESS',
+          time: new Date(),
+          note: 'Không có phụ tùng cần xuất kho. Bắt đầu thi công.',
+        })
+        progress.system_logs.push({
+          time: new Date(),
+          type: 'INF',
+          message: 'Không có phụ tùng cần xuất kho. Xe chuyển thẳng sang Đang thi công.',
+        })
+      } else {
+        progress.current_step = 'WAITING_PARTS'
+        progress.status = 'WAITING_PARTS'
+        progress.timeline.push({
+          step: 'WAITING_PARTS',
+          status: 'IN_PROGRESS',
+          time: new Date(),
+          note: 'Khách hàng đã thanh toán cọc. Chờ xuất kho phụ tùng.',
+        })
+        progress.system_logs.push({
+          time: new Date(),
+          type: 'INF',
+          message: 'Khách hàng đã thanh toán tiền cọc báo giá. Đang chờ xuất kho phụ tùng.',
+        })
+      }
+
       await progress.save()
 
       try {
         const io = getIO()
-        io.to('room_inventory').emit('parts_request', {
-          progress_id: progress._id,
-          message: 'Đơn sửa chữa cần xuất kho phụ tùng.',
-        })
-        if (progress.advisor_id) {
-          io.to(`user_${progress.advisor_id}`).emit('quotation_paid', {
+        if (progress.parts_usage.length === 0) {
+          // No parts — notify tech to start immediately
+          if (progress.mechanic_id) {
+            io.to(`user_${progress.mechanic_id}`).emit('parts_ready', {
+              progress_id: progress._id,
+              message: 'Không cần phụ tùng. Bắt đầu thi công ngay!',
+            })
+          }
+          if (progress.advisor_id) {
+            io.to(`user_${progress.advisor_id}`).emit('parts_ready', {
+              progress_id: progress._id,
+              message: 'Khách hàng đã thanh toán cọc. Không cần phụ tùng, xe đang thi công.',
+            })
+          }
+        } else {
+          // Has parts — notify warehouse and staff to wait for dispatch
+          io.to('room_inventory').emit('parts_request', {
             progress_id: progress._id,
-            message: 'Khách hàng đã thanh toán cọc. Đang chờ xuất kho phụ tùng.',
+            message: 'Đơn sửa chữa cần xuất kho phụ tùng.',
           })
-        }
-        if (progress.mechanic_id) {
-          io.to(`user_${progress.mechanic_id}`).emit('quotation_paid', {
-            progress_id: progress._id,
-            message: 'Báo giá đã được thanh toán. Xe sẽ vào xưởng sau khi có đủ phụ tùng.',
-          })
+          if (progress.advisor_id) {
+            io.to(`user_${progress.advisor_id}`).emit('quotation_paid', {
+              progress_id: progress._id,
+              message: 'Khách hàng đã thanh toán cọc. Đang chờ xuất kho phụ tùng.',
+            })
+          }
+          if (progress.mechanic_id) {
+            io.to(`user_${progress.mechanic_id}`).emit('quotation_paid', {
+              progress_id: progress._id,
+              message: 'Báo giá đã được thanh toán. Xe sẽ vào xưởng sau khi có đủ phụ tùng.',
+            })
+          }
         }
       } catch (_) {}
+
+      const customerMsg = progress.parts_usage.length === 0
+        ? 'Bạn đã đặt cọc thành công. Kỹ thuật viên sẽ bắt đầu thi công ngay.'
+        : 'Bạn đã đặt cọc thành công. Chúng tôi đang chuẩn bị phụ tùng cho xe của bạn.'
 
       if (progress.booking_id?.user_id) {
         await createAndEmitNotification(progress.booking_id.user_id, {
           title: 'Thanh toán cọc thành công',
-          message: 'Bạn đã đặt cọc thành công. Chúng tôi đang chuẩn bị phụ tùng cho xe của bạn.',
+          message: customerMsg,
           type: 'SERVICE',
           reference_id: progress._id.toString(),
           reference_link: `/tracking/${progress.booking_id?.booking_code || progress._id}`,
         }).catch(() => {})
       }
 
-      console.log(`VNPay quotation deposit completed`, { progressId: progress._id, transactionNo })
+      console.log(`VNPay quotation deposit completed`, { progressId: progress._id, transactionNo, hasPartsUsage: progress.parts_usage.length > 0 })
       return res.redirect(`${frontendUrl}/payment/success?order_id=${progress.booking_id?.booking_code || progress._id}&type=quotation`)
     }
 

@@ -4,10 +4,9 @@ import ProgressHero from './Hero/ProgressHero';
 import RepairRoadmap from './Roadmap/RepairRoadmap';
 import PartsInventory from './Logistics/PartsInventory';
 import SystemActivityLog from './Logistics/SystemActivityLog';
-import { useProgressTabLogic } from '../../hooks/useProgressTabLogic';
 
-const ProgressTab = () => {
-    const { progressData, isLoading } = useProgressTabLogic();
+const ProgressTab = ({ progressData, setProgressData }) => {
+    const isLoading = false;
 
     if (isLoading || !progressData) {
         return (
@@ -53,7 +52,7 @@ const ProgressTab = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Column: Timeline */}
                 <div className="lg:col-span-8">
-                    <RepairRoadmap steps={progressData.timeline_steps} />
+                    <RepairRoadmap steps={progressData.timeline_steps} setProgressData={setProgressData} />
                 </div>
 
                 {/* Right Column: Mini Panels */}

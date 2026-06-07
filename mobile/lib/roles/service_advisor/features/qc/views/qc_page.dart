@@ -5,11 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../../shared/widgets/buttons/glass_nav_back_button.dart';
 import '../../../../../shared/widgets/buttons/liquid_button.dart';
 import '../../../../../shared/widgets/toast/glass_toast.dart';
+import '../../walkaround/widgets/modals/signature_pad_modal.dart';
 import '../controllers/qc_controller.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
 
 class QcPage extends ConsumerStatefulWidget {
   final String progressId;
@@ -33,9 +37,11 @@ class _QcPageState extends ConsumerState<QcPage> {
     try {
       await ref.read(qcControllerProvider.notifier).submitQc();
       if (mounted) {
+        // Refresh dashboard immediately so the card moves out of "Chờ QC"
+        ref.read(advisorDashboardProvider.notifier).refresh();
         GlassToast.show(
           context,
-          title: 'Đã chuyển sang QC!'.tr(),
+          title: 'QC hoàn tất! Đã thông báo khách hàng.'.tr(),
           icon: CupertinoIcons.check_mark_circled,
         );
         context.pop();
@@ -48,6 +54,13 @@ class _QcPageState extends ConsumerState<QcPage> {
           icon: CupertinoIcons.xmark_circle,
         );
       }
+    }
+  }
+
+  Future<void> _handleSign() async {
+    final sig = await SignaturePadModal.show(context);
+    if (sig != null && sig.isNotEmpty) {
+      ref.read(qcControllerProvider.notifier).setSignature(sig);
     }
   }
 
@@ -111,6 +124,14 @@ class _QcPageState extends ConsumerState<QcPage> {
                         passed: state.checklist.where((c) => c.checked).length,
                         total: state.checklist.length,
                       ),
+                      const SizedBox(height: 20),
+                      _SignatureSection(
+                        theme: theme,
+                        isDark: isDark,
+                        signature: state.advisorSignature,
+                        onSign: _handleSign,
+                        onClear: () => ref.read(qcControllerProvider.notifier).clearSignature(),
+                      ),
                     ]),
                   ),
                 ),
@@ -125,7 +146,9 @@ class _QcPageState extends ConsumerState<QcPage> {
                 isDark: isDark,
                 bottomSafeArea: bottomSafeArea,
                 isLoading: state.isSubmitting,
+                canSubmit: state.canSubmit,
                 allChecked: state.allChecked,
+                hasSigned: state.advisorSignature.isNotEmpty,
                 onSubmit: _handleSubmit,
               ),
             ),
@@ -349,12 +372,142 @@ class _ProgressIndicator extends StatelessWidget {
   }
 }
 
+class _SignatureSection extends StatelessWidget {
+  final ThemeData theme;
+  final bool isDark;
+  final String signature;
+  final VoidCallback onSign;
+  final VoidCallback onClear;
+
+  const _SignatureSection({
+    required this.theme,
+    required this.isDark,
+    required this.signature,
+    required this.onSign,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasSig = signature.isNotEmpty;
+    Uint8List? sigBytes;
+    if (hasSig) {
+      try { sigBytes = base64Decode(signature); } catch (_) {}
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: ShapeDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : theme.colorScheme.surface.withValues(alpha: 0.72),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+          side: BorderSide(
+            color: hasSig
+                ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                : Colors.white.withValues(alpha: isDark ? 0.12 : 0.4),
+            width: hasSig ? 1.0 : 0.5,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                hasSig ? CupertinoIcons.checkmark_seal_fill : CupertinoIcons.signature,
+                size: 18,
+                color: hasSig ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Chữ ký cố vấn dịch vụ'.tr(),
+                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const Spacer(),
+              if (hasSig)
+                GestureDetector(
+                  onTap: onClear,
+                  child: Text(
+                    'Xóa'.tr(),
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          GestureDetector(
+            onTap: hasSig ? null : onSign,
+            child: Container(
+              height: 120,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: hasSig ? 0.95 : 0.06),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: hasSig
+                      ? theme.colorScheme.primary.withValues(alpha: 0.3)
+                      : theme.colorScheme.outline.withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
+              child: hasSig && sigBytes != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.memory(sigBytes, fit: BoxFit.contain),
+                    )
+                  : Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(CupertinoIcons.pencil, size: 24,
+                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Nhấn để ký tên'.tr(),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+          ),
+          if (!hasSig) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onSign,
+                icon: const Icon(CupertinoIcons.pencil, size: 16),
+                label: Text('Ký tên'.tr()),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _BottomBar extends StatelessWidget {
   final ThemeData theme;
   final bool isDark;
   final double bottomSafeArea;
   final bool isLoading;
+  final bool canSubmit;
   final bool allChecked;
+  final bool hasSigned;
   final VoidCallback onSubmit;
 
   const _BottomBar({
@@ -362,7 +515,9 @@ class _BottomBar extends StatelessWidget {
     required this.isDark,
     required this.bottomSafeArea,
     required this.isLoading,
+    required this.canSubmit,
     required this.allChecked,
+    required this.hasSigned,
     required this.onSubmit,
   });
 
@@ -406,11 +561,13 @@ class _BottomBar extends StatelessWidget {
             child: LiquidButton(
               isLoading: isLoading,
               isGlass: false,
-              onPressed: (!allChecked || isLoading) ? null : onSubmit,
+              onPressed: (!canSubmit || isLoading) ? null : onSubmit,
               child: Text(
-                allChecked
-                    ? 'Xác Nhận QC & Chuyển Giao'.tr()
-                    : 'Hoàn thành tất cả hạng mục để tiếp tục'.tr(),
+                !allChecked
+                    ? 'Hoàn thành tất cả hạng mục để tiếp tục'.tr()
+                    : !hasSigned
+                        ? 'Vui lòng ký tên để xác nhận'.tr()
+                        : 'Xác Nhận QC & Chuyển Giao'.tr(),
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,

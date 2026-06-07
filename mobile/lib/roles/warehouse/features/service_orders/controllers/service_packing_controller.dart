@@ -110,6 +110,7 @@ class ServicePackingController extends Notifier<ServicePackingState> {
         order: ServiceOrderModel(
           id: state.order!.id,
           quotationId: state.order!.quotationId,
+          sequenceNumber: state.order!.sequenceNumber,
           priority: state.order!.priority,
           status: ServiceOrderStatus.pendingPick,
           createdAt: state.order!.createdAt,
@@ -123,7 +124,7 @@ class ServicePackingController extends Notifier<ServicePackingState> {
 
   void reportPartException(String partId, String reason, DateTime? expectedArrivalDate) {
     if (state.order == null) return;
-    
+
     final updatedParts = state.order!.parts.map((p) {
       if (p.partId == partId) {
         return ServicePartItem(
@@ -143,6 +144,7 @@ class ServicePackingController extends Notifier<ServicePackingState> {
       order: ServiceOrderModel(
         id: state.order!.id,
         quotationId: state.order!.quotationId,
+        sequenceNumber: state.order!.sequenceNumber,
         priority: state.order!.priority,
         status: state.order!.status,
         createdAt: state.order!.createdAt,
@@ -151,7 +153,7 @@ class ServicePackingController extends Notifier<ServicePackingState> {
         parts: updatedParts,
       ),
     );
-    
+
     undoPart(partId);
   }
 
@@ -165,6 +167,7 @@ class ServicePackingController extends Notifier<ServicePackingState> {
         order: ServiceOrderModel(
           id: state.order!.id,
           quotationId: state.order!.quotationId,
+          sequenceNumber: state.order!.sequenceNumber,
           priority: state.order!.priority,
           status: ServiceOrderStatus.readyForHandover,
           createdAt: state.order!.createdAt,

@@ -88,12 +88,10 @@ export const getRepairProgressById = asyncHandler(async (req, res) => {
     const progress = await RepairProgress.findById(req.params.id)
         .populate({
             path: 'booking_id',
-            populate: [
-                { path: 'user_id', select: 'full_name email phone' },
-                { path: 'service_id', select: 'service_name price duration' },
-            ],
+            populate: { path: 'user_id', select: 'full_name email phone avatar' },
         })
-        .populate('staff_id', 'full_name')
+        .populate('advisor_id', 'full_name email phone avatar')
+        .populate('mechanic_id', 'full_name email phone avatar')
 
     if (!progress) {
         res.status(404)

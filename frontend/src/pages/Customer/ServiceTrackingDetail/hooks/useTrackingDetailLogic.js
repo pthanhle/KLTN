@@ -5,6 +5,116 @@ import { normalizeSignatureDataUrl } from '../utils/trackingDataUtils';
 import trackingApi from '../../../../services/api/tracking.api';
 import { useSelector } from 'react-redux';
 
+const IN_PROGRESS_STATUSES = ['IN_PROGRESS', 'QC_TESTING', 'COMPLETED'];
+
+const mapProgressData = (p) => {
+    if (!IN_PROGRESS_STATUSES.includes(p.status)) return null;
+
+    const parts = p.parts_usage || [];
+    const overallProgress = parts.length === 0
+        ? (p.status === 'COMPLETED' ? 100 : 50)
+        : Math.round(parts.reduce((sum, part) => {
+            if (part.status === 'COMPLETED') return sum + 100;
+            if (part.status === 'IN_PROGRESS') return sum + (part.progress || 50);
+            return sum;
+        }, 0) / parts.length);
+
+    const timeline = p.timeline || [];
+    const inProgressStep = timeline.find((s) => s.step === 'IN_PROGRESS');
+    const mechanic = p.mechanic_id;
+    const labors = p.quotation?.labors || [];
+
+    const doneSteps = [];
+    const receivedStep = timeline.find((s) => s.step === 'RECEIVED');
+    if (receivedStep) {
+        doneSteps.push({
+            id: 'step_received',
+            status: 'done',
+            title: 'Tiếp nhận & Lập hồ sơ',
+            completed_at: receivedStep.time,
+            description: receivedStep.note || 'Đã hoàn tất tiếp nhận và kiểm tra tình trạng xe.',
+        });
+    }
+    const diagStep = timeline.find((s) => s.step === 'DIAGNOSING');
+    if (diagStep) {
+        doneSteps.push({
+            id: 'step_diag',
+            status: 'done',
+            title: 'Chẩn đoán điện tử',
+            completed_at: diagStep.time,
+            description: diagStep.notes || diagStep.note || 'Đã hoàn thành chẩn đoán kỹ thuật toàn diện.',
+        });
+    }
+
+    const laborSteps = labors.map((labor, idx) => {
+        let stepStatus;
+        if (p.status === 'COMPLETED' || p.status === 'QC_TESTING') {
+            stepStatus = 'done';
+        } else {
+            stepStatus = idx === 0 ? 'active' : 'pending';
+        }
+        return {
+            id: `labor_${idx}`,
+            status: stepStatus,
+            title: labor.description,
+            started_at: idx === 0 ? inProgressStep?.time : null,
+            completed_at: stepStatus === 'done' ? inProgressStep?.time : null,
+            description: labor.hours > 0 ? `${labor.hours} giờ công` : '',
+            mechanic: (idx === 0 && mechanic) ? {
+                name: mechanic.full_name,
+                role: 'KỸ THUẬT VIÊN',
+                avatar: mechanic.avatar || null,
+            } : null,
+            evidence_images: (idx === 0 && inProgressStep?.images?.length)
+                ? inProgressStep.images.map((url, i) => ({ id: `img_${i}`, url, alt: `Hình ảnh thi công ${i + 1}` }))
+                : [],
+        };
+    });
+
+    const supplementSteps = (p.supplement_requests || []).map((req) => ({
+        id: `supplement_${req._id}`,
+        status: req.status === 'PENDING' ? 'warning' : req.status === 'APPROVED' ? 'done' : 'pending',
+        title: req.title,
+        started_at: req.created_at,
+        description: req.description || '',
+        approval_request: req.status !== 'REJECTED' ? {
+            id: req._id,
+            booking_code: p.booking_id?.booking_code,
+            issue_title: req.title,
+            technician_note: req.description,
+            action_required: req.delay_reason || 'Phát sinh trong quá trình thi công',
+            parts: req.parts || [],
+            labors: req.labors || [],
+            total_price: req.total_price || 0,
+            status: req.status.toLowerCase(),
+        } : null,
+    }));
+
+    const activeLaborTitle = laborSteps.find((s) => s.status === 'active')?.title;
+
+    return {
+        overall_progress: p.status === 'COMPLETED' ? 100 : overallProgress,
+        current_operation_name: activeLaborTitle || (p.status === 'QC_TESTING' ? 'Đang Kiểm Định QC' : 'Đang Thi Công'),
+        estimated_ready_at: p.estimated_completion || null,
+        hero_image: inProgressStep?.images?.[0] || null,
+        timeline_steps: [...doneSteps, ...laborSteps, ...supplementSteps],
+        parts_inventory: parts.map((part, idx) => ({
+            id: part.sku || `part_${idx}`,
+            sku: part.sku || '',
+            name: part.name,
+            status_code: part.status === 'COMPLETED' ? 'DONE' : part.status === 'IN_PROGRESS' ? 'INSTALLING' : 'WAITING',
+            fulfillment_percentage: part.status === 'COMPLETED' ? 100 : part.status === 'IN_PROGRESS' ? (part.progress || 50) : 0,
+            estimated_arrival_at: part.eta || null,
+        })),
+        system_activity: (p.system_logs || []).map((log, idx) => ({
+            id: `log_${idx}`,
+            timestamp: log.time,
+            type_code: log.type,
+            message: log.message,
+        })),
+    };
+};
+
 const mapDiagnosticData = (timeline) => {
     const diagStep = timeline.find((s) => s.step === 'DIAGNOSING' && s.status === 'COMPLETED');
     if (!diagStep?.diagnostics?.length) return null;
@@ -135,6 +245,34 @@ const mapQuotationData = (realProgress, ri, advisorSignatureUrl, customerSignatu
     };
 };
 
+const mapQcData = (p) => {
+    const checklist = p.qc_checklist || [];
+    const signature = p.qc_advisor_signature || null;
+    const advisor = p.advisor_id || {};
+
+    if (!checklist.length && !signature) return null;
+
+    const kcs_tasks = checklist.map((item, i) => ({
+        id: i,
+        title: item.task || `Hạng mục ${i + 1}`,
+        desc: '',
+        icon: 'Cpu',
+        status: item.status === 'passed' ? 'completed' : item.status === 'failed' ? 'processing' : 'pending',
+    }));
+
+    return {
+        kcs_tasks,
+        estimated_delivery: p.estimated_completion || null,
+        spec_hud: null,
+        vehicle_visual: null,
+        manager: {
+            name: advisor.full_name || 'Cố vấn dịch vụ',
+            role: 'CỐ VẤN DỊCH VỤ',
+            signature: signature ? `data:image/png;base64,${signature}` : null,
+        },
+    };
+};
+
 export const useTrackingDetailLogic = () => {
     const { id } = useParams();
     const location = useLocation();
@@ -147,6 +285,7 @@ export const useTrackingDetailLogic = () => {
     const [qcData, setQcData] = useState(null);
     const [overviewData, setOverviewData] = useState(null);
     const [quotationData, setQuotationData] = useState(null);
+    const [progressData, setProgressData] = useState(null);
     const [repairStatus, setRepairStatus] = useState('RECEIVED');
     const [progressId, setProgressId] = useState(null);
     const { isAuthenticated } = useSelector((state) => state.auth);
@@ -191,7 +330,8 @@ export const useTrackingDetailLogic = () => {
                 setOverviewData(ri ? mapOverviewData(realProgress, ri, advisorSignatureUrl, customerSignatureUrl) : null);
                 setDiagnosticData(realProgress.timeline ? mapDiagnosticData(realProgress.timeline) : null);
                 setQuotationData(mapQuotationData(realProgress, ri, advisorSignatureUrl, customerSignatureUrl));
-                setQcData(null); // QC data mapped when QC_TESTING step is implemented
+                setQcData(mapQcData(realProgress));
+                setProgressData(mapProgressData(realProgress));
             } catch (err) {
                 const message =
                     err?.response?.data?.message ||
@@ -216,6 +356,8 @@ export const useTrackingDetailLogic = () => {
         qcData,
         quotationData,
         setQuotationData,
+        progressData,
+        setProgressData,
         repairStatus,
         progressId,
         t,

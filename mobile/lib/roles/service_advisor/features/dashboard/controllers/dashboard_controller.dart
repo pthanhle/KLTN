@@ -23,7 +23,14 @@ class AdvisorDashboardState {
   });
 
   List<RepairOrderModel> get filteredOrders {
-    var list = allRepairOrders.where((ro) => ro.stage == selectedStage).toList();
+    var list = allRepairOrders.where((ro) {
+      if (ro.stage != selectedStage) return false;
+      // "Phát Sinh" tab: only surface orders that have an unresolved supplement request
+      if (selectedStage == ROStage.inProgress) {
+        return ro.pendingSupplementId != null;
+      }
+      return true;
+    }).toList();
 
     if (filterDate != null) {
       list = list.where((ro) {

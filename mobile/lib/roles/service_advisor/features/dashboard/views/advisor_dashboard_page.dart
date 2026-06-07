@@ -160,11 +160,8 @@ class _AdvisorDashboardPageState extends ConsumerState<AdvisorDashboardPage> {
                             } else if (order.stage == ROStage.qc) {
                               context.go('/advisor/qc/${order.id}');
                             } else if (order.stage == ROStage.inProgress) {
-                              if (order.pendingSupplementId != null) {
-                                context.go('/advisor/supplement/${order.id}');
-                              } else {
-                                context.go('/advisor/qc/${order.id}');
-                              }
+                              // "Phát Sinh" tab — always has a pending supplement
+                              context.go('/advisor/supplement/${order.id}');
                             } else {
                               context.go('/advisor/walkaround/${order.id}');
                             }

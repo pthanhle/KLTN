@@ -114,6 +114,7 @@ class _RepairOrderCardState extends State<RepairOrderCard>
                         vehicleInfo: order.vehicleInfo,
                         serviceType: order.serviceType,
                         bookingCode: order.bookingCode,
+                        sequenceNumber: order.sequenceNumber,
                       ),
                       const SizedBox(height: 16),
                       Divider(

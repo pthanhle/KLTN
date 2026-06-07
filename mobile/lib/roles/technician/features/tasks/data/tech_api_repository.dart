@@ -56,6 +56,25 @@ class TechApiRepository {
     }
   }
 
+  Future<Map<String, dynamic>> fetchRepairProgressDetail(String progressId) async {
+    final token = await _getToken();
+    if (token == null) throw Exception('SESSION_EXPIRED');
+    try {
+      final response = await _dio.get(
+        '${ApiConfig.baseUrl}/staff/service/repair-progress/$progressId',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('access_token');
+        throw Exception('SESSION_EXPIRED');
+      }
+      throw Exception(e.response?.data?['message'] ?? 'Không thể tải dữ liệu: ${e.message}');
+    }
+  }
+
   Future<void> submitDiagnostics({
     required String progressId,
     required List<Map<String, dynamic>> diagnostics,

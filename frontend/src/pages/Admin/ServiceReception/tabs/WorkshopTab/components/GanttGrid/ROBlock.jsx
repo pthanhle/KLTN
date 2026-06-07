@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Car, MoreVertical, AlertTriangle, Clock, User, Wrench, Layers } from 'lucide-react';
+import { Car, MoreVertical, AlertTriangle, Clock, User, Wrench, Layers, Moon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Popover, Image } from 'antd';
 import { calculateLeftPercentage, calculateWidthPercentage, calculateBlockBoundaries } from '../../utils/ganttUtils';
+
+const SHOP_CLOSE_MINS = 19 * 60; // 19:00 — shop closing time
 
 const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDateStr }) => {
     const { t } = useTranslation('adminServiceReception');
@@ -18,14 +20,19 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
     };
 
     const displayCode = booking.booking_code || `#${String(booking._id).slice(-8).toUpperCase()}`;
+    const isCompleted = booking.status === 'COMPLETED';
 
-    // Real-time clock — refreshes every 30 s so the progress bar stays live
+    // Real-time clock — stops ticking at 19:00 for same-day cars
     const [now, setNow] = useState(() => new Date());
     useEffect(() => {
-        if (booking.status === 'COMPLETED') return; // no ticking needed for finished jobs
-        const id = setInterval(() => setNow(new Date()), 30_000);
+        if (isCompleted) return;
+        const id = setInterval(() => {
+            const n = new Date();
+            const mins = n.getHours() * 60 + n.getMinutes();
+            if (mins < SHOP_CLOSE_MINS) setNow(n);
+        }, 30_000);
         return () => clearInterval(id);
-    }, [booking.status]);
+    }, [isCompleted]);
 
     const currMins = now.getHours() * 60 + now.getMinutes();
 
@@ -38,8 +45,13 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
         originalEndMins
     } = calculateBlockBoundaries(booking, selectedDateStr, currMins);
 
+    // Overnight states
+    const isOvernightCar = !isCompleted && isContinuedFromYesterday;
+    const isStayingOvernight = !isCompleted && !isContinuedFromYesterday && currMins >= SHOP_CLOSE_MINS;
+    const isAnyOvernight = isOvernightCar || isStayingOvernight;
+
     let originalWidthPct = 100;
-    if (isOverdue) {
+    if (isOverdue && !isAnyOvernight) {
         const startMins = parseInt(displayStart.split(':')[0]) * 60 + parseInt(displayStart.split(':')[1]);
         const endMins = parseInt(displayEnd.split(':')[0]) * 60 + parseInt(displayEnd.split(':')[1]);
         const plannedEndMins = Math.max(startMins, Math.min(originalEndMins, endMins));
@@ -51,19 +63,20 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
     const left = calculateLeftPercentage(displayStart);
     const width = calculateWidthPercentage(displayStart, displayEnd);
 
-    // --- Progress bar state ---
-    const isCompleted = booking.status === 'COMPLETED';
+    // --- Progress bar ---
     let progressPercent = 0;
-    let progressColor = 'bg-emerald-500'; // green = normal
+    let progressColor = 'bg-emerald-500';
 
     if (isCompleted) {
         progressPercent = 100;
-        // Was it late? compare actual completion (updatedAt proxy) vs planned end
         const actualEnd = booking.actual_end_time ? new Date(booking.actual_end_time) : null;
         const plannedEnd = booking.expected_end_datetime ? new Date(booking.expected_end_datetime) : null;
         progressColor = (actualEnd && plannedEnd && actualEnd > plannedEnd)
             ? 'bg-red-500'
             : 'bg-emerald-500';
+    } else if (isAnyOvernight) {
+        progressPercent = 100;
+        progressColor = 'bg-amber-500';
     } else if (booking.expected_start_datetime && booking.expected_end_datetime) {
         const startMs = new Date(booking.expected_start_datetime).getTime();
         const endMs = new Date(booking.expected_end_datetime).getTime();
@@ -72,7 +85,7 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
             progressPercent = Math.min(100, ((nowMs - startMs) / (endMs - startMs)) * 100);
         }
         const remainingMs = endMs - now.getTime();
-        const WARNING_MS = 30 * 60 * 1000; // 30 minutes
+        const WARNING_MS = 30 * 60 * 1000;
         if (isOverdue) {
             progressColor = 'bg-red-500';
         } else if (remainingMs <= WARNING_MS || progressPercent >= 80) {
@@ -80,7 +93,6 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
         }
     }
 
-    // Completion label
     const completedLate = isCompleted && (() => {
         const actualEnd = booking.actual_end_time ? new Date(booking.actual_end_time) : null;
         const plannedEnd = booking.expected_end_datetime ? new Date(booking.expected_end_datetime) : null;
@@ -89,18 +101,15 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: booking._id,
-        data: {
-            type: 'workshop_booking',
-            booking,
-        },
+        data: { type: 'workshop_booking', booking },
     });
 
     const style = {
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 0.6 : 1,
         zIndex: isDragging ? 999 : (isConflict ? 30 : 10),
-        left: left,
-        width: width,
+        left,
+        width,
         position: 'absolute',
         touchAction: 'none'
     };
@@ -109,10 +118,8 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
     if (booking.expected_start_datetime && booking.expected_end_datetime) {
         const startDt = new Date(booking.expected_start_datetime);
         const endDt = new Date(booking.expected_end_datetime);
-        
         const formatTime = (dt) => `${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}`;
         const formatDate = (dt) => `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth() + 1).toString().padStart(2, '0')}`;
-        
         if (startDt.toDateString() === endDt.toDateString()) {
             displayTimeSlot = `${formatTime(startDt)} - ${formatTime(endDt)}`;
         } else {
@@ -126,6 +133,15 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
 
     const assistantsCount = booking.assistant_technicians?.length || 0;
 
+    // Border & background color class based on state
+    const borderClass = isConflict
+        ? 'border-red-500 animate-pulse'
+        : isAnyOvernight
+            ? 'border-amber-400 dark:border-amber-500/70 shadow-amber-500/20'
+            : isOverdue
+                ? 'border-red-400 dark:border-red-500/50 shadow-red-500/20'
+                : 'border-slate-200 dark:border-white/10 hover:border-yellow-500/50';
+
     const tooltipContent = (
         <div className="flex flex-col gap-2 p-1 min-w-[200px] text-slate-800 dark:text-slate-200">
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-1">
@@ -134,7 +150,7 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                     {booking.sequence_number != null && <span className="ml-1.5">#{booking.sequence_number}</span>}
                 </span>
                 <span className="bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300">
-                    {t(`status_${booking.status}`, booking.status)}
+                    {isAnyOvernight ? 'QUA ĐÊM' : t(`status_${booking.status}`, booking.status)}
                 </span>
             </div>
             <div className="flex items-center gap-2 text-xs">
@@ -149,6 +165,12 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                 <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{displayTimeSlot}</span>
             </div>
+            {isAnyOvernight && (
+                <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                    <Moon className="w-3.5 h-3.5" />
+                    <span>{isOvernightCar ? 'Xe từ hôm qua — khoang đang giữ chỗ' : 'Xe chưa xong — sẽ để qua đêm'}</span>
+                </div>
+            )}
             {primaryTech && (
                 <div className="flex items-center gap-2 text-xs">
                     <Wrench className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
@@ -185,21 +207,22 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                     </div>
                 ))}
             </div>
-
-            <div className="flex gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-white/10">
-                <button
-                    onClick={(e) => { e.stopPropagation(); adjustDuration(booking._id, -30); }}
-                    className="flex-1 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 py-1 rounded text-xs text-slate-700 dark:text-slate-300 font-bold transition-colors"
-                >
-                    {t('tooltip_sub_time', '-30m')}
-                </button>
-                <button
-                    onClick={(e) => { e.stopPropagation(); adjustDuration(booking._id, 30); }}
-                    className="flex-1 bg-yellow-100 dark:bg-yellow-500/10 hover:bg-yellow-200 dark:hover:bg-yellow-500/20 text-yellow-700 dark:text-yellow-500 py-1 rounded text-xs font-bold transition-colors"
-                >
-                    {t('tooltip_add_time', '+30m')}
-                </button>
-            </div>
+            {!isAnyOvernight && (
+                <div className="flex gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-white/10">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); adjustDuration(booking._id, -30); }}
+                        className="flex-1 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 py-1 rounded text-xs text-slate-700 dark:text-slate-300 font-bold transition-colors"
+                    >
+                        {t('tooltip_sub_time', '-30m')}
+                    </button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); adjustDuration(booking._id, 30); }}
+                        className="flex-1 bg-yellow-100 dark:bg-yellow-500/10 hover:bg-yellow-200 dark:hover:bg-yellow-500/20 text-yellow-700 dark:text-yellow-500 py-1 rounded text-xs font-bold transition-colors"
+                    >
+                        {t('tooltip_add_time', '+30m')}
+                    </button>
+                </div>
+            )}
         </div>
     );
 
@@ -209,15 +232,12 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
             style={style}
             {...attributes}
             {...listeners}
-            className={`top-3 bottom-3 shadow-sm hover:shadow-md flex flex-col justify-between border cursor-grab transition-all z-10 touch-none group ${isConflict
-                ? 'border-red-500 animate-pulse'
-                : (isOverdue ? 'border-red-400 dark:border-red-500/50 shadow-red-500/20' : 'border-slate-200 dark:border-white/10 hover:border-yellow-500/50')
-                } ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none border-l-0' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none border-r-0' : 'rounded-xl')}`}
+            className={`top-3 bottom-3 shadow-sm hover:shadow-md flex flex-col justify-between border cursor-grab transition-all z-10 touch-none group ${borderClass} ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none border-l-0' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none border-r-0' : 'rounded-xl')}`}
         >
             {/* Arrows for multi-day */}
             {isContinuedFromYesterday && (
-                <div className="absolute left-0 top-0 bottom-0 flex items-center justify-center bg-slate-200/50 dark:bg-white/10 w-4 z-20" title="Kế thừa từ hôm qua">
-                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400">{'<'}</span>
+                <div className="absolute left-0 top-0 bottom-0 flex items-center justify-center bg-amber-200/50 dark:bg-amber-800/30 w-4 z-20" title="Xe từ hôm qua">
+                    <span className="text-[10px] font-black text-amber-600 dark:text-amber-400">{'<'}</span>
                 </div>
             )}
             {isContinuesToTomorrow && (
@@ -226,31 +246,53 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                 </div>
             )}
 
-            {/* Background Layers */}
+            {/* Background */}
             <div className={`absolute inset-0 flex overflow-hidden z-0 ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none pl-4' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none pr-4' : 'rounded-xl')}`}>
-                <div
-                    style={{ width: `${isOverdue ? originalWidthPct : 100}%` }}
-                    className={`h-full transition-all ${isConflict ? 'bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-[#1c1c1e]'}`}
-                ></div>
-                {isOverdue && (
-                    <div
-                        style={{ width: `${100 - originalWidthPct}%` }}
-                        className="h-full bg-red-50 dark:bg-red-900/20 border-l border-dashed border-red-400 dark:border-red-500/50 relative overflow-hidden transition-all"
-                        title={t('tooltip_overdue', 'Quá giờ thi công dự kiến')}
-                    >
-                        <div className="absolute inset-0 opacity-10 dark:opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #ef4444 10px, #ef4444 20px)' }}></div>
-                    </div>
+                {isAnyOvernight ? (
+                    /* Amber background for overnight cars */
+                    <>
+                        <div className="h-full w-full bg-amber-50 dark:bg-amber-900/20" />
+                        <div className="absolute inset-0 opacity-[0.07] dark:opacity-[0.12]"
+                            style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #f59e0b 10px, #f59e0b 20px)' }} />
+                    </>
+                ) : (
+                    <>
+                        <div
+                            style={{ width: `${isOverdue ? originalWidthPct : 100}%` }}
+                            className={`h-full transition-all ${isConflict ? 'bg-red-500/10 dark:bg-red-500/20' : 'bg-white dark:bg-[#1c1c1e]'}`}
+                        />
+                        {isOverdue && (
+                            <div
+                                style={{ width: `${100 - originalWidthPct}%` }}
+                                className="h-full bg-red-50 dark:bg-red-900/20 border-l border-dashed border-red-400 dark:border-red-500/50 relative overflow-hidden transition-all"
+                                title={t('tooltip_overdue', 'Quá giờ thi công dự kiến')}
+                            >
+                                <div className="absolute inset-0 opacity-10 dark:opacity-20"
+                                    style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #ef4444 10px, #ef4444 20px)' }} />
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 
             {/* Hover overlay */}
-            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity z-0 pointer-events-none ${isConflict ? 'bg-red-500/5' : 'bg-slate-50/50 dark:bg-white/5'} ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none' : 'rounded-xl')}`}></div>
+            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity z-0 pointer-events-none ${isConflict ? 'bg-red-500/5' : isAnyOvernight ? 'bg-amber-500/5' : 'bg-slate-50/50 dark:bg-white/5'} ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none' : 'rounded-xl')}`} />
 
-            {/* Completion status badge — shown for COMPLETED bookings */}
+            {/* Status badge */}
             {isCompleted && (
                 <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
                     <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-md ${completedLate ? 'bg-red-500/90 text-white' : 'bg-emerald-500/90 text-white'}`}>
                         {completedLate ? 'Hoàn thành quá thời gian' : 'Hoàn thành'}
+                    </span>
+                </div>
+            )}
+
+            {/* Overnight badge */}
+            {isAnyOvernight && (
+                <div className="absolute top-1.5 right-1.5 z-30 pointer-events-none">
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-500/90 text-white shadow-md">
+                        <Moon className="w-2.5 h-2.5" />
+                        {isOvernightCar ? 'Xe qua đêm' : 'Để qua đêm'}
                     </span>
                 </div>
             )}
@@ -277,16 +319,28 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
             <div className={`relative z-10 p-3 flex flex-col justify-between h-full pointer-events-none ${isContinuedFromYesterday ? 'ml-3' : ''} ${isContinuesToTomorrow ? 'mr-3' : ''}`}>
                 <div className="flex justify-between items-start pointer-events-auto">
                     <div className="flex flex-col gap-1">
-                        <span className={`text-[9px] font-bold uppercase tracking-widest ${isOverdue ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                        <span className={`text-[9px] font-bold uppercase tracking-widest ${isAnyOvernight ? 'text-amber-600 dark:text-amber-400' : isOverdue ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'}`}>
                             {displayCode}
                             {booking.sequence_number != null && <span className="text-yellow-600 dark:text-yellow-500 normal-case"> #{booking.sequence_number}</span>}
-                            {isOverdue && ` ${t('status_overdue')}`}
+                            {isOverdue && !isAnyOvernight && ` ${t('status_overdue')}`}
                         </span>
-                        <div className={`flex items-center gap-1.5 text-[10px] w-fit uppercase font-black tracking-wider px-2 py-0.5 rounded border shadow-inner ${isConflict
-                            ? 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/20'
-                            : (isOverdue ? 'text-red-700 dark:text-red-300 bg-red-100/50 dark:bg-red-900/30 border-red-200 dark:border-red-500/30' : 'text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-black/30 border-slate-200 dark:border-white/5')
-                            }`}>
-                            {isConflict ? <AlertTriangle className="w-3.5 h-3.5" /> : (isOverdue ? <Clock className="w-3.5 h-3.5 text-red-500" /> : <Car className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />)}
+                        <div className={`flex items-center gap-1.5 text-[10px] w-fit uppercase font-black tracking-wider px-2 py-0.5 rounded border shadow-inner ${
+                            isConflict
+                                ? 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/20'
+                                : isAnyOvernight
+                                    ? 'text-amber-700 dark:text-amber-300 bg-amber-100/50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-500/30'
+                                    : isOverdue
+                                        ? 'text-red-700 dark:text-red-300 bg-red-100/50 dark:bg-red-900/30 border-red-200 dark:border-red-500/30'
+                                        : 'text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-black/30 border-slate-200 dark:border-white/5'
+                        }`}>
+                            {isConflict
+                                ? <AlertTriangle className="w-3.5 h-3.5" />
+                                : isAnyOvernight
+                                    ? <Moon className="w-3.5 h-3.5 text-amber-500" />
+                                    : isOverdue
+                                        ? <Clock className="w-3.5 h-3.5 text-red-500" />
+                                        : <Car className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                            }
                             {booking.license_plate}
                         </div>
                     </div>
@@ -301,7 +355,7 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
 
                 <div className="flex flex-col gap-0.5 overflow-hidden min-w-0 pr-1">
                     {booking.service_type && (
-                        <div className="flex items-center gap-1 text-[9px] text-yellow-600 dark:text-yellow-500 font-semibold truncate">
+                        <div className={`flex items-center gap-1 text-[9px] font-semibold truncate ${isAnyOvernight ? 'text-amber-600 dark:text-amber-500' : 'text-yellow-600 dark:text-yellow-500'}`}>
                             <Layers className="w-2.5 h-2.5 shrink-0" />
                             {SERVICE_TYPE_LABELS[booking.service_type] || booking.service_type}
                         </div>
@@ -309,7 +363,7 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                     <div className="flex items-center gap-1 truncate opacity-70 text-[10px]">
                         {booking.selected_services?.[0]?.name || 'Dịch vụ'}
                         {booking.selected_services?.length > 1 && (
-                             <span className="text-[9px] font-bold text-slate-500">+{booking.selected_services.length - 1}</span>
+                            <span className="text-[9px] font-bold text-slate-500">+{booking.selected_services.length - 1}</span>
                         )}
                     </div>
                     {primaryTech && (

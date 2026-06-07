@@ -7,7 +7,7 @@ import VehicleHUD from './VehicleHUD';
 import TechnicalHUD from './TechnicalHUD';
 import FinancialHUD from './FinancialHUD';
 
-const HeaderPanel = ({ bookingCode, overviewData, quotationData }) => {
+const HeaderPanel = ({ bookingCode, sequenceNumber, overviewData, quotationData }) => {
     const { t } = useTranslation('adminRODetail');
     const navigate = useNavigate();
 
@@ -25,7 +25,14 @@ const HeaderPanel = ({ bookingCode, overviewData, quotationData }) => {
                     >
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                     </button>
-                    <h1 className="text-2xl md:text-3xl font-bold text-amber-500 tracking-tighter uppercase">{bookingCode}</h1>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl md:text-3xl font-bold text-amber-500 tracking-tighter uppercase">{bookingCode}</h1>
+                        {sequenceNumber != null && (
+                            <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md tracking-wide">
+                                #{sequenceNumber}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 {/* Global Stage Stepper - Ultra Minimalist Design */}

@@ -89,6 +89,8 @@ class _ServicePackingDetailPageState extends ConsumerState<ServicePackingDetailP
                           child: PackingTechInfoCard(
                             technician: order.assignedTechnician,
                             licensePlate: order.customer.licensePlate,
+                            bookingCode: order.quotationId.isNotEmpty ? order.quotationId : null,
+                            sequenceNumber: order.sequenceNumber,
                           ),
                         ),
                       ),

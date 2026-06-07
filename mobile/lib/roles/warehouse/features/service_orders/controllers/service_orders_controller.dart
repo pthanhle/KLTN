@@ -97,6 +97,7 @@ class ServiceOrdersController extends Notifier<ServiceOrdersState> {
     return ServiceOrderModel(
       id: json['progress_id']?.toString() ?? '',
       quotationId: json['booking_code']?.toString() ?? '',
+      sequenceNumber: (json['sequence_number'] as num?)?.toInt(),
       priority: priorityStr == 'urgent' ? OrderPriority.urgent : OrderPriority.standard,
       status: ServiceOrderStatus.pendingPick,
       createdAt: json['created_at'] != null
@@ -149,6 +150,7 @@ class ServiceOrdersController extends Notifier<ServiceOrdersState> {
         return ServiceOrderModel(
           id: o.id,
           quotationId: o.quotationId,
+          sequenceNumber: o.sequenceNumber,
           priority: o.priority,
           status: newStatus,
           createdAt: o.createdAt,

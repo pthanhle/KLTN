@@ -6,7 +6,7 @@ class MpiCategoryHeader extends StatelessWidget {
   final String title;
   final bool isExpanded;
   final VoidCallback onToggle;
-  final VoidCallback onPassAll;
+  final VoidCallback? onPassAll;
   final bool isAllPassed;
 
   const MpiCategoryHeader({
@@ -14,7 +14,7 @@ class MpiCategoryHeader extends StatelessWidget {
     required this.title,
     required this.isExpanded,
     required this.onToggle,
-    required this.onPassAll,
+    this.onPassAll,
     required this.isAllPassed,
   });
 

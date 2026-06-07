@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:ui';
@@ -25,11 +26,15 @@ class MpiChecklistPage extends ConsumerStatefulWidget {
 class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
   late TextEditingController _conclusionController;
   bool _isSubmitting = false;
+  bool _conclusionSynced = false;
 
   @override
   void initState() {
     super.initState();
     _conclusionController = TextEditingController();
+    Future.microtask(() {
+      ref.read(techMpiControllerProvider.notifier).init(widget.progressId);
+    });
   }
 
   @override
@@ -110,6 +115,24 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
     final theme = Theme.of(context);
     final stateAsync = ref.watch(techMpiControllerProvider);
 
+    // Sync conclusion text from state into the TextEditingController once after load
+    if (stateAsync.hasValue && !_conclusionSynced) {
+      final conclusion = stateAsync.value!.generalConclusion;
+      if (conclusion.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _conclusionController.text = conclusion;
+            _conclusionController.selection = TextSelection.collapsed(
+              offset: conclusion.length,
+            );
+          }
+        });
+      }
+      _conclusionSynced = true;
+    }
+
+    final isLocked = stateAsync.value?.isLocked ?? false;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: MeshBackground(
@@ -155,6 +178,10 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
                 ],
               ),
             ),
+            if (isLocked)
+              SliverToBoxAdapter(
+                child: _LockedBanner(theme: theme),
+              ),
             stateAsync.when(
               data: (state) => SliverList(
                 delegate: SliverChildBuilderDelegate(
@@ -162,6 +189,7 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
                     final category = state.categories[index];
                     return MpiCategorySection(
                       category: category,
+                      readOnly: state.isLocked,
                       onPassAll: () => ref
                           .read(techMpiControllerProvider.notifier)
                           .togglePassAllCategory(category.id),
@@ -188,12 +216,13 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
               SliverToBoxAdapter(
                 child: MpiConclusionCard(
                   controller: _conclusionController,
+                  readOnly: isLocked,
                   onChanged: (text) => ref
                       .read(techMpiControllerProvider.notifier)
                       .updateGeneralConclusion(text),
                 ),
               ),
-            if (stateAsync.hasValue)
+            if (stateAsync.hasValue && !isLocked)
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 sliver: SliverToBoxAdapter(
@@ -219,6 +248,42 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _LockedBanner extends StatelessWidget {
+  final ThemeData theme;
+  const _LockedBanner({required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(CupertinoIcons.lock_fill, size: 16, color: theme.colorScheme.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Kết quả chẩn đoán đã được gửi và không thể thay đổi.'.tr(),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

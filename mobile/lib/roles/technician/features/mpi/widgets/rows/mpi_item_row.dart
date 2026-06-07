@@ -6,12 +6,12 @@ import '../badges/mpi_media_badge.dart';
 
 class MpiItemRow extends StatelessWidget {
   final MpiItemModel item;
-  final Function(MpiItemStatus) onStatusChanged;
+  final Function(MpiItemStatus)? onStatusChanged;
 
   const MpiItemRow({
     super.key,
     required this.item,
-    required this.onStatusChanged,
+    this.onStatusChanged,
   });
 
   @override
@@ -65,6 +65,7 @@ class MpiItemRow extends StatelessWidget {
           _MpiStatusButtonGroup(
             currentStatus: item.status,
             onStatusChanged: onStatusChanged,
+            readOnly: onStatusChanged == null,
           ),
         ],
       ),
@@ -74,15 +75,17 @@ class MpiItemRow extends StatelessWidget {
 
 class _MpiStatusButtonGroup extends StatelessWidget {
   final MpiItemStatus currentStatus;
-  final Function(MpiItemStatus) onStatusChanged;
+  final Function(MpiItemStatus)? onStatusChanged;
+  final bool readOnly;
 
   const _MpiStatusButtonGroup({
     required this.currentStatus,
-    required this.onStatusChanged,
+    this.onStatusChanged,
+    this.readOnly = false,
   });
 
   void _handleTap(MpiItemStatus tapped) {
-    onStatusChanged(currentStatus == tapped ? MpiItemStatus.unchecked : tapped);
+    onStatusChanged?.call(currentStatus == tapped ? MpiItemStatus.unchecked : tapped);
   }
 
   @override
@@ -93,19 +96,19 @@ class _MpiStatusButtonGroup extends StatelessWidget {
         MpiGhostButton(
           type: MpiItemStatus.pass,
           isSelected: currentStatus == MpiItemStatus.pass,
-          onTap: () => _handleTap(MpiItemStatus.pass),
+          onTap: readOnly ? null : () => _handleTap(MpiItemStatus.pass),
         ),
         const SizedBox(width: 6),
         MpiGhostButton(
           type: MpiItemStatus.monitor,
           isSelected: currentStatus == MpiItemStatus.monitor,
-          onTap: () => _handleTap(MpiItemStatus.monitor),
+          onTap: readOnly ? null : () => _handleTap(MpiItemStatus.monitor),
         ),
         const SizedBox(width: 6),
         MpiGhostButton(
           type: MpiItemStatus.fail,
           isSelected: currentStatus == MpiItemStatus.fail,
-          onTap: () => _handleTap(MpiItemStatus.fail),
+          onTap: readOnly ? null : () => _handleTap(MpiItemStatus.fail),
         ),
       ],
     );

@@ -3,7 +3,7 @@ import asyncHandler from 'express-async-handler'
 import { createAndEmitNotification } from '../../../../utils/notificationHelper.js'
 
 export const updateQC = asyncHandler(async (req, res) => {
-    const { progress_id, qc_checklist, qc_metrics } = req.body
+    const { progress_id, qc_checklist, qc_metrics, advisor_signature } = req.body
 
     const progress = await RepairProgress.findById(progress_id).populate('booking_id')
     if (!progress) {
@@ -11,16 +11,31 @@ export const updateQC = asyncHandler(async (req, res) => {
         throw new Error('Không tìm thấy RepairProgress')
     }
 
+    // Map mobile format { id, label, passed } → schema format { task, status, checked_at }
     if (qc_checklist) {
-        progress.qc_checklist = qc_checklist
+        progress.qc_checklist = qc_checklist.map(item => ({
+            task: item.label || item.task || '',
+            status: item.passed ? 'passed' : (item.status || 'pending'),
+            checked_at: item.passed ? new Date() : null,
+        }))
+    }
+
+    if (advisor_signature) {
+        progress.qc_advisor_signature = advisor_signature
     }
 
     if (qc_metrics) {
-        progress.qc_metrics = qc_metrics
+        progress.qc_metrics = {
+            pass_rate: qc_metrics.items_total > 0
+                ? Math.round((qc_metrics.items_passed / qc_metrics.items_total) * 100)
+                : 0,
+            ...qc_metrics,
+        }
     }
 
-    progress.current_step = 'QC_TESTING'
-    progress.status = 'QC_TESTING'
+    // Advisor has signed off — advance to COMPLETED (ready for handover)
+    progress.current_step = 'COMPLETED'
+    progress.status = 'COMPLETED'
 
     const stepExists = progress.timeline.find(t => t.step === 'QC_TESTING')
     if (!stepExists) {
@@ -28,7 +43,7 @@ export const updateQC = asyncHandler(async (req, res) => {
             step: 'QC_TESTING',
             status: 'COMPLETED',
             time: new Date(),
-            note: 'Đang tiến hành kiểm tra chất lượng (QC)'
+            note: 'Kiểm định chất lượng hoàn tất, xe sẵn sàng bàn giao'
         })
     }
 

@@ -22,7 +22,9 @@ const PARTS_STATUS_MAP = {
 
 const mapAPIToROData = (p) => {
     const booking = p.booking_id || {};
-    const user = booking.user_id || {};
+    // customer_info is a direct sub-document on booking; user_id is a populated User ref
+    const customerInfo = booking.customer_info || {};
+    const userRef = booking.user_id || {};
     const vehicle = booking.vehicle_info || {};
     const timeline = p.timeline || [];
 
@@ -30,14 +32,17 @@ const mapAPIToROData = (p) => {
     const receivedStep = timeline.find(t => t.step === 'RECEIVED');
     const receptionInfo = receivedStep?.reception_info || {};
 
+    const advisor = p.advisor_id || {};
+    const mechanic = p.mechanic_id || {};
+
     const overview = {
         booking_code: booking.booking_code || p._id,
         status: p.status,
-        customer_note: booking.customer_notes || '',
+        customer_note: booking.customer_notes || booking.customer_note || '',
         customer_info: {
-            full_name: user.full_name || 'Khách hàng',
-            phone: user.phone || '',
-            email: user.email || '',
+            full_name: customerInfo.full_name || userRef.full_name || 'Khách hàng',
+            phone: customerInfo.contact_phone || userRef.phone || '',
+            email: customerInfo.email || userRef.email || '',
         },
         vehicle_info: {
             license_plate: vehicle.license_plate || '',
@@ -50,6 +55,10 @@ const mapAPIToROData = (p) => {
             odometer: receptionInfo.odometer || 0,
             fuel_level: receptionInfo.fuel_level || 0,
         },
+        advisor: advisor.full_name ? { name: advisor.full_name, email: advisor.email } : null,
+        mechanic: mechanic.full_name ? { name: mechanic.full_name, email: mechanic.email } : null,
+        estimated_completion: p.estimated_completion || null,
+        bay_id: p.bay_id || null,
     };
 
     // ----------- diagnostics -----------
@@ -172,27 +181,33 @@ const mapAPIToROData = (p) => {
 export const useRODetailLogic = () => {
     const { id } = useParams();
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [roData, setRoData] = useState(null);
     const [bookingCode, setBookingCode] = useState(id);
+    const [sequenceNumber, setSequenceNumber] = useState(null);
 
     useEffect(() => {
         if (!id) return;
-        const fetch = async () => {
+        const load = async () => {
             setIsLoading(true);
+            setError(null);
             try {
                 const raw = await AdminRepairAPI.getRepairProgressById(id);
                 const mapped = mapAPIToROData(raw);
                 setBookingCode(raw.booking_id?.booking_code || id);
+                setSequenceNumber(raw.booking_id?.sequence_number ?? null);
                 setRoData(mapped);
             } catch (err) {
-                console.error('useRODetailLogic: failed to fetch', err);
+                const msg = err?.response?.data?.message || err?.message || 'Không thể tải dữ liệu đơn RO';
+                console.error('useRODetailLogic:', msg, err);
+                setError(msg);
                 setRoData(null);
             } finally {
                 setIsLoading(false);
             }
         };
-        fetch();
+        load();
     }, [id]);
 
-    return { bookingCode, isLoading, roData };
+    return { bookingCode, sequenceNumber, isLoading, error, roData };
 };

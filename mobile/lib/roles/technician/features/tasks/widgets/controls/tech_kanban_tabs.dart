@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
-enum TechTaskTab { diagnosing, waitingParts, inProgress }
+enum TechTaskTab { diagnosing, waitingParts, inProgress, completed }
 
 class TechKanbanTabs extends StatelessWidget {
   final TechTaskTab selectedTab;
@@ -75,6 +75,8 @@ class _TechTabChipState extends State<_TechTabChip> {
         return 'Chờ phụ tùng';
       case TechTaskTab.inProgress:
         return 'Đang thi công';
+      case TechTaskTab.completed:
+        return 'Đã hoàn thành';
     }
   }
 
@@ -86,6 +88,8 @@ class _TechTabChipState extends State<_TechTabChip> {
         return CupertinoIcons.time;
       case TechTaskTab.inProgress:
         return CupertinoIcons.wrench;
+      case TechTaskTab.completed:
+        return CupertinoIcons.checkmark_seal_fill;
     }
   }
 

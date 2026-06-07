@@ -10,9 +10,10 @@ const LogisticsInventory = ({ progressData }) => {
     const { parts_inventory = [] } = progressData;
 
     const required_items = parts_inventory.length;
-    const items_ready = parts_inventory.filter(p => p.status_code === 'DONE').length;
-    const items_pending = parts_inventory.filter(p => p.status_code === 'PENDING').length;
-    const fulfillment_percentage = required_items > 0 ? Math.round((items_ready / required_items) * 100) : 0;
+    // INSTALLING = dispatched from warehouse (xuất kho thành công); DONE = installation complete
+    // Both count toward warehouse export percentage
+    const items_exported = parts_inventory.filter(p => p.status_code === 'INSTALLING' || p.status_code === 'DONE').length;
+    const fulfillment_percentage = required_items > 0 ? Math.round((items_exported / required_items) * 100) : 0;
 
     // We don't have detailed item lists in the mock, so we'll construct a representative view based on the stats
     // In a real app, this would iterate over an array of parts with status.
@@ -28,7 +29,7 @@ const LogisticsInventory = ({ progressData }) => {
             <div className="mb-3 flex justify-between items-end">
                 <span className="text-3xl font-bold text-slate-800 dark:text-[#dce1fb] leading-none">{fulfillment_percentage}%</span>
                 <span className="text-[10px] font-semibold text-slate-500 dark:text-[#d3c5ac] uppercase tracking-wider mb-1">
-                    {items_ready}/{required_items} {t('logistics_items', 'Items')}
+                    {items_exported}/{required_items} {t('logistics_items', 'Món')}
                 </span>
             </div>
 

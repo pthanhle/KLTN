@@ -31,12 +31,12 @@ const QcTab = ({ qcData }) => {
                         <QcKineticChecklist tasks={qcData.kcs_tasks} />
                     </div>
 
-                    <QcSpecHud specs={qcData.spec_hud} />
+                    {qcData.spec_hud && <QcSpecHud specs={qcData.spec_hud} />}
                 </div>
 
                 {/* Right Column: Verification & Approval */}
                 <div className="space-y-8">
-                    <QcVehicleVisual vehicle={qcData.vehicle_visual} />
+                    {qcData.vehicle_visual && <QcVehicleVisual vehicle={qcData.vehicle_visual} />}
                     <QcVerification manager={qcData.manager} />
                 </div>
             </div>

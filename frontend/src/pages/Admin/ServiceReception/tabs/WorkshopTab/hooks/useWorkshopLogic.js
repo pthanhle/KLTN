@@ -26,6 +26,7 @@ const mapProgressToBooking = (p) => {
     let frontendStatus;
     if (p.status === 'RECEIVED') frontendStatus = 'RO_CREATED';
     else if (p.status === 'COMPLETED') frontendStatus = 'COMPLETED';
+    else if (p.status === 'QC_TESTING') frontendStatus = 'QC_TESTING';
     else frontendStatus = 'IN_PROGRESS';
 
     return {
@@ -263,7 +264,7 @@ export const useWorkshopLogic = (selectedDate) => {
     );
 
     return {
-        bookings: filtered.filter(b => b.status === 'IN_PROGRESS' || b.status === 'COMPLETED'),
+        bookings: filtered.filter(b => b.status === 'IN_PROGRESS'),
         unassignedBookings: filtered.filter(b => b.status === 'RO_CREATED'),
         bays,
         technicians: getTechniciansWithWorkload(),

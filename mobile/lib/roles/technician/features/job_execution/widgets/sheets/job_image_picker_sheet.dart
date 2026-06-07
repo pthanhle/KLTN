@@ -5,8 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/job_execution_controller.dart';
 import '../../constants/job_execution_constants.dart';
+import '../../../../../../core/config/api_config.dart';
 
 abstract final class JobImagePickerSheet {
   static void show(BuildContext context, {required String taskId, required WidgetRef ref}) {
@@ -19,11 +23,20 @@ abstract final class JobImagePickerSheet {
   }
 }
 
-class _JobImagePickerSheetContent extends StatelessWidget {
+class _JobImagePickerSheetContent extends StatefulWidget {
   final String taskId;
   final WidgetRef ref;
 
   const _JobImagePickerSheetContent({required this.taskId, required this.ref});
+
+  @override
+  State<_JobImagePickerSheetContent> createState() => _JobImagePickerSheetContentState();
+}
+
+class _JobImagePickerSheetContentState extends State<_JobImagePickerSheetContent> {
+  final _picker = ImagePicker();
+  bool _isUploading = false;
+  String? _errorMessage;
 
   Widget _glassBlock({required ThemeData theme, required bool isDark, required Widget child}) {
     return Container(
@@ -68,13 +81,13 @@ class _JobImagePickerSheetContent extends StatelessWidget {
 
   Widget _actionRow({
     required ThemeData theme,
-    required BuildContext ctx,
     required IconData icon,
     required String label,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
+    final isDisabled = _isUploading || onTap == null;
     return GestureDetector(
-      onTap: onTap,
+      onTap: isDisabled ? null : onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
@@ -85,12 +98,17 @@ class _JobImagePickerSheetContent extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 20, color: theme.colorScheme.primary),
+            Icon(icon, size: 20,
+                color: isDisabled
+                    ? theme.colorScheme.primary.withValues(alpha: 0.35)
+                    : theme.colorScheme.primary),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                color: theme.colorScheme.primary,
+                color: isDisabled
+                    ? theme.colorScheme.primary.withValues(alpha: 0.35)
+                    : theme.colorScheme.primary,
                 fontSize: JobExecutionUiConstants.sheetActionFontSize,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.3,
@@ -100,6 +118,60 @@ class _JobImagePickerSheetContent extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _pickAndUpload(ImageSource source) async {
+    try {
+      final file = await _picker.pickImage(source: source, imageQuality: 80, maxWidth: 1920);
+      if (file == null || !mounted) return;
+
+      setState(() {
+        _isUploading = true;
+        _errorMessage = null;
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+      if (token == null) throw Exception('SESSION_EXPIRED');
+
+      final bytes = await file.readAsBytes();
+      final filename = file.name.isNotEmpty ? file.name : 'image.jpg';
+      final dio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+      ));
+      final formData = FormData.fromMap({
+        'image': MultipartFile.fromBytes(bytes, filename: filename),
+      });
+      final response = await dio.post(
+        '${ApiConfig.baseUrl}/upload/image',
+        data: formData,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      final url = response.data['url'] as String?;
+      if (!mounted) return;
+
+      widget.ref
+          .read(jobExecutionControllerProvider.notifier)
+          .completeTask(widget.taskId, photoUrl: url);
+
+      Navigator.pop(context);
+    } on DioException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isUploading = false;
+        _errorMessage = e.response?.statusCode == 401
+            ? 'Phiên đăng nhập hết hạn.'
+            : 'Không thể tải ảnh lên. Vui lòng thử lại.';
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isUploading = false;
+        _errorMessage = 'Không thể tải ảnh lên. Vui lòng thử lại.';
+      });
+    }
   }
 
   @override
@@ -135,7 +207,7 @@ class _JobImagePickerSheetContent extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Vui lòng chụp ảnh hoặc quay video kết quả sau khi thi công xong để hoàn tất hạng mục.'.tr(),
+                            'Vui lòng chụp ảnh hoặc chọn ảnh minh chứng sau khi thi công xong để hoàn tất hạng mục.'.tr(),
                             style: TextStyle(
                               color: theme.colorScheme.onSurfaceVariant,
                               fontSize: 13,
@@ -143,31 +215,47 @@ class _JobImagePickerSheetContent extends StatelessWidget {
                             ),
                             textAlign: TextAlign.center,
                           ),
+                          if (_errorMessage != null) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              _errorMessage!,
+                              style: TextStyle(
+                                color: theme.colorScheme.error,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                          if (_isUploading) ...[
+                            const SizedBox(height: 12),
+                            const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2.5),
+                            ),
+                          ],
                         ],
                       ),
                     ),
                     Container(height: 0.5, color: theme.dividerColor.withValues(alpha: 0.15)),
                     _actionRow(
                       theme: theme,
-                      ctx: context,
                       icon: CupertinoIcons.camera,
                       label: 'Chụp ảnh mới'.tr(),
-                      onTap: () {
+                      onTap: _isUploading ? null : () {
                         HapticFeedback.lightImpact();
-                        Navigator.pop(context);
-                        ref.read(jobExecutionControllerProvider.notifier).completeTask(taskId);
+                        _pickAndUpload(ImageSource.camera);
                       },
                     ),
                     Container(height: 0.5, color: theme.dividerColor.withValues(alpha: 0.15)),
                     _actionRow(
                       theme: theme,
-                      ctx: context,
                       icon: CupertinoIcons.photo_on_rectangle,
                       label: 'Chọn từ thư viện'.tr(),
-                      onTap: () {
+                      onTap: _isUploading ? null : () {
                         HapticFeedback.lightImpact();
-                        Navigator.pop(context);
-                        ref.read(jobExecutionControllerProvider.notifier).completeTask(taskId);
+                        _pickAndUpload(ImageSource.gallery);
                       },
                     ),
                   ],
@@ -178,7 +266,7 @@ class _JobImagePickerSheetContent extends StatelessWidget {
                 theme: theme,
                 isDark: isDark,
                 child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: _isUploading ? null : () => Navigator.pop(context),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
                     width: double.infinity,
@@ -190,7 +278,9 @@ class _JobImagePickerSheetContent extends StatelessWidget {
                       'Hủy'.tr(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: theme.colorScheme.primary,
+                        color: _isUploading
+                            ? theme.colorScheme.primary.withValues(alpha: 0.35)
+                            : theme.colorScheme.primary,
                         fontSize: JobExecutionUiConstants.sheetActionFontSize,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.3,

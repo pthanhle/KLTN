@@ -130,6 +130,7 @@ class RepairOrderModel {
   final String id;
   final String bookingId;
   final String bookingCode;
+  final int? sequenceNumber;
   final String customerNote;
   final VehicleInfo vehicleInfo;
   final CustomerInfo customerInfo;
@@ -152,6 +153,7 @@ class RepairOrderModel {
     required this.id,
     required this.bookingId,
     this.bookingCode = '',
+    this.sequenceNumber,
     this.customerNote = '',
     required this.vehicleInfo,
     required this.customerInfo,

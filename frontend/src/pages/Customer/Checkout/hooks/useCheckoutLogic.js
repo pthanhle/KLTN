@@ -23,7 +23,7 @@ export const useCheckoutLogic = () => {
         const pathname = window.location.pathname;
         if ((pathname.includes('/payment/success') || pathname.includes('/payment/failed')) && type === 'quotation' && orderId) {
             if (pathname.includes('/payment/success')) {
-                navigate(`/tracking/${orderId}?tab=quotation`, { replace: true });
+                navigate(`/tracking/${orderId}?tab=quotations`, { replace: true });
             } else {
                 navigate(`/tracking/${orderId}?deposit_failed=1`, { replace: true });
             }

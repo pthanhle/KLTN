@@ -61,9 +61,6 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
   }
 
   Future<void> init(String progressId) async {
-    final current = state.value;
-    if (current?.progressId == progressId) return;
-
     state = AsyncData(JobExecutionState(progressId: progressId, tasks: [], parts: [], isLoading: true));
 
     try {
@@ -139,14 +136,8 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
         isLoading: false,
         awaitingParts: awaitingParts,
       ));
-    } catch (e) {
-      state = AsyncData(JobExecutionState(
-        progressId: progressId,
-        tasks: [],
-        parts: [],
-        isLoading: false,
-        error: e.toString(),
-      ));
+    } catch (e, st) {
+      state = AsyncError(e, st);
     }
   }
 
@@ -166,13 +157,18 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
     state = AsyncData(currentState.copyWith(tasks: updatedTasks));
   }
 
-  Future<void> completeTask(String taskId) async {
+  Future<void> completeTask(String taskId, {String? photoUrl}) async {
     final currentState = state.value;
     if (currentState == null) return;
 
     final updatedTasks = currentState.tasks.map((task) {
       if (task.id == taskId && task.status == JobTaskStatus.inProgress) {
-        return task.copyWith(status: JobTaskStatus.completed, completedAt: DateTime.now());
+        final urls = photoUrl != null ? [...task.mediaUrls, photoUrl] : task.mediaUrls;
+        return task.copyWith(
+          status: JobTaskStatus.completed,
+          completedAt: DateTime.now(),
+          mediaUrls: urls,
+        );
       }
       return task;
     }).toList();

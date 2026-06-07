@@ -8,6 +8,7 @@ import TechOptionItem from './TechOptionItem';
 const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCancel, selectedDate }) => {
     const { t } = useTranslation('adminServiceReception');
     const { form, handleSubmit } = useAssignmentModal({ visible, assignmentData, onConfirm, selectedDate });
+    const selectedPrimaryTech = Form.useWatch('primary_technician', form);
 
     return (
         <Modal
@@ -127,11 +128,13 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
                             className="w-full"
                             size="large"
                             maxTagCount="responsive"
-                            options={technicians.map(t => ({
-                                value: t._id,
-                                label: t.full_name,
-                                tech: t
-                            }))}
+                            options={technicians
+                                .filter(tech => tech._id !== selectedPrimaryTech)
+                                .map(t => ({
+                                    value: t._id,
+                                    label: t.full_name,
+                                    tech: t
+                                }))}
                             optionRender={(option) => (
                                 <TechOptionItem tech={option.data.tech} isPreferred={option.data.tech._id === assignmentData?.booking?.preferred_technician} />
                             )}

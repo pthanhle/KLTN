@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../models/job_task_model.dart';
 import '../../constants/job_execution_constants.dart';
 import 'tasks/job_task_card/job_task_card.dart';
@@ -32,6 +33,23 @@ class JobTasksSection extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemBuilder: (context, _) => const JobTaskCardSkeleton(),
+      );
+    }
+
+    if (tasks.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: JobExecutionUiConstants.sectionHorizontalPadding,
+          vertical: 48,
+        ),
+        child: Center(
+          child: Text(
+            'Không có hạng mục thi công nào'.tr(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ),
       );
     }
 

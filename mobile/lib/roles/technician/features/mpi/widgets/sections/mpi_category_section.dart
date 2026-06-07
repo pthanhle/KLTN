@@ -10,12 +10,14 @@ class MpiCategorySection extends StatefulWidget {
   final MpiCategoryModel category;
   final VoidCallback onPassAll;
   final Function(String, MpiItemStatus) onStatusChanged;
+  final bool readOnly;
 
   const MpiCategorySection({
     super.key,
     required this.category,
     required this.onPassAll,
     required this.onStatusChanged,
+    this.readOnly = false,
   });
 
   @override
@@ -69,7 +71,7 @@ class _MpiCategorySectionState extends State<MpiCategorySection> {
                 title: widget.category.name,
                 isExpanded: _isExpanded,
                 onToggle: _toggle,
-                onPassAll: widget.onPassAll,
+                onPassAll: widget.readOnly ? null : widget.onPassAll,
                 isAllPassed: isAllPassed,
               ),
               AnimatedCrossFade(
@@ -85,8 +87,10 @@ class _MpiCategorySectionState extends State<MpiCategorySection> {
                           children: [
                             MpiItemRow(
                               item: item,
-                              onStatusChanged: (status) =>
-                                  widget.onStatusChanged(item.id, status),
+                              onStatusChanged: widget.readOnly
+                                  ? null
+                                  : (status) =>
+                                      widget.onStatusChanged(item.id, status),
                             ),
                             if (item != widget.category.items.last)
                               Divider(

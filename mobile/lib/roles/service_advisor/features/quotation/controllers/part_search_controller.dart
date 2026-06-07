@@ -35,7 +35,10 @@ class PartSearchState {
   }
 }
 
+typedef PartAddOverride = void Function(PartItemModel part, int qty, {String? expectedDate});
+
 class PartSearchController extends Notifier<PartSearchState> {
+  PartAddOverride? _addOverride;
   final Dio _dio = Dio(BaseOptions(
     connectTimeout: const Duration(milliseconds: ApiConfig.connectTimeout),
     receiveTimeout: const Duration(milliseconds: ApiConfig.receiveTimeout),
@@ -83,9 +86,17 @@ class PartSearchController extends Notifier<PartSearchState> {
     _fetchParts(query);
   }
 
-  void addPartToQuotation(PartItemModel part, int quantity, {String? expectedDate}) {
-    final quotationCtrl = ref.read(quotationControllerProvider.notifier);
+  void setAddOverride(PartAddOverride? override) {
+    _addOverride = override;
+  }
 
+  void addPartToQuotation(PartItemModel part, int quantity, {String? expectedDate}) {
+    if (_addOverride != null) {
+      _addOverride!(part, quantity, expectedDate: expectedDate);
+      return;
+    }
+
+    final quotationCtrl = ref.read(quotationControllerProvider.notifier);
     final cartItem = CartPartItem(
       id: part.id,
       sku: part.sku,
@@ -95,7 +106,6 @@ class PartSearchController extends Notifier<PartSearchState> {
       isBackorder: part.availableStock == 0,
       expectedDate: expectedDate,
     );
-
     quotationCtrl.addPart(cartItem);
   }
 }

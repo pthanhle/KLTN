@@ -27,8 +27,8 @@ const TrackingTab = () => {
 
     const navigate = useNavigate();
 
-    const handleCustomerClick = (bookingCode) => {
-        navigate(`/admin/services/reception/${bookingCode}`);
+    const handleCustomerClick = (progressId) => {
+        navigate(`/admin/services/reception/${progressId}`);
     };
 
     return (

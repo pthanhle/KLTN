@@ -137,8 +137,8 @@ class _SupplementApprovalPageState extends ConsumerState<SupplementApprovalPage>
                         const SizedBox(height: SupplementConstants.sectionSpacing),
                         SupplementIssueSection(
                           title: data.issueTitle,
-                          description: data.technicianNote,
-                          proposedFix: data.actionRequired,
+                          description: data.issueDescription,
+                          proposedFix: data.proposedFix,
                           mechanicName: data.mechanicName,
                           mechanicRole: data.mechanicRole,
                           imageUrls: data.evidenceMediaUrls,

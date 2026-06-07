@@ -10,6 +10,7 @@ import 'widgets/controls/service_segmented_control.dart';
 import 'widgets/empty_state/service_empty_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ttauto_staff/shared/widgets/inputs/list_search_bar.dart';
+import 'package:ttauto_staff/shared/widgets/inputs/date_filter_chip.dart';
 
 class ServiceOrdersPage extends ConsumerStatefulWidget {
   const ServiceOrdersPage({super.key});
@@ -86,10 +87,25 @@ class _ServiceOrdersPageState extends ConsumerState<ServiceOrdersPage> {
               ),
 
               SliverToBoxAdapter(
-                child: ListSearchBar(
-                  hintText: 'Tìm mã đơn, biển số, khách hàng...',
-                  onChanged: ref.read(serviceOrdersProvider.notifier).updateSearch,
+                child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ListSearchBar(
+                          hintText: 'Tìm mã đơn, biển số, khách hàng...',
+                          onChanged: ref.read(serviceOrdersProvider.notifier).updateSearch,
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      DateFilterChip(
+                        selectedDate: ordersState.filterDate,
+                        onDateChanged: ref.read(serviceOrdersProvider.notifier).setFilterDate,
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

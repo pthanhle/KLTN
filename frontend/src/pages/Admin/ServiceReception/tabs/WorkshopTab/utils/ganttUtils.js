@@ -96,17 +96,15 @@ export const calculateBlockBoundaries = (booking, selectedDateStr, currentMins) 
 
     // 3. Calculate Overdue based on actual End Date Time
     const now = new Date();
-    // Only overdue if the task is IN_PROGRESS and we have passed the actual expected end datetime
-    if (booking.status === 'IN_PROGRESS' && now > endDt) {
+    // Completed bookings keep their fixed block — never stretch
+    const isActiveStatus = booking.status !== 'RO_CREATED' && booking.status !== 'COMPLETED';
+    if (isActiveStatus && now > endDt) {
         isOverdue = true;
-        // If the task was supposed to end today or earlier, stretch it to NOW (if now is today)
-        // If we are looking at a day that is BEFORE "now", and the task should have ended, how does it look?
-        // Let's keep it simple: if selectedDate is TODAY, stretch to currentMins.
+        // Stretch to current time only when viewing today
         const todayStr = now.toISOString().split('T')[0];
         if (selectedDateStr === todayStr) {
             const cappedCurrMins = Math.min(Math.max(currentMins, endDt.getHours() * 60 + endDt.getMinutes()), END_HOUR * 60);
             endStr = `${Math.floor(cappedCurrMins / 60).toString().padStart(2, '0')}:${(cappedCurrMins % 60).toString().padStart(2, '0')}`;
-            // If stretched to END_HOUR, does it continue tomorrow? No, just overdue.
         }
     }
 

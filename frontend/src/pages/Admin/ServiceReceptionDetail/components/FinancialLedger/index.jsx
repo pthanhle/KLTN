@@ -14,7 +14,12 @@ const FinancialLedger = ({ quotationData }) => {
         return <EmptyLedger status={quotationData?.status || 'PENDING'} />;
     }
 
-    const { status, items, summary } = quotationData;
+    const { status, items, summary, payment_terms } = quotationData;
+    const enrichedSummary = {
+        ...summary,
+        deposit_amount: payment_terms?.deposit_amount || 0,
+        remaining_amount: payment_terms?.remaining_amount || 0,
+    };
 
     return (
         <div className="flex flex-col gap-6 h-full">
@@ -35,7 +40,7 @@ const FinancialLedger = ({ quotationData }) => {
                     </button>
                 </div>
 
-                <LedgerTable items={items} summary={summary} />
+                <LedgerTable items={items} summary={enrichedSummary} />
             </div>
 
             <Modal
@@ -53,7 +58,7 @@ const FinancialLedger = ({ quotationData }) => {
                     </div>
 
                     <div className="mb-8">
-                        <LedgerTable items={items} summary={summary} />
+                        <LedgerTable items={items} summary={enrichedSummary} />
                     </div>
 
                     <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-white/10">

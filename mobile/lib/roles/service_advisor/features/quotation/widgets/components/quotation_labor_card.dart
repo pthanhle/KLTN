@@ -38,7 +38,7 @@ class QuotationLaborCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${QuotationUtils.formatHours(labor.quantity)} @ ${QuotationUtils.formatCurrency(labor.unitPrice)}/h',
+                  '${QuotationUtils.formatHours(labor.hours)} @ ${QuotationUtils.formatCurrency(labor.rate)}/h',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

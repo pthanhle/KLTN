@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { Car, MoreVertical, AlertTriangle, Clock, User, Wrench, Layers } from 'lucide-react';
@@ -19,7 +19,14 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
 
     const displayCode = booking.booking_code || `#${String(booking._id).slice(-8).toUpperCase()}`;
 
-    const now = new Date();
+    // Real-time clock — refreshes every 30 s so the progress bar stays live
+    const [now, setNow] = useState(() => new Date());
+    useEffect(() => {
+        if (booking.status === 'COMPLETED') return; // no ticking needed for finished jobs
+        const id = setInterval(() => setNow(new Date()), 30_000);
+        return () => clearInterval(id);
+    }, [booking.status]);
+
     const currMins = now.getHours() * 60 + now.getMinutes();
 
     const {
@@ -32,16 +39,9 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
     } = calculateBlockBoundaries(booking, selectedDateStr, currMins);
 
     let originalWidthPct = 100;
-
-    // If it's overdue, the block is stretched to current time, but we need to visualize the original planned part
-    // The original part ends at originalEndMins. The stretched part ends at currentMins (capped).
-    // displayEnd might have been stretched to currentMins. Let's calculate percentage.
     if (isOverdue) {
-        // Parse displayStart and displayEnd to mins to calculate percentage
         const startMins = parseInt(displayStart.split(':')[0]) * 60 + parseInt(displayStart.split(':')[1]);
         const endMins = parseInt(displayEnd.split(':')[0]) * 60 + parseInt(displayEnd.split(':')[1]);
-
-        // The original planned end relative to this day's start
         const plannedEndMins = Math.max(startMins, Math.min(originalEndMins, endMins));
         if (endMins > startMins) {
             originalWidthPct = ((plannedEndMins - startMins) / (endMins - startMins)) * 100;
@@ -51,16 +51,41 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
     const left = calculateLeftPercentage(displayStart);
     const width = calculateWidthPercentage(displayStart, displayEnd);
 
-    // Time-based progress bar (0–100%)
+    // --- Progress bar state ---
+    const isCompleted = booking.status === 'COMPLETED';
     let progressPercent = 0;
-    if (booking.expected_start_datetime && booking.expected_end_datetime) {
+    let progressColor = 'bg-emerald-500'; // green = normal
+
+    if (isCompleted) {
+        progressPercent = 100;
+        // Was it late? compare actual completion (updatedAt proxy) vs planned end
+        const actualEnd = booking.actual_end_time ? new Date(booking.actual_end_time) : null;
+        const plannedEnd = booking.expected_end_datetime ? new Date(booking.expected_end_datetime) : null;
+        progressColor = (actualEnd && plannedEnd && actualEnd > plannedEnd)
+            ? 'bg-red-500'
+            : 'bg-emerald-500';
+    } else if (booking.expected_start_datetime && booking.expected_end_datetime) {
         const startMs = new Date(booking.expected_start_datetime).getTime();
         const endMs = new Date(booking.expected_end_datetime).getTime();
         const nowMs = now.getTime();
         if (nowMs > startMs && endMs > startMs) {
             progressPercent = Math.min(100, ((nowMs - startMs) / (endMs - startMs)) * 100);
         }
+        const remainingMs = endMs - now.getTime();
+        const WARNING_MS = 30 * 60 * 1000; // 30 minutes
+        if (isOverdue) {
+            progressColor = 'bg-red-500';
+        } else if (remainingMs <= WARNING_MS || progressPercent >= 80) {
+            progressColor = 'bg-yellow-500';
+        }
     }
+
+    // Completion label
+    const completedLate = isCompleted && (() => {
+        const actualEnd = booking.actual_end_time ? new Date(booking.actual_end_time) : null;
+        const plannedEnd = booking.expected_end_datetime ? new Date(booking.expected_end_datetime) : null;
+        return actualEnd && plannedEnd && actualEnd > plannedEnd;
+    })();
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: booking._id,
@@ -220,6 +245,16 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
 
             {/* Hover overlay */}
             <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity z-0 pointer-events-none ${isConflict ? 'bg-red-500/5' : 'bg-slate-50/50 dark:bg-white/5'} ${isContinuedFromYesterday ? 'rounded-r-xl rounded-l-none' : (isContinuesToTomorrow ? 'rounded-l-xl rounded-r-none' : 'rounded-xl')}`}></div>
+
+            {/* Completion status badge — shown for COMPLETED bookings */}
+            {isCompleted && (
+                <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-md ${completedLate ? 'bg-red-500/90 text-white' : 'bg-emerald-500/90 text-white'}`}>
+                        {completedLate ? 'Hoàn thành quá thời gian' : 'Hoàn thành'}
+                    </span>
+                </div>
+            )}
+
             {primaryTech && (
                 <div className="absolute -right-2 -top-2 flex items-center z-20 shadow-md">
                     <div className="w-6 h-6 rounded-full border-2 border-white dark:border-[#1c1c1e] overflow-hidden bg-slate-700 shrink-0 flex items-center justify-center">
@@ -292,7 +327,7 @@ const ROBlock = ({ booking, isConflict, technicians, adjustDuration, selectedDat
                 <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded-b-xl overflow-hidden z-20 bg-slate-200/30 dark:bg-white/5">
                     <div
                         style={{ width: `${progressPercent}%` }}
-                        className={`h-full transition-all duration-[60000ms] ease-linear ${isOverdue ? 'bg-red-500' : 'bg-emerald-500'}`}
+                        className={`h-full transition-width duration-[30000ms] ease-linear ${progressColor}`}
                     />
                 </div>
             )}

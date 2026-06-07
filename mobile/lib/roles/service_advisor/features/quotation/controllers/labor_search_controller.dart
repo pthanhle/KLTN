@@ -39,10 +39,13 @@ class LaborSearchState {
   }
 }
 
+typedef LaborConfirmOverride = void Function(List<LaborItemModel> labors);
+
 class LaborSearchController extends Notifier<LaborSearchState> {
   // Danh mục tiền công dùng dữ liệu chuẩn (master data) cố định, đảm bảo
   // các hạng mục báo giá luôn khớp 1-1 với "Hạng mục thi công" bên role kỹ thuật.
-  List<LaborItemModel> _allItems = mockLaborMasterData;
+  final List<LaborItemModel> _allItems = mockLaborMasterData;
+  LaborConfirmOverride? _confirmOverride;
 
   @override
   LaborSearchState build() {
@@ -62,7 +65,7 @@ class LaborSearchController extends Notifier<LaborSearchState> {
       final matchCategory = category == 'Tất cả' || item.category == category;
       final matchQuery = query.isEmpty ||
           item.name.toLowerCase().contains(lowerQuery) ||
-          item.id.toLowerCase().contains(lowerQuery);
+          item.laborCode.toLowerCase().contains(lowerQuery);
       return matchCategory && matchQuery;
     }).toList();
   }
@@ -94,14 +97,22 @@ class LaborSearchController extends Notifier<LaborSearchState> {
     return categories;
   }
 
+  void setConfirmOverride(LaborConfirmOverride? override) {
+    _confirmOverride = override;
+  }
+
   void confirmSelection() {
-    final quotationController = ref.read(quotationControllerProvider.notifier);
     final selectedLabors = _allItems
-        .where((labor) => state.selectedLaborIds.contains(labor.id))
+        .where((labor) => state.selectedLaborIds.contains(labor.laborCode))
         .toList();
 
-    for (final labor in selectedLabors) {
-      quotationController.addLabor(labor);
+    if (_confirmOverride != null) {
+      _confirmOverride!(selectedLabors);
+    } else {
+      final quotationController = ref.read(quotationControllerProvider.notifier);
+      for (final labor in selectedLabors) {
+        quotationController.addLabor(labor);
+      }
     }
 
     state = state.copyWith(selectedLaborIds: const {});

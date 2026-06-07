@@ -60,11 +60,12 @@ class SupplementController extends AsyncNotifier<SupplementRequestModel?> {
       );
 
       final request = SupplementRequestModel(
-        orderId: orderId,
+        bookingCode: orderId,
         taskId: taskId,
-        description: description,
-        proposedSolution: proposedSolution,
-        evidenceUrls: evidenceUrls,
+        issueTitle: title,
+        technicianNote: description,
+        actionRequired: proposedSolution,
+        evidenceMediaUrls: evidenceUrls,
         status: 'PENDING',
       );
 

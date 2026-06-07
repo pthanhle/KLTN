@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { message } from 'antd';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 import { AdminRepairAPI } from '../../../../../../services/api/adminRepair.api';
 import { AdminStaffAPI } from '../../../../../../services/api/adminStaff.api';
 
@@ -20,6 +21,12 @@ const mapProgressToBooking = (p) => {
         const end = new Date(p.expected_end_datetime);
         timeSlot = `${start.toTimeString().slice(0, 5)} - ${end.toTimeString().slice(0, 5)}`;
     }
+
+    // Map backend status to frontend display status
+    let frontendStatus;
+    if (p.status === 'RECEIVED') frontendStatus = 'RO_CREATED';
+    else if (p.status === 'COMPLETED') frontendStatus = 'COMPLETED';
+    else frontendStatus = 'IN_PROGRESS';
 
     return {
         _id: p._id,
@@ -43,8 +50,9 @@ const mapProgressToBooking = (p) => {
         time_slot: timeSlot,
         primary_technician: mechanic?._id?.toString() || mechanic?.toString() || null,
         assistant_technicians: [],
-        // RECEIVED → waiting for assignment, DIAGNOSING → assigned/in-progress
-        status: p.status === 'RECEIVED' ? 'RO_CREATED' : 'IN_PROGRESS',
+        status: frontendStatus,
+        // Used to determine late-completion on the Gantt card
+        actual_end_time: p.updatedAt || null,
     };
 };
 
@@ -64,16 +72,26 @@ export const useWorkshopLogic = (selectedDate) => {
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [receivedRes, diagnosingRes, baysRes, staffRes] = await Promise.all([
+            const [receivedRes, diagnosingRes, quotingRes, waitingPartsRes, inProgressRes, qcRes, completedRes, baysRes, staffRes] = await Promise.all([
                 AdminRepairAPI.getRepairProgresses({ status: 'RECEIVED', limit: 100 }),
                 AdminRepairAPI.getRepairProgresses({ status: 'DIAGNOSING', limit: 100 }),
+                AdminRepairAPI.getRepairProgresses({ status: 'QUOTING', limit: 100 }),
+                AdminRepairAPI.getRepairProgresses({ status: 'WAITING_PARTS', limit: 100 }),
+                AdminRepairAPI.getRepairProgresses({ status: 'IN_PROGRESS', limit: 100 }),
+                AdminRepairAPI.getRepairProgresses({ status: 'QC_TESTING', limit: 100 }),
+                AdminRepairAPI.getRepairProgresses({ status: 'COMPLETED', limit: 100 }),
                 AdminRepairAPI.getServiceBays({ limit: 50 }),
                 AdminStaffAPI.getStaff({ limit: 100 }),
             ]);
 
             const received = (receivedRes?.repairProgresses || []).map(mapProgressToBooking);
             const diagnosing = (diagnosingRes?.repairProgresses || []).map(mapProgressToBooking);
-            setAllBookings([...received, ...diagnosing]);
+            const quoting = (quotingRes?.repairProgresses || []).map(mapProgressToBooking);
+            const waitingParts = (waitingPartsRes?.repairProgresses || []).map(mapProgressToBooking);
+            const inProgress = (inProgressRes?.repairProgresses || []).map(mapProgressToBooking);
+            const qcTesting = (qcRes?.repairProgresses || []).map(mapProgressToBooking);
+            const completed = (completedRes?.repairProgresses || []).map(mapProgressToBooking);
+            setAllBookings([...received, ...diagnosing, ...quoting, ...waitingParts, ...inProgress, ...qcTesting, ...completed]);
 
             const rawBays = baysRes?.serviceBays || [];
             setBays(rawBays.map(b => ({
@@ -135,6 +153,15 @@ export const useWorkshopLogic = (selectedDate) => {
 
         const targetBay = bays.find(b => b.id === over.id);
         if (targetBay) {
+            if (dateStr && draggedBooking.booking_date && draggedBooking.booking_date !== dateStr) {
+                const bookingDateFormatted = dayjs(draggedBooking.booking_date).format('DD/MM/YYYY');
+                const filterDateFormatted = selectedDate.format('DD/MM/YYYY');
+                message.error(
+                    `Không thể phân công: lệnh sửa chữa này có lịch ngày ${bookingDateFormatted}, không thể phân công vào khoang ở ngày ${filterDateFormatted}.`
+                );
+                return;
+            }
+
             const occupant = allBookings.find(b => b.bay_id === targetBay.id && b._id !== bookingId);
             if (occupant) {
                 message.error(`${targetBay.name} đang có xe "${occupant.license_plate || occupant.booking_code}". Mỗi khoang chỉ nhận 1 xe.`);
@@ -236,7 +263,7 @@ export const useWorkshopLogic = (selectedDate) => {
     );
 
     return {
-        bookings: filtered.filter(b => b.status === 'IN_PROGRESS'),
+        bookings: filtered.filter(b => b.status === 'IN_PROGRESS' || b.status === 'COMPLETED'),
         unassignedBookings: filtered.filter(b => b.status === 'RO_CREATED'),
         bays,
         technicians: getTechniciansWithWorkload(),

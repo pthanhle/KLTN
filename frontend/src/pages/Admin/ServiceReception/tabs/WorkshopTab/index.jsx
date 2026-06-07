@@ -98,6 +98,7 @@ const WorkshopTab = ({ selectedDate }) => {
                 technicians={technicians}
                 onConfirm={confirmAssignment}
                 onCancel={cancelAssignment}
+                selectedDate={selectedDate}
             />
 
             <Modal

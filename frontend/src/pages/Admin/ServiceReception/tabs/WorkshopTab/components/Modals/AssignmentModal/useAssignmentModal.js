@@ -2,25 +2,40 @@ import { useEffect } from 'react';
 import { Form } from 'antd';
 import dayjs from 'dayjs';
 
-const useAssignmentModal = ({ visible, assignmentData, onConfirm }) => {
+const useAssignmentModal = ({ visible, assignmentData, onConfirm, selectedDate }) => {
     const [form] = Form.useForm();
 
     useEffect(() => {
         if (visible && assignmentData) {
             let timeRange = [];
             const booking = assignmentData.booking;
-            
+            // The canonical date to anchor times to: prefer selectedDate filter, fall back to booking date
+            const anchorDateStr = selectedDate
+                ? selectedDate.format('YYYY-MM-DD')
+                : (booking?.booking_date || new Date().toISOString().split('T')[0]);
+
             if (booking?.expected_start_datetime && booking?.expected_end_datetime) {
-                timeRange = [dayjs(booking.expected_start_datetime), dayjs(booking.expected_end_datetime)];
+                // Re-anchor existing datetimes to the selected date (only time part carries over)
+                const existStart = dayjs(booking.expected_start_datetime);
+                const existEnd = dayjs(booking.expected_end_datetime);
+                timeRange = [
+                    dayjs(anchorDateStr).hour(existStart.hour()).minute(existStart.minute()).second(0),
+                    dayjs(anchorDateStr).hour(existEnd.hour()).minute(existEnd.minute()).second(0),
+                ];
             } else if (booking?.time_slot) {
                 const parts = booking.time_slot.split(' - ');
                 if (parts.length === 2) {
-                    const baseDateStr = booking.booking_date || new Date().toISOString().split('T')[0];
                     timeRange = [
-                        dayjs(`${baseDateStr} ${parts[0]}`, 'YYYY-MM-DD HH:mm'),
-                        dayjs(`${baseDateStr} ${parts[1]}`, 'YYYY-MM-DD HH:mm')
+                        dayjs(`${anchorDateStr} ${parts[0]}`, 'YYYY-MM-DD HH:mm'),
+                        dayjs(`${anchorDateStr} ${parts[1]}`, 'YYYY-MM-DD HH:mm')
                     ];
                 }
+            } else {
+                // Default: 08:00 – 10:00 on the selected date
+                timeRange = [
+                    dayjs(anchorDateStr).hour(8).minute(0).second(0),
+                    dayjs(anchorDateStr).hour(10).minute(0).second(0),
+                ];
             }
 
             form.setFieldsValue({
@@ -30,7 +45,7 @@ const useAssignmentModal = ({ visible, assignmentData, onConfirm }) => {
                 assistant_technicians: assignmentData.booking?.assistant_technicians || []
             });
         }
-    }, [visible, assignmentData, form]);
+    }, [visible, assignmentData, selectedDate, form]);
 
     const handleSubmit = () => {
         form.validateFields().then((values) => {

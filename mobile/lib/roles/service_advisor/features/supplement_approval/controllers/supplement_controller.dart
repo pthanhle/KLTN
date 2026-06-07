@@ -3,6 +3,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/config/api_config.dart';
+import '../../../models/labor_item_model.dart';
+import '../../../models/part_item_model.dart';
+import '../models/supplement_labor_model.dart';
+import '../models/supplement_part_model.dart';
 import '../models/supplement_model.dart';
 
 class SupplementController extends Notifier<AsyncValue<SupplementModel>> {
@@ -86,6 +90,92 @@ class SupplementController extends Notifier<AsyncValue<SupplementModel>> {
     } catch (e, st) {
       state = AsyncError(e, st);
     }
+  }
+
+  void addPart(SupplementPartModel part) {
+    final current = state.value;
+    if (current == null) return;
+    final existing = current.addedParts.indexWhere((p) => p.sku == part.sku);
+    List<SupplementPartModel> updated;
+    if (existing >= 0) {
+      updated = [...current.addedParts];
+      final old = updated[existing];
+      updated[existing] = old.copyWith(quantity: old.quantity + 1);
+    } else {
+      updated = [...current.addedParts, part];
+    }
+    state = AsyncData(current.copyWith(addedParts: updated));
+  }
+
+  void addLabor(SupplementLaborModel labor) {
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(addedLabors: [...current.addedLabors, labor]));
+  }
+
+  void addPartFromSearch(PartItemModel part, int quantity, {String? expectedDate}) {
+    final supplementPart = SupplementPartModel(
+      id: part.id,
+      sku: part.sku,
+      name: part.name,
+      unitPrice: part.price,
+      quantity: quantity,
+      stockOnHand: part.availableStock,
+    );
+    final current = state.value;
+    if (current == null) return;
+    final existing = current.addedParts.indexWhere((p) => p.sku == part.sku);
+    List<SupplementPartModel> updated;
+    if (existing >= 0) {
+      updated = [...current.addedParts];
+      final old = updated[existing];
+      updated[existing] = old.copyWith(quantity: old.quantity + quantity);
+    } else {
+      updated = [...current.addedParts, supplementPart];
+    }
+    state = AsyncData(current.copyWith(addedParts: updated));
+  }
+
+  void addLaborsFromSearch(List<LaborItemModel> labors) {
+    final current = state.value;
+    if (current == null) return;
+    final newItems = labors.map((l) => SupplementLaborModel(
+      id: l.laborCode,
+      laborCode: l.laborCode,
+      description: l.name,
+      unitPrice: l.basePrice,
+      quantity: l.estimatedHours,
+    )).toList();
+    state = AsyncData(current.copyWith(addedLabors: [...current.addedLabors, ...newItems]));
+  }
+
+  void updatePartQuantity(String id, int quantity) {
+    final current = state.value;
+    if (current == null) return;
+    if (quantity <= 0) {
+      removePart(id);
+      return;
+    }
+    final updated = current.addedParts.map((p) {
+      return p.id == id ? p.copyWith(quantity: quantity) : p;
+    }).toList();
+    state = AsyncData(current.copyWith(addedParts: updated));
+  }
+
+  void removePart(String id) {
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(
+      addedParts: current.addedParts.where((p) => p.id != id).toList(),
+    ));
+  }
+
+  void removeLabor(String id) {
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(
+      addedLabors: current.addedLabors.where((l) => l.id != id).toList(),
+    ));
   }
 
   Future<void> resolve(String action) async {

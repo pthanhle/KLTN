@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import '../../../../../../shared/widgets/buttons/add_catalog_button.dart';
+import '../../../../../../shared/widgets/buttons/glass_close_button.dart';
 import '../../controllers/quotation_controller.dart';
 import '../../models/quotation_model.dart';
 import '../components/quotation_part_card.dart';
@@ -13,40 +15,31 @@ import '../../constants/quotation_constants.dart';
 import '../modals/part_search_modal/part_search_modal.dart';
 import '../modals/labor_search_modal/labor_search_modal.dart';
 import '../../utils/quotation_utils.dart';
+import '../../../walkaround/models/service_package_model.dart';
+import '../../../walkaround/providers/service_catalog_provider.dart';
 
 class ServiceCartSection extends ConsumerWidget {
   const ServiceCartSection({super.key});
 
-  void _showLaborChoice(BuildContext context, WidgetRef ref) {
+  void _showLaborCatalog(BuildContext context) {
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _LaborChoiceSheet(
-        onCatalog: () {
-          Navigator.pop(ctx);
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (c) => const LaborSearchModal(),
-          );
-        },
-        onManual: () {
-          Navigator.pop(ctx);
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (c) => ManualLaborSheet(
-              onAdd: (desc, price, hours) {
-                ref.read(quotationControllerProvider.notifier)
-                    .addManualLabor(description: desc, price: price, hours: hours);
-              },
-            ),
-          );
-        },
-      ),
+      builder: (c) => const LaborSearchModal(),
+    );
+  }
+
+  void _showServiceCatalog(BuildContext context) {
+    HapticFeedback.mediumImpact();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useRootNavigator: true,
+      barrierColor: Colors.black.withValues(alpha: 0.4),
+      builder: (context) => const _QuotationServiceModal(),
     );
   }
 
@@ -56,13 +49,15 @@ class ServiceCartSection extends ConsumerWidget {
     final theme = Theme.of(context);
 
     final data = asyncData.value;
+    final services = data?.selectedServices ?? const <ServicePackageModel>[];
     final parts = data?.parts ?? const <CartPartItem>[];
     final labor = data?.labor ?? const <CartLaborItem>[];
-    final totalItems = parts.length + labor.length;
+    final totalItems = services.length + parts.length + labor.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ── Section header ──────────────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(
               horizontal: QuotationConstants.paddingHorizontal),
@@ -91,16 +86,55 @@ class ServiceCartSection extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
 
-        if (data.parts.isNotEmpty)
-          ...data.parts.map((part) => QuotationPartCard(
+        // ── Dịch vụ đặt trước ───────────────────────────────────
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: QuotationConstants.paddingHorizontal),
+          child: Text(
+            'Gói dịch vụ'.tr(),
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...services.map((svc) => _QuotationServiceCard(service: svc)),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: QuotationConstants.paddingHorizontal),
+          child: AddCatalogButton(
+            icon: CupertinoIcons.bag_fill,
+            label: 'Thêm gói dịch vụ'.tr(),
+            onTap: () => _showServiceCatalog(context),
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // ── Phụ tùng & Tiền công ────────────────────────────────
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: QuotationConstants.paddingHorizontal),
+          child: Text(
+            'Phụ tùng & Tiền công'.tr(),
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        if (parts.isNotEmpty)
+          ...parts.map((part) => QuotationPartCard(
                 part: part,
                 onRemove: () => ref.read(quotationControllerProvider.notifier).removePart(part.id),
               )),
 
-        if (data.labor.isNotEmpty)
-          ...data.labor.map((labor) => QuotationLaborCard(
-                labor: labor,
-                onRemove: () => ref.read(quotationControllerProvider.notifier).removeLabor(labor.id),
+        if (labor.isNotEmpty)
+          ...labor.map((item) => QuotationLaborCard(
+                labor: item,
+                onRemove: () => ref.read(quotationControllerProvider.notifier).removeLabor(item.id),
               )),
 
         const SizedBox(height: 8),
@@ -132,8 +166,7 @@ class ServiceCartSection extends ConsumerWidget {
                 child: AddCatalogButton(
                   icon: CupertinoIcons.person_fill,
                   label: 'Tiền công'.tr(),
-                  onTap: () => _showLaborChoice(context, ref),
-                  theme: theme,
+                  onTap: () => _showLaborCatalog(context),
                 ),
               ),
             ],
@@ -144,178 +177,461 @@ class ServiceCartSection extends ConsumerWidget {
   }
 }
 
-class _LaborChoiceSheet extends StatelessWidget {
-  final VoidCallback onCatalog;
-  final VoidCallback onManual;
-
-  const _LaborChoiceSheet({required this.onCatalog, required this.onManual});
+// ─────────────────────────────────────────────
+// Service card in cart
+// ─────────────────────────────────────────────
+class _QuotationServiceCard extends ConsumerWidget {
+  final ServicePackageModel service;
+  const _QuotationServiceCard({required this.service});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 8),
-          Container(
-            width: 36, height: 4,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(2),
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: QuotationConstants.paddingHorizontal),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: ShapeDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : theme.colorScheme.surface.withValues(alpha: 0.72),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 16,
+              cornerSmoothing: 1.0,
+            ),
+            side: BorderSide(
+              color: primary.withValues(alpha: 0.25),
+              width: 0.5,
             ),
           ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Thêm tiền công'.tr(),
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(CupertinoIcons.bag_fill, size: 18, color: primary),
             ),
-          ),
-          const SizedBox(height: 8),
-          ListTile(
-            leading: const Icon(CupertinoIcons.list_bullet),
-            title: Text('Từ danh mục'.tr()),
-            subtitle: Text('Chọn từ danh sách dịch vụ tiêu chuẩn'.tr()),
-            onTap: onCatalog,
-          ),
-          ListTile(
-            leading: const Icon(CupertinoIcons.pencil),
-            title: Text('Nhập thủ công'.tr()),
-            subtitle: Text('Tự nhập mô tả và đơn giá'.tr()),
-            onTap: onManual,
-          ),
-          SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    service.name,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (service.category.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      service.category,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              QuotationUtils.formatCurrency(service.basePrice),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(width: 4),
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                ref
+                    .read(quotationControllerProvider.notifier)
+                    .removeServicePackage(service.id);
+              },
+              child: Icon(
+                CupertinoIcons.xmark_circle_fill,
+                size: 20,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class ManualLaborSheet extends StatefulWidget {
-  final void Function(String description, double price, double hours) onAdd;
-
-  const ManualLaborSheet({super.key, required this.onAdd});
+// ─────────────────────────────────────────────
+// Service catalog modal (wired to quotation controller)
+// ─────────────────────────────────────────────
+class _QuotationServiceModal extends ConsumerStatefulWidget {
+  const _QuotationServiceModal();
 
   @override
-  State<ManualLaborSheet> createState() => _ManualLaborSheetState();
+  ConsumerState<_QuotationServiceModal> createState() =>
+      _QuotationServiceModalState();
 }
 
-class _ManualLaborSheetState extends State<ManualLaborSheet> {
-  final _descCtrl = TextEditingController();
-  final _priceCtrl = TextEditingController();
-  final _hoursCtrl = TextEditingController(text: '1');
-
-  @override
-  void dispose() {
-    _descCtrl.dispose();
-    _priceCtrl.dispose();
-    _hoursCtrl.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    final desc = _descCtrl.text.trim();
-    final price = double.tryParse(_priceCtrl.text.replaceAll(',', '').replaceAll('.', '')) ?? 0;
-    final hours = double.tryParse(_hoursCtrl.text) ?? 1;
-
-    if (desc.isEmpty) return;
-    if (price <= 0) return;
-
-    widget.onAdd(desc, price, hours);
-    Navigator.pop(context);
-  }
+class _QuotationServiceModalState
+    extends ConsumerState<_QuotationServiceModal> {
+  String _selectedCategory = 'Tất cả';
 
   @override
   Widget build(BuildContext context) {
+    final catalogAsync = ref.watch(serviceCatalogProvider);
     final theme = Theme.of(context);
-    final bottom = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 16, 20, bottom + 24),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      height: MediaQuery.of(context).size.height * 0.78,
+      decoration: ShapeDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.65),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 32,
+            cornerSmoothing: 1.0,
+          ),
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 0.5,
+          ),
+        ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 36, height: 4,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Nhập tiền công thủ công'.tr(),
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 20),
-          TextField(
-            controller: _descCtrl,
-            decoration: InputDecoration(
-              labelText: 'Mô tả công việc'.tr(),
-              border: const OutlineInputBorder(),
-            ),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          const SizedBox(height: 12),
-          Row(
+      child: ClipSmoothRect(
+        radius: SmoothBorderRadius(cornerRadius: 32, cornerSmoothing: 1.0),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Column(
             children: [
-              Expanded(
-                flex: 2,
-                child: TextField(
-                  controller: _priceCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Đơn giá (₫)'.tr(),
-                    border: const OutlineInputBorder(),
+              const SizedBox(height: 12),
+              Center(
+                child: Container(
+                  width: 48,
+                  height: 6,
+                  decoration: ShapeDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(
+                          cornerRadius: 3, cornerSmoothing: 1.0),
+                    ),
                   ),
-                  keyboardType: TextInputType.number,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Text(
+                      'Thêm gói dịch vụ'.tr(),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GlassCloseButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               Expanded(
-                child: TextField(
-                  controller: _hoursCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'Số giờ'.tr(),
-                    border: const OutlineInputBorder(),
+                child: catalogAsync.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, _) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        'Không thể tải danh mục dịch vụ. Vui lòng thử lại.'.tr(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  data: (catalog) {
+                    final categories = [
+                      'Tất cả',
+                      ...catalog
+                          .map((e) => e.category)
+                          .where((c) => c.isNotEmpty)
+                          .toSet(),
+                    ];
+                    final displayed = _selectedCategory == 'Tất cả'
+                        ? catalog
+                        : catalog
+                            .where((p) => p.category == _selectedCategory)
+                            .toList();
+
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: 36,
+                          child: ListView.separated(
+                            physics: const BouncingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            itemCount: categories.length,
+                            separatorBuilder: (_, idx) =>
+                                const SizedBox(width: 8),
+                            itemBuilder: (context, i) {
+                              final cat = categories[i];
+                              return _QCategoryChip(
+                                title: cat.tr(),
+                                isSelected: cat == _selectedCategory,
+                                onTap: () {
+                                  HapticFeedback.selectionClick();
+                                  setState(() => _selectedCategory = cat);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Container(
+                            height: 0.5,
+                            color: Colors.white.withValues(alpha: 0.15),
+                          ),
+                        ),
+                        Expanded(
+                          child: displayed.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'Không có gói dịch vụ nào'.tr(),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color:
+                                          theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                )
+                              : ListView.separated(
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: const EdgeInsets.fromLTRB(
+                                      24, 16, 24, 24),
+                                  itemCount: displayed.length,
+                                  separatorBuilder: (_, idx) =>
+                                      const SizedBox(height: 12),
+                                  itemBuilder: (context, i) =>
+                                      _QServiceCatalogCard(
+                                          package: displayed[i]),
+                                ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  24,
+                  12,
+                  24,
+                  MediaQuery.of(context).padding.bottom > 0
+                      ? MediaQuery.of(context).padding.bottom
+                      : 24,
+                ),
+                child: FilledButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: Text('Xong'.tr()),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: _submit,
-              child: Text('Thêm'.tr()),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _AddButton extends StatefulWidget {
-  final bool isDark;
-  final IconData icon;
-  final String label;
+class _QCategoryChip extends StatelessWidget {
+  final String title;
+  final bool isSelected;
   final VoidCallback onTap;
+
+  const _QCategoryChip({
+    required this.title,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: ShapeDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: 0.88)
+              : Colors.white.withValues(alpha: 0.08),
+          shape: SmoothRectangleBorder(
+            borderRadius:
+                SmoothBorderRadius(cornerRadius: 20, cornerSmoothing: 1.0),
+            side: BorderSide(
+              color: isSelected
+                  ? Colors.white.withValues(alpha: 0.55)
+                  : Colors.white.withValues(alpha: 0.2),
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 200),
+          style: theme.textTheme.labelLarge!.copyWith(
+            color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+          child: Text(title),
+        ),
+      ),
+    );
+  }
+}
+
+class _QServiceCatalogCard extends ConsumerWidget {
+  final ServicePackageModel package;
+  const _QServiceCatalogCard({required this.package});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isSelected = ref.watch(
+      quotationControllerProvider.select(
+        (asyncVal) =>
+            asyncVal.value?.selectedServices.any((s) => s.id == package.id) ??
+            false,
+      ),
+    );
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        if (!isSelected) {
+          ref
+              .read(quotationControllerProvider.notifier)
+              .addServicePackage(package);
+        } else {
+          ref
+              .read(quotationControllerProvider.notifier)
+              .removeServicePackage(package.id);
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.all(16),
+        decoration: ShapeDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.12)
+              : Colors.white.withValues(alpha: isDark ? 0.05 : 0.15),
+          shape: SmoothRectangleBorder(
+            borderRadius:
+                SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+            side: BorderSide(
+              color: isSelected
+                  ? theme.colorScheme.primary.withValues(alpha: 0.6)
+                  : Colors.white.withValues(alpha: 0.2),
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (package.category.isNotEmpty)
+                    Text(
+                      package.category.tr(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  const SizedBox(height: 2),
+                  Text(
+                    package.name,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    QuotationUtils.formatCurrency(package.basePrice),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 24,
+              height: 24,
+              decoration: ShapeDecoration(
+                color: isSelected
+                    ? theme.colorScheme.primary.withValues(alpha: 0.88)
+                    : Colors.transparent,
+                shape: SmoothRectangleBorder(
+                  borderRadius:
+                      SmoothBorderRadius(cornerRadius: 12, cornerSmoothing: 1.0),
+                  side: BorderSide(
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.outline,
+                    width: 1.5,
+                  ),
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(CupertinoIcons.checkmark_alt,
+                      size: 14, color: Colors.white)
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CountBadge extends StatelessWidget {
+  final int count;
   final ThemeData theme;
 
   const _CountBadge({super.key, required this.count, required this.theme});

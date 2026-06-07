@@ -62,9 +62,8 @@ export const mapRescheduleDataToForm = (rescheduleData, userProfile) => {
     };
 };
 
-export const mapFormToBookingPayload = (data, carId, isReschedule, rescheduleData) => {
-    // Send standard object payload instead of temporary string
-    const deliveryAddressObj = data.bookingType === 'home' 
+export const mapFormToBookingPayload = (data, carId) => {
+    const deliveryAddressObj = data.bookingType === 'home'
         ? {
             street: data.addressDetail,
             ward: data.ward,
@@ -83,9 +82,24 @@ export const mapFormToBookingPayload = (data, carId, isReschedule, rescheduleDat
         time_slot: data.selectedTimeSlot,
         has_driver_license: data.hasDriverLicense ?? false,
         customer_note: data.note,
+    };
+};
 
-        is_reschedule: isReschedule,
+export const mapFormToReschedulePayload = (data) => {
+    const deliveryAddressObj = data.bookingType === 'home'
+        ? {
+            street: data.addressDetail,
+            ward: data.ward,
+            district: data.district,
+            city: data.city,
+        } : null;
+
+    return {
+        booking_date: data.selectedDate.format('YYYY-MM-DD'),
+        time_slot: data.selectedTimeSlot,
         reschedule_reason: data.rescheduleReason || null,
-        original_booking_id: rescheduleData?.booking_code || null,
+        test_drive_type: data.bookingType,
+        showroom_branch: data.bookingType === 'showroom' ? data.showroomBranch : null,
+        delivery_address: deliveryAddressObj,
     };
 };

@@ -27,7 +27,6 @@ final QuotationModel mockQuotationData = QuotationModel(
       rate: 100.00,
     ),
   ],
-  depositRequired: 200.00,
   receptionSnapshot: const ReceptionSnapshot(
     odometer: 24000,
     fuelLevel: 21,

@@ -91,23 +91,28 @@ const mapQuotationData = (realProgress, ri, advisorSignatureUrl, customerSignatu
             brand: booking.vehicle_info?.brand || '',
             model: booking.vehicle_info?.model || '',
             license_plate: booking.vehicle_info?.license_plate || '',
-            vin_number: booking.vehicle_info?.vin_number || '',
-            current_odometer: booking.vehicle_info?.current_odometer || 0,
+            // ODO recorded at reception (ri.odometer), not from booking vehicle profile
+            current_odometer: ri?.odometer || booking.vehicle_info?.current_odometer || 0,
         },
         advisor_name: realProgress.advisor_id?.full_name || '',
         creation_date: creationDate ? new Date(creationDate).toLocaleDateString('vi-VN') : '',
         status: q.status || 'PENDING',
         service_package_total: q.service_package_total || 0,
-        parts: (q.parts || []).map((p) => ({
-            sku: p.sku,
-            name: p.name,
+        parts: (q.parts || []).map((p, idx) => ({
+            id: p.sku || `part_${idx}`,
+            sku: p.sku || '',
+            name: p.name || '',
             quantity: p.quantity || 0,
             unit_price: p.unit_price || 0,
+            total_price: (p.quantity || 0) * (p.unit_price || 0),
         })),
-        labors: (q.labors || []).map((l) => ({
-            description: l.description,
-            hours: l.hours || 0,
-            rate: l.rate || 0,
+        // QuotationItemsTable expects: { id, name, quantity (hours), unit_price (rate), total_price }
+        labors: (q.labors || []).map((l, idx) => ({
+            id: l.description || `labor_${idx}`,
+            name: l.description || '',
+            quantity: l.hours || 0,
+            unit_price: l.rate || 0,
+            total_price: (l.hours || 0) * (l.rate || 0),
         })),
         vat_rate: q.vat_rate ?? 0.1,
         deposit_amount: q.deposit_amount || 0,
@@ -144,7 +149,13 @@ export const useTrackingDetailLogic = () => {
     const [quotationData, setQuotationData] = useState(null);
     const [repairStatus, setRepairStatus] = useState('RECEIVED');
     const [progressId, setProgressId] = useState(null);
-    const { userInfo } = useSelector((state) => state.auth);
+    const { isAuthenticated } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const tabParam = queryParams.get('tab');
+        if (tabParam) setActiveTab(tabParam);
+    }, [location.search]);
 
     useEffect(() => {
         const fetchDashboardDetail = async () => {
@@ -154,11 +165,10 @@ export const useTrackingDetailLogic = () => {
             try {
                 if (!id) throw new Error('Không tìm thấy mã đơn dịch vụ trong URL.');
 
-                const token = userInfo?.token;
                 const queryParams = new URLSearchParams(location.search);
                 const licensePlate = queryParams.get('license_plate');
 
-                if (!token && !licensePlate) {
+                if (!isAuthenticated && !licensePlate) {
                     throw new Error('Vui lòng đăng nhập hoặc cung cấp biển số xe để xem thông tin đơn dịch vụ.');
                 }
 
@@ -166,7 +176,7 @@ export const useTrackingDetailLogic = () => {
                 if (licensePlate) {
                     realProgress = await trackingApi.lookupTracking(id, licensePlate);
                 } else {
-                    realProgress = await trackingApi.getTrackingDetail(id, token);
+                    realProgress = await trackingApi.getTrackingDetail(id);
                 }
 
                 if (!realProgress) throw new Error('Không tìm thấy đơn dịch vụ.');
@@ -194,7 +204,7 @@ export const useTrackingDetailLogic = () => {
         };
 
         fetchDashboardDetail();
-    }, [id, location.search, userInfo?.token]);
+    }, [id, location.search, isAuthenticated]);
 
     return {
         isLoading,

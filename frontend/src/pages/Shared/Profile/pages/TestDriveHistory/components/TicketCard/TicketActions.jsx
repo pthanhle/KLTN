@@ -1,4 +1,4 @@
-import { CalendarClock, XCircle, Star } from 'lucide-react';
+import { CalendarClock, XCircle } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 
 const TicketActions = ({ status, id, handleReschedule, handleCancel, t }) => {
@@ -37,19 +37,6 @@ const TicketActions = ({ status, id, handleReschedule, handleCancel, t }) => {
             );
         }
 
-        if (status === 'Completed') {
-            return (
-                <div className="w-full flex flex-col gap-3">
-                    <button className="w-full py-3.5 bg-yellow-500 border border-yellow-500 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-[0_4px_12px_rgba(234,179,8,0.2)] hover:bg-yellow-400 hover:border-yellow-400 hover:-translate-y-0.5 transition-all duration-300 flex flex-col items-center gap-1.5 group">
-                        <Star size={20} className="text-slate-900" />
-                        {t('review_btn', 'Đánh giá')}
-                    </button>
-                </div>
-            );
-        }
-
-        // 3: In progress, 5: Cancelled
-        // Trống (không hiển thị nút thao tác rác) cho vé Không thể Edit
         return null;
     };
 

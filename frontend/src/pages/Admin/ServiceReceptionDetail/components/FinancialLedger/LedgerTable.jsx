@@ -50,19 +50,35 @@ const LedgerTable = ({ items, summary }) => {
             </div>
             
             {/* Totals Area */}
-            <div className="p-4 md:p-5 bg-slate-50 dark:bg-[#1a1a1c] border-t border-slate-200 dark:border-white/10 flex justify-end gap-6 md:gap-10 items-end">
+            <div className="p-4 md:p-5 bg-slate-50 dark:bg-[#1a1a1c] border-t border-slate-200 dark:border-white/10 flex flex-wrap justify-end gap-6 md:gap-10 items-end">
                 <div className="text-right">
-                    <span className="text-[10px] text-slate-500 dark:text-[#d3c5ac] uppercase tracking-widest block mb-1 font-semibold">{t('ledger_tax', 'Tax')}</span>
+                    <span className="text-[10px] text-slate-500 dark:text-[#d3c5ac] uppercase tracking-widest block mb-1 font-semibold">{t('ledger_tax', 'Thuế VAT (10%)')}</span>
                     <span className="text-sm text-slate-700 dark:text-[#dce1fb] font-mono">
                         {formatCurrency(summary?.vat_amount)}
                     </span>
                 </div>
                 <div className="text-right">
-                    <span className="text-[10px] text-amber-500 uppercase tracking-widest block mb-1 font-semibold">{t('ledger_grand_total', 'Grand Total')}</span>
+                    <span className="text-[10px] text-amber-500 uppercase tracking-widest block mb-1 font-semibold">{t('ledger_grand_total', 'Tổng cộng')}</span>
                     <span className="text-2xl md:text-3xl font-bold text-amber-500 font-mono leading-none">
                         {formatCurrency(summary?.grand_total)}
                     </span>
                 </div>
+                {summary?.deposit_amount > 0 && (
+                    <div className="w-full border-t border-slate-200 dark:border-white/10 pt-3 mt-1 flex flex-wrap justify-end gap-6 md:gap-10">
+                        <div className="text-right">
+                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block mb-1 font-semibold">{t('ledger_deposit_paid', 'Đã đặt cọc')}</span>
+                            <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                                {formatCurrency(summary?.deposit_amount)}
+                            </span>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-[10px] text-rose-500 uppercase tracking-widest block mb-1 font-semibold">{t('ledger_remaining', 'Còn lại')}</span>
+                            <span className="text-xl font-bold text-rose-500 font-mono">
+                                {formatCurrency(summary?.remaining_amount)}
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

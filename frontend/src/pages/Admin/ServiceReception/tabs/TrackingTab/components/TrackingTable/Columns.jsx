@@ -24,7 +24,7 @@ export const getColumns = (t, onCustomerClick) => [
         align: 'left',
         render: (text, record) => (
             <div className="whitespace-nowrap">
-                <button className="font-bold text-yellow-600 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors cursor-pointer text-left focus:outline-none" onClick={(e) => { e.stopPropagation(); if (onCustomerClick) onCustomerClick(record.booking_code); }}>
+                <button className="font-bold text-yellow-600 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors cursor-pointer text-left focus:outline-none" onClick={(e) => { e.stopPropagation(); if (onCustomerClick) onCustomerClick(record.id); }}>
                     {record.customer_name}
                 </button>
                 <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{record.license_plate} • {record.vehicle_model}</div>

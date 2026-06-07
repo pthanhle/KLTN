@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AdminAppointmentAPI } from '../../../../../services/api/adminAppointment.api';
 import { AdminStaffAPI } from '../../../../../services/api/adminStaff.api';
 import { message } from 'antd';
+import dayjs from 'dayjs';
 
 export const useReceptionLogic = (selectedDate) => {
     const queryClient = useQueryClient();
@@ -32,7 +33,8 @@ export const useReceptionLogic = (selectedDate) => {
             sequence_number: b.sequence_number,
             created_at: b.createdAt,
             booking_date: b.booking_date,
-            time_slot: b.time_slot,
+            booking_date_display: b.booking_date ? dayjs(b.booking_date).format('DD/MM/YYYY') : '—',
+            time_slot: b.time_slot || '—',
             customer_name: b.user_id?.full_name || b.customer_info?.full_name || 'Khách hàng',
             customer_phone: b.customer_info?.contact_phone || b.user_id?.phone || '',
             is_vip: false,
@@ -40,6 +42,7 @@ export const useReceptionLogic = (selectedDate) => {
             vehicle_model: b.vehicle_info?.model || '',
             license_plate: b.vehicle_info?.license_plate || '',
             vehicle_condition: b.customer_note || '',
+            service_type: b.service_type || null,
             selected_services: (b.services || []).map(s => ({ name: s.service_name })),
             status: b.booking_status,
             // Normalize advisor_id to string whether it's a populated object or raw ID
@@ -90,6 +93,18 @@ export const useReceptionLogic = (selectedDate) => {
             return;
         }
 
+        if (dateStr && booking.booking_date) {
+            const bookingDateStr = dayjs(booking.booking_date).format('YYYY-MM-DD');
+            if (bookingDateStr !== dateStr) {
+                const bookingDateFormatted = dayjs(booking.booking_date).format('DD/MM/YYYY');
+                const filterDateFormatted = selectedDate.format('DD/MM/YYYY');
+                message.error(
+                    `Không thể phân công: đơn dịch vụ này có lịch ngày ${bookingDateFormatted}, không thể phân công vào nhân viên ở ngày ${filterDateFormatted}.`
+                );
+                return;
+            }
+        }
+
         queryClient.setQueryData(QUERY_KEY, (old) => {
             if (!old) return old;
             const updated = (old.appointments || []).map(b =>
@@ -109,8 +124,18 @@ export const useReceptionLogic = (selectedDate) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEY });
             message.error('Lỗi khi điều phối đơn: ' + (error.response?.data?.message || error.message));
         }
-    }, [bookings, queryClient]);
+    }, [bookings, queryClient, dateStr, selectedDate]);
 
+    // Bookings filtered by selected date — used in advisor columns only
+    const bookingsByDate = useMemo(() => {
+        if (!dateStr) return bookings;
+        return bookings.filter(b => {
+            if (!b.booking_date) return true;
+            return dayjs(b.booking_date).format('YYYY-MM-DD') === dateStr;
+        });
+    }, [bookings, dateStr]);
+
+    // Incoming queue always shows ALL unassigned regardless of date
     const unassignedBookings = bookings.filter(b => !b.advisor_id);
     const activeBooking = activeId ? bookings.find(b => b._id === activeId) : null;
 
@@ -161,7 +186,7 @@ export const useReceptionLogic = (selectedDate) => {
     };
 
     return {
-        bookings,
+        bookings: bookingsByDate,
         advisors,
         isLoading,
         handleDragStart,

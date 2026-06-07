@@ -135,8 +135,7 @@ class _QuotationSummaryCardState extends ConsumerState<QuotationSummaryCard> {
                   const SizedBox(height: 16),
 
                   // Summary rows
-                  _buildRow(theme, 'Gói dịch vụ'.tr(), data.servicePackageTotal,
-                      isReadOnly: true),
+                  _buildRow(theme, 'Gói dịch vụ'.tr(), data.servicePackageTotal),
                   const SizedBox(height: 8),
                   _buildRow(theme, 'Phụ tùng'.tr(), data.partsTotal),
                   const SizedBox(height: 8),

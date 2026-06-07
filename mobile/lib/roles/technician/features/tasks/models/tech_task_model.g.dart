@@ -17,6 +17,9 @@ _TechTaskModel _$TechTaskModelFromJson(Map<String, dynamic> json) =>
       role: json['role'] as String,
       urgency: $enumDecode(_$TechTaskUrgencyEnumMap, json['urgency']),
       status: $enumDecode(_$TechTaskStatusEnumMap, json['status']),
+      bookingDate: json['bookingDate'] as String?,
+      bookingCode: json['bookingCode'] as String?,
+      sequenceNumber: (json['sequenceNumber'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$TechTaskModelToJson(_TechTaskModel instance) =>
@@ -30,6 +33,9 @@ Map<String, dynamic> _$TechTaskModelToJson(_TechTaskModel instance) =>
       'role': instance.role,
       'urgency': _$TechTaskUrgencyEnumMap[instance.urgency]!,
       'status': _$TechTaskStatusEnumMap[instance.status]!,
+      'bookingDate': instance.bookingDate,
+      'bookingCode': instance.bookingCode,
+      'sequenceNumber': instance.sequenceNumber,
     };
 
 const _$TechTaskUrgencyEnumMap = {

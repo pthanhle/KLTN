@@ -56,7 +56,7 @@ const TrackingTable = ({
                     onRow={(record) => ({
                         onClick: () => {
                             if (onCustomerClick) {
-                                onCustomerClick(record.booking_code);
+                                onCustomerClick(record.id);
                             }
                         }
                     })}

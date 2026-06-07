@@ -62,7 +62,17 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
   }
 
   void _handleTaskAction(String taskId, JobTaskStatus status) {
+    final awaitingParts = ref.read(jobExecutionControllerProvider).value?.awaitingParts ?? false;
     if (status == JobTaskStatus.pending) {
+      if (awaitingParts) {
+        HapticFeedback.heavyImpact();
+        GlassToast.show(
+          context,
+          title: 'Đang chờ kho xuất phụ tùng cho đơn này.'.tr(),
+          icon: CupertinoIcons.cube_box,
+        );
+        return;
+      }
       ref.read(jobExecutionControllerProvider.notifier).startTask(taskId);
     } else if (status == JobTaskStatus.inProgress) {
       _handleCameraTap(taskId);
@@ -219,14 +229,21 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
                             physics: const BouncingScrollPhysics(),
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 120),
-                              child: JobTasksSection(
-                                tasks: state.tasks,
-                                isDark: isDark,
-                                onToggleStatus: (id) {
-                                  final task = state.tasks.firstWhere((t) => t.id == id);
-                                  _handleTaskAction(id, task.status);
-                                },
-                                onCameraTap: _handleCameraTap,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (state.awaitingParts)
+                                    _AwaitingPartsBanner(isDark: isDark),
+                                  JobTasksSection(
+                                    tasks: state.tasks,
+                                    isDark: isDark,
+                                    onToggleStatus: (id) {
+                                      final task = state.tasks.firstWhere((t) => t.id == id);
+                                      _handleTaskAction(id, task.status);
+                                    },
+                                    onCameraTap: _handleCameraTap,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -237,9 +254,6 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
                               child: JobPartsSection(
                                 parts: state.parts,
                                 isDark: isDark,
-                                onToggleCheck: (id) => ref
-                                    .read(jobExecutionControllerProvider.notifier)
-                                    .togglePartCheck(id),
                               ),
                             ),
                           ),
@@ -287,6 +301,45 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
           ),
         ],
         ),
+      ),
+    );
+  }
+}
+
+/// Banner cảnh báo khi đơn đang ở trạng thái WAITING_PARTS — kỹ thuật viên
+/// chưa thể bắt đầu thi công cho tới khi kho xuất đủ phụ tùng đã báo giá.
+class _AwaitingPartsBanner extends StatelessWidget {
+  final bool isDark;
+
+  const _AwaitingPartsBanner({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    const color = Color(0xFFFF9500);
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: isDark ? 0.12 : 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+      ),
+      child: Row(
+        children: [
+          const Icon(CupertinoIcons.cube_box_fill, color: color, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Đang chờ kho xuất phụ tùng cho đơn này. Bạn chỉ có thể bắt đầu thi công sau khi phụ tùng được giao đầy đủ.'.tr(),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

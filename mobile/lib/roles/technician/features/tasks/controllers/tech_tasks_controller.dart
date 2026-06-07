@@ -8,18 +8,27 @@ class TechTasksState {
   final TechTaskStatus? currentFilter;
   final int currentTabIndex;
   final String searchQuery;
+  final DateTime? filterDate;
 
   TechTasksState({
     required this.allTasks,
     required this.currentFilter,
     required this.currentTabIndex,
     this.searchQuery = '',
+    this.filterDate,
   });
 
   List<TechTaskModel> get filteredTasks {
     var list = currentFilter == null
         ? List<TechTaskModel>.from(allTasks)
         : allTasks.where((task) => task.status == currentFilter).toList();
+
+    if (filterDate != null) {
+      final fd = filterDate!;
+      final fdStr =
+          '${fd.year.toString().padLeft(4, '0')}-${fd.month.toString().padLeft(2, '0')}-${fd.day.toString().padLeft(2, '0')}';
+      list = list.where((t) => t.bookingDate == fdStr).toList();
+    }
 
     if (searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
@@ -30,8 +39,13 @@ class TechTasksState {
       }).toList();
     }
 
-    // Newest first: reverse insertion order (API returns chronological)
-    return list.reversed.toList();
+    // Newest first by bookingDate then startTime
+    list.sort((a, b) {
+      final dateComp = (b.bookingDate ?? '').compareTo(a.bookingDate ?? '');
+      if (dateComp != 0) return dateComp;
+      return (b.startTime).compareTo(a.startTime);
+    });
+    return list;
   }
 
   TechTasksState copyWith({
@@ -39,12 +53,15 @@ class TechTasksState {
     TechTaskStatus? currentFilter,
     int? currentTabIndex,
     String? searchQuery,
+    DateTime? filterDate,
+    bool clearFilterDate = false,
   }) {
     return TechTasksState(
       allTasks: allTasks ?? this.allTasks,
       currentFilter: currentFilter,
       currentTabIndex: currentTabIndex ?? this.currentTabIndex,
       searchQuery: searchQuery ?? this.searchQuery,
+      filterDate: clearFilterDate ? null : (filterDate ?? this.filterDate),
     );
   }
 }
@@ -117,6 +134,16 @@ class TechTasksController extends AsyncNotifier<TechTasksState> {
     final current = state.value;
     if (current == null) return;
     state = AsyncData(current.copyWith(searchQuery: query));
+  }
+
+  void setFilterDate(DateTime? date) {
+    final current = state.value;
+    if (current == null) return;
+    if (date == null) {
+      state = AsyncData(current.copyWith(clearFilterDate: true));
+    } else {
+      state = AsyncData(current.copyWith(filterDate: date));
+    }
   }
 
   Future<void> refresh() async {

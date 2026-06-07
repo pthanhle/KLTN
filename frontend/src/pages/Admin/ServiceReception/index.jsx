@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Calendar } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { Tabs, DatePicker } from 'antd';
 import PageBreadcrumbs from '../../../components/PageBreadcrumbs';
 import { useServiceReception } from './hooks/useServiceReception.jsx';
@@ -41,13 +41,6 @@ const ServiceReceptionPage = () => {
                             />
                         </div>
 
-                        <button
-                            type="button"
-                            className="group flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 hover:bg-slate-800 dark:bg-yellow-500 dark:hover:bg-yellow-400 text-white dark:text-slate-900 rounded-xl font-black text-[11px] tracking-widest uppercase shadow-xl shadow-slate-900/20 dark:shadow-yellow-500/20 active:scale-95 transition-all outline-none w-full sm:w-auto shrink-0"
-                        >
-                            <Settings size={16} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-300" />
-                            {t('header_settings', 'Cài đặt Bảng')}
-                        </button>
                     </div>
                 </div>
 

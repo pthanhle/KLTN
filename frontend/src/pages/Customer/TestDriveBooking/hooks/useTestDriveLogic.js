@@ -1,20 +1,22 @@
 import { useState, useEffect, useMemo } from 'react';
 import { App } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { TIME_SLOTS, SHOWROOM_BRANCHES } from '../data/testDrive.mock';
 import { getBookingSchema } from '../schemas/bookingSchema';
-import { mapRescheduleDataToForm, mapFormToBookingPayload } from '../utils/bookingFormMapper';
+import { mapRescheduleDataToForm, mapFormToBookingPayload, mapFormToReschedulePayload } from '../utils/bookingFormMapper';
 import { useClientProductDetailQuery } from '../../../../services/queries/clientProduct.queries';
-import { useGetTestDriveById, useSubmitTestDrive } from '../../../../services/queries/bookingQueries';
+import { useGetTestDriveById, useSubmitTestDrive, useRescheduleTestDrive } from '../../../../services/queries/bookingQueries';
 import { useGetCheckoutProfile } from '../../../../services/queries/checkoutQueries';
 import { useLocationCascade } from './useLocationCascade';
 
 export const useTestDriveLogic = () => {
     const { message } = App.useApp();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const { t } = useTranslation(['booking']);
@@ -24,7 +26,7 @@ export const useTestDriveLogic = () => {
 
     const { data: rescheduleData, error: fetchError } = useGetTestDriveById(rescheduleId);
     const { data: userProfile } = useGetCheckoutProfile();
-    
+
     useEffect(() => {
         if (fetchError) {
             message.error(t('booking_notFound', 'Không tìm thấy lịch hẹn cần dời hoặc vé đã bị khóa.'));
@@ -33,6 +35,7 @@ export const useTestDriveLogic = () => {
     }, [fetchError, t, navigate]);
 
     const submitMutation = useSubmitTestDrive();
+    const rescheduleMutation = useRescheduleTestDrive();
     const { data: realCar, isLoading: isCarLoading } = useClientProductDetailQuery(id);
     const [car, setCar] = useState(null);
 
@@ -69,23 +72,37 @@ export const useTestDriveLogic = () => {
     };
 
     const onSubmit = (data) => {
-        const payload = mapFormToBookingPayload(data, car?.id, isReschedule, rescheduleData);
-        submitMutation.mutate(payload, {
-            onSuccess: () => {
-                message.success(isReschedule 
-                    ? t('reschedule_success', 'Dời lịch thành công! Quý khách sẽ nhận được liên hệ xác nhận.') 
-                    : t('booking_success', 'Đăng ký lái thử thành công! Quý khách sẽ nhận được liên hệ sớm nhất.'));
-                navigate(-1);
-            },
-            onError: (error) => {
-                message.error(error.message || t('booking_fail', 'Đã xảy ra lỗi hệ thống.'));
-            }
-        });
+        if (isReschedule) {
+            const payload = mapFormToReschedulePayload(data);
+            rescheduleMutation.mutate({ id: rescheduleId, payload }, {
+                onSuccess: () => {
+                    message.success(t('reschedule_success', 'Dời lịch thành công! Quý khách sẽ nhận được liên hệ xác nhận.'));
+                    queryClient.invalidateQueries({ queryKey: ['testDriveList'] });
+                    queryClient.invalidateQueries({ queryKey: ['testDrive', rescheduleId] });
+                    navigate('/profile/test-drives', { replace: true });
+                },
+                onError: (error) => {
+                    message.error(error.message || t('booking_fail', 'Đã xảy ra lỗi hệ thống.'));
+                }
+            });
+        } else {
+            const payload = mapFormToBookingPayload(data, car?.id);
+            submitMutation.mutate(payload, {
+                onSuccess: () => {
+                    message.success(t('booking_success', 'Đăng ký lái thử thành công! Quý khách sẽ nhận được liên hệ sớm nhất.'));
+                    queryClient.invalidateQueries({ queryKey: ['testDriveList'] });
+                    navigate('/profile/test-drives', { replace: true });
+                },
+                onError: (error) => {
+                    message.error(error.message || t('booking_fail', 'Đã xảy ra lỗi hệ thống.'));
+                }
+            });
+        }
     };
 
     return {
         car,
-        isLoading: submitMutation.isPending || isCarLoading,
+        isLoading: submitMutation.isPending || rescheduleMutation.isPending || isCarLoading,
         isReschedule,
         handleCancel,
         methods,

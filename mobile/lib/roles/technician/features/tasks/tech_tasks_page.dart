@@ -7,6 +7,7 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'dart:ui';
 import '../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../shared/widgets/inputs/list_search_bar.dart';
+import '../../../../shared/widgets/inputs/date_filter_chip.dart';
 import '../../../../core/views/components/navigation/header/header_avatar_button.dart';
 import 'controllers/tech_tasks_controller.dart';
 import 'widgets/sections/tech_tasks_list_section.dart';
@@ -72,10 +73,25 @@ class TechTasksPage extends ConsumerWidget {
                         },
                       ),
                     ),
-                    ListSearchBar(
-                      hintText: 'Tìm biển số, dòng xe, khoang...',
-                      onChanged: (q) => ref.read(techTasksControllerProvider.notifier).updateSearch(q),
+                    Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ListSearchBar(
+                              hintText: 'Tìm biển số, dòng xe, khoang...',
+                              onChanged: (q) => ref.read(techTasksControllerProvider.notifier).updateSearch(q),
+                              padding: EdgeInsets.zero,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          DateFilterChip(
+                            selectedDate: tasksState.value?.filterDate,
+                            onDateChanged: (date) => ref.read(techTasksControllerProvider.notifier).setFilterDate(date),
+                            padding: EdgeInsets.zero,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

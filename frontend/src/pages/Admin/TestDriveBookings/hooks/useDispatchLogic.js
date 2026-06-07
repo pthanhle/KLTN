@@ -8,7 +8,7 @@ import { message } from 'antd';
 export const useDispatchLogic = (t) => {
     const queryClient = useQueryClient();
     const [searchStaff, setSearchStaff] = useState('');
-    const [filterDate, setFilterDate] = useState(null);
+    const [filterDate, setFilterDate] = useState(dayjs());
     const [activeBooking, setActiveBooking] = useState(null);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [pendingAssignmentData, setPendingAssignmentData] = useState(null);
@@ -55,6 +55,15 @@ export const useDispatchLogic = (t) => {
             const staff = staffList.find(s => s._id === staffId);
 
             if (booking && staff) {
+                if (filterDate && booking.selectedDate) {
+                    const filterDateStr = filterDate.format('DD/MM/YYYY');
+                    if (booking.selectedDate !== filterDateStr) {
+                        message.error(
+                            `Không thể phân công: lịch lái thử này có ngày ${booking.selectedDate}, nhưng bạn đang xem ngày ${filterDateStr}. Vui lòng chọn đúng ngày để phân công.`
+                        );
+                        return;
+                    }
+                }
                 setPendingAssignmentData({ booking, staff });
                 setIsAssignModalOpen(true);
             }

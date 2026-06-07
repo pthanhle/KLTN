@@ -119,12 +119,17 @@ class TechApiRepository {
         ? DateTime.tryParse(json['expected_end_datetime'].toString())
         : null;
 
-    final String startTime = startDt != null
-        ? '${startDt.hour.toString().padLeft(2, '0')}:${startDt.minute.toString().padLeft(2, '0')}'
+    final startLocal = startDt?.toLocal();
+    final endLocal = endDt?.toLocal();
+    final String startTime = startLocal != null
+        ? '${startLocal.hour.toString().padLeft(2, '0')}:${startLocal.minute.toString().padLeft(2, '0')}'
         : '--:--';
-    final String endTime = endDt != null
-        ? '${endDt.hour.toString().padLeft(2, '0')}:${endDt.minute.toString().padLeft(2, '0')}'
+    final String endTime = endLocal != null
+        ? '${endLocal.hour.toString().padLeft(2, '0')}:${endLocal.minute.toString().padLeft(2, '0')}'
         : '--:--';
+    final String? bookingDate = startLocal != null
+        ? '${startLocal.year.toString().padLeft(4, '0')}-${startLocal.month.toString().padLeft(2, '0')}-${startLocal.day.toString().padLeft(2, '0')}'
+        : null;
 
     final String status = json['status']?.toString() ?? 'DIAGNOSING';
     final taskStatus = _parseStatus(status);
@@ -146,6 +151,11 @@ class TechApiRepository {
       role: 'Thợ chính',
       urgency: TechTaskUrgency.standard,
       status: taskStatus,
+      bookingDate: bookingDate,
+      bookingCode: booking['booking_code']?.toString(),
+      sequenceNumber: booking['sequence_number'] is num
+          ? (booking['sequence_number'] as num).toInt()
+          : null,
     );
   }
 

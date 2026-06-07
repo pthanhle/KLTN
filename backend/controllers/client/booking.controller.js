@@ -22,7 +22,7 @@ export const getBookings = asyncHandler(async (req, res) => {
 
     const total = await Booking.countDocuments(query)
     const bookings = await Booking.find(query)
-        .populate('product_id', 'name sku brandName images price')
+        .populate('product_id', 'name sku brandName image price')
         .populate('advisor_id', 'full_name phone avatar')
         .populate('mechanic_id', 'full_name phone avatar')
         .sort({ booking_date: -1 })
@@ -186,6 +186,12 @@ export const rescheduleBooking = asyncHandler(async (req, res) => {
     if (delivery_address) booking.delivery_address = delivery_address
 
     booking.booking_status = 'PENDING'
+
+    // Nếu đã có advisor phân công thì reset để admin phân công lại
+    if (booking.advisor_id) {
+        booking.advisor_id = null
+        booking.requested_staff = []
+    }
 
     await booking.save()
 

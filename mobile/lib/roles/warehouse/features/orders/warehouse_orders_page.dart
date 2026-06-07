@@ -7,6 +7,7 @@ import 'package:ttauto_staff/roles/warehouse/features/orders/controllers/warehou
 import 'package:ttauto_staff/roles/warehouse/features/orders/widgets/controls/orders_segmented_control.dart';
 import 'package:ttauto_staff/roles/warehouse/features/orders/widgets/orders_list_view.dart';
 import 'package:ttauto_staff/shared/widgets/inputs/list_search_bar.dart';
+import 'package:ttauto_staff/shared/widgets/inputs/date_filter_chip.dart';
 
 class WarehouseOrdersPage extends ConsumerStatefulWidget {
   const WarehouseOrdersPage({super.key});
@@ -79,10 +80,25 @@ class _WarehouseOrdersPageState extends ConsumerState<WarehouseOrdersPage> {
               ),
 
               SliverToBoxAdapter(
-                child: ListSearchBar(
-                  hintText: 'Tìm mã đơn, khách hàng...',
-                  onChanged: controller.updateSearch,
+                child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ListSearchBar(
+                          hintText: 'Tìm mã đơn, khách hàng...',
+                          onChanged: controller.updateSearch,
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      DateFilterChip(
+                        selectedDate: state.filterDate,
+                        onDateChanged: controller.setFilterDate,
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

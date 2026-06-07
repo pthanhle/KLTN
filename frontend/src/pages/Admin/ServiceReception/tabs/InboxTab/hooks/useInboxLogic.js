@@ -29,6 +29,7 @@ export const useInboxLogic = () => {
             vehicle_model: b.vehicle_info?.model || '',
             license_plate: b.vehicle_info?.license_plate || '',
             vehicle_condition: b.customer_note || '',
+            service_type: b.service_type || null,
             selected_services: (b.services || []).map(s => ({ name: s.service_name })),
         }));
     }, [data]);

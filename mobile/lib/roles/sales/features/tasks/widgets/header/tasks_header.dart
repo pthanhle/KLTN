@@ -6,6 +6,7 @@ import 'package:ttauto_staff/roles/sales/features/tasks/widgets/controls/tasks_s
 import 'package:ttauto_staff/roles/sales/features/tasks/controllers/sales_tasks_controller.dart';
 import '../../../../../../core/utils/theme_extension.dart';
 import '../../../../../../shared/widgets/inputs/list_search_bar.dart';
+import '../../../../../../shared/widgets/inputs/date_filter_chip.dart';
 
 class TasksHeader extends ConsumerWidget {
   const TasksHeader({super.key});
@@ -13,6 +14,7 @@ class TasksHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(salesTasksControllerProvider.notifier);
+    final filterDate = ref.watch(salesTasksControllerProvider).filterDate;
 
     return Padding(
       padding: const EdgeInsets.only(top: 16, left: 24, right: 24, bottom: 8),
@@ -30,10 +32,22 @@ class TasksHeader extends ConsumerWidget {
           const SizedBox(height: 16),
           const TasksSegmentedControl(),
           const SizedBox(height: 8),
-          ListSearchBar(
-            hintText: 'Tìm biển số, khách hàng...',
-            onChanged: controller.updateSearch,
-            padding: EdgeInsets.zero,
+          Row(
+            children: [
+              Expanded(
+                child: ListSearchBar(
+                  hintText: 'Tìm biển số, khách hàng...',
+                  onChanged: controller.updateSearch,
+                  padding: EdgeInsets.zero,
+                ),
+              ),
+              const SizedBox(width: 8),
+              DateFilterChip(
+                selectedDate: filterDate,
+                onDateChanged: controller.setFilterDate,
+                padding: EdgeInsets.zero,
+              ),
+            ],
           ),
         ],
       ),

@@ -37,6 +37,15 @@ export const useCancelTestDrive = () => {
     });
 };
 
+export const useRescheduleTestDrive = () => {
+    return useMutation({
+        mutationFn: ({ id, payload }) => BookingAPI.rescheduleTestDrive(id, payload),
+        onError: (error) => {
+            console.error('[Mutation Reschedule Error]:', error);
+        }
+    });
+};
+
 export const useAvailableTimeSlotsQuery = (date) => {
     return useQuery({
         queryKey: ['availableTimeSlots', date],

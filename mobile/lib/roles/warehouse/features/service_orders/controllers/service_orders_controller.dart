@@ -12,12 +12,14 @@ class ServiceOrdersState {
   final List<ServiceOrderModel> orders;
   final String? error;
   final String searchQuery;
+  final DateTime? filterDate;
 
   const ServiceOrdersState({
     this.isLoading = false,
     this.orders = const [],
     this.error,
     this.searchQuery = '',
+    this.filterDate,
   });
 
   ServiceOrdersState copyWith({
@@ -25,17 +27,29 @@ class ServiceOrdersState {
     List<ServiceOrderModel>? orders,
     String? error,
     String? searchQuery,
+    DateTime? filterDate,
+    bool clearFilterDate = false,
   }) {
     return ServiceOrdersState(
       isLoading: isLoading ?? this.isLoading,
       orders: orders ?? this.orders,
       error: error,
       searchQuery: searchQuery ?? this.searchQuery,
+      filterDate: clearFilterDate ? null : (filterDate ?? this.filterDate),
     );
   }
 
   List<ServiceOrderModel> _applySearchAndSort(List<ServiceOrderModel> list) {
     var result = List<ServiceOrderModel>.from(list);
+
+    if (filterDate != null) {
+      final fd = filterDate!;
+      result = result.where((o) {
+        final d = o.createdAt;
+        return d.year == fd.year && d.month == fd.month && d.day == fd.day;
+      }).toList();
+    }
+
     if (searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
       result = result.where((o) {
@@ -119,6 +133,14 @@ class ServiceOrdersController extends Notifier<ServiceOrdersState> {
 
   void updateSearch(String query) {
     state = state.copyWith(searchQuery: query);
+  }
+
+  void setFilterDate(DateTime? date) {
+    if (date == null) {
+      state = state.copyWith(clearFilterDate: true);
+    } else {
+      state = state.copyWith(filterDate: date);
+    }
   }
 
   void updateOrderStatus(String orderId, ServiceOrderStatus newStatus) {

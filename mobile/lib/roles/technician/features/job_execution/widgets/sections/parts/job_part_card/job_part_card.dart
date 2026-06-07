@@ -11,19 +11,16 @@ import 'job_part_check_button.dart';
 class JobPartCard extends StatelessWidget {
   final JobPartModel part;
   final bool isDark;
-  final VoidCallback onToggleCheck;
 
   const JobPartCard({
     super.key,
     required this.part,
     required this.isDark,
-    required this.onToggleCheck,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isCompleted = part.status == JobPartStatus.completed;
 
     return Container(
       margin: const EdgeInsets.only(bottom: JobExecutionUiConstants.cardMarginBottom),
@@ -81,10 +78,10 @@ class JobPartCard extends StatelessWidget {
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      if (part.etaTime != null) ...[
+                      if (part.etaTime != null && part.status != JobPartStatus.completed) ...[
                         const SizedBox(height: 2),
                         Text(
-                          'ETA: ${part.etaTime!.toLocal()}',
+                          '${'Dự kiến'.tr()}: ${DateFormat('HH:mm dd/MM').format(part.etaTime!.toLocal())}',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                           ),
@@ -94,7 +91,7 @@ class JobPartCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                JobPartCheckButton(isCompleted: isCompleted, onTap: onToggleCheck),
+                JobPartCheckButton(status: part.status),
               ],
             ),
           ),

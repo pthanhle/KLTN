@@ -78,13 +78,18 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
       final data = response.data as Map<String, dynamic>? ?? {};
       final quotation = data['quotation'] as Map<String, dynamic>? ?? {};
       final labors = quotation['labors'] as List<dynamic>? ?? [];
-      final parts = quotation['parts'] as List<dynamic>? ?? [];
+      // Phụ tùng đang chờ phải lấy từ `parts_usage` (nguồn dữ liệu thật do kho cập nhật
+      // trạng thái nhặt hàng), KHÔNG lấy từ `quotation.parts` (danh sách tĩnh advisor báo giá).
+      final partsUsage = data['parts_usage'] as List<dynamic>? ?? [];
+      final progressStatus = (data['status'] ?? data['progress']?['status'])?.toString();
+      final awaitingParts = progressStatus == 'WAITING_PARTS';
 
       final taskModels = labors.asMap().entries.map((entry) {
         final i = entry.key;
         final l = entry.value as Map<String, dynamic>;
         return JobTaskModel(
           id: l['_id']?.toString() ?? l['service_id']?.toString() ?? 'labor_$i',
+          laborCode: l['labor_code']?.toString() ?? l['service_id']?.toString() ?? 'labor_$i',
           // Backend lưu tên hạng mục công việc trong field `description`
           // (xem backend/models/repairProgressModel.js -> quotation.labors)
           name: l['description']?.toString() ?? l['service_name']?.toString() ?? 'Hạng mục ${i + 1}',
@@ -93,14 +98,37 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
         );
       }).toList();
 
-      final partModels = parts.asMap().entries.map((entry) {
+      final partModels = partsUsage.asMap().entries.map((entry) {
         final i = entry.key;
         final p = entry.value as Map<String, dynamic>;
+        final rawStatus = p['status']?.toString() ?? 'WAITING';
+        final etaRaw = p['eta']?.toString();
+        final eta = etaRaw != null ? DateTime.tryParse(etaRaw) : null;
+
+        JobPartStatus status;
+        switch (rawStatus) {
+          case 'IN_PROGRESS':
+            status = JobPartStatus.installing;
+            break;
+          case 'COMPLETED':
+            status = JobPartStatus.completed;
+            break;
+          case 'WAITING':
+          default:
+            // Quá hạn ETA mà kho vẫn chưa xuất -> coi như hàng đặt thêm (backorder)
+            status = (eta != null && eta.isBefore(DateTime.now()))
+                ? JobPartStatus.backorder
+                : JobPartStatus.pending;
+        }
+
         return JobPartModel(
-          id: p['part_id']?.toString() ?? p['_id']?.toString() ?? 'part_$i',
+          id: p['_id']?.toString() ?? p['part_id']?.toString() ?? 'part_$i',
+          sku: p['sku']?.toString() ?? '',
           name: p['name']?.toString() ?? 'Phụ tùng ${i + 1}',
           quantity: (p['quantity'] as num?)?.toInt() ?? 1,
           icon: JobPartIcon.settings,
+          status: status,
+          etaTime: eta,
         );
       }).toList();
 
@@ -109,8 +137,9 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
         tasks: taskModels,
         parts: partModels,
         isLoading: false,
+        awaitingParts: awaitingParts,
       ));
-    } catch (e, st) {
+    } catch (e) {
       state = AsyncData(JobExecutionState(
         progressId: progressId,
         tasks: [],
@@ -124,6 +153,8 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
   Future<void> startTask(String taskId) async {
     final currentState = state.value;
     if (currentState == null) return;
+    // Khoá thao tác bắt đầu thi công cho tới khi kho xuất đủ phụ tùng cho đơn này
+    if (currentState.awaitingParts) return;
 
     final updatedTasks = currentState.tasks.map((task) {
       if (task.id == taskId && task.status == JobTaskStatus.pending) {
@@ -149,21 +180,11 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
     state = AsyncData(currentState.copyWith(tasks: updatedTasks));
   }
 
-  Future<void> togglePartCheck(String partId) async {
-    final currentState = state.value;
-    if (currentState == null) return;
-
-    final updatedParts = currentState.parts.map((part) {
-      if (part.id == partId) {
-        final newStatus = part.status == JobPartStatus.completed
-            ? JobPartStatus.pending
-            : JobPartStatus.completed;
-        return part.copyWith(status: newStatus);
-      }
-      return part;
-    }).toList();
-
-    state = AsyncData(currentState.copyWith(parts: updatedParts));
+  Future<void> refresh() async {
+    final progressId = state.value?.progressId;
+    if (progressId == null) return;
+    state = AsyncData(JobExecutionState(tasks: [], parts: []));
+    await init(progressId);
   }
 }
 

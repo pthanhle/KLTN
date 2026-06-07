@@ -30,6 +30,9 @@ abstract class TechTaskModel with _$TechTaskModel {
     required String role,
     required TechTaskUrgency urgency,
     required TechTaskStatus status,
+    String? bookingDate,
+    String? bookingCode,
+    int? sequenceNumber,
   }) = _TechTaskModel;
 
   factory TechTaskModel.fromJson(Map<String, dynamic> json) =>

@@ -1,12 +1,7 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getTrackingDetail = async (bookingCode, token) => {
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    };
-    const response = await axiosClient.get(`/client/tracking/${bookingCode}`, config);
+const getTrackingDetail = async (bookingCode) => {
+    const response = await axiosClient.get(`/client/tracking/${bookingCode}`);
     return response;
 };
 

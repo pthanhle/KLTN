@@ -10,6 +10,7 @@ class AdvisorDashboardState {
   final ROStage selectedStage;
   final bool sessionExpired;
   final String searchQuery;
+  final DateTime? filterDate;
 
   AdvisorDashboardState({
     this.isLoading = true,
@@ -18,10 +19,20 @@ class AdvisorDashboardState {
     this.selectedStage = ROStage.pending,
     this.sessionExpired = false,
     this.searchQuery = '',
+    this.filterDate,
   });
 
   List<RepairOrderModel> get filteredOrders {
     var list = allRepairOrders.where((ro) => ro.stage == selectedStage).toList();
+
+    if (filterDate != null) {
+      list = list.where((ro) {
+        final d = ro.scheduledArrivalTime;
+        return d.year == filterDate!.year &&
+            d.month == filterDate!.month &&
+            d.day == filterDate!.day;
+      }).toList();
+    }
 
     if (searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
@@ -43,6 +54,8 @@ class AdvisorDashboardState {
     ROStage? selectedStage,
     bool? sessionExpired,
     String? searchQuery,
+    DateTime? filterDate,
+    bool clearFilterDate = false,
   }) {
     return AdvisorDashboardState(
       isLoading: isLoading ?? this.isLoading,
@@ -51,6 +64,7 @@ class AdvisorDashboardState {
       selectedStage: selectedStage ?? this.selectedStage,
       sessionExpired: sessionExpired ?? this.sessionExpired,
       searchQuery: searchQuery ?? this.searchQuery,
+      filterDate: clearFilterDate ? null : (filterDate ?? this.filterDate),
     );
   }
 }
@@ -92,6 +106,14 @@ class AdvisorDashboardController extends Notifier<AdvisorDashboardState> {
 
   void updateSearch(String query) {
     state = state.copyWith(searchQuery: query);
+  }
+
+  void setFilterDate(DateTime? date) {
+    if (date == null) {
+      state = state.copyWith(clearFilterDate: true);
+    } else {
+      state = state.copyWith(filterDate: date);
+    }
   }
 
   Future<void> refresh() async {

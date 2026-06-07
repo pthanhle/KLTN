@@ -62,6 +62,7 @@ class WalkaroundController extends Notifier<WalkaroundState> {
           orderId: order.id,
           customerComplaint: order.customerNote,
           selectedPackages: order.selectedServices,
+          hotspots: const [],
           checklist: [
             const ChecklistItemModel(id: 'chk_1', name: 'Tài sản (Tiền mặt, Kính râm)', checked: false),
             const ChecklistItemModel(id: 'chk_2', name: 'Tình trạng đèn chiếu sáng', checked: false),

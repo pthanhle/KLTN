@@ -12,6 +12,7 @@ import '../../../../../core/views/components/navigation/header/header_avatar_but
 import '../../../../../core/views/components/navigation/header/header_notification_button.dart';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../../shared/widgets/inputs/list_search_bar.dart';
+import '../../../../../shared/widgets/inputs/date_filter_chip.dart';
 import '../../../../../roles/auth/controllers/auth_controller.dart';
 
 class AdvisorDashboardPage extends ConsumerStatefulWidget {
@@ -100,10 +101,25 @@ class _AdvisorDashboardPageState extends ConsumerState<AdvisorDashboardPage> {
                         onStageSelected: controller.selectStage,
                       ),
                     ),
-                    ListSearchBar(
-                      hintText: 'Tìm biển số, khách hàng, mã đơn...',
-                      onChanged: controller.updateSearch,
+                    Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ListSearchBar(
+                              hintText: 'Tìm biển số, khách hàng, mã đơn...',
+                              onChanged: controller.updateSearch,
+                              padding: EdgeInsets.zero,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          DateFilterChip(
+                            selectedDate: state.filterDate,
+                            onDateChanged: controller.setFilterDate,
+                            padding: EdgeInsets.zero,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

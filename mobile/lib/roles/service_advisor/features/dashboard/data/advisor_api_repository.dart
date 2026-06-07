@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/config/api_config.dart';
 import '../models/repair_order_model.dart';
+import '../../walkaround/models/service_package_model.dart';
 // MpiCategory is defined in repair_order_model.dart
 
 class AdvisorApiRepository {
@@ -168,6 +169,26 @@ class AdvisorApiRepository {
       mpiConclusion: mpiConclusion,
       pendingSupplementId: pendingSupplementId,
       servicePackageTotal: (booking['total_cost'] as num?)?.toDouble() ?? 0.0,
+      selectedServices: _parseBookedServices(service, booking),
     );
+  }
+
+  /// Builds the list of pre-booked services from the booking's service_id object.
+  /// The booking stores a single service; total_cost is used as the price since
+  /// basePrice on the service may be a base rate before any booking-level pricing.
+  List<ServicePackageModel> _parseBookedServices(dynamic service, Map<String, dynamic> booking) {
+    if (service is! Map || service.isEmpty) return [];
+    final totalCost = (booking['total_cost'] as num?)?.toDouble() ?? 0.0;
+    return [
+      ServicePackageModel(
+        id: service['_id']?.toString() ?? service['id']?.toString() ?? '',
+        sku: service['sku']?.toString() ?? '',
+        name: service['service_name']?.toString() ?? service['name']?.toString() ?? '',
+        description: service['description']?.toString() ?? '',
+        basePrice: totalCost,
+        category: service['category']?.toString() ?? '',
+        isPackage: true,
+      ),
+    ];
   }
 }

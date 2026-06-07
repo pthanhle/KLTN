@@ -1,6 +1,6 @@
 import React from 'react';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Lock, Calendar, Clock, MoreVertical, XCircle, CalendarClock } from 'lucide-react';
+import { GripVertical, Lock, Calendar, Clock, MoreVertical, XCircle, CalendarClock, Wrench } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBookingCard } from './hooks/useBookingCard';
 
@@ -21,6 +21,14 @@ const BookingCard = ({ booking, onReschedule, onNoShow, onViewDetail }) => {
     } = useBookingCard(booking, onReschedule, onNoShow, onViewDetail);
 
     const isReceived = booking.status === 'RECEIVED';
+
+    const SERVICE_TYPE_LABELS = {
+        MAINTENANCE: 'Bảo dưỡng',
+        CAR_SPA: 'Chăm sóc xe',
+        REPAIR: 'Sửa chữa',
+        INSPECTION: 'Kiểm định',
+        OTHER: 'Khác',
+    };
 
     const style = {
         transform: CSS.Translate.toString(transform),
@@ -46,7 +54,7 @@ const BookingCard = ({ booking, onReschedule, onNoShow, onViewDetail }) => {
                     </span>
                     <div className="flex items-center text-yellow-600 dark:text-yellow-500 text-[10px] font-bold">
                         <Calendar className="w-3 h-3 mr-1" />
-                        {booking.booking_date.split('-').reverse().join('/')}
+                        {booking.booking_date_display}
                         <span className="mx-1.5 opacity-50">•</span>
                         <Clock className="w-3 h-3 mr-1" />
                         {booking.time_slot}
@@ -115,11 +123,22 @@ const BookingCard = ({ booking, onReschedule, onNoShow, onViewDetail }) => {
             </div>
 
             <div className="flex flex-wrap gap-1 mt-3">
+                {booking.service_type && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-50 dark:bg-yellow-500/10 text-[11px] font-bold text-yellow-700 dark:text-yellow-400 rounded-md border border-yellow-200 dark:border-yellow-500/30">
+                        <Wrench className="w-3 h-3" />
+                        {SERVICE_TYPE_LABELS[booking.service_type] || booking.service_type}
+                    </span>
+                )}
                 {booking.selected_services?.map((service, index) => (
                     <span key={index} className="px-2 py-0.5 bg-slate-100 dark:bg-white/5 text-[11px] font-medium text-slate-600 dark:text-slate-300 rounded-md border border-slate-200 dark:border-white/10">
                         {service.name}
                     </span>
                 ))}
+                {!booking.service_type && !booking.selected_services?.length && (
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 italic">
+                        {t('bookingCard_noService', 'Chưa có dịch vụ')}
+                    </span>
+                )}
             </div>
 
             {/* Hover hint */}

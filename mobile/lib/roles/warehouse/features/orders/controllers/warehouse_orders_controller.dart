@@ -12,12 +12,14 @@ class WarehouseOrdersState {
   final OrderStatus currentTab;
   final List<WarehouseOrderModel> orders;
   final String searchQuery;
+  final DateTime? filterDate;
 
   const WarehouseOrdersState({
     this.isLoading = false,
     this.currentTab = OrderStatus.pendingPick,
     this.orders = const [],
     this.searchQuery = '',
+    this.filterDate,
   });
 
   WarehouseOrdersState copyWith({
@@ -25,12 +27,15 @@ class WarehouseOrdersState {
     OrderStatus? currentTab,
     List<WarehouseOrderModel>? orders,
     String? searchQuery,
+    DateTime? filterDate,
+    bool clearFilterDate = false,
   }) {
     return WarehouseOrdersState(
       isLoading: isLoading ?? this.isLoading,
       currentTab: currentTab ?? this.currentTab,
       orders: orders ?? this.orders,
       searchQuery: searchQuery ?? this.searchQuery,
+      filterDate: clearFilterDate ? null : (filterDate ?? this.filterDate),
     );
   }
 }
@@ -77,6 +82,14 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
   List<WarehouseOrderModel> get filteredOrders {
     var list = state.orders.where((order) => order.status == state.currentTab).toList();
 
+    if (state.filterDate != null) {
+      final fd = state.filterDate!;
+      list = list.where((o) {
+        final d = o.createdAt;
+        return d.year == fd.year && d.month == fd.month && d.day == fd.day;
+      }).toList();
+    }
+
     if (state.searchQuery.isNotEmpty) {
       final q = state.searchQuery.toLowerCase();
       list = list.where((o) {
@@ -91,6 +104,14 @@ class WarehouseOrdersController extends Notifier<WarehouseOrdersState> {
 
   void updateSearch(String query) {
     state = state.copyWith(searchQuery: query);
+  }
+
+  void setFilterDate(DateTime? date) {
+    if (date == null) {
+      state = state.copyWith(clearFilterDate: true);
+    } else {
+      state = state.copyWith(filterDate: date);
+    }
   }
 
   Future<void> refresh() async {

@@ -10,6 +10,7 @@ class SalesTasksState {
   final bool isLoading;
   final String? error;
   final String searchQuery;
+  final DateTime? filterDate;
 
   SalesTasksState({
     this.allTasks = const [],
@@ -17,6 +18,7 @@ class SalesTasksState {
     this.isLoading = true,
     this.error,
     this.searchQuery = '',
+    this.filterDate,
   });
 
   SalesTasksState copyWith({
@@ -25,6 +27,8 @@ class SalesTasksState {
     bool? isLoading,
     String? error,
     String? searchQuery,
+    DateTime? filterDate,
+    bool clearFilterDate = false,
   }) {
     return SalesTasksState(
       allTasks: allTasks ?? this.allTasks,
@@ -32,11 +36,24 @@ class SalesTasksState {
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       searchQuery: searchQuery ?? this.searchQuery,
+      filterDate: clearFilterDate ? null : (filterDate ?? this.filterDate),
     );
   }
 
   List<TaskModel> _sortAndFilter(List<TaskModel> list) {
     var result = List<TaskModel>.from(list);
+
+    // Date filter
+    if (filterDate != null) {
+      result = result.where((t) {
+        final dt = DateTime.tryParse(t.appointmentTime ?? '');
+        if (dt == null) return false;
+        return dt.year == filterDate!.year &&
+            dt.month == filterDate!.month &&
+            dt.day == filterDate!.day;
+      }).toList();
+    }
+
     if (searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
       result = result.where((t) {
@@ -127,6 +144,14 @@ class SalesTasksController extends Notifier<SalesTasksState> {
 
   void updateSearch(String query) {
     state = state.copyWith(searchQuery: query);
+  }
+
+  void setFilterDate(DateTime? date) {
+    if (date == null) {
+      state = state.copyWith(clearFilterDate: true);
+    } else {
+      state = state.copyWith(filterDate: date);
+    }
   }
 
   Future<void> refresh() async {

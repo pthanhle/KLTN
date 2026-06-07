@@ -1,12 +1,18 @@
+import '../../walkaround/models/service_package_model.dart';
+
 class DiagnosticItem {
   final String title;
   final String description;
   final String imageUrl;
+  final String? technicianNote;
+  final List<String> evidenceMediaUrls;
 
   const DiagnosticItem({
     required this.title,
     required this.description,
     required this.imageUrl,
+    this.technicianNote,
+    this.evidenceMediaUrls = const [],
   });
 
   factory DiagnosticItem.fromJson(Map<String, dynamic> json) {
@@ -14,6 +20,8 @@ class DiagnosticItem {
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       imageUrl: json['image_url'] ?? '',
+      technicianNote: json['technician_note'] as String?,
+      evidenceMediaUrls: List<String>.from(json['evidence_media_urls'] ?? []),
     );
   }
 
@@ -21,6 +29,8 @@ class DiagnosticItem {
     'title': title,
     'description': description,
     'image_url': imageUrl,
+    'technician_note': technicianNote,
+    'evidence_media_urls': evidenceMediaUrls,
   };
 }
 
@@ -211,7 +221,7 @@ class QuotationModel {
   final String advisorNote;
   final List<CartPartItem> parts;
   final List<CartLaborItem> labor;
-  final double servicePackageTotal;
+  final List<ServicePackageModel> selectedServices;
   final ReceptionSnapshot? receptionSnapshot;
 
   const QuotationModel({
@@ -220,16 +230,20 @@ class QuotationModel {
     this.advisorNote = '',
     this.parts = const [],
     this.labor = const [],
-    this.servicePackageTotal = 0.0,
+    this.selectedServices = const [],
     this.receptionSnapshot,
   });
 
+  double get servicePackageTotal =>
+      selectedServices.fold(0.0, (s, p) => s + p.basePrice);
   double get partsTotal => parts.fold(0, (sum, part) => sum + (part.price * part.quantity));
   double get laborTotal => labor.fold(0, (sum, item) => sum + item.total);
   double get subtotal => servicePackageTotal + partsTotal + laborTotal;
   double get vatAmount => subtotal * 0.1;
   double get grandTotal => subtotal + vatAmount;
   double get depositAmount => (grandTotal * 0.5).roundToDouble();
+  double get depositRequired => depositAmount;
+  double get discountAmount => 0.0;
 
   QuotationModel copyWith({
     String? orderId,
@@ -237,7 +251,7 @@ class QuotationModel {
     String? advisorNote,
     List<CartPartItem>? parts,
     List<CartLaborItem>? labor,
-    double? servicePackageTotal,
+    List<ServicePackageModel>? selectedServices,
     ReceptionSnapshot? receptionSnapshot,
   }) {
     return QuotationModel(
@@ -246,7 +260,7 @@ class QuotationModel {
       advisorNote: advisorNote ?? this.advisorNote,
       parts: parts ?? this.parts,
       labor: labor ?? this.labor,
-      servicePackageTotal: servicePackageTotal ?? this.servicePackageTotal,
+      selectedServices: selectedServices ?? this.selectedServices,
       receptionSnapshot: receptionSnapshot ?? this.receptionSnapshot,
     );
   }
@@ -264,7 +278,10 @@ class QuotationModel {
               ?.map((e) => CartLaborItem.fromJson(e))
               .toList() ??
           [],
-      servicePackageTotal: (json['service_package_total'] ?? 0).toDouble(),
+      selectedServices: (json['selected_services'] as List<dynamic>?)
+              ?.map((e) => ServicePackageModel.fromJson(e))
+              .toList() ??
+          [],
       receptionSnapshot: json['reception_snapshot'] != null
           ? ReceptionSnapshot.fromJson(json['reception_snapshot'])
           : null,
@@ -278,6 +295,7 @@ class QuotationModel {
     'parts': parts.map((e) => e.toJson()).toList(),
     'labor': labor.map((e) => e.toJson()).toList(),
     'service_package_total': servicePackageTotal,
+    'selected_services': selectedServices.map((e) => e.toJson()).toList(),
     'reception_snapshot': receptionSnapshot?.toJson(),
   };
 }

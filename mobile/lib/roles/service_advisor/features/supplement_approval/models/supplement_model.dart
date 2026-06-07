@@ -1,3 +1,6 @@
+import 'supplement_part_model.dart';
+import 'supplement_labor_model.dart';
+
 class SupplementModel {
   final String id;
   final String supplementId;
@@ -14,6 +17,8 @@ class SupplementModel {
   final DateTime newDeliveryTime;
   final String delayReason;
   final SupplementStatus status;
+  final List<SupplementPartModel> addedParts;
+  final List<SupplementLaborModel> addedLabors;
 
   SupplementModel({
     required this.id,
@@ -31,6 +36,8 @@ class SupplementModel {
     required this.newDeliveryTime,
     required this.delayReason,
     this.status = SupplementStatus.pending,
+    this.addedParts = const [],
+    this.addedLabors = const [],
   });
 
   factory SupplementModel.fromJson(Map<String, dynamic> json) {
@@ -75,8 +82,53 @@ class SupplementModel {
     };
   }
 
-  double get costDifference => newCost - oldCost;
+  double get addedPartsTotal =>
+      addedParts.fold(0, (sum, p) => sum + p.total);
+  double get addedLaborsTotal =>
+      addedLabors.fold(0, (sum, l) => sum + l.total);
+  double get calculatedNewCost => newCost + addedPartsTotal + addedLaborsTotal;
+  double get costDifference => calculatedNewCost - oldCost;
   Duration get timeDifference => newDeliveryTime.difference(oldDeliveryTime);
+
+  SupplementModel copyWith({
+    String? id,
+    String? supplementId,
+    String? orderId,
+    String? issueTitle,
+    String? issueDescription,
+    String? proposedFix,
+    String? mechanicName,
+    String? mechanicRole,
+    List<String>? evidenceMediaUrls,
+    double? oldCost,
+    double? newCost,
+    DateTime? oldDeliveryTime,
+    DateTime? newDeliveryTime,
+    String? delayReason,
+    SupplementStatus? status,
+    List<SupplementPartModel>? addedParts,
+    List<SupplementLaborModel>? addedLabors,
+  }) {
+    return SupplementModel(
+      id: id ?? this.id,
+      supplementId: supplementId ?? this.supplementId,
+      orderId: orderId ?? this.orderId,
+      issueTitle: issueTitle ?? this.issueTitle,
+      issueDescription: issueDescription ?? this.issueDescription,
+      proposedFix: proposedFix ?? this.proposedFix,
+      mechanicName: mechanicName ?? this.mechanicName,
+      mechanicRole: mechanicRole ?? this.mechanicRole,
+      evidenceMediaUrls: evidenceMediaUrls ?? this.evidenceMediaUrls,
+      oldCost: oldCost ?? this.oldCost,
+      newCost: newCost ?? this.newCost,
+      oldDeliveryTime: oldDeliveryTime ?? this.oldDeliveryTime,
+      newDeliveryTime: newDeliveryTime ?? this.newDeliveryTime,
+      delayReason: delayReason ?? this.delayReason,
+      status: status ?? this.status,
+      addedParts: addedParts ?? this.addedParts,
+      addedLabors: addedLabors ?? this.addedLabors,
+    );
+  }
 }
 
 enum SupplementStatus {

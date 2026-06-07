@@ -5,9 +5,9 @@ import { Clock, UserPlus, CheckCircle2, X } from 'lucide-react';
 import useAssignmentModal from './useAssignmentModal';
 import TechOptionItem from './TechOptionItem';
 
-const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCancel }) => {
+const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCancel, selectedDate }) => {
     const { t } = useTranslation('adminServiceReception');
-    const { form, handleSubmit } = useAssignmentModal({ visible, assignmentData, onConfirm });
+    const { form, handleSubmit } = useAssignmentModal({ visible, assignmentData, onConfirm, selectedDate });
 
     return (
         <Modal
@@ -80,10 +80,15 @@ const AssignmentModal = ({ visible, assignmentData, technicians, onConfirm, onCa
                     >
                         <DatePicker.RangePicker
                             showTime={{ format: 'HH:mm', minuteStep: 15 }}
-                            format="DD/MM/YYYY HH:mm"
+                            format="HH:mm DD/MM/YYYY"
                             className="w-full bg-slate-50 dark:bg-[#1c1c1e] border-slate-200 dark:border-white/10 hover:border-yellow-500/50 focus:border-yellow-500 focus:shadow-none h-11 rounded-xl"
                             popupClassName="dark-time-picker"
                             suffixIcon={<Clock className="w-4 h-4 text-slate-400" />}
+                            disabledDate={(current) => {
+                                if (!selectedDate) return false;
+                                return current && !current.isSame(selectedDate, 'day');
+                            }}
+                            placeholder={['Giờ bắt đầu', 'Giờ kết thúc']}
                         />
                     </Form.Item>
                 </div>

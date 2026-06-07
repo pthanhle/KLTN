@@ -9,14 +9,12 @@ class JobPartsSection extends StatelessWidget {
   final List<JobPartModel> parts;
   final bool isDark;
   final bool isLoading;
-  final Function(String partId) onToggleCheck;
 
   const JobPartsSection({
     super.key,
     required this.parts,
     required this.isDark,
     this.isLoading = false,
-    required this.onToggleCheck,
   });
 
   @override
@@ -65,7 +63,6 @@ class JobPartsSection extends StatelessWidget {
           key: ValueKey(part.id),
           part: part,
           isDark: isDark,
-          onToggleCheck: () => onToggleCheck(part.id),
         );
       },
     );

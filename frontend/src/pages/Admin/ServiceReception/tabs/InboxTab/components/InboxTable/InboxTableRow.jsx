@@ -1,8 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, CalendarDays, CheckCircle2, MessageSquare, AlertCircle, Phone, Crown } from 'lucide-react';
+import { Clock, CalendarDays, CheckCircle2, MessageSquare, AlertCircle, Phone, Crown, Wrench } from 'lucide-react';
 import { calculateAging } from '../../utils/timeUtils';
 import dayjs from 'dayjs';
+
+const SERVICE_TYPE_LABELS = {
+    MAINTENANCE: 'Bảo dưỡng',
+    CAR_SPA: 'Chăm sóc xe',
+    REPAIR: 'Sửa chữa',
+    INSPECTION: 'Kiểm định',
+    OTHER: 'Khác',
+};
 
 const InboxTableRow = ({ booking, onConfirm, onReject }) => {
     const { t } = useTranslation('adminServiceReception');
@@ -64,11 +72,20 @@ const InboxTableRow = ({ booking, onConfirm, onReject }) => {
                     </div>
                 )}
                 <div className="flex flex-wrap gap-1.5 mt-2 w-full justify-end">
+                    {booking.service_type && (
+                        <span className="flex items-center gap-1 px-2.5 py-1 bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30 text-yellow-700 dark:text-yellow-400 text-xs font-bold rounded-lg">
+                            <Wrench size={11} />
+                            {SERVICE_TYPE_LABELS[booking.service_type] || booking.service_type}
+                        </span>
+                    )}
                     {booking.selected_services?.map((service, idx) => (
                         <span key={idx} className="px-2.5 py-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-lg truncate max-w-[150px]">
                             {service.name}
                         </span>
                     ))}
+                    {!booking.service_type && !booking.selected_services?.length && (
+                        <span className="text-xs text-slate-400 dark:text-slate-500 italic">Chưa có dịch vụ</span>
+                    )}
                 </div>
             </div>
 

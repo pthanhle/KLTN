@@ -6,6 +6,7 @@ import '../../../../../core/config/api_config.dart';
 import '../models/quotation_model.dart';
 import '../../../models/labor_item_model.dart';
 import '../../dashboard/controllers/dashboard_controller.dart';
+import '../../walkaround/models/service_package_model.dart';
 
 
 class _ActiveQuotationOrderIdNotifier extends Notifier<String> {
@@ -39,24 +40,69 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   void init(String orderId) {
     _orderId = orderId;
     ref.read(activeQuotationOrderIdProvider.notifier).state = orderId;
+    // Capture in-session cart before clearing, so _loadForOrder can preserve it.
+    final sessionSnapshot = state.value;
     state = const AsyncLoading();
-    // Force a fresh dashboard fetch so a just-completed KTV diagnosis is reflected
-    // immediately instead of relying on the cached (up to 30s stale) dashboard state.
     ref.read(advisorDashboardProvider.notifier).refresh().then((_) {
-      _loadForOrder(orderId);
+      _loadForOrder(orderId, sessionSnapshot: sessionSnapshot);
     });
   }
 
-  /// Called when advisor pulls to refresh or receives diagnosis_completed socket event.
   void refresh() {
+    final sessionSnapshot = state.value;
     state = const AsyncLoading();
-    // Re-fetch dashboard first so diagnosis data is up-to-date
     ref.read(advisorDashboardProvider.notifier).refresh().then((_) {
-      _loadForOrder(_orderId);
+      _loadForOrder(_orderId, sessionSnapshot: sessionSnapshot);
     });
   }
 
-  Future<void> _loadForOrder(String orderId) async {
+  /// Fetches the submitted quotation from the backend for the given progress ID.
+  /// Returns (parts, labors) or empty lists if not available / not yet submitted.
+  Future<(List<CartPartItem>, List<CartLaborItem>)> _fetchBackendQuotation(String progressId) async {
+    try {
+      final token = await _getToken();
+      final resp = await _dio.get(
+        '${ApiConfig.baseUrl}/staff/service/repair-progress/$progressId',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      final data = resp.data as Map<String, dynamic>? ?? {};
+      final q = data['quotation'] as Map<String, dynamic>? ?? {};
+
+      final parts = (q['parts'] as List<dynamic>? ?? []).asMap().entries.map((e) {
+        final p = e.value as Map<String, dynamic>;
+        return CartPartItem(
+          id: p['sku']?.toString().isNotEmpty == true
+              ? p['sku'].toString()
+              : 'part_${e.key}',
+          sku: p['sku']?.toString() ?? '',
+          name: p['name']?.toString() ?? '',
+          price: (p['unit_price'] as num?)?.toDouble() ?? 0,
+          quantity: (p['quantity'] as num?)?.toInt() ?? 1,
+        );
+      }).toList();
+
+      final labors = (q['labors'] as List<dynamic>? ?? []).asMap().entries.map((e) {
+        final l = e.value as Map<String, dynamic>;
+        return CartLaborItem(
+          id: l['description']?.toString().isNotEmpty == true
+              ? l['description'].toString()
+              : 'labor_${e.key}',
+          name: l['description']?.toString() ?? '',
+          hours: (l['hours'] as num?)?.toDouble() ?? 0,
+          rate: (l['rate'] as num?)?.toDouble() ?? 0,
+        );
+      }).toList();
+
+      return (parts, labors);
+    } catch (_) {
+      return (const <CartPartItem>[], const <CartLaborItem>[]);
+    }
+  }
+
+  Future<void> _loadForOrder(String orderId, {QuotationModel? sessionSnapshot}) async {
+    // Restore submitted quotation from backend (handles app restart after submit).
+    final (backendParts, backendLabors) = await _fetchBackendQuotation(orderId);
+
     final dashboard = ref.read(advisorDashboardProvider);
     try {
       final order = dashboard.allRepairOrders.firstWhere((o) => o.id == orderId);
@@ -77,9 +123,9 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
               : 'Xe trong tình trạng bình thường');
 
       final receptionInfo = order.receptionInfo;
-      ReceptionSnapshot? snapshot;
+      ReceptionSnapshot? receptionSnapshot;
       if (receptionInfo != null) {
-        snapshot = ReceptionSnapshot(
+        receptionSnapshot = ReceptionSnapshot(
           odometer: receptionInfo.odometer,
           fuelLevel: receptionInfo.fuelLevel.round(),
           customerNotes: receptionInfo.customerNotes,
@@ -100,8 +146,17 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
         );
       }
 
-      // Preserve existing cart items if already loaded (pull-to-refresh scenario)
-      final existing = state.value;
+      // Cart priority: in-session edits (not yet submitted) > backend submitted data > empty.
+      // "In-session edits" are captured in sessionSnapshot before state is cleared.
+      final parts = sessionSnapshot?.parts.isNotEmpty == true
+          ? sessionSnapshot!.parts
+          : backendParts;
+      final labor = sessionSnapshot?.labor.isNotEmpty == true
+          ? sessionSnapshot!.labor
+          : backendLabors;
+      final services = sessionSnapshot?.selectedServices.isNotEmpty == true
+          ? sessionSnapshot!.selectedServices
+          : order.selectedServices;
 
       state = AsyncData(QuotationModel(
         orderId: orderId,
@@ -110,10 +165,10 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
           description: diagDescription,
           imageUrl: '',
         ),
-        receptionSnapshot: snapshot,
-        servicePackageTotal: order.servicePackageTotal,
-        parts: existing?.parts ?? [],
-        labor: existing?.labor ?? [],
+        receptionSnapshot: receptionSnapshot,
+        selectedServices: services,
+        parts: parts,
+        labor: labor,
       ));
     } catch (_) {
       state = AsyncData(QuotationModel(
@@ -123,8 +178,14 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
           description: 'KTV chưa hoàn tất kiểm tra xe',
           imageUrl: '',
         ),
+        parts: backendParts,
+        labor: backendLabors,
       ));
     }
+  }
+
+  void applyPromoCode(String code) {
+    // Promo code logic not yet implemented
   }
 
   void updateAdvisorNote(String note) {
@@ -174,29 +235,16 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
   void addLabor(LaborItemModel labor) {
     if (state.hasValue && state.value != null) {
       final currentLabor = List<CartLaborItem>.from(state.value!.labor);
-      final existingIndex = currentLabor.indexWhere((l) => l.id == labor.id);
+      final existingIndex = currentLabor.indexWhere((l) => l.id == labor.laborCode);
       if (existingIndex < 0) {
         currentLabor.add(CartLaborItem(
-          id: labor.id,
+          id: labor.laborCode,
           name: labor.name,
           hours: labor.estimatedHours,
-          rate: labor.estimatedHours > 0 ? labor.price / labor.estimatedHours : labor.price,
+          rate: labor.estimatedHours > 0 ? labor.basePrice / labor.estimatedHours : labor.basePrice,
         ));
         state = AsyncData(state.value!.copyWith(labor: currentLabor));
       }
-    }
-  }
-
-  void addManualLabor({required String description, required double price, double hours = 1}) {
-    if (state.hasValue && state.value != null) {
-      final currentLabor = List<CartLaborItem>.from(state.value!.labor);
-      currentLabor.add(CartLaborItem(
-        id: 'manual_${DateTime.now().millisecondsSinceEpoch}',
-        name: description,
-        hours: hours,
-        rate: hours > 0 ? price / hours : price,
-      ));
-      state = AsyncData(state.value!.copyWith(labor: currentLabor));
     }
   }
 
@@ -211,6 +259,23 @@ class QuotationController extends Notifier<AsyncValue<QuotationModel>> {
     if (state.hasValue && state.value != null) {
       final updated = state.value!.parts.where((p) => p.id != id).toList();
       state = AsyncData(state.value!.copyWith(parts: updated));
+    }
+  }
+
+  void addServicePackage(ServicePackageModel pkg) {
+    if (state.hasValue && state.value != null) {
+      final current = List<ServicePackageModel>.from(state.value!.selectedServices);
+      if (!current.any((s) => s.id == pkg.id)) {
+        current.add(pkg);
+        state = AsyncData(state.value!.copyWith(selectedServices: current));
+      }
+    }
+  }
+
+  void removeServicePackage(String id) {
+    if (state.hasValue && state.value != null) {
+      final updated = state.value!.selectedServices.where((s) => s.id != id).toList();
+      state = AsyncData(state.value!.copyWith(selectedServices: updated));
     }
   }
 

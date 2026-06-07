@@ -16,7 +16,6 @@ const QuotationEntityInfo = ({ quotation, t }) => (
             <div className="space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-slate-500 dark:text-[#a0a0a0]">{t('quote_info_brand', 'Dòng xe')}:</span><span className="font-semibold text-slate-800 dark:text-white text-right">{quotation.vehicle_info?.brand} {quotation.vehicle_info?.model}</span></div>
                 <div className="flex justify-between"><span className="text-slate-500 dark:text-[#a0a0a0]">{t('quote_info_plate', 'Biển số')}:</span><span className="font-semibold text-slate-800 dark:text-white">{quotation.vehicle_info?.license_plate}</span></div>
-                <div className="flex justify-between"><span className="text-slate-500 dark:text-[#a0a0a0]">{t('quote_info_vin', 'Số khung (VIN)')}:</span><span className="font-semibold text-slate-800 dark:text-white uppercase">{quotation.vehicle_info?.vin_number}</span></div>
                 <div className="flex justify-between"><span className="text-slate-500 dark:text-[#a0a0a0]">{t('quote_info_odo', 'Số ODO')}:</span><span className="font-semibold text-slate-800 dark:text-white">{formatOdometer(quotation.vehicle_info?.current_odometer)} KM</span></div>
             </div>
         </div>

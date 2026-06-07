@@ -13,7 +13,7 @@ export const useQuotationTabLogic = (quotationData, setQuotationData) => {
 
         const servicePackageTotal = quotationData.service_package_total || 0;
         const partsTotal = (quotationData.parts || []).reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-        const laborTotal = (quotationData.labors || []).reduce((sum, item) => sum + (item.hours * item.rate), 0);
+        const laborTotal = (quotationData.labors || []).reduce((sum, item) => sum + (item.total_price ?? item.quantity * item.unit_price ?? 0), 0);
         const subtotal = servicePackageTotal + partsTotal + laborTotal;
         const actualVatRate = quotationData.vat_rate ?? 0.1;
         const vatAmount = subtotal * actualVatRate;

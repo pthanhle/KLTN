@@ -1,91 +1,66 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { message } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { formatCurrency, updateMasterServiceStatus } from '../utils/trackingDataUtils';
+import { formatCurrency } from '../utils/trackingDataUtils';
+import { CheckoutAPI } from '../../../../services/api/checkout';
 
 export const useQuotationTabLogic = (quotationData, setQuotationData) => {
     const { t } = useTranslation('tracking');
-    const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
-    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+    const [isDepositRedirecting, setIsDepositRedirecting] = useState(false);
 
-    // Deposit Auto-trigger
-    useEffect(() => {
-        const isApprovedStatus = quotationData?.status === 'APPROVED';
-        const hasPendingDeposit = quotationData?.payment_terms?.deposit_status === 'PENDING' && quotationData?.payment_terms?.required_deposit > 0;
-        if (isApprovedStatus && hasPendingDeposit) {
-            setIsDepositModalOpen(true);
-        }
-    }, [quotationData?.status, quotationData?.payment_terms?.deposit_status, quotationData?.payment_terms?.required_deposit]);
-
-    // Tính toán lại hoàn toàn Hóa Đơn (Tuyệt đối không hardcode trên mảng tĩnh)
     const calculations = useMemo(() => {
         if (!quotationData) return null;
 
-        const partsTotal = quotationData.parts.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-        const laborTotal = quotationData.labors.reduce((sum, item) => sum + (item.hours * item.rate), 0);
-        const subtotal = partsTotal + laborTotal;
+        const servicePackageTotal = quotationData.service_package_total || 0;
+        const partsTotal = (quotationData.parts || []).reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+        const laborTotal = (quotationData.labors || []).reduce((sum, item) => sum + (item.hours * item.rate), 0);
+        const subtotal = servicePackageTotal + partsTotal + laborTotal;
         const actualVatRate = quotationData.vat_rate ?? 0.1;
         const vatAmount = subtotal * actualVatRate;
         const grandTotal = subtotal + vatAmount;
+        const depositAmount = quotationData.deposit_amount || Math.round(grandTotal * 0.5);
 
         return {
+            servicePackageTotal,
             partsTotal,
             laborTotal,
             subtotal,
             vatAmount,
             grandTotal,
+            depositAmount,
             vatFormatted: `${(actualVatRate * 100).toFixed(0)}%`
         };
     }, [quotationData]);
 
-    const handleOpenSignature = () => setIsSignatureModalOpen(true);
-    const handleCloseSignature = () => setIsSignatureModalOpen(false);
-
-    const handleConfirmSignature = (signatureDataUrl) => {
-        setIsSignatureModalOpen(false);
-        
-        // Optimistic State Update for UI Reactivity
-        setQuotationData(prev => ({
-            ...prev,
-            status: 'APPROVED',
-            customer_signature: signatureDataUrl
-        }));
-
-        // Ghi xuống DB Mock chung để các trang khác (Profile) đều nhận ra Đã duyệt
-        updateMasterServiceStatus(quotationData.booking_code, 'IN_PROGRESS');
-
-        message.success(t('notify_approved_desc', 'Chữ ký điện tử đã mã hoá. Lệnh sửa chữa đã gửi xuống Xưởng.'));
-    };
+    const handleDepositVNPay = useCallback(async () => {
+        if (!quotationData?.progress_id) {
+            message.error('Không tìm thấy mã đơn dịch vụ');
+            return;
+        }
+        setIsDepositRedirecting(true);
+        try {
+            const response = await CheckoutAPI.createServiceDepositPayment(quotationData.progress_id);
+            if (response?.url) {
+                window.location.href = response.url;
+            } else {
+                throw new Error(response?.message || 'Không thể tạo liên kết thanh toán');
+            }
+        } catch (err) {
+            message.error(err?.response?.data?.message || err?.message || 'Có lỗi khi kết nối VNPay');
+            setIsDepositRedirecting(false);
+        }
+    }, [quotationData?.progress_id]);
 
     const handleReject = () => {
-        message.error(t('notify_reject_desc', 'Yêu cầu Từ chối Báo giá đã được ghi nhận. Cố vấn sẽ liên hệ lại.'));
-    };
-
-    const closeDepositModal = () => setIsDepositModalOpen(false);
-
-    const handleDepositPaymentComplete = () => {
-        setIsDepositModalOpen(false);
-        setQuotationData(prev => ({
-            ...prev,
-            payment_terms: {
-                ...prev.payment_terms,
-                deposit_status: 'PAID'
-            }
-        }));
-        message.success(t('quo_deposit_success', 'Xác Nhận Đã Nhận Chuyển Khoản Cọc'));
+        message.info(t('notify_reject_desc', 'Yêu cầu từ chối đã được ghi nhận. Cố vấn sẽ liên hệ lại.'));
     };
 
     return {
-        isSignatureModalOpen,
         calculations,
         formatCurrency,
-        handleOpenSignature,
-        handleCloseSignature,
-        handleConfirmSignature,
+        handleDepositVNPay,
+        isDepositRedirecting,
         handleReject,
-        isDepositModalOpen,
-        closeDepositModal,
-        handleDepositPaymentComplete,
         t
     };
 };

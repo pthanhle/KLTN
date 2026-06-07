@@ -14,8 +14,10 @@ import '../../utils/quotation_utils.dart';
 
 class QuotationSummaryCard extends ConsumerStatefulWidget {
   final QuotationModel data;
+  final bool canSubmit;
+  final String? lockedHint;
 
-  const QuotationSummaryCard({super.key, required this.data});
+  const QuotationSummaryCard({super.key, required this.data, this.canSubmit = true, this.lockedHint});
 
   @override
   ConsumerState<QuotationSummaryCard> createState() => _QuotationSummaryCardState();
@@ -25,7 +27,7 @@ class _QuotationSummaryCardState extends ConsumerState<QuotationSummaryCard> {
   bool _isSubmitting = false;
 
   Future<void> _handleSubmit(BuildContext context) async {
-    if (_isSubmitting) return;
+    if (_isSubmitting || !widget.canSubmit) return;
     HapticFeedback.mediumImpact();
     setState(() => _isSubmitting = true);
     try {
@@ -52,7 +54,11 @@ class _QuotationSummaryCardState extends ConsumerState<QuotationSummaryCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(
           horizontal: QuotationConstants.paddingHorizontal),
-      child: Container(
+      child: Opacity(
+        opacity: widget.canSubmit ? 1.0 : 0.4,
+        child: IgnorePointer(
+        ignoring: !widget.canSubmit,
+        child: Container(
         decoration: ShapeDecoration(
           color: isDark
               ? Colors.white.withValues(alpha: 0.05)
@@ -101,19 +107,40 @@ class _QuotationSummaryCardState extends ConsumerState<QuotationSummaryCard> {
                       letterSpacing: -0.3,
                     ),
                   ),
+                  if (!widget.canSubmit && widget.lockedHint != null) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.lock_outline, size: 16, color: theme.colorScheme.onErrorContainer),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              widget.lockedHint!,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onErrorContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
 
                   // Summary rows
+                  _buildRow(theme, 'Gói dịch vụ'.tr(), data.servicePackageTotal,
+                      isReadOnly: true),
+                  const SizedBox(height: 8),
                   _buildRow(theme, 'Phụ tùng'.tr(), data.partsTotal),
                   const SizedBox(height: 8),
                   _buildRow(theme, 'Tiền công'.tr(), data.laborTotal),
-                  const SizedBox(height: 8),
-                  _buildRow(
-                    theme,
-                    'Giảm giá'.tr(),
-                    -data.discountAmount,
-                    color: theme.colorScheme.error,
-                  ),
                   const SizedBox(height: 8),
                   _buildRow(theme, 'VAT (10%)'.tr(), data.vatAmount),
                   const SizedBox(height: 16),
@@ -146,12 +173,45 @@ class _QuotationSummaryCardState extends ConsumerState<QuotationSummaryCard> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+
+                  // Deposit (50%)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Cọc trước (50%)'.tr(),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          QuotationUtils.formatCurrency(data.depositAmount),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 24),
 
                   LiquidButton(
                     isLoading: _isSubmitting,
                     isGlass: false,
-                    onPressed: _isSubmitting ? null : () => _handleSubmit(context),
+                    onPressed: (_isSubmitting || !widget.canSubmit) ? null : () => _handleSubmit(context),
                     child: Text(
                       _isSubmitting ? 'Đang gửi...'.tr() : 'Trình Duyệt Báo Giá'.tr(),
                       style: theme.textTheme.bodyLarge?.copyWith(
@@ -166,24 +226,33 @@ class _QuotationSummaryCardState extends ConsumerState<QuotationSummaryCard> {
             ),
           ),
         ),
+        ),
+        ),
       ),
     );
   }
 
-  Widget _buildRow(ThemeData theme, String label, double amount, {Color? color}) {
+  Widget _buildRow(ThemeData theme, String label, double amount, {Color? color, bool isReadOnly = false}) {
+    final effectiveColor = color ?? theme.colorScheme.onSurfaceVariant;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: color ?? theme.colorScheme.onSurfaceVariant,
-          ),
+        Row(
+          children: [
+            Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(color: effectiveColor),
+            ),
+            if (isReadOnly) ...[
+              const SizedBox(width: 4),
+              Icon(Icons.lock_outline, size: 12, color: effectiveColor.withValues(alpha: 0.5)),
+            ],
+          ],
         ),
         Text(
           QuotationUtils.formatCurrency(amount),
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: color ?? theme.colorScheme.onSurfaceVariant,
+            color: effectiveColor,
             fontWeight: FontWeight.w600,
           ),
         ),

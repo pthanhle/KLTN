@@ -5,7 +5,15 @@ const paymentSchema = mongoose.Schema(
     order_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Order',
-      required: true,
+    },
+    progress_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'RepairProgress',
+    },
+    payment_type: {
+      type: String,
+      enum: ['order', 'quotation_deposit', 'final_payment'],
+      default: 'order',
     },
     amount: {
       type: mongoose.Types.Decimal128,

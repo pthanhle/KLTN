@@ -30,13 +30,13 @@ export const ORDER_STATUSES = {
         border: 'border-cyan-200 dark:border-cyan-500/20'
     },
     PACKED: {
-        value: 'PACKED',
+        value: 'PROCESSING',
         color: 'text-indigo-600 dark:text-indigo-500',
         bg: 'bg-indigo-50 dark:bg-indigo-500/10',
         border: 'border-indigo-200 dark:border-indigo-500/20'
     },
     SHIPPING: {
-        value: 'SHIPPING',
+        value: 'SHIPPED',
         color: 'text-orange-600 dark:text-orange-500',
         bg: 'bg-orange-50 dark:bg-orange-500/10',
         border: 'border-orange-200 dark:border-orange-500/20'

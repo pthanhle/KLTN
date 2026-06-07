@@ -5,6 +5,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import '../../controllers/quotation_controller.dart';
 import '../../models/quotation_model.dart';
+import '../../../dashboard/models/repair_order_model.dart';
+import '../mpi_diagnosis_detail_modal.dart';
 import '../shared/glass_card.dart';
 import '../shared/glass_text_field.dart';
 import '../../constants/quotation_constants.dart';
@@ -12,13 +14,26 @@ import '../../constants/quotation_constants.dart';
 class TechnicianDiagnosisSection extends ConsumerWidget {
   final QuotationModel data;
   final String orderId;
+  final List<MpiCategory> mpiDiagnostics;
+  final String mpiConclusion;
+  final bool hasViewedDiagnosis;
+  final VoidCallback onViewDetail;
 
-  const TechnicianDiagnosisSection({super.key, required this.data, required this.orderId});
+  const TechnicianDiagnosisSection({
+    super.key,
+    required this.data,
+    required this.orderId,
+    this.mpiDiagnostics = const [],
+    this.mpiConclusion = '',
+    this.hasViewedDiagnosis = false,
+    required this.onViewDetail,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final controller = ref.read(quotationControllerProvider.notifier);
+    final hasDiagnosis = mpiDiagnostics.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +53,13 @@ class TechnicianDiagnosisSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              InkWell(
+                borderRadius: BorderRadius.circular(QuotationConstants.radiusSmall),
+                onTap: hasDiagnosis ? () {
+                  MpiDiagnosisDetailModal.show(context, mpiDiagnostics, mpiConclusion);
+                  onViewDetail();
+                } : null,
+                child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
@@ -60,6 +81,30 @@ class TechnicianDiagnosisSection extends ConsumerWidget {
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
+                        if (hasDiagnosis) ...[
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Icon(
+                                hasViewedDiagnosis ? CupertinoIcons.checkmark_alt_circle_fill : CupertinoIcons.list_bullet_below_rectangle,
+                                size: 16,
+                                color: hasViewedDiagnosis ? Colors.green : theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                hasViewedDiagnosis
+                                    ? 'Đã xem chi tiết hạng mục kiểm tra'.tr()
+                                    : 'Xem chi tiết hạng mục kiểm tra'.tr(),
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: hasViewedDiagnosis ? Colors.green : theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(CupertinoIcons.chevron_right, size: 12, color: theme.colorScheme.primary),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -103,6 +148,7 @@ class TechnicianDiagnosisSection extends ConsumerWidget {
                     ),
                   ),
                 ],
+                ),
               ),
               const SizedBox(height: 24),
               Text(

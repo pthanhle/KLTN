@@ -12,6 +12,8 @@ class JobExecutionState {
   final List<JobPartModel> parts;
   final bool isLoading;
   final String? error;
+  // true khi đơn đang ở bước WAITING_PARTS (kho chưa xuất đủ phụ tùng cho báo giá)
+  final bool awaitingParts;
 
   JobExecutionState({
     this.progressId,
@@ -19,6 +21,7 @@ class JobExecutionState {
     required this.parts,
     this.isLoading = false,
     this.error,
+    this.awaitingParts = false,
   });
 
   JobExecutionState copyWith({
@@ -27,6 +30,7 @@ class JobExecutionState {
     List<JobPartModel>? parts,
     bool? isLoading,
     String? error,
+    bool? awaitingParts,
   }) {
     return JobExecutionState(
       progressId: progressId ?? this.progressId,
@@ -34,6 +38,7 @@ class JobExecutionState {
       parts: parts ?? this.parts,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      awaitingParts: awaitingParts ?? this.awaitingParts,
     );
   }
 }
@@ -80,7 +85,9 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
         final l = entry.value as Map<String, dynamic>;
         return JobTaskModel(
           id: l['_id']?.toString() ?? l['service_id']?.toString() ?? 'labor_$i',
-          name: l['service_name']?.toString() ?? 'Hạng mục ${i + 1}',
+          // Backend lưu tên hạng mục công việc trong field `description`
+          // (xem backend/models/repairProgressModel.js -> quotation.labors)
+          name: l['description']?.toString() ?? l['service_name']?.toString() ?? 'Hạng mục ${i + 1}',
           description: '${l['hours'] ?? 0} giờ công',
           icon: JobTaskIcon.build,
         );

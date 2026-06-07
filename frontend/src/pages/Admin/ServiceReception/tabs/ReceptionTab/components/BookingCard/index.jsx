@@ -4,7 +4,7 @@ import { GripVertical, Lock, Calendar, Clock, MoreVertical, XCircle, CalendarClo
 import { useTranslation } from 'react-i18next';
 import { useBookingCard } from './hooks/useBookingCard';
 
-const BookingCard = ({ booking, onReschedule, onNoShow }) => {
+const BookingCard = ({ booking, onReschedule, onNoShow, onViewDetail }) => {
     const { t } = useTranslation('adminServiceReception');
     const {
         isMenuOpen,
@@ -12,12 +12,13 @@ const BookingCard = ({ booking, onReschedule, onNoShow }) => {
         closeMenu,
         handleReschedule,
         handleNoShow,
+        handleCardClick,
         attributes,
         listeners,
         setNodeRef,
         transform,
         isDragging
-    } = useBookingCard(booking, onReschedule, onNoShow);
+    } = useBookingCard(booking, onReschedule, onNoShow, onViewDetail);
 
     const isReceived = booking.status === 'RECEIVED';
 
@@ -33,10 +34,11 @@ const BookingCard = ({ booking, onReschedule, onNoShow }) => {
             style={style}
             {...attributes}
             {...listeners}
-            className={`bg-white dark:bg-[#1c1c1e] rounded-xl p-5 shadow-lg dark:shadow-[0_15px_30px_rgba(0,0,0,0.3)] relative group hover:-translate-y-1 transition-transform touch-none border border-slate-100 dark:border-white/5 ${isReceived ? 'cursor-default opacity-80' : 'cursor-grab'}`}
+            onClick={handleCardClick}
+            className={`bg-white dark:bg-[#1c1c1e] rounded-xl p-5 shadow-lg dark:shadow-[0_15px_30px_rgba(0,0,0,0.3)] relative group hover:-translate-y-1 transition-transform touch-none border border-slate-100 dark:border-white/5 ${isReceived ? 'cursor-pointer opacity-80' : 'cursor-grab'}`}
         >
-            <div className="absolute inset-0 bg-black/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity"></div>
-            
+            <div className="absolute inset-0 bg-black/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity pointer-events-none" />
+
             <div className="flex justify-between items-start mb-3 gap-2">
                 <div className="flex flex-col gap-1.5">
                     <span className="w-fit bg-slate-50 dark:bg-[#0a0a0b] text-slate-500 dark:text-slate-400 px-2 py-1 rounded font-mono text-[10px] tracking-wider border border-slate-200 dark:border-white/10 shadow-inner">
@@ -50,34 +52,37 @@ const BookingCard = ({ booking, onReschedule, onNoShow }) => {
                         {booking.time_slot}
                     </div>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
+                    {booking.sequence_number != null && (
+                        <span className="font-mono text-[10px] font-bold text-yellow-600 dark:text-yellow-500">
+                            #{booking.sequence_number}
+                        </span>
+                    )}
                     {isReceived
                         ? <Lock className="text-emerald-500 w-4 h-4 shrink-0" title="Đã tiếp nhận" />
                         : <GripVertical className="text-slate-400 dark:text-slate-500 w-4 h-4 shrink-0 cursor-grab" />
                     }
-                    <div className="relative" onPointerDown={(e) => e.stopPropagation()}>
-                        <button 
+                    {/* Stop click propagation so menu click doesn't open the drawer */}
+                    <div className="relative" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                        <button
                             onClick={handleMenuClick}
                             className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors rounded-md hover:bg-slate-100 dark:hover:bg-white/10"
                         >
                             <MoreVertical className="w-4 h-4" />
                         </button>
-                        
+
                         {isMenuOpen && (
                             <>
-                                <div 
-                                    className="fixed inset-0 z-[1000]" 
-                                    onClick={closeMenu}
-                                ></div>
+                                <div className="fixed inset-0 z-[1000]" onClick={closeMenu} />
                                 <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-[#2e3447] rounded-lg shadow-xl border border-slate-100 dark:border-white/10 z-[1001] py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                                    <button 
+                                    <button
                                         onClick={handleReschedule}
                                         className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 flex items-center gap-2"
                                     >
                                         <CalendarClock size={16} className="text-yellow-600 dark:text-premium-gold" />
                                         {t('action_reschedule', 'Reschedule')}
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={handleNoShow}
                                         className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
                                     >
@@ -115,6 +120,11 @@ const BookingCard = ({ booking, onReschedule, onNoShow }) => {
                         {service.name}
                     </span>
                 ))}
+            </div>
+
+            {/* Hover hint */}
+            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-60 transition-opacity">
+                <span className="text-[10px] text-slate-400 italic">Nhấn để xem chi tiết</span>
             </div>
         </div>
     );

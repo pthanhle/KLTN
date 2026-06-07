@@ -6,6 +6,7 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ttauto_staff/core/config/api_config.dart';
 import 'package:ttauto_staff/roles/warehouse/features/orders/controllers/warehouse_orders_controller.dart';
 import 'package:ttauto_staff/shared/widgets/toast/glass_toast.dart';
 import 'package:ttauto_staff/shared/widgets/buttons/liquid_button.dart';
@@ -44,9 +45,13 @@ class _DispatchBottomSheetState extends State<DispatchBottomSheet> {
   final _trackingCodeController = TextEditingController();
   bool _isLoading = false;
 
+  bool get _isCodeMatching =>
+      _trackingCodeController.text.trim() == ApiConfig.validTrackingCode;
+
   bool get _isValid =>
       _providerController.text.trim().isNotEmpty &&
-      _trackingCodeController.text.trim().isNotEmpty;
+      _trackingCodeController.text.trim().isNotEmpty &&
+      _isCodeMatching;
 
   @override
   void dispose() {
@@ -183,6 +188,16 @@ class _DispatchBottomSheetState extends State<DispatchBottomSheet> {
                   icon: CupertinoIcons.barcode,
                   suffixIcon: CupertinoIcons.qrcode_viewfinder,
                 ),
+                if (_trackingCodeController.text.trim().isNotEmpty && !_isCodeMatching) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'Mã vận đơn không hợp lệ. Vui lòng quét đúng mã trên phiếu của ĐVVC.'.tr(),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 32),
                 Consumer(
                   builder: (context, ref, child) {

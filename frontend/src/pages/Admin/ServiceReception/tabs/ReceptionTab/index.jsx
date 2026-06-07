@@ -5,6 +5,7 @@ import IncomingBookingsPane from './components/IncomingBookingsPane';
 import AdvisorWorkloadPane from './components/AdvisorWorkloadPane';
 import BookingCard from './components/BookingCard';
 import RescheduleModal from './components/RescheduleModal';
+import ServiceBookingDetailDrawer from './components/ServiceBookingDetailDrawer';
 import ConfirmModal from '../../../../../components/ui/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +27,11 @@ const ReceptionTab = ({ selectedDate }) => {
         bookingToMarkNoShow,
         isRescheduleModalOpen,
         setIsRescheduleModalOpen,
-        selectedBookingForReschedule
+        selectedBookingForReschedule,
+        handleViewDetail,
+        handleCloseDetail,
+        selectedBookingForDetail,
+        isDetailDrawerOpen,
     } = useReceptionLogic(selectedDate);
 
     const sensors = useSensors(
@@ -50,6 +55,7 @@ const ReceptionTab = ({ selectedDate }) => {
                     isLoading={isLoading}
                     onReschedule={handleRescheduleClick}
                     onNoShow={confirmNoShow}
+                    onViewDetail={handleViewDetail}
                 />
 
                 <AdvisorWorkloadPane
@@ -58,6 +64,7 @@ const ReceptionTab = ({ selectedDate }) => {
                     isLoading={isLoading}
                     onReschedule={handleRescheduleClick}
                     onNoShow={confirmNoShow}
+                    onViewDetail={handleViewDetail}
                 />
 
                 <DragOverlay>
@@ -74,7 +81,7 @@ const ReceptionTab = ({ selectedDate }) => {
                 />
             )}
 
-            <ConfirmModal 
+            <ConfirmModal
                 isOpen={!!bookingToMarkNoShow}
                 onClose={handleNoShowCancel}
                 onConfirm={handleNoShowConfirm}
@@ -83,6 +90,13 @@ const ReceptionTab = ({ selectedDate }) => {
                 confirmText={t('action_no_show', 'Đánh dấu')}
                 cancelText={t('modal_reschedule_btn_cancel', 'Hủy')}
                 iconType="alert"
+            />
+
+            <ServiceBookingDetailDrawer
+                booking={selectedBookingForDetail}
+                advisors={advisors}
+                open={isDetailDrawerOpen}
+                onClose={handleCloseDetail}
             />
         </div>
     );

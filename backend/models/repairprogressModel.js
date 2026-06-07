@@ -4,17 +4,17 @@ const timelineStepSchema = new mongoose.Schema(
   {
     step: {
       type: String,
-      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED'],
+      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'WAITING_PARTS', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED'],
     },
     key: { type: String },
     status: {
       type: String,
-      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED', 'CANCELLED'],
+      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'WAITING_PARTS', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED', 'CANCELLED'],
       default: 'RECEIVED',
     },
     current_step: {
       type: String,
-      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED'],
+      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'WAITING_PARTS', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED'],
       default: 'RECEIVED'
     },
     diagnostics: [
@@ -27,7 +27,8 @@ const timelineStepSchema = new mongoose.Schema(
           {
             name: String,
             status: { type: String, enum: ['normal', 'warning', 'critical'], default: 'normal' },
-            action_required: String
+            action_required: String,
+            media_urls: [String]
           }
         ]
       }
@@ -170,19 +171,20 @@ const repairProgressSchema = mongoose.Schema(
 
     current_step: {
       type: String,
-      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED'],
+      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'WAITING_PARTS', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED'],
       default: 'RECEIVED',
     },
 
     status: {
       type: String,
-      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED', 'CANCELLED'],
+      enum: ['RECEIVED', 'DIAGNOSING', 'QUOTING', 'WAITING_PARTS', 'IN_PROGRESS', 'QC_TESTING', 'COMPLETED', 'CANCELLED'],
       default: 'RECEIVED',
     },
 
     timeline: { type: [timelineStepSchema], default: [] },
 
     quotation: {
+      service_package_total: { type: Number, default: 0 },
       parts: [
         {
           sku: String,
@@ -200,6 +202,7 @@ const repairProgressSchema = mongoose.Schema(
       ],
       vat_rate: { type: Number, default: 0.1 },
       deposit_amount: { type: Number, default: 0 },
+      final_amount: { type: Number, default: 0 },
       status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
       approved_at: Date,
     },

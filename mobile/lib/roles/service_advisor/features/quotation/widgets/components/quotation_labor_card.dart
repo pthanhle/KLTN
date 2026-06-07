@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../models/quotation_model.dart';
 import '../../constants/quotation_constants.dart';
@@ -6,8 +7,9 @@ import '../shared/glass_card.dart';
 
 class QuotationLaborCard extends StatelessWidget {
   final CartLaborItem labor;
+  final VoidCallback? onRemove;
 
-  const QuotationLaborCard({super.key, required this.labor});
+  const QuotationLaborCard({super.key, required this.labor, this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +52,17 @@ class QuotationLaborCard extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
+          if (onRemove != null) ...[
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: onRemove,
+              child: Icon(
+                CupertinoIcons.trash,
+                size: 18,
+                color: theme.colorScheme.error,
+              ),
+            ),
+          ],
         ],
       ),
     );

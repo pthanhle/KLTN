@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 
-export const useBookingCard = (booking, onReschedule, onNoShow) => {
+export const useBookingCard = (booking, onReschedule, onNoShow, onViewDetail) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const isReceived = booking.status === 'RECEIVED';
@@ -33,12 +33,17 @@ export const useBookingCard = (booking, onReschedule, onNoShow) => {
         if (onNoShow) onNoShow(booking._id);
     };
 
+    const handleCardClick = () => {
+        if (onViewDetail) onViewDetail(booking);
+    };
+
     return {
         isMenuOpen,
         handleMenuClick,
         closeMenu,
         handleReschedule,
         handleNoShow,
+        handleCardClick,
         attributes,
         listeners,
         setNodeRef,

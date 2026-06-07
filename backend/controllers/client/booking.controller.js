@@ -1,6 +1,7 @@
 import Booking from '../../models/bookingModel.js'
 import Car from '../../models/carModel.js'
 import Notification from '../../models/notificationModel.js'
+import { getNextSequence } from '../../models/counterModel.js'
 import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
 
@@ -112,9 +113,12 @@ export const createBooking = asyncHandler(async (req, res) => {
 
     const prefix = booking_type === 'test_drive' ? 'TD' : 'SRV'
     const booking_code = generateBookingCode(prefix)
+    const counterName = booking_type === 'test_drive' ? 'booking_seq_test_drive' : 'booking_seq_service'
+    const sequence_number = await getNextSequence(counterName)
 
     const booking = await Booking.create({
         booking_code,
+        sequence_number,
         user_id: req.user._id,
         customer_info,
         booking_type,

@@ -59,6 +59,7 @@ const timelineStepSchema = new mongoose.Schema(
 const bookingSchema = mongoose.Schema(
   {
     booking_code: { type: String, unique: true, sparse: true },
+    sequence_number: { type: Number, index: true },
 
     user_id: {
       type: mongoose.Schema.Types.ObjectId,

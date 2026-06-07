@@ -12,9 +12,43 @@ import '../components/quotation_labor_card.dart';
 import '../../constants/quotation_constants.dart';
 import '../modals/part_search_modal/part_search_modal.dart';
 import '../modals/labor_search_modal/labor_search_modal.dart';
+import '../../utils/quotation_utils.dart';
 
 class ServiceCartSection extends ConsumerWidget {
   const ServiceCartSection({super.key});
+
+  void _showLaborChoice(BuildContext context, WidgetRef ref) {
+    HapticFeedback.mediumImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _LaborChoiceSheet(
+        onCatalog: () {
+          Navigator.pop(ctx);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (c) => const LaborSearchModal(),
+          );
+        },
+        onManual: () {
+          Navigator.pop(ctx);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (c) => ManualLaborSheet(
+              onAdd: (desc, price, hours) {
+                ref.read(quotationControllerProvider.notifier)
+                    .addManualLabor(description: desc, price: price, hours: hours);
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -57,11 +91,17 @@ class ServiceCartSection extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
 
-        if (parts.isNotEmpty)
-          ...parts.map((part) => QuotationPartCard(part: part)),
+        if (data.parts.isNotEmpty)
+          ...data.parts.map((part) => QuotationPartCard(
+                part: part,
+                onRemove: () => ref.read(quotationControllerProvider.notifier).removePart(part.id),
+              )),
 
-        if (labor.isNotEmpty)
-          ...labor.map((l) => QuotationLaborCard(labor: l)),
+        if (data.labor.isNotEmpty)
+          ...data.labor.map((labor) => QuotationLaborCard(
+                labor: labor,
+                onRemove: () => ref.read(quotationControllerProvider.notifier).removeLabor(labor.id),
+              )),
 
         const SizedBox(height: 8),
 
@@ -92,17 +132,8 @@ class ServiceCartSection extends ConsumerWidget {
                 child: AddCatalogButton(
                   icon: CupertinoIcons.person_fill,
                   label: 'Tiền công'.tr(),
-                  onTap: () {
-                    HapticFeedback.mediumImpact();
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      useRootNavigator: true,
-                      backgroundColor: Colors.transparent,
-                      barrierColor: Colors.black.withValues(alpha: 0.4),
-                      builder: (context) => const LaborSearchModal(),
-                    );
-                  },
+                  onTap: () => _showLaborChoice(context, ref),
+                  theme: theme,
                 ),
               ),
             ],
@@ -113,8 +144,178 @@ class ServiceCartSection extends ConsumerWidget {
   }
 }
 
-class _CountBadge extends StatelessWidget {
-  final int count;
+class _LaborChoiceSheet extends StatelessWidget {
+  final VoidCallback onCatalog;
+  final VoidCallback onManual;
+
+  const _LaborChoiceSheet({required this.onCatalog, required this.onManual});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          Container(
+            width: 36, height: 4,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              'Thêm tiền công'.tr(),
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            leading: const Icon(CupertinoIcons.list_bullet),
+            title: Text('Từ danh mục'.tr()),
+            subtitle: Text('Chọn từ danh sách dịch vụ tiêu chuẩn'.tr()),
+            onTap: onCatalog,
+          ),
+          ListTile(
+            leading: const Icon(CupertinoIcons.pencil),
+            title: Text('Nhập thủ công'.tr()),
+            subtitle: Text('Tự nhập mô tả và đơn giá'.tr()),
+            onTap: onManual,
+          ),
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
+        ],
+      ),
+    );
+  }
+}
+
+class ManualLaborSheet extends StatefulWidget {
+  final void Function(String description, double price, double hours) onAdd;
+
+  const ManualLaborSheet({super.key, required this.onAdd});
+
+  @override
+  State<ManualLaborSheet> createState() => _ManualLaborSheetState();
+}
+
+class _ManualLaborSheetState extends State<ManualLaborSheet> {
+  final _descCtrl = TextEditingController();
+  final _priceCtrl = TextEditingController();
+  final _hoursCtrl = TextEditingController(text: '1');
+
+  @override
+  void dispose() {
+    _descCtrl.dispose();
+    _priceCtrl.dispose();
+    _hoursCtrl.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final desc = _descCtrl.text.trim();
+    final price = double.tryParse(_priceCtrl.text.replaceAll(',', '').replaceAll('.', '')) ?? 0;
+    final hours = double.tryParse(_hoursCtrl.text) ?? 1;
+
+    if (desc.isEmpty) return;
+    if (price <= 0) return;
+
+    widget.onAdd(desc, price, hours);
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 16, 20, bottom + 24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 36, height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Nhập tiền công thủ công'.tr(),
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _descCtrl,
+            decoration: InputDecoration(
+              labelText: 'Mô tả công việc'.tr(),
+              border: const OutlineInputBorder(),
+            ),
+            textCapitalization: TextCapitalization.sentences,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: TextField(
+                  controller: _priceCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Đơn giá (₫)'.tr(),
+                    border: const OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _hoursCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Số giờ'.tr(),
+                    border: const OutlineInputBorder(),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _submit,
+              child: Text('Thêm'.tr()),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddButton extends StatefulWidget {
+  final bool isDark;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
   final ThemeData theme;
 
   const _CountBadge({super.key, required this.count, required this.theme});

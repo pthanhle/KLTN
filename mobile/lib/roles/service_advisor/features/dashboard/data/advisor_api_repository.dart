@@ -104,6 +104,7 @@ class AdvisorApiRepository {
     // or DIAGNOSING.
     ROStage stage;
     switch (currentStatus) {
+      case 'WAITING_PARTS':
       case 'IN_PROGRESS':
         stage = ROStage.inProgress;
         break;
@@ -116,7 +117,7 @@ class AdvisorApiRepository {
         stage = ROStage.delivery;
         break;
       default:
-        // RECEIVED, DIAGNOSING, QUOTING, QUOTATION — or anything unknown:
+        // RECEIVED, DIAGNOSING, QUOTING — or anything unknown:
         // if reception not done yet → Cần Đón; otherwise → Báo Giá
         stage = parsedReceptionInfo == null ? ROStage.pending : ROStage.quotation;
     }
@@ -166,6 +167,7 @@ class AdvisorApiRepository {
       mpiDiagnostics: mpiDiagnostics,
       mpiConclusion: mpiConclusion,
       pendingSupplementId: pendingSupplementId,
+      servicePackageTotal: (booking['total_cost'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

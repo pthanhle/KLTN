@@ -10,6 +10,8 @@ export const useReceptionLogic = (selectedDate) => {
     const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
     const [selectedBookingForReschedule, setSelectedBookingForReschedule] = useState(null);
     const [bookingToMarkNoShow, setBookingToMarkNoShow] = useState(null);
+    const [selectedBookingForDetail, setSelectedBookingForDetail] = useState(null);
+    const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
 
     const dateStr = selectedDate ? selectedDate.format('YYYY-MM-DD') : null;
 
@@ -27,6 +29,7 @@ export const useReceptionLogic = (selectedDate) => {
         return raw.map(b => ({
             _id: b._id,
             booking_code: b.booking_code,
+            sequence_number: b.sequence_number,
             created_at: b.createdAt,
             booking_date: b.booking_date,
             time_slot: b.time_slot,
@@ -139,6 +142,15 @@ export const useReceptionLogic = (selectedDate) => {
         setIsRescheduleModalOpen(true);
     };
 
+    const handleViewDetail = (booking) => {
+        setSelectedBookingForDetail(booking);
+        setIsDetailDrawerOpen(true);
+    };
+
+    const handleCloseDetail = () => {
+        setIsDetailDrawerOpen(false);
+    };
+
     const rescheduleBooking = async (bookingId, newTime, newDate) => {
         try {
             setIsRescheduleModalOpen(false);
@@ -164,6 +176,10 @@ export const useReceptionLogic = (selectedDate) => {
         handleRescheduleClick,
         isRescheduleModalOpen,
         setIsRescheduleModalOpen,
-        selectedBookingForReschedule
+        selectedBookingForReschedule,
+        handleViewDetail,
+        handleCloseDetail,
+        selectedBookingForDetail,
+        isDetailDrawerOpen,
     };
 };

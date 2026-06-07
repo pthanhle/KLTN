@@ -152,9 +152,13 @@ class TechApiRepository {
   TechTaskStatus _parseStatus(String status) {
     switch (status) {
       case 'DIAGNOSING':
-        return TechTaskStatus.diagnosing;
       case 'QUOTING':
+        // QUOTING means advisor is creating quotation — tech still in "Khám xe"
+        return TechTaskStatus.diagnosing;
+      case 'WAITING_PARTS':
+        return TechTaskStatus.waitingParts;
       case 'IN_PROGRESS':
+      case 'QC_TESTING':
         return TechTaskStatus.inProgress;
       case 'COMPLETED':
         return TechTaskStatus.completed;

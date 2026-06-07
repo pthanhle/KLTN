@@ -1,7 +1,7 @@
 import React from 'react';
 import AdvisorColumn from '../AdvisorColumn';
 
-const AdvisorWorkloadPane = ({ advisors, bookings, isLoading, onReschedule, onNoShow }) => {
+const AdvisorWorkloadPane = ({ advisors, bookings, isLoading, onReschedule, onNoShow, onViewDetail }) => {
     return (
         <section className="flex-1 bg-slate-50 dark:bg-[#0a0a0b] overflow-x-auto overflow-y-hidden p-8 flex gap-8">
             {isLoading ? (
@@ -17,12 +17,13 @@ const AdvisorWorkloadPane = ({ advisors, bookings, isLoading, onReschedule, onNo
                     });
                     return (
                         <AdvisorColumn
-                            key={advisor._id} 
-                            advisor={advisor} 
+                            key={advisor._id}
+                            advisor={advisor}
                             assignedBookings={assignedBookings}
                             isLoading={false}
                             onReschedule={onReschedule}
                             onNoShow={onNoShow}
+                            onViewDetail={onViewDetail}
                         />
                     );
                 })

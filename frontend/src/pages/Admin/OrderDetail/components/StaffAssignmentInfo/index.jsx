@@ -1,10 +1,37 @@
 import React from 'react';
 import { Image } from 'antd';
-import { UserCog, Tag, Phone, RefreshCw } from 'lucide-react';
+import { UserCog, Tag, Phone, RefreshCw, UserPlus } from 'lucide-react';
 import { mockStaffData } from '../../../Staff/data/mockStaffData';
 
-export const StaffAssignmentInfo = ({ assignment, t, onReassign }) => {
-    if (!assignment || !assignment.assigned_staff_id) return null;
+export const StaffAssignmentInfo = ({ assignment, t, onReassign, orderStatus }) => {
+    const hasStaff = assignment?.assigned_staff_id;
+    const canAssign = ['CONFIRMED', 'PROCESSING'].includes(orderStatus);
+
+    if (!hasStaff) {
+        if (!canAssign) return null;
+        return (
+            <section className="bg-white dark:bg-[#141416] rounded-2xl p-6 border border-slate-200 dark:border-white/5 mt-8 shadow-sm">
+                <div className="flex items-center gap-2 mb-5">
+                    <UserCog size={16} className="text-yellow-600 dark:text-yellow-500" />
+                    <h3 className="text-[11px] uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400">
+                        {t('staff_assigned_title', 'Nhân viên phụ trách đóng gói')}
+                    </h3>
+                </div>
+                <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-dashed border-slate-200 dark:border-white/10 flex flex-col items-center gap-3 text-center">
+                    <p className="text-sm text-slate-400 dark:text-slate-500">
+                        {t('no_staff_assigned', 'Chưa có nhân viên được phân công')}
+                    </p>
+                    <button
+                        onClick={onReassign}
+                        className="px-5 py-2 rounded-xl bg-indigo-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-600 transition-colors flex items-center gap-2"
+                    >
+                        <UserPlus size={14} />
+                        {t('assign_now_btn', 'Phân công ngay')}
+                    </button>
+                </div>
+            </section>
+        );
+    }
 
     const staffId = typeof assignment.assigned_staff_id === 'object'
         ? assignment.assigned_staff_id._id

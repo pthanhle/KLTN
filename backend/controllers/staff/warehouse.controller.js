@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import RepairProgress from '../../models/repairprogressModel.js'
 import Part from '../../models/partModel.js'
+import { getIO } from '../../config/socket.js'
 
 export const getPickLists = asyncHandler(async (req, res) => {
     const progresses = await RepairProgress.find({
@@ -85,6 +86,40 @@ export const dispatchParts = asyncHandler(async (req, res) => {
             type: 'INF',
             message: `Thủ kho đã xuất kho ${dispatchedCount} phụ tùng đến khoang sửa chữa.`,
         })
+
+        const allPartsReady = progress.parts_usage.every(p => p.status !== 'WAITING')
+        if (allPartsReady && progress.status === 'WAITING_PARTS') {
+            progress.current_step = 'IN_PROGRESS'
+            progress.status = 'IN_PROGRESS'
+            progress.timeline.push({
+                step: 'IN_PROGRESS',
+                status: 'IN_PROGRESS',
+                time: new Date(),
+                note: 'Tất cả phụ tùng đã xuất kho. Bắt đầu thi công.',
+            })
+            progress.system_logs.push({
+                time: new Date(),
+                type: 'INF',
+                message: 'Tất cả phụ tùng đã xuất kho. Xe chuyển sang Đang thi công.',
+            })
+
+            try {
+                const io = getIO()
+                if (progress.mechanic_id) {
+                    io.to(`user_${progress.mechanic_id}`).emit('parts_ready', {
+                        progress_id: progress._id,
+                        message: 'Phụ tùng đã sẵn sàng. Bắt đầu thi công!',
+                    })
+                }
+                if (progress.advisor_id) {
+                    io.to(`user_${progress.advisor_id}`).emit('parts_ready', {
+                        progress_id: progress._id,
+                        message: 'Tất cả phụ tùng đã xuất kho. Xe đang được thi công.',
+                    })
+                }
+            } catch (_) {}
+        }
+
         await progress.save()
     }
 

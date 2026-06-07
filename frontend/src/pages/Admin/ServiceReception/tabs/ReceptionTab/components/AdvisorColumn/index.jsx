@@ -6,7 +6,7 @@ import { Image, Skeleton } from 'antd';
 import BookingCard from '../BookingCard';
 import { RECEPTION_CONSTANTS } from '../../../../constants/receptionConstants';
 
-const AdvisorColumn = ({ advisor, assignedBookings, isLoading, onReschedule, onNoShow }) => {
+const AdvisorColumn = ({ advisor, assignedBookings, isLoading, onReschedule, onNoShow, onViewDetail }) => {
     const { t } = useTranslation('adminServiceReception');
     const { setNodeRef, isOver } = useDroppable({
         id: advisor ? advisor._id : 'loading',
@@ -84,7 +84,7 @@ const AdvisorColumn = ({ advisor, assignedBookings, isLoading, onReschedule, onN
                 className={`flex-1 p-5 overflow-y-auto space-y-4 ${isOver ? 'bg-slate-100/50 dark:bg-[#101014]/50' : ''}`}
             >
                 {assignedBookings.map(booking => (
-                    <BookingCard key={booking._id} booking={booking} onReschedule={onReschedule} onNoShow={onNoShow} />
+                    <BookingCard key={booking._id} booking={booking} onReschedule={onReschedule} onNoShow={onNoShow} onViewDetail={onViewDetail} />
                 ))}
 
                 <div className={`border-2 border-dashed ${isOver ? 'border-yellow-500 bg-yellow-500/10' : 'border-slate-300 dark:border-white/10 bg-slate-100/30 dark:bg-[#101014]/30'} rounded-xl h-32 flex items-center justify-center hover:bg-slate-100/80 dark:hover:bg-[#101014]/80 hover:border-yellow-500/50 transition-all group shadow-inner`}>

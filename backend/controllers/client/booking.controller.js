@@ -4,6 +4,8 @@ import Notification from '../../models/notificationModel.js'
 import { getNextSequence } from '../../models/counterModel.js'
 import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
+import emailQueue from '../../queues/emailQueue.js'
+import { testDriveConfirmationEmail } from '../../utils/emailTemplates.js'
 
 const generateBookingCode = (prefix = 'BK') => {
     const rand = Math.random().toString(36).substring(2, 8).toUpperCase()
@@ -149,6 +151,32 @@ export const createBooking = asyncHandler(async (req, res) => {
         })
     } catch (e) {
         console.error('Notification error:', e)
+    }
+
+    if (booking_type === 'test_drive' && req.user.email) {
+        try {
+            const formattedDate = new Date(booking_date).toLocaleDateString('vi-VN', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+            })
+            const carName = car ? `${car.brandName || ''} ${car.name}`.trim() : 'Xe đã chọn'
+            const locationInfo = test_drive_type === 'home'
+                ? (delivery_address || '')
+                : (showroom_branch || 'Showroom TT AUTO')
+            await emailQueue.add('sendEmail', {
+                to: req.user.email,
+                ...testDriveConfirmationEmail(
+                    req.user.full_name,
+                    booking_code,
+                    carName,
+                    formattedDate,
+                    time_slot,
+                    test_drive_type || 'showroom',
+                    locationInfo,
+                ),
+            })
+        } catch (e) {
+            console.error('Test drive confirmation email error:', e)
+        }
     }
 
     res.status(201).json({

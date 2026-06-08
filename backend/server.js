@@ -21,6 +21,7 @@ import { initSocket } from './config/socket.js'
 import './workers/emailWorker.js'
 import './workers/imageWorker.js'
 import './workers/maintenanceReminderWorker.js'
+import './workers/appointmentReminderWorker.js'
 
 import adminIndexRoutes from './routes/admin/index.route.js'
 import clientIndexRoutes from './routes/client/index.route.js'

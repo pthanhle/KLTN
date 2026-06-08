@@ -178,6 +178,112 @@ export const maintenanceReminderEmail = (fullName, bookingUrl) => ({
 })
 
 
+export const testDriveConfirmationEmail = (fullName, bookingCode, carName, bookingDate, timeSlot, driveType, locationInfo) => ({
+    subject: `Xác nhận đặt lịch lái thử – ${bookingCode}`,
+    html: `
+        <div style="${BASE_STYLE}">
+            <h2 style="color: #1e293b; text-align: center;">Đặt lịch lái thử thành công!</h2>
+            <p>Xin chào <strong>${fullName}</strong>,</p>
+            <p>Chúng tôi đã nhận được yêu cầu đặt lịch lái thử của bạn. Dưới đây là thông tin chi tiết:</p>
+
+            <div style="background-color: #f8fafc; border-left: 4px solid #eab308; padding: 16px; border-radius: 6px; margin: 20px 0;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #1e293b;">
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b; width: 40%;">Mã đặt lịch:</td>
+                        <td style="padding: 6px 0; font-weight: bold; font-family: monospace; font-size: 16px; letter-spacing: 1px;">${bookingCode}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Xe lái thử:</td>
+                        <td style="padding: 6px 0; font-weight: bold;">${carName}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Ngày hẹn:</td>
+                        <td style="padding: 6px 0; font-weight: bold;">${bookingDate}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Khung giờ:</td>
+                        <td style="padding: 6px 0; font-weight: bold;">${timeSlot}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Hình thức:</td>
+                        <td style="padding: 6px 0;">${driveType === 'home' ? 'Lái thử tại nhà' : 'Lái thử tại showroom'}</td>
+                    </tr>
+                    ${locationInfo ? `
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">${driveType === 'home' ? 'Địa chỉ:' : 'Showroom:'}</td>
+                        <td style="padding: 6px 0;">${locationInfo}</td>
+                    </tr>` : ''}
+                </table>
+            </div>
+
+            <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px; border-radius: 6px; margin: 16px 0; font-size: 14px; color: #92400e;">
+                <strong>Lưu ý:</strong> Lịch hẹn đang chờ xác nhận từ đội ngũ TT AUTO. Chúng tôi sẽ liên hệ với bạn sớm nhất.
+            </div>
+
+            <p style="font-size: 14px; color: #64748b;">
+                Bạn có thể xem và quản lý lịch hẹn trong mục <strong>Tài khoản › Lịch sử dịch vụ</strong>.
+            </p>
+            <hr style="${HR_STYLE}">
+            <p style="${FOOTER_STYLE}">Cảm ơn bạn đã tin tưởng TT AUTO! Mọi thắc mắc vui lòng liên hệ: support@ttauto.vn</p>
+        </div>
+    `,
+})
+
+
+export const appointmentReminderEmail = (fullName, bookingCode, bookingType, bookingDate, timeSlot, locationInfo) => {
+    const typeLabel = bookingType === 'test_drive' ? 'lái thử' : bookingType === 'maintenance' ? 'bảo dưỡng' : 'dịch vụ'
+    const typeIcon = bookingType === 'test_drive' ? '🚗' : '🔧'
+    return {
+        subject: `Nhắc lịch hôm nay: Bạn có lịch ${typeLabel} tại TT AUTO`,
+        html: `
+            <div style="${BASE_STYLE}">
+                <h2 style="color: #1e293b; text-align: center;">Nhắc lịch hẹn hôm nay</h2>
+                <p>Xin chào <strong>${fullName}</strong>,</p>
+                <p>Đây là lời nhắc về lịch hẹn của bạn <strong>hôm nay</strong> tại <strong>TT AUTO</strong>.</p>
+
+                <div style="background-color: #f0fdf4; border: 1px solid #86efac; padding: 16px; border-radius: 8px; margin: 20px 0;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #1e293b;">
+                        <tr>
+                            <td style="padding: 6px 0; color: #64748b; width: 40%;">Loại lịch:</td>
+                            <td style="padding: 6px 0; font-weight: bold;">Lịch ${typeLabel}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px 0; color: #64748b;">Mã đặt lịch:</td>
+                            <td style="padding: 6px 0; font-weight: bold; font-family: monospace;">${bookingCode}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px 0; color: #64748b;">Ngày:</td>
+                            <td style="padding: 6px 0; font-weight: bold;">${bookingDate}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px 0; color: #64748b;">Khung giờ:</td>
+                            <td style="padding: 6px 0; font-weight: bold;">${timeSlot}</td>
+                        </tr>
+                        ${locationInfo ? `
+                        <tr>
+                            <td style="padding: 6px 0; color: #64748b;">Địa điểm:</td>
+                            <td style="padding: 6px 0;">${locationInfo}</td>
+                        </tr>` : ''}
+                    </table>
+                </div>
+
+                <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 14px; border-radius: 6px; margin: 16px 0; font-size: 14px; color: #1e40af;">
+                    <strong>Chuẩn bị trước khi đến:</strong>
+                    <ul style="margin: 8px 0 0 0; padding-left: 18px;">
+                        <li>Mang theo CCCD/CMND và giấy phép lái xe (nếu có)</li>
+                        <li>Đến đúng giờ để đảm bảo thời gian phục vụ tốt nhất</li>
+                        <li>Liên hệ hotline nếu cần thay đổi lịch hẹn</li>
+                    </ul>
+                </div>
+
+                <hr style="${HR_STYLE}">
+                <p style="${FOOTER_STYLE}">TT AUTO – Đội ngũ chúng tôi sẽ sẵn sàng đón tiếp bạn! Liên hệ: support@ttauto.vn</p>
+            </div>
+        `,
+    }
+}
+
+
 export const serviceTrackingEmail = (fullName, trackingCode, trackingUrl, licensePlate, serviceItems = []) => ({
     subject: 'Thông tin dịch vụ & Theo dõi tiến độ',
     html: `

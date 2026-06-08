@@ -25,9 +25,13 @@ export const createVNPayPayment = asyncHandler(async (req, res) => {
 
     let validAmount, orderInfo, paymentType
     if (paymentTypeReq === 'final_payment') {
-      if (progress.status !== 'QC_TESTING') {
+      if (progress.status !== 'COMPLETED') {
         res.status(400)
         throw new Error('Xe chưa hoàn thành kiểm định QC')
+      }
+      if (progress.delivery?.invoice_ledger?.payment_status === 'PAID') {
+        res.status(400)
+        throw new Error('Đơn dịch vụ này đã được thanh toán đầy đủ')
       }
       const remaining = (progress.quotation?.final_amount || 0) - (progress.quotation?.deposit_amount || 0)
       validAmount = Math.floor(remaining)
@@ -280,7 +284,8 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
           }).catch(() => {})
         }
 
-        return res.redirect(`${frontendUrl}/payment/success?order_id=${progress.booking_id?.booking_code || progress._id}&type=quotation`)
+        const bookingCode = progress.booking_id?.booking_code || progress._id
+        return res.redirect(`${frontendUrl}/tracking/${bookingCode}?tab=delivery&paid=1`)
       }
 
       // Deposit flow — build parts_usage first to decide if warehouse step is needed

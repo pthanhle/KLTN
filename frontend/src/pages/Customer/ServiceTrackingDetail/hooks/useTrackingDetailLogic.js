@@ -245,6 +245,86 @@ const mapQuotationData = (realProgress, ri, advisorSignatureUrl, customerSignatu
     };
 };
 
+const mapDeliveryData = (p) => {
+    if (!['COMPLETED'].includes(p.status)) return null;
+
+    const q = p.quotation || {};
+    const booking = p.booking_id || {};
+    const advisor = p.advisor_id || {};
+
+    // Build invoice items from quotation parts + labors + approved supplement parts/labors
+    const items = [];
+    (q.parts || []).forEach((part, i) => {
+        items.push({
+            id: `part_${i}`,
+            sku: part.sku || '',
+            name: part.name || '',
+            quantity: part.quantity || 0,
+            unit_price: part.unit_price || 0,
+            total_price: (part.quantity || 0) * (part.unit_price || 0),
+            is_addition: false,
+        });
+    });
+    (q.labors || []).forEach((labor, i) => {
+        items.push({
+            id: `labor_${i}`,
+            sku: '',
+            name: labor.description || '',
+            quantity: labor.hours || 1,
+            unit_price: labor.rate || 0,
+            total_price: (labor.hours || 1) * (labor.rate || 0),
+            is_addition: false,
+        });
+    });
+
+    const partsTotal = (q.parts || []).reduce((s, p) => s + (p.quantity || 0) * (p.unit_price || 0), 0);
+    const laborsTotal = (q.labors || []).reduce((s, l) => s + (l.hours || 1) * (l.rate || 0), 0);
+    const subTotal = partsTotal + laborsTotal;
+    const vatRate = q.vat_rate ?? 0.1;
+    const vatAmount = subTotal * vatRate;
+    const grandTotal = q.final_amount || (subTotal + vatAmount);
+    const depositPaid = q.deposit_amount || 0;
+    const balanceDue = Math.max(0, grandTotal - depositPaid);
+
+    const advisorSigRaw = p.qc_advisor_signature || null;
+    const advisorSigUrl = advisorSigRaw ? `data:image/png;base64,${advisorSigRaw}` : null;
+
+    // Next maintenance: 3 months from today, +5000 km from odometer
+    const ri = p.timeline?.find((s) => s.step === 'RECEIVED')?.reception_info || {};
+    const currentOdo = ri.odometer || 0;
+    const nextMaintDate = new Date();
+    nextMaintDate.setMonth(nextMaintDate.getMonth() + 3);
+
+    return {
+        handover_brief: {
+            odo_out: p.delivery?.handover_brief?.odometer_at_delivery || currentOdo,
+            next_maintenance_date: nextMaintDate.toISOString(),
+            next_maintenance_km: currentOdo + 5000,
+            warranty_months: 24,
+            status_code: 'READY',
+        },
+        invoice_ledger: {
+            transaction_id: booking.booking_code || p._id,
+            items,
+            sub_total: subTotal,
+            vat_amount: vatAmount,
+            grand_total: grandTotal,
+            deposit_paid: depositPaid,
+            balance_due: balanceDue,
+            payment_status: p.delivery?.invoice_ledger?.payment_status || 'PENDING',
+        },
+        handshake_protocol: {
+            advisor_signature: {
+                is_signed: !!advisorSigUrl,
+                image_url: advisorSigUrl,
+                role: 'CỐ VẤN DỊCH VỤ',
+                name: advisor.full_name || 'Cố vấn dịch vụ',
+            },
+            client_signature: { is_signed: false, image_url: null },
+        },
+    };
+};
+
 const mapQcData = (p) => {
     const checklist = p.qc_checklist || [];
     const signature = p.qc_advisor_signature || null;
@@ -286,6 +366,7 @@ export const useTrackingDetailLogic = () => {
     const [overviewData, setOverviewData] = useState(null);
     const [quotationData, setQuotationData] = useState(null);
     const [progressData, setProgressData] = useState(null);
+    const [deliveryData, setDeliveryData] = useState(null);
     const [repairStatus, setRepairStatus] = useState('RECEIVED');
     const [progressId, setProgressId] = useState(null);
     const { isAuthenticated } = useSelector((state) => state.auth);
@@ -331,6 +412,7 @@ export const useTrackingDetailLogic = () => {
                 setDiagnosticData(realProgress.timeline ? mapDiagnosticData(realProgress.timeline) : null);
                 setQuotationData(mapQuotationData(realProgress, ri, advisorSignatureUrl, customerSignatureUrl));
                 setQcData(mapQcData(realProgress));
+                setDeliveryData(mapDeliveryData(realProgress));
                 setProgressData(mapProgressData(realProgress));
             } catch (err) {
                 const message =
@@ -358,6 +440,7 @@ export const useTrackingDetailLogic = () => {
         setQuotationData,
         progressData,
         setProgressData,
+        deliveryData,
         repairStatus,
         progressId,
         t,

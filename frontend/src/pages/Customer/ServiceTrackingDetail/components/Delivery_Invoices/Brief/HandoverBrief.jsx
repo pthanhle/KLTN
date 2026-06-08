@@ -29,7 +29,9 @@ const HandoverBrief = ({ data }) => {
                             {t('del_next_maint', 'Bảo dưỡng định kỳ tiếp theo')}
                         </p>
                         <p className="text-lg font-bold text-emerald-600 dark:text-[#4edea3]">
-                            {new Date(data.next_maintenance_date).toLocaleDateString('vi-VN')}
+                            {data.next_maintenance_date
+                                ? new Date(data.next_maintenance_date).toLocaleDateString('vi-VN')
+                                : '—'}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-[#a0a0a0] font-medium mt-1">
                             {t('del_or', 'hoặc')} {formatOdometer(data.next_maintenance_km)} km

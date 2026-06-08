@@ -1,18 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image } from 'antd';
-import { Check, Pointer } from 'lucide-react';
+import { Check, Pointer, CreditCard } from 'lucide-react';
 import { CHECKLIST_ITEMS } from '../../../constants/deliveryConstants';
 import SignatureModal from '../../Quotations_Approval/SignatureModal';
+import { formatCurrency } from '../../../utils/trackingDataUtils';
 
-const HandshakeProtocol = ({ data }) => {
+const HandshakeProtocol = ({
+    data,
+    isPaid,
+    balanceDue,
+    onCanPayChange,
+    canPay,
+    onFinalPayment,
+    isFinalPaymentRedirecting,
+}) => {
     const { t } = useTranslation('tracking');
     const [checkedItems, setCheckedItems] = useState({});
     const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
-    const [clientSig, setClientSig] = useState(data.client_signature?.image_url || null);
+    const [clientSig, setClientSig] = useState(data?.client_signature?.image_url || null);
+
+    const allChecked = CHECKLIST_ITEMS.every((item) => checkedItems[item.id]);
+
+    useEffect(() => {
+        onCanPayChange?.(allChecked && !!clientSig);
+    }, [allChecked, clientSig, onCanPayChange]);
 
     const toggleCheck = (id) => {
-        setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+        if (isPaid) return;
+        setCheckedItems((prev) => ({ ...prev, [id]: !prev[id] }));
     };
 
     const handleSaveSignature = (sigUrl) => {
@@ -21,23 +37,30 @@ const HandshakeProtocol = ({ data }) => {
     };
 
     return (
-        <div className="bg-slate-50 dark:bg-[#141416] rounded-xl p-8 border border-slate-200 dark:border-white/5 shadow-sm h-full">
+        <div className="bg-slate-50 dark:bg-[#141416] rounded-xl p-8 border border-slate-200 dark:border-white/5 shadow-sm">
             <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-[#a0a0a0] mb-6">
                 {t('del_handshake', 'Biên Bản Bàn Giao Thỏa Thuận')}
             </h3>
 
+            {/* Checkboxes */}
             <div className="space-y-4 mb-8">
-                {CHECKLIST_ITEMS.map(item => (
-                    <label 
-                        key={item.id} 
-                        className="flex items-center gap-4 cursor-pointer group"
+                {CHECKLIST_ITEMS.map((item) => (
+                    <label
+                        key={item.id}
+                        className={`flex items-center gap-4 ${isPaid ? 'cursor-default' : 'cursor-pointer group'}`}
                         onClick={() => toggleCheck(item.id)}
                     >
-                        <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${checkedItems[item.id] ? 'border-yellow-500 bg-yellow-500/10' : 'border-slate-300 dark:border-white/20 group-hover:border-yellow-500'}`}>
-                            <Check 
-                                className={`text-yellow-600 dark:text-[#d4af37] transition-transform ${checkedItems[item.id] ? 'scale-100' : 'scale-0 group-active:scale-100'}`} 
-                                size={16} 
-                                strokeWidth={3} 
+                        <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                            checkedItems[item.id] || isPaid
+                                ? 'border-yellow-500 bg-yellow-500/10'
+                                : 'border-slate-300 dark:border-white/20 group-hover:border-yellow-500'
+                        }`}>
+                            <Check
+                                className={`text-yellow-600 dark:text-[#d4af37] transition-transform ${
+                                    checkedItems[item.id] || isPaid ? 'scale-100' : 'scale-0'
+                                }`}
+                                size={16}
+                                strokeWidth={3}
                             />
                         </div>
                         <span className="text-sm font-medium text-slate-700 dark:text-white select-none">
@@ -47,27 +70,34 @@ const HandshakeProtocol = ({ data }) => {
                 ))}
             </div>
 
-            <div className="space-y-6">
+            {/* Signatures */}
+            <div className="space-y-6 mb-8">
                 {/* Advisor Signature */}
                 <div>
                     <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 dark:text-[#a0a0a0] mb-2">
                         {t('del_advisor', 'Cố Vấn Dịch Vụ')}
                     </p>
                     <div className="h-24 bg-white dark:bg-[#1e1e20] rounded-lg border border-slate-200 dark:border-white/10 relative flex items-center justify-center overflow-hidden">
-                        {data.advisor_signature?.is_signed && (
-                            <Image 
-                                src={data.advisor_signature.image_url} 
-                                alt="Advisor Signature" 
+                        {data?.advisor_signature?.is_signed && data.advisor_signature.image_url ? (
+                            <Image
+                                src={data.advisor_signature.image_url}
+                                alt="Advisor Signature"
                                 preview={false}
-                                className="h-16 opacity-80 dark:invert" 
+                                className="h-16 opacity-80"
                             />
-                        )}
-                        <div className="absolute bottom-2 right-2 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span className="text-[8px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
-                                {t('del_verified', 'Đã Xác Thực')}
+                        ) : (
+                            <span className="text-xs text-slate-400 dark:text-slate-500 italic">
+                                {t('label_awaiting_signature', 'Chưa có chữ ký')}
                             </span>
-                        </div>
+                        )}
+                        {data?.advisor_signature?.is_signed && (
+                            <div className="absolute bottom-2 right-2 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                <span className="text-[8px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
+                                    {t('del_verified', 'Đã Xác Thực')}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -77,9 +107,11 @@ const HandshakeProtocol = ({ data }) => {
                         {t('del_client', 'Chữ Ký Khách Hàng Xác Nhận')}
                     </p>
                     {!clientSig ? (
-                        <div 
-                            onClick={() => setIsSignatureModalOpen(true)}
-                            className="h-32 bg-slate-100/50 dark:bg-white/5 rounded-lg border-2 border-dashed border-slate-300 dark:border-white/20 flex flex-col items-center justify-center gap-2 cursor-pointer group hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                        <div
+                            onClick={() => !isPaid && setIsSignatureModalOpen(true)}
+                            className={`h-32 bg-slate-100/50 dark:bg-white/5 rounded-lg border-2 border-dashed border-slate-300 dark:border-white/20 flex flex-col items-center justify-center gap-2 transition-colors ${
+                                isPaid ? 'cursor-default opacity-50' : 'cursor-pointer group hover:bg-slate-100 dark:hover:bg-white/10'
+                            }`}
                         >
                             <Pointer className="text-slate-400 dark:text-[#a0a0a0] group-hover:text-yellow-600 dark:group-hover:text-[#d4af37] transition-colors" size={24} />
                             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#a0a0a0]">
@@ -87,25 +119,52 @@ const HandshakeProtocol = ({ data }) => {
                             </span>
                         </div>
                     ) : (
-                        <div 
-                            onClick={() => setIsSignatureModalOpen(true)}
-                            className="h-32 bg-white dark:bg-[#1e1e20] rounded-lg border border-slate-200 dark:border-white/10 relative flex items-center justify-center overflow-hidden cursor-pointer"
+                        <div
+                            onClick={() => !isPaid && setIsSignatureModalOpen(true)}
+                            className={`h-32 bg-white dark:bg-[#1e1e20] rounded-lg border border-slate-200 dark:border-white/10 relative flex items-center justify-center overflow-hidden ${
+                                isPaid ? 'cursor-default' : 'cursor-pointer'
+                            }`}
                         >
                             <Image src={clientSig} alt="Client Signature" preview={false} className="h-24 opacity-90 dark:invert" />
-                            <div className="absolute top-2 right-2 flex items-center gap-1 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full border border-yellow-200 dark:border-yellow-700/50">
-                                <span className="text-[8px] uppercase font-bold text-yellow-600 dark:text-[#d4af37]">
-                                    {t('del_resign', 'Chạm để ký lại')}
-                                </span>
-                            </div>
+                            {!isPaid && (
+                                <div className="absolute top-2 right-2 flex items-center gap-1 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full border border-yellow-200 dark:border-yellow-700/50">
+                                    <span className="text-[8px] uppercase font-bold text-yellow-600 dark:text-[#d4af37]">
+                                        {t('del_resign', 'Chạm để ký lại')}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
 
-            <SignatureModal 
-                isOpen={isSignatureModalOpen} 
-                onClose={() => setIsSignatureModalOpen(false)} 
-                onConfirm={handleSaveSignature} 
+            {/* VNPay Payment Button */}
+            {!isPaid && (
+                <button
+                    onClick={canPay && !isFinalPaymentRedirecting ? onFinalPayment : undefined}
+                    disabled={!canPay || isFinalPaymentRedirecting}
+                    className={`w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-3 transition-all duration-300 ${
+                        canPay
+                            ? 'bg-gradient-to-r from-yellow-500 to-yellow-400 text-slate-900 shadow-[0_8px_24px_rgba(234,179,8,0.3)] hover:scale-[1.02] active:scale-95 cursor-pointer'
+                            : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                    }`}
+                >
+                    <CreditCard size={18} />
+                    <span className="uppercase tracking-widest">
+                        {isFinalPaymentRedirecting
+                            ? t('del_redirecting', 'Đang chuyển hướng...')
+                            : canPay
+                                ? `${t('del_pay_vnpay', 'Thanh toán VNPay')} — ${formatCurrency(balanceDue)} VNĐ`
+                                : t('del_sign_first', 'Tích & ký để thanh toán')
+                        }
+                    </span>
+                </button>
+            )}
+
+            <SignatureModal
+                isOpen={isSignatureModalOpen}
+                onClose={() => setIsSignatureModalOpen(false)}
+                onConfirm={handleSaveSignature}
             />
         </div>
     );

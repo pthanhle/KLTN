@@ -72,6 +72,7 @@ const ServiceTrackingDetail = () => {
         setQuotationData,
         progressData,
         setProgressData,
+        deliveryData,
         repairStatus,
         progressId,
         t,
@@ -143,7 +144,14 @@ const ServiceTrackingDetail = () => {
                                 <QuotationTab quotationData={quotationData} setQuotationData={setQuotationData} />
                             )}
                             {activeTab === 'progress' && <ProgressTab progressData={progressData} setProgressData={setProgressData} />}
-                            {activeTab === 'delivery' && <DeliveryTab />}
+                            {activeTab === 'delivery' && (
+                                <DeliveryTab
+                                    deliveryData={deliveryData}
+                                    progressId={progressId}
+                                    onFinalPayment={handleFinalPayment}
+                                    isFinalPaymentRedirecting={isFinalPaymentRedirecting}
+                                />
+                            )}
 
                             {!['overview', 'diagnostics', 'qc', 'quotations', 'progress', 'delivery'].includes(activeTab) && (
                                 <div className="flex items-center justify-center py-20 opacity-50 text-slate-500 uppercase font-bold tracking-widest text-sm">
@@ -153,44 +161,6 @@ const ServiceTrackingDetail = () => {
                         </>
                     )}
                 </main>
-
-                {/* Final payment bar — shown when QC done */}
-                {repairStatus === 'QC_TESTING' && activeTab === 'qc' && progressId && !isLoading && (
-                    <div className="sticky bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-[#141416]/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 shadow-2xl z-30 lg:hidden">
-                        <button
-                            onClick={handleFinalPayment}
-                            disabled={isFinalPaymentRedirecting}
-                            className="w-full py-4 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-400 text-slate-900 font-black uppercase tracking-widest text-sm shadow-[0_10px_30px_rgba(234,179,8,0.3)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
-                        >
-                            <CreditCard size={18} />
-                            {isFinalPaymentRedirecting ? 'Đang chuyển hướng...' : 'Thanh toán phần còn lại qua VNPay'}
-                        </button>
-                    </div>
-                )}
-
-                {/* Desktop final payment bar */}
-                {repairStatus === 'QC_TESTING' && activeTab === 'qc' && progressId && !isLoading && (
-                    <div className="hidden lg:block mx-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="max-w-7xl mx-auto bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div>
-                                <p className="text-xs font-bold uppercase tracking-widest text-yellow-700 dark:text-yellow-400 mb-1">
-                                    Xe đã hoàn thành kiểm định QC
-                                </p>
-                                <p className="text-sm text-slate-600 dark:text-[#a0a0a0]">
-                                    Vui lòng thanh toán phần còn lại để nhận xe.
-                                </p>
-                            </div>
-                            <button
-                                onClick={handleFinalPayment}
-                                disabled={isFinalPaymentRedirecting}
-                                className="flex-shrink-0 px-8 py-3 rounded-full bg-yellow-500 hover:bg-yellow-400 disabled:opacity-70 text-slate-900 font-bold text-sm flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95 shadow-md"
-                            >
-                                <CreditCard size={18} />
-                                {isFinalPaymentRedirecting ? 'Đang chuyển hướng...' : 'Thanh toán qua VNPay'}
-                            </button>
-                        </div>
-                    </div>
-                )}
 
                 <div className="h-24 lg:hidden" />
                 <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} repairStatus={repairStatus} />

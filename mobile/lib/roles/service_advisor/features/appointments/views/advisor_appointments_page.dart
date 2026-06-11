@@ -80,7 +80,7 @@ class AdvisorAppointmentsPage extends ConsumerWidget {
 
               if (dashState.isLoading)
                 const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: CupertinoActivityIndicator()),
                 )
               else if (appointments.isEmpty)
                 SliverFillRemaining(

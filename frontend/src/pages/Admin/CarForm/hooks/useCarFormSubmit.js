@@ -113,8 +113,7 @@ export const useCarFormSubmit = (form) => {
                     .catch(err => console.error('Query invalidation failed', err));
 
                 sessionStorage.setItem('admin_car_success', 'Cập nhật xe thành công!');
-                console.log('Redirecting to /admin/cars via window.location.replace');
-                window.location.replace('/admin/cars');
+                navigate('/admin/cars');
             } else {
                 console.log('Calling createAdminProduct api directly for publish');
                 await createAdminProduct(formData);
@@ -125,8 +124,7 @@ export const useCarFormSubmit = (form) => {
                     .catch(err => console.error('Query invalidation failed', err));
 
                 sessionStorage.setItem('admin_car_success', 'Thêm xe mới thành công!');
-                console.log('Redirecting to /admin/cars via window.location.replace');
-                window.location.replace('/admin/cars');
+                navigate('/admin/cars');
             }
         } catch (error) {
             console.error('handlePublish error', error);
@@ -153,8 +151,8 @@ export const useCarFormSubmit = (form) => {
                     .catch(err => console.error('Query invalidation failed', err));
 
                 sessionStorage.setItem('admin_car_success', 'Đã lưu nháp cập nhật!');
-                console.log('Redirecting to /admin/cars via window.location.replace');
-                window.location.replace('/admin/cars');
+                console.log('Redirecting to /admin/cars via navigate');
+                navigate('/admin/cars');
             } else {
                 console.log('Calling createAdminProduct api directly for draft');
                 await createAdminProduct(formData);
@@ -165,8 +163,8 @@ export const useCarFormSubmit = (form) => {
                     .catch(err => console.error('Query invalidation failed', err));
 
                 sessionStorage.setItem('admin_car_success', 'Đã lưu bản nháp mới!');
-                console.log('Redirecting to /admin/cars via window.location.replace');
-                window.location.replace('/admin/cars');
+                console.log('Redirecting to /admin/cars via navigate');
+                navigate('/admin/cars');
             }
         } catch (error) {
             console.error('handleSaveDraft error', error);

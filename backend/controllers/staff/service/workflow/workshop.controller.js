@@ -90,6 +90,14 @@ export const markJobDone = asyncHandler(async (req, res) => {
         })
     }
 
+    if (progress.parts_usage && progress.parts_usage.length > 0) {
+        progress.parts_usage.forEach(p => {
+            if (p.status === 'IN_PROGRESS' || p.status === 'WAITING') {
+                p.status = 'COMPLETED'
+            }
+        })
+    }
+
     await progress.save()
 
     try {

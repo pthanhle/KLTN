@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../roles/auth/controllers/auth_controller.dart';
@@ -14,7 +15,7 @@ class DynamicDashboard extends ConsumerWidget {
     final user = ref.watch(authControllerProvider).value;
 
     if (user == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CupertinoActivityIndicator());
     }
 
     switch (user.role.toLowerCase()) {

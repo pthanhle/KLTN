@@ -12,7 +12,7 @@ import QCQualityGates from './components/QCQualityGates';
 
 const AdminServiceReceptionDetailPage = () => {
     const navigate = useNavigate();
-    const { bookingCode, sequenceNumber, isLoading, error, roData } = useRODetailLogic();
+    const { bookingCode, sequenceNumber, isLoading, error, roData, refetch } = useRODetailLogic();
 
     if (isLoading) return <RODetailSkeleton />;
 
@@ -28,7 +28,7 @@ const AdminServiceReceptionDetailPage = () => {
                 </div>
                 <div className="flex gap-3">
                     <button
-                        onClick={() => window.location.reload()}
+                        onClick={refetch}
                         className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-200 transition-colors"
                     >
                         <RefreshCw className="w-4 h-4" /> Thử lại

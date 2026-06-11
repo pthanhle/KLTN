@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import InboxTableRow from './InboxTableRow';
 import { Inbox } from 'lucide-react';
 
-const InboxTable = ({ bookings, onConfirm, onReject }) => {
+const InboxTable = ({ bookings, onConfirm, onReject, confirmingId }) => {
     const { t } = useTranslation('adminServiceReception');
 
     if (!bookings || bookings.length === 0) {
@@ -39,6 +39,7 @@ const InboxTable = ({ bookings, onConfirm, onReject }) => {
                         booking={booking} 
                         onConfirm={onConfirm} 
                         onReject={onReject}
+                        isConfirming={confirmingId === booking._id}
                     />
                 ))}
             </div>

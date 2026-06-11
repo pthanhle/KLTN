@@ -264,6 +264,14 @@ export const vnpayReturn = asyncHandler(async (req, res) => {
         })
         await progress.save()
 
+        if (progress.booking_id) {
+          const booking = await mongoose.model('Booking').findById(progress.booking_id._id)
+          if (booking) {
+            booking.booking_status = 'COMPLETED'
+            await booking.save()
+          }
+        }
+
         try {
           const io = getIO()
           if (progress.advisor_id) {

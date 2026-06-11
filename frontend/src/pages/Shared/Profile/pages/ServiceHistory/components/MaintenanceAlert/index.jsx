@@ -1,13 +1,20 @@
 import { AlertTriangle } from 'lucide-react';
 import { Button } from 'antd';
 
-const MaintenanceAlert = ({ nextDate, t }) => {
+const MaintenanceAlert = ({ alertInfo, t }) => {
+    if (!alertInfo) return null;
+    
+    const vehicleName = `${alertInfo.brand || ''} ${alertInfo.model || ''}`.trim();
+    const vehicleText = vehicleName ? ` cho xe ${vehicleName} (${alertInfo.license_plate})` : '';
+
     return (
         <div className="bg-yellow-500 text-[#0a0a0b] p-4 lg:p-5 rounded-[20px] lg:rounded-2xl mb-8 flex flex-col sm:flex-row sm:items-center justify-between shadow-[0_8px_30px_rgba(234,179,8,0.25)] gap-4">
             <div className="flex items-center gap-3">
                 <AlertTriangle size={24} className="flex-shrink-0" />
                 <span className="font-bold text-sm sm:text-[15px]">
-                    {t('service_alert_msg', 'Lịch bảo dưỡng định kỳ tiếp theo khuyến nghị vào:')} {nextDate}
+                    {t('service_alert_msg', 'Lịch bảo dưỡng định kỳ tiếp theo')}
+                    {vehicleText}
+                    {t('service_alert_msg_2', ' khuyến nghị vào:')} {alertInfo.nextDate}
                 </span>
             </div>
             <Button 

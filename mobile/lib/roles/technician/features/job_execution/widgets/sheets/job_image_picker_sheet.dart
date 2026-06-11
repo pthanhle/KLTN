@@ -228,13 +228,9 @@ class _JobImagePickerSheetContentState extends State<_JobImagePickerSheetContent
                             ),
                           ],
                           if (_isUploading) ...[
-                            const SizedBox(height: 12),
-                            const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(strokeWidth: 2.5),
-                            ),
-                          ],
+                             const SizedBox(height: 12),
+                             const CupertinoActivityIndicator(radius: 11),
+                           ],
                         ],
                       ),
                     ),

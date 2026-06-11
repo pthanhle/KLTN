@@ -1,4 +1,6 @@
 export const OrderStepper = ({ status, steps, currentStepIndex }) => {
+    const isOrderDone = status === 'COMPLETED' || status === 'DELIVERED';
+
     return (
         <section className="bg-white dark:bg-[#141416] rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 dark:border-white/5" data-purpose="order-stepper">
             <div className="relative flex items-center justify-between">
@@ -6,13 +8,13 @@ export const OrderStepper = ({ status, steps, currentStepIndex }) => {
                 <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 dark:bg-slate-800 -translate-y-1/2 -z-0 rounded-full"></div>
                 {/* Active Line */}
                 <div 
-                    className="absolute top-1/2 left-0 h-0.5 bg-yellow-500 -translate-y-1/2 -z-0 transition-all duration-500 rounded-full"
-                    style={{ width: `${(currentStepIndex / 3) * 100}%` }}
+                    className={`absolute top-1/2 left-0 h-0.5 ${isOrderDone ? 'bg-green-500' : 'bg-yellow-500'} -translate-y-1/2 -z-0 transition-all duration-500 rounded-full`}
+                    style={{ width: `${(currentStepIndex / Math.max(1, steps.length - 1)) * 100}%` }}
                 ></div>
 
                 {steps.map((step, idx) => {
-                    const isCompleted = idx < currentStepIndex;
-                    const isActive = idx === currentStepIndex;
+                    const isCompleted = isOrderDone ? idx <= currentStepIndex : idx < currentStepIndex;
+                    const isActive = isOrderDone ? false : idx === currentStepIndex;
                     const isPending = idx > currentStepIndex;
                     
                     const IconObj = step.icon;

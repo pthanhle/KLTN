@@ -99,8 +99,12 @@ class SalesTasksController extends Notifier<SalesTasksState> {
     return SalesTasksState();
   }
 
-  Future<void> _loadTasks() async {
-    state = state.copyWith(isLoading: true, error: null);
+  Future<void> _loadTasks({bool isRefresh = false}) async {
+    if (!isRefresh) {
+      state = state.copyWith(isLoading: true, error: null);
+    } else {
+      state = state.copyWith(error: null);
+    }
     try {
       final tasks = await testDriveApiService.fetchMyTasks();
       state = state.copyWith(allTasks: tasks, isLoading: false);
@@ -155,7 +159,7 @@ class SalesTasksController extends Notifier<SalesTasksState> {
   }
 
   Future<void> refresh() async {
-    await _loadTasks();
+    await _loadTasks(isRefresh: true);
   }
 }
 

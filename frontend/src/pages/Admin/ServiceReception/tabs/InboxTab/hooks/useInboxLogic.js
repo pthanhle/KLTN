@@ -77,6 +77,8 @@ export const useInboxLogic = () => {
         confirmReject,
         handleRejectConfirm,
         handleRejectCancel,
-        bookingToReject
+        bookingToReject,
+        confirmingId: confirmMutation.isPending ? confirmMutation.variables : null,
+        rejectingId: rejectMutation.isPending ? rejectMutation.variables : null
     };
 };

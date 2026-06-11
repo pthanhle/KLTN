@@ -25,7 +25,7 @@ import { Skeleton, message } from 'antd';
 import { useTrackingDetailLogic } from './hooks/useTrackingDetailLogic';
 import { CheckoutAPI } from '../../../services/api/checkout';
 
-const ErrorState = ({ message, t }) => {
+const ErrorState = ({ message, t, onRetry }) => {
     const navigate = useNavigate();
     return (
         <div className="flex flex-col items-center justify-center py-32 px-6 text-center gap-6">
@@ -42,7 +42,7 @@ const ErrorState = ({ message, t }) => {
             </div>
             <div className="flex gap-3">
                 <button
-                    onClick={() => window.location.reload()}
+                    onClick={onRetry}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
                 >
                     <RefreshCw className="w-4 h-4" />
@@ -76,6 +76,7 @@ const ServiceTrackingDetail = () => {
         repairStatus,
         progressId,
         t,
+        refetch,
     } = useTrackingDetailLogic();
 
     const [isFinalPaymentRedirecting, setIsFinalPaymentRedirecting] = useState(false);
@@ -134,7 +135,7 @@ const ServiceTrackingDetail = () => {
                             <Skeleton active paragraph={{ rows: 6 }} className="dark:opacity-20" />
                         </div>
                     ) : error ? (
-                        <ErrorState message={error} t={t} />
+                        <ErrorState message={error} t={t} onRetry={refetch} />
                     ) : (
                         <>
                             {activeTab === 'overview' && <OverviewTab overviewData={overviewData} />}

@@ -15,7 +15,7 @@ const setRefreshTokenCookie = (res, refreshToken) => {
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/api/client/auth',
   })
@@ -290,27 +290,14 @@ export const refreshToken = asyncHandler(async (req, res) => {
 
   const user = await User.findById(decoded.id).populate('role_id', 'role_name')
   if (!user || !user.refreshTokens.includes(token)) {
-    if (user) {
-      user.refreshTokens = []
-      await user.save()
-    }
     res.status(401)
-    throw new Error('Refresh token đã bị thu hồi')
+    throw new Error('Refresh token đã bị thu hồi hoặc không hợp lệ')
   }
 
   if (user.status !== 'active') {
     res.status(403)
     throw new Error('Tài khoản đã bị khóa')
   }
-
-  const newRefreshToken = generateRefreshToken(user._id)
-  user.refreshTokens = user.refreshTokens
-    .filter(t => t !== token)
-    .concat(newRefreshToken)
-    .slice(-5)
-  await user.save()
-
-  setRefreshTokenCookie(res, newRefreshToken)
 
   res.json({
     accessToken: generateAccessToken(user._id),
@@ -332,7 +319,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
   res.clearCookie('refreshToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
     path: '/api/client/auth',
   })
 
@@ -377,7 +364,7 @@ export const changePassword = asyncHandler(async (req, res) => {
   res.clearCookie('refreshToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
     path: '/api/client/auth',
   })
 

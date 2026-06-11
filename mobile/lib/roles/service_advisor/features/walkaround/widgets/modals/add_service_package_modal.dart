@@ -110,7 +110,7 @@ class _AddServicePackageModalState
               // Catalog content (category chips + package list), driven by real backend data
               Expanded(
                 child: catalogAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () => const Center(child: CupertinoActivityIndicator()),
                   error: (err, stack) => Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),

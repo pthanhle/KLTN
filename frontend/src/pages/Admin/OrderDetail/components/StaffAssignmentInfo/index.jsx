@@ -102,13 +102,15 @@ export const StaffAssignmentInfo = ({ assignment, t, onReassign, orderStatus }) 
                     </div>
                 </div>
 
-                <button
-                    onClick={onReassign}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-yellow-500/10 text-slate-700 dark:text-yellow-500 text-xs font-bold uppercase tracking-widest border border-slate-200 dark:border-yellow-500/20 hover:bg-slate-200 dark:hover:bg-yellow-500/20 hover:text-slate-900 dark:hover:text-yellow-400 transition-all flex items-center justify-center gap-2 shadow-sm"
-                >
-                    <RefreshCw size={14} />
-                    {t('reassign_btn', 'Phân công lại')}
-                </button>
+                {canAssign && (
+                    <button
+                        onClick={onReassign}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-yellow-500/10 text-slate-700 dark:text-yellow-500 text-xs font-bold uppercase tracking-widest border border-slate-200 dark:border-yellow-500/20 hover:bg-slate-200 dark:hover:bg-yellow-500/20 hover:text-slate-900 dark:hover:text-yellow-400 transition-all flex items-center justify-center gap-2 shadow-sm"
+                    >
+                        <RefreshCw size={14} />
+                        {t('reassign_btn', 'Phân công lại')}
+                    </button>
+                )}
             </div>
         </section>
     );

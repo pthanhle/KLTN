@@ -187,8 +187,8 @@ class TechApiRepository {
       case 'WAITING_PARTS':
         return TechTaskStatus.waitingParts;
       case 'IN_PROGRESS':
-      case 'QC_TESTING':
         return TechTaskStatus.inProgress;
+      case 'QC_TESTING':
       case 'COMPLETED':
         return TechTaskStatus.completed;
       default:

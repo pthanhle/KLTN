@@ -5,7 +5,7 @@ import { FileDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const ServiceHistory = () => {
-    const { t, servicesData, nextRecommendedDate, isLoading } = useServiceHistoryLogic();
+    const { t, servicesData, nextRecommendedDates, isLoading } = useServiceHistoryLogic();
 
     return (
         <section className="w-full">
@@ -20,7 +20,9 @@ const ServiceHistory = () => {
                 </button>
             </div>
 
-            <MaintenanceAlert nextDate={nextRecommendedDate} t={t} />
+            {nextRecommendedDates && nextRecommendedDates.map((alertInfo, idx) => (
+                <MaintenanceAlert key={idx} alertInfo={alertInfo} t={t} />
+            ))}
 
             <div className="grid grid-cols-1 gap-8">
                 {isLoading ? (

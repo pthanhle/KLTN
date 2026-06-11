@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +15,7 @@ import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../../shared/widgets/inputs/list_search_bar.dart';
 import '../../../../../shared/widgets/inputs/date_filter_chip.dart';
 import '../../../../../roles/auth/controllers/auth_controller.dart';
+import '../../../../../shared/widgets/toast/glass_toast.dart';
 
 class AdvisorDashboardPage extends ConsumerStatefulWidget {
   const AdvisorDashboardPage({super.key});
@@ -36,12 +38,10 @@ class _AdvisorDashboardPageState extends ConsumerState<AdvisorDashboardPage> {
         ref.read(authControllerProvider.notifier).logout();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'),
-                backgroundColor: Colors.red,
-              ),
+            GlassToast.show(
+              context,
+              title: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'.tr(),
+              icon: CupertinoIcons.lock_circle,
             );
             context.go('/login');
           }

@@ -32,16 +32,28 @@ class TasksListView extends ConsumerWidget {
     List<TaskModel> tasks = state.activeTasks;
 
     if (tasks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      return RefreshIndicator(
+        onRefresh: () => ref.read(salesTasksControllerProvider.notifier).refresh(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.only(top: topPadding, bottom: 100),
           children: [
-            Icon(Icons.inbox, size: 64, color: context.colors.outlineVariant),
-            const SizedBox(height: 16),
-            Text(
-              tr('Không có công việc nào trong danh sách này.', context: context),
-              style: context.textTheme.bodyLarge?.copyWith(
-                color: context.colors.onSurfaceVariant,
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.inbox, size: 64, color: context.colors.outlineVariant),
+                    const SizedBox(height: 16),
+                    Text(
+                      tr('Không có công việc nào trong danh sách này.', context: context),
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -49,14 +61,17 @@ class TasksListView extends ConsumerWidget {
       );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.only(top: topPadding, bottom: 100),
-      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-        return TaskCard(task: task);
-      },
+    return RefreshIndicator(
+      onRefresh: () => ref.read(salesTasksControllerProvider.notifier).refresh(),
+      child: ListView.builder(
+        padding: EdgeInsets.only(top: topPadding, bottom: 100),
+        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        itemCount: tasks.length,
+        itemBuilder: (context, index) {
+          final task = tasks[index];
+          return TaskCard(task: task);
+        },
+      ),
     );
   }
 }

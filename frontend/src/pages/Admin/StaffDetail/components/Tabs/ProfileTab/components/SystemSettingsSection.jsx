@@ -48,6 +48,9 @@ const PasswordResetModal = ({ open, staffName, onClose, onSubmit }) => {
                     </div>
                 ),
                 okText: 'Đã lưu',
+                okButtonProps: { 
+                    className: '!bg-yellow-500 hover:!bg-yellow-400 !border-none !shadow-none' 
+                },
             });
         } catch (e) {
             setError(e?.response?.data?.message || 'Không thể đặt lại mật khẩu');

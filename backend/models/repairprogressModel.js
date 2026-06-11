@@ -266,6 +266,33 @@ const repairProgressSchema = mongoose.Schema(
 
     qc_advisor_signature: { type: String, default: '' },
 
+    delivery: {
+      handover_brief: {
+        odometer_at_delivery: Number,
+        fuel_level_at_delivery: String,
+        is_car_washed: { type: Boolean, default: false },
+        is_interior_cleaned: { type: Boolean, default: false }
+      },
+      invoice_ledger: {
+        invoice_no: String,
+        payment_status: { type: String, enum: ['UNPAID', 'PARTIALLY_PAID', 'PAID'], default: 'UNPAID' },
+        payment_method: String,
+        paid_amount: { type: Number, default: 0 },
+        total_amount: { type: Number, default: 0 },
+        payment_qr_url: String
+      },
+      handover_agreement: {
+        received_old_parts: { type: Boolean, default: false },
+        no_new_scratches: { type: Boolean, default: false },
+        personal_belongings_checked: { type: Boolean, default: false }
+      },
+      handshake_protocol: {
+        promised_delivery_date: Date,
+        actual_delivery_date: Date,
+        customer_satisfaction_level: { type: Number, min: 1, max: 5 }
+      }
+    },
+
     notes: { type: String, default: '' },
 
     estimated_completion: { type: Date },

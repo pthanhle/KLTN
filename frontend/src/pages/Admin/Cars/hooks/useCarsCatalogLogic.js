@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useMemo } from 'react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCarsFilter } from './useCarsFilter';
 import { useCarsSelection } from './useCarsSelection';
@@ -8,6 +8,7 @@ import { useAdminProductsQuery, useUpdateAdminProductMutation, adminProductKeys 
 import { useCarSocket } from './useCarSocket';
 
 export const useCarsCatalogLogic = () => {
+    const { message } = App.useApp();
     const filterState = useCarsFilter();
     const taxonomyState = useDynamicTaxonomies();
     

@@ -126,7 +126,7 @@
     "order_step_placed": "Đã Đặt Hàng",
     "order_step_confirmed": "Đã Xác Nhận",
     "order_step_transit": "Đang Giao Hàng",
-    "order_step_delivered": "Đã Giao Vận",
+    "order_step_delivered": "Hoàn Tất",
     "order_step_arriving": "Sắp giao",
     "order_step_est": "Dự kiến 2-3 ngày",
     "order_dtl_address": "Địa chỉ Nhận hàng",

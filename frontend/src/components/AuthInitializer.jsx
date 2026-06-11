@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { tokenRefreshed, logout } from '@/store/slices/authSlice';
+import { logout } from '@/store/slices/authSlice';
 import { authApi } from '@/services/api/auth';
 
 const AuthInitializer = () => {
@@ -13,13 +13,7 @@ const AuthInitializer = () => {
         hasInitialized.current = true;
 
         if (user && !accessToken) {
-            authApi.refreshToken()
-                .then((data) => {
-                    dispatch(tokenRefreshed({
-                        accessToken: data.accessToken,
-                        user: data.user,
-                    }));
-                })
+            authApi.getMe()
                 .catch(() => {
                     dispatch(logout());
                 });

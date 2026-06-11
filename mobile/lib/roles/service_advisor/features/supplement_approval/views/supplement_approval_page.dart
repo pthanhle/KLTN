@@ -271,7 +271,7 @@ class _ActionButton extends StatelessWidget {
         ),
       ),
       icon: isLoading
-          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          ? const CupertinoActivityIndicator(color: Colors.white, radius: 9)
           : Icon(icon, size: 18, color: Colors.white),
       label: Text(
         label,

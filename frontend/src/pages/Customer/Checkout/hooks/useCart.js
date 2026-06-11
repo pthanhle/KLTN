@@ -1,8 +1,8 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { App } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { toggleChecked, toggleAllChecks as toggleAllRedux, setCartItems, removeFromCart as removeFromReduxCart } from '@/store/slices/cartSlice';
+import { toggleChecked, toggleAllChecks as toggleAllRedux, setCartItems, removeFromCart as removeFromReduxCart, updateQuantity as updateReduxQuantity } from '@/store/slices/cartSlice';
 
 import { useGetCart, useUpdateCartItem, useRemoveFromCart } from '@/services/queries/clientCart.queries';
 import { useToggleWishlist } from '@/services/queries/clientWishlist.queries';
@@ -15,7 +15,6 @@ export const useCart = (t) => {
     const dispatch = useDispatch();
     const cartItems = useSelector(state => state.cart.items);
 
-    // Wire up React Query hooks
     const { data: serverCart, refetch: refetchCart, isLoading: isLoadingCart } = useGetCart();
     const { mutate: updateApiQuantity } = useUpdateCartItem();
     const { mutate: removeApiItem } = useRemoveFromCart();
@@ -58,24 +57,39 @@ export const useCart = (t) => {
         }
     };
 
+    const timersRef = useRef({});
+
     const updateQuantity = (id, delta) => {
         const item = cartItems.find(i => i.id === id);
         if (!item) return;
         const newQuantity = item.quantity + delta;
         const maxStock = item.inventory?.available_stock || 0;
 
-        if (newQuantity >= 1 && newQuantity <= maxStock) {
-            updateApiQuantity({ item_id: id, quantity: newQuantity }, {
-                onError: (err) => {
-                    message.error(err.response?.data?.message || 'Không thể cập nhật số lượng');
-                    refetchCart(); // rollback on error
-                }
-            });
+        if (newQuantity > maxStock) {
+            message.warning(t('max_stock_reached', `Xin lỗi, kho chỉ còn ${maxStock} đơn vị sản phẩm này.`));
+            return;
+        }
+
+        if (newQuantity >= 1) {
+            dispatch(updateReduxQuantity({ id, quantity: newQuantity }));
+
+            if (timersRef.current[id]) {
+                clearTimeout(timersRef.current[id]);
+            }
+
+            timersRef.current[id] = setTimeout(() => {
+                updateApiQuantity({ item_id: id, quantity: newQuantity }, {
+                    onError: (err) => {
+                        message.error(err.response?.data?.message || 'Không thể cập nhật số lượng');
+                        refetchCart();
+                    }
+                });
+                delete timersRef.current[id];
+            }, 500);
         }
     };
 
     const removeItem = (id) => {
-        // Optimistic UI update: Remove instantly so the user doesn't wait
         dispatch(removeFromReduxCart(id));
 
         removeApiItem(id, {
@@ -84,7 +98,7 @@ export const useCart = (t) => {
             },
             onError: (err) => {
                 message.error(err.response?.data?.message || 'Có lỗi khi xóa');
-                refetchCart(); // Rollback if API fails
+                refetchCart();
             }
         });
     };
@@ -97,7 +111,6 @@ export const useCart = (t) => {
             toggleWishlist(item.part_id, {
                 onSuccess: () => {
                     message.success({ content: t('move_wishlist_success', `Đã chuyển "${name}" vào mục Yêu thích!`), key: 'wishlist' });
-                    // Remove from cart when moved to wishlist natively
                     removeItem(item.id);
                 },
                 onError: (err) => {

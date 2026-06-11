@@ -10,6 +10,7 @@ import '../controllers/walkaround_controller.dart';
 import '../widgets/shared/walkaround_tab_switcher.dart';
 import '../../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../../shared/widgets/buttons/glass_nav_back_button.dart';
+import '../../../../../shared/widgets/toast/glass_toast.dart';
 import '../../shared/widgets/buttons/advisor_primary_button.dart';
 import '../widgets/sections/customer_voice_section.dart';
 import '../widgets/sections/vehicle_state_section.dart';
@@ -162,22 +163,27 @@ class _WalkaroundPageState extends ConsumerState<WalkaroundPage> {
                               final success = await controller.submit();
                               if (!context.mounted) return;
                               if (success) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Tiếp nhận xe thành công!'),
-                                    backgroundColor: Color(0xFF22C55E),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
+                                HapticFeedback.mediumImpact();
+                                GlassToast.show(
+                                  context,
+                                  title: 'Tiếp nhận xe thành công'.tr(),
+                                  subtitle: 'Xe đã được đưa vào quy trình dịch vụ'.tr(),
+                                  icon: CupertinoIcons.checkmark_seal_fill,
+                                  color: const Color(0xFF30B0C7),
+                                  duration: const Duration(seconds: 4),
                                 );
                                 context.pop();
                               } else {
-                                final err = state.submitError ?? 'Có lỗi xảy ra, vui lòng thử lại.';
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(' $err'),
-                                    backgroundColor: const Color(0xFFEF4444),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
+                                HapticFeedback.heavyImpact();
+                                final err = ref.read(walkaroundControllerProvider).submitError
+                                    ?? 'Có lỗi xảy ra, vui lòng thử lại.';
+                                GlassToast.show(
+                                  context,
+                                  title: 'Tiếp nhận thất bại'.tr(),
+                                  subtitle: err,
+                                  icon: CupertinoIcons.exclamationmark_circle_fill,
+                                  color: const Color(0xFFFF3B30),
+                                  duration: const Duration(seconds: 5),
                                 );
                               }
                             }

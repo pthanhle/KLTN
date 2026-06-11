@@ -129,8 +129,8 @@ const mapAPIToROData = (p) => {
         };
     }
 
-    // ----------- progress (roadmap + logistics) -----------
-    const currentStepIdx = STEP_ORDER.indexOf(p.current_step || p.status);
+    const activeStep = p.status === 'COMPLETED' ? 'COMPLETED' : (p.current_step || p.status);
+    const currentStepIdx = STEP_ORDER.indexOf(activeStep);
 
     const timeline_steps = STEP_ORDER.map((stepKey, idx) => {
         const timelineStep = timeline.find(t => t.step === stepKey);
@@ -161,11 +161,10 @@ const mapAPIToROData = (p) => {
     const progressData = { timeline_steps, parts_inventory };
 
     // ----------- qc -----------
-    const qcStep = timeline.find(t => t.step === 'QC_TESTING');
     let qcData = null;
-    if (qcStep?.qc_checklist?.length) {
+    if (p.qc_checklist?.length) {
         qcData = {
-            kcs_tasks: qcStep.qc_checklist.map((task, i) => ({
+            kcs_tasks: p.qc_checklist.map((task, i) => ({
                 id: i,
                 title: task.task,
                 status: task.status || 'pending',
@@ -186,28 +185,29 @@ export const useRODetailLogic = () => {
     const [bookingCode, setBookingCode] = useState(id);
     const [sequenceNumber, setSequenceNumber] = useState(null);
 
+    const load = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const raw = await AdminRepairAPI.getRepairProgressById(id);
+            const mapped = mapAPIToROData(raw);
+            setBookingCode(raw.booking_id?.booking_code || id);
+            setSequenceNumber(raw.booking_id?.sequence_number ?? null);
+            setRoData(mapped);
+        } catch (err) {
+            const msg = err?.response?.data?.message || err?.message || 'Không thể tải dữ liệu đơn RO';
+            console.error('useRODetailLogic:', msg, err);
+            setError(msg);
+            setRoData(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (!id) return;
-        const load = async () => {
-            setIsLoading(true);
-            setError(null);
-            try {
-                const raw = await AdminRepairAPI.getRepairProgressById(id);
-                const mapped = mapAPIToROData(raw);
-                setBookingCode(raw.booking_id?.booking_code || id);
-                setSequenceNumber(raw.booking_id?.sequence_number ?? null);
-                setRoData(mapped);
-            } catch (err) {
-                const msg = err?.response?.data?.message || err?.message || 'Không thể tải dữ liệu đơn RO';
-                console.error('useRODetailLogic:', msg, err);
-                setError(msg);
-                setRoData(null);
-            } finally {
-                setIsLoading(false);
-            }
-        };
         load();
     }, [id]);
 
-    return { bookingCode, sequenceNumber, isLoading, error, roData };
+    return { bookingCode, sequenceNumber, isLoading, error, roData, refetch: load };
 };

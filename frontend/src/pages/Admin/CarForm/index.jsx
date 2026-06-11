@@ -24,17 +24,26 @@ const CarForm = () => {
     const { isInitializing } = useCarFormInit(id, form);
 
     const renderTabContent = () => {
-        switch (activeTab) {
-            case 'overview': return <OverviewTab form={form} />;
-            case 'pricing': return <PricingInventoryTab form={form} />;
-            case 'specs': return <SpecsTab form={form} />;
-            case 'colors': return <ColorsTab form={form} />;
-            case 'features': return <FeaturesTab form={form} />;
-            case 'seo': return <SEOTab form={form} />;
-            case 'library': return <MediaLibraryTab form={form} />;
-            case '360': return <ThreeSixtyTab form={form} />;
-            default: return null;
-        }
+        const tabs = [
+            { key: 'overview', component: <OverviewTab form={form} /> },
+            { key: 'pricing', component: <PricingInventoryTab form={form} /> },
+            { key: 'specs', component: <SpecsTab form={form} /> },
+            { key: 'colors', component: <ColorsTab form={form} /> },
+            { key: 'features', component: <FeaturesTab form={form} /> },
+            { key: 'seo', component: <SEOTab form={form} /> },
+            { key: 'library', component: <MediaLibraryTab form={form} /> },
+            { key: '360', component: <ThreeSixtyTab form={form} /> },
+        ];
+
+        return (
+            <>
+                {tabs.map(tab => (
+                    <div key={tab.key} className={activeTab === tab.key ? 'block' : 'hidden'}>
+                        {tab.component}
+                    </div>
+                ))}
+            </>
+        );
     };
 
     return (

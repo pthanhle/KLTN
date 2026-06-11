@@ -84,14 +84,19 @@ class JobExecutionController extends AsyncNotifier<JobExecutionState> {
       final taskModels = labors.asMap().entries.map((entry) {
         final i = entry.key;
         final l = entry.value as Map<String, dynamic>;
+        
+        JobTaskStatus taskStatus = JobTaskStatus.pending;
+        if (progressStatus == 'QC_TESTING' || progressStatus == 'COMPLETED') {
+          taskStatus = JobTaskStatus.completed;
+        }
+
         return JobTaskModel(
           id: l['_id']?.toString() ?? l['service_id']?.toString() ?? 'labor_$i',
           laborCode: l['labor_code']?.toString() ?? l['service_id']?.toString() ?? 'labor_$i',
-          // Backend lưu tên hạng mục công việc trong field `description`
-          // (xem backend/models/repairProgressModel.js -> quotation.labors)
           name: l['description']?.toString() ?? l['service_name']?.toString() ?? 'Hạng mục ${i + 1}',
           description: '${l['hours'] ?? 0} giờ công',
           icon: JobTaskIcon.build,
+          status: taskStatus,
         );
       }).toList();
 

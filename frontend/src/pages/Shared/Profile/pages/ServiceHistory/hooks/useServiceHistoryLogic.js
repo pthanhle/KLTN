@@ -36,12 +36,48 @@ export const useServiceHistoryLogic = () => {
         }));
     }, [bookings]);
 
-    const nextRecommendedDate = servicesData.length > 0 ? "20/05/2026" : null;
+    const nextRecommendedDates = useMemo(() => {
+        const completedBookings = servicesData.filter(b => b.booking_status === 'COMPLETED');
+        if (completedBookings.length === 0) return [];
+
+        const vehicleGroups = {};
+        completedBookings.forEach(b => {
+            const vehicleId = b.vehicle_info?.license_plate || b.vehicle_info?.vin_number || 'Unknown';
+            if (!vehicleGroups[vehicleId]) {
+                vehicleGroups[vehicleId] = [];
+            }
+            vehicleGroups[vehicleId].push(b);
+        });
+
+        const recommendations = [];
+        for (const [vehicleId, bookings] of Object.entries(vehicleGroups)) {
+            const latestBooking = bookings.reduce((latest, current) => {
+                return new Date(current.booking_date) > new Date(latest.booking_date) ? current : latest;
+            });
+
+            const nextDate = new Date(latestBooking.booking_date);
+            nextDate.setDate(nextDate.getDate() + 90);
+
+            const day = String(nextDate.getDate()).padStart(2, '0');
+            const month = String(nextDate.getMonth() + 1).padStart(2, '0');
+            const year = nextDate.getFullYear();
+
+            recommendations.push({
+                vehicleId,
+                brand: latestBooking.vehicle_info?.brand,
+                model: latestBooking.vehicle_info?.model,
+                license_plate: latestBooking.vehicle_info?.license_plate,
+                nextDate: `${day}/${month}/${year}`
+            });
+        }
+
+        return recommendations;
+    }, [servicesData]);
 
     return {
         t,
         servicesData,
-        nextRecommendedDate,
+        nextRecommendedDates,
         isLoading
     };
 };

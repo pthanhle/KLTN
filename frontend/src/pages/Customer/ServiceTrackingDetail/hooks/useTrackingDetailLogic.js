@@ -377,54 +377,54 @@ export const useTrackingDetailLogic = () => {
         if (tabParam) setActiveTab(tabParam);
     }, [location.search]);
 
-    useEffect(() => {
-        const fetchDashboardDetail = async () => {
-            setIsLoading(true);
-            setError(null);
+    const fetchDashboardDetail = async () => {
+        setIsLoading(true);
+        setError(null);
 
-            try {
-                if (!id) throw new Error('Không tìm thấy mã đơn dịch vụ trong URL.');
+        try {
+            if (!id) throw new Error('Không tìm thấy mã đơn dịch vụ trong URL.');
 
-                const queryParams = new URLSearchParams(location.search);
-                const licensePlate = queryParams.get('license_plate');
+            const queryParams = new URLSearchParams(location.search);
+            const licensePlate = queryParams.get('license_plate');
 
-                if (!isAuthenticated && !licensePlate) {
-                    throw new Error('Vui lòng đăng nhập hoặc cung cấp biển số xe để xem thông tin đơn dịch vụ.');
-                }
-
-                let realProgress;
-                if (licensePlate) {
-                    realProgress = await trackingApi.lookupTracking(id, licensePlate);
-                } else {
-                    realProgress = await trackingApi.getTrackingDetail(id);
-                }
-
-                if (!realProgress) throw new Error('Không tìm thấy đơn dịch vụ.');
-
-                const receivedStep = realProgress.timeline?.find((s) => s.step === 'RECEIVED');
-                const ri = receivedStep?.reception_info || realProgress.reception_info || null;
-                const advisorSignatureUrl = normalizeSignatureDataUrl(receivedStep?.signatures?.advisor?.signature_url);
-                const customerSignatureUrl = normalizeSignatureDataUrl(receivedStep?.signatures?.customer?.signature_url);
-
-                setProgressId(realProgress._id);
-                setRepairStatus(realProgress.status || 'RECEIVED');
-                setOverviewData(ri ? mapOverviewData(realProgress, ri, advisorSignatureUrl, customerSignatureUrl) : null);
-                setDiagnosticData(realProgress.timeline ? mapDiagnosticData(realProgress.timeline) : null);
-                setQuotationData(mapQuotationData(realProgress, ri, advisorSignatureUrl, customerSignatureUrl));
-                setQcData(mapQcData(realProgress));
-                setDeliveryData(mapDeliveryData(realProgress));
-                setProgressData(mapProgressData(realProgress));
-            } catch (err) {
-                const message =
-                    err?.response?.data?.message ||
-                    err?.message ||
-                    'Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.';
-                setError(message);
-            } finally {
-                setIsLoading(false);
+            if (!isAuthenticated && !licensePlate) {
+                throw new Error('Vui lòng đăng nhập hoặc cung cấp biển số xe để xem thông tin đơn dịch vụ.');
             }
-        };
 
+            let realProgress;
+            if (licensePlate) {
+                realProgress = await trackingApi.lookupTracking(id, licensePlate);
+            } else {
+                realProgress = await trackingApi.getTrackingDetail(id);
+            }
+
+            if (!realProgress) throw new Error('Không tìm thấy đơn dịch vụ.');
+
+            const receivedStep = realProgress.timeline?.find((s) => s.step === 'RECEIVED');
+            const ri = receivedStep?.reception_info || realProgress.reception_info || null;
+            const advisorSignatureUrl = normalizeSignatureDataUrl(receivedStep?.signatures?.advisor?.signature_url);
+            const customerSignatureUrl = normalizeSignatureDataUrl(receivedStep?.signatures?.customer?.signature_url);
+
+            setProgressId(realProgress._id);
+            setRepairStatus(realProgress.status || 'RECEIVED');
+            setOverviewData(ri ? mapOverviewData(realProgress, ri, advisorSignatureUrl, customerSignatureUrl) : null);
+            setDiagnosticData(realProgress.timeline ? mapDiagnosticData(realProgress.timeline) : null);
+            setQuotationData(mapQuotationData(realProgress, ri, advisorSignatureUrl, customerSignatureUrl));
+            setQcData(mapQcData(realProgress));
+            setDeliveryData(mapDeliveryData(realProgress));
+            setProgressData(mapProgressData(realProgress));
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                err?.message ||
+                'Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.';
+            setError(message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchDashboardDetail();
     }, [id, location.search, isAuthenticated]);
 
@@ -444,5 +444,6 @@ export const useTrackingDetailLogic = () => {
         repairStatus,
         progressId,
         t,
+        refetch: fetchDashboardDetail,
     };
 };

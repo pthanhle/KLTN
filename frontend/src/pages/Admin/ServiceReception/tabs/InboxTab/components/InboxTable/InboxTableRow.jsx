@@ -12,7 +12,7 @@ const SERVICE_TYPE_LABELS = {
     OTHER: 'Khác',
 };
 
-const InboxTableRow = ({ booking, onConfirm, onReject }) => {
+const InboxTableRow = ({ booking, onConfirm, onReject, isConfirming }) => {
     const { t } = useTranslation('adminServiceReception');
     const aging = calculateAging(booking.created_at);
 
@@ -99,9 +99,15 @@ const InboxTableRow = ({ booking, onConfirm, onReject }) => {
                 </button>
                 <button
                     onClick={() => onConfirm(booking._id)}
-                    className="w-full md:w-auto bg-amber-400 hover:bg-amber-500 dark:bg-amber-500 dark:hover:bg-amber-400 text-slate-900 uppercase text-[11px] font-black tracking-widest px-6 py-3 rounded-full shadow-lg shadow-amber-500/20 active:scale-95 transition-all"
+                    disabled={isConfirming}
+                    className={`w-full md:w-auto bg-amber-400 text-slate-900 uppercase text-[11px] font-black tracking-widest px-6 py-3 rounded-full shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 ${
+                        isConfirming 
+                            ? 'opacity-75 cursor-not-allowed' 
+                            : 'hover:bg-amber-500 dark:bg-amber-500 dark:hover:bg-amber-400 active:scale-95'
+                    }`}
                 >
-                    {t('inbox_btn_confirm', 'Confirm')}
+                    {isConfirming && <div className="w-3.5 h-3.5 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin"></div>}
+                    {isConfirming ? t('action_processing', 'Đang xử lý...') : t('inbox_btn_confirm', 'Confirm')}
                 </button>
             </div>
         </div>

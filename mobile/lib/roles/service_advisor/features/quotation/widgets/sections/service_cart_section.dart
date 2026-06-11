@@ -355,7 +355,7 @@ class _QuotationServiceModalState
               Expanded(
                 child: catalogAsync.when(
                   loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                      const Center(child: CupertinoActivityIndicator()),
                   error: (err, _) => Center(
                     child: Padding(
                       padding: const EdgeInsets.all(24),

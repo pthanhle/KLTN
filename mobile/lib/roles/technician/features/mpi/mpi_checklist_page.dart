@@ -13,6 +13,7 @@ import 'widgets/cards/mpi_conclusion_card.dart';
 import 'widgets/modals/mpi_item_update_modal.dart';
 import 'widgets/skeletons/mpi_checklist_skeleton.dart';
 import '../tasks/data/tech_api_repository.dart';
+import '../../../../shared/widgets/toast/glass_toast.dart';
 
 class MpiChecklistPage extends ConsumerStatefulWidget {
   final String plate;
@@ -78,15 +79,19 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
         conclusion: mpiState.generalConclusion,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã gửi kết quả chẩn đoán thành công!')),
+        GlassToast.show(
+          context,
+          title: 'Đã gửi kết quả chẩn đoán thành công!'.tr(),
+          icon: CupertinoIcons.check_mark_circled_solid,
         );
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Theme.of(context).colorScheme.error),
+        GlassToast.show(
+          context,
+          title: 'Lỗi: $e',
+          icon: CupertinoIcons.xmark_circle,
         );
       }
     } finally {
@@ -226,18 +231,14 @@ class _MpiChecklistPageState extends ConsumerState<MpiChecklistPage> {
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 sliver: SliverToBoxAdapter(
-                  child: LiquidButton(
-                    onPressed: _isSubmitting
-                        ? null
-                        : () => _submitDiagnostics(stateAsync.value!),
-                    child: _isSubmitting
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : Text('Hoàn tất chẩn đoán'.tr()),
-                  ),
+                    child: LiquidButton(
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => _submitDiagnostics(stateAsync.value!),
+                      child: _isSubmitting
+                          ? const CupertinoActivityIndicator(color: Colors.white, radius: 10)
+                          : Text('Hoàn tất chẩn đoán'.tr()),
+                    ),
                 ),
               ),
             const SliverToBoxAdapter(

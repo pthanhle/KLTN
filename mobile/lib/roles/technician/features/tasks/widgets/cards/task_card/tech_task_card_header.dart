@@ -67,29 +67,31 @@ class TechTaskCardHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              // Booking code + sequence number row
               Row(
                 children: [
                   if (task.bookingCode != null) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                      decoration: ShapeDecoration(
-                        color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.06),
-                        shape: SmoothRectangleBorder(
-                          borderRadius: SmoothBorderRadius(cornerRadius: 6, cornerSmoothing: 1.0),
-                          side: BorderSide(
-                            color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.10),
-                            width: 0.5,
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: ShapeDecoration(
+                          color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.06),
+                          shape: SmoothRectangleBorder(
+                            borderRadius: SmoothBorderRadius(cornerRadius: 6, cornerSmoothing: 1.0),
+                            side: BorderSide(
+                              color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.10),
+                              width: 0.5,
+                            ),
                           ),
                         ),
-                      ),
-                      child: Text(
-                        task.bookingCode!,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontFamily: 'monospace',
-                          fontSize: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
-                          letterSpacing: 0.2,
+                        child: Text(
+                          task.bookingCode!,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontFamily: 'monospace',
+                            fontSize: 10,
+                            color: theme.colorScheme.onSurfaceVariant,
+                            letterSpacing: 0.2,
+                          ),
                         ),
                       ),
                     ),

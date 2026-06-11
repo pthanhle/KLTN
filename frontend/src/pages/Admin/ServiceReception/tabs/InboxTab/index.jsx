@@ -14,7 +14,8 @@ const InboxTab = () => {
         confirmReject,
         handleRejectConfirm,
         handleRejectCancel,
-        bookingToReject
+        bookingToReject,
+        confirmingId
     } = useInboxLogic();
 
     return (
@@ -24,7 +25,7 @@ const InboxTab = () => {
                 {isLoading ? (
                     <InboxSkeleton />
                 ) : (
-                    <InboxTable bookings={bookings} onConfirm={confirmBooking} onReject={confirmReject} />
+                    <InboxTable bookings={bookings} onConfirm={confirmBooking} onReject={confirmReject} confirmingId={confirmingId} />
                 )}
             </div>
 

@@ -2,14 +2,16 @@ import React from 'react';
 import { Form } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+const EMPTY_ARRAY = [];
+
 export const useMediaLibrary = () => {
     const { t } = useTranslation('adminCarForm');
     const form = Form.useFormInstance();
 
     const rawHeroImage = Form.useWatch('image', form);
-    const photos = Form.useWatch(['gallery', 'photos'], form) || [];
-    const newPhotos = Form.useWatch('new_photos', form) || [];
-    const videos = Form.useWatch(['gallery', 'videos'], form) || [];
+    const photos = Form.useWatch(['gallery', 'photos'], form) || EMPTY_ARRAY;
+    const newPhotos = Form.useWatch('new_photos', form) || EMPTY_ARRAY;
+    const videos = Form.useWatch(['gallery', 'videos'], form) || EMPTY_ARRAY;
 
     const getRealFile = (val) => {
         if (!val) return null;

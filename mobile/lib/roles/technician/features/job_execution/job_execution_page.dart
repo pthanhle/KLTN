@@ -1,9 +1,12 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'models/job_task_model.dart';
+import 'models/job_part_model.dart';
 import 'controllers/job_execution_controller.dart';
 import 'widgets/controls/job_segmented_control.dart';
 import 'widgets/sections/job_tasks_section.dart';
@@ -11,10 +14,13 @@ import 'widgets/sections/job_parts_section.dart';
 import '../../../../shared/widgets/toast/glass_toast.dart';
 import '../../../../shared/widgets/backgrounds/mesh_background.dart';
 import '../../../../shared/widgets/buttons/glass_nav_back_button.dart';
+import '../../../../shared/widgets/buttons/liquid_button.dart';
 import 'widgets/buttons/job_danger_fab.dart';
 import 'widgets/modals/supplement_modal/supplement_modal.dart';
 import 'widgets/sheets/job_image_picker_sheet.dart';
 import '../tasks/data/tech_api_repository.dart';
+import '../dashboard/controllers/tech_dashboard_controller.dart';
+
 
 class JobExecutionPage extends ConsumerStatefulWidget {
   final String plate;
@@ -94,24 +100,183 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
 
   Future<void> _handleMarkJobDone() async {
     if (_isMarkingDone) return;
-    final confirmed = await showCupertinoDialog<bool>(
+
+    // §20: 2-block Liquid Glass confirmation sheet — KHÔNG dùng CupertinoAlertDialog
+    final confirmed = await showCupertinoModalPopup<bool>(
       context: context,
-      builder: (ctx) => CupertinoAlertDialog(
-        title: Text('Hoàn tất thi công?'.tr()),
-        content: Text('Xe sẽ được chuyển sang giai đoạn QC nghiệm thu. Bạn không thể hoàn tác.'.tr()),
-        actions: [
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            child: Text('Hủy'.tr()),
-            onPressed: () => Navigator.of(ctx).pop(false),
+      barrierColor: Colors.black.withValues(alpha: 0.40),
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        final isDark = theme.brightness == Brightness.dark;
+        const appleGreen = Color(0xFF34C759);
+
+        Widget glassBlock({required Widget child}) {
+          return Container(
+            width: double.infinity,
+            decoration: ShapeDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.white.withValues(alpha: 0.72),
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+                side: BorderSide(
+                  color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.80),
+                  width: 0.5,
+                ),
+              ),
+              shadows: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.06),
+                  blurRadius: 20,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ClipSmoothRect(
+              radius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: child,
+              ),
+            ),
+          );
+        }
+
+        return Material(
+          type: MaterialType.transparency,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Block 1: Title + destructive confirm action
+                  glassBlock(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                          child: Column(
+                            children: [
+                              // Icon badge
+                              Container(
+                                width: 52,
+                                height: 52,
+                                decoration: ShapeDecoration(
+                                  color: appleGreen.withValues(alpha: isDark ? 0.15 : 0.10),
+                                  shape: SmoothRectangleBorder(
+                                    borderRadius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+                                    side: BorderSide(
+                                      color: appleGreen.withValues(alpha: isDark ? 0.35 : 0.25),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                ),
+                                child: ClipSmoothRect(
+                                  radius: SmoothBorderRadius(cornerRadius: 16, cornerSmoothing: 1.0),
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                    child: const Center(
+                                      child: Icon(
+                                        CupertinoIcons.checkmark_shield_fill,
+                                        color: appleGreen,
+                                        size: 26,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              Text(
+                                'Hoàn tất thi công?'.tr(),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: -0.5,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Xe sẽ được chuyển sang giai đoạn QC nghiệm thu.\nBạn không thể hoàn tác thao tác này.'.tr(),
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontSize: 13,
+                                  height: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(height: 0.5, color: theme.dividerColor.withValues(alpha: 0.15)),
+                        // Confirm action — màu xanh (positive, not destructive)
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            Navigator.pop(ctx, true);
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 17),
+                            color: Colors.transparent,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(CupertinoIcons.checkmark_circle_fill, size: 20, color: appleGreen),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Xác nhận hoàn tất'.tr(),
+                                  style: const TextStyle(
+                                    color: appleGreen,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Block 2: Cancel — luôn tách riêng, fontWeight w700
+                  glassBlock(
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.pop(ctx, false);
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 17),
+                        color: Colors.transparent,
+                        child: Text(
+                          'Hủy'.tr(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
           ),
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            child: Text('Xác nhận'.tr()),
-            onPressed: () => Navigator.of(ctx).pop(true),
-          ),
-        ],
-      ),
+        );
+      },
     );
 
     if (confirmed != true || !mounted) return;
@@ -119,11 +284,25 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
     try {
       await techApiRepository.markJobDone(progressId: widget.progressId);
       if (mounted) {
+        HapticFeedback.mediumImpact();
+
+        final execState = ref.read(jobExecutionControllerProvider).value;
+        if (execState != null) {
+          final updatedParts = execState.parts.map((p) =>
+            p.status == JobPartStatus.installing ? p.copyWith(status: JobPartStatus.completed) : p,
+          ).toList();
+          ref.read(jobExecutionControllerProvider.notifier).state =
+            AsyncData(execState.copyWith(parts: updatedParts));
+        }
+
+        ref.read(techDashboardControllerProvider.notifier).refresh();
+
         GlassToast.show(context, title: 'Hoàn tất! Chờ SA nghiệm thu.'.tr(), icon: CupertinoIcons.check_mark_circled_solid);
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
+        HapticFeedback.heavyImpact();
         GlassToast.show(context, title: e.toString().replaceFirst('Exception: ', ''), icon: CupertinoIcons.xmark_circle);
       }
     } finally {
@@ -278,18 +457,35 @@ class _JobExecutionPageState extends ConsumerState<JobExecutionPage> {
                   children: [
                     JobDangerFab(onTap: _handleReportIssue),
                     const SizedBox(height: 10),
-                    FilledButton.icon(
-                      onPressed: _isMarkingDone ? null : _handleMarkJobDone,
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(52),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                      ),
-                      icon: _isMarkingDone
-                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Icon(CupertinoIcons.checkmark_shield_fill, size: 18),
-                      label: Text(
-                        _isMarkingDone ? 'Đang xử lý...'.tr() : 'Hoàn tất thi công'.tr(),
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                    // §10: LiquidButton bọc trong Island glass — không dùng FilledButton (Material)
+                    ClipSmoothRect(
+                      radius: SmoothBorderRadius(cornerRadius: 28, cornerSmoothing: 1.0),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                        child: Container(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.04)
+                              : Colors.white.withValues(alpha: 0.25),
+                          padding: const EdgeInsets.all(10),
+                          child: LiquidButton(
+                            onPressed: _isMarkingDone ? null : _handleMarkJobDone,
+                            isLoading: _isMarkingDone,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(CupertinoIcons.checkmark_shield_fill, size: 18, color: Colors.white),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Hoàn tất thi công'.tr(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],

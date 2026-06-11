@@ -83,13 +83,9 @@ class SupplementMediaPicker extends StatelessWidget {
                           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                           child: Center(
                             child: isUploading
-                                ? SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: errorColor,
-                                    ),
+                                ? CupertinoActivityIndicator(
+                                    color: errorColor,
+                                    radius: 12,
                                   )
                                 : Icon(CupertinoIcons.camera_fill, color: errorColor, size: 26),
                           ),
@@ -168,11 +164,7 @@ class SupplementMediaPicker extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Center(
-                  child: SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                  ),
+                  child: CupertinoActivityIndicator(radius: 11),
                 ),
               ),
           ],

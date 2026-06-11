@@ -8,8 +8,8 @@ export const QuotationHeader = ({ quotation, t }) => (
                 <h1 className="text-2xl font-bold tracking-tighter text-slate-800 dark:text-white uppercase">TT AUTO</h1>
             </div>
             <div className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                <p>Số 123, Đường Láng, Đống Đa, Hà Nội</p>
-                <p>Hotline: 1900 6789 - 024.333.8888</p>
+                <p>Số 1 Võ Văn Ngân, Phường Linh Chiểu, Thành phố Thủ Đức, TP.HCM</p>
+                <p>Hotline: 1900.8888</p>
                 <p>Email: service@ttauto.vn</p>
             </div>
         </div>

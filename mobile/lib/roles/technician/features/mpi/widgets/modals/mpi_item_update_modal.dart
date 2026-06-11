@@ -405,11 +405,7 @@ class _MpiItemUpdateModalState extends State<MpiItemUpdateModal> {
                               child: Container(
                                 color: Colors.black.withValues(alpha: 0.25),
                                 child: const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                                  ),
+                                  child: CupertinoActivityIndicator(radius: 12),
                                 ),
                               ),
                             ),
@@ -442,11 +438,7 @@ class _MpiItemUpdateModalState extends State<MpiItemUpdateModal> {
                         LiquidButton(
                           onPressed: _isUploading ? null : _handleSave,
                           child: _isUploading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                )
+                              ? const CupertinoActivityIndicator(color: Colors.white, radius: 10)
                               : Text('Lưu thông tin'.tr()),
                         ),
                       ],

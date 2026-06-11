@@ -13,7 +13,7 @@ export const useOrderDetailLogic = (orderId) => {
     const navigate = useNavigate();
 
     const { data: orderDetail, isLoading } = useGetOrderById(orderId);
-    
+
     const cancelMutation = useCancelOrder();
     const confirmMutation = useConfirmReceipt();
 
@@ -39,7 +39,7 @@ export const useOrderDetailLogic = (orderId) => {
         if (stt === 'PENDING') return 0;
         if (stt === 'CONFIRMED') return 1;
         if (stt === 'PROCESSING' || stt === 'PACKED') return 2;
-        if (stt === 'SHIPPING') return 3;
+        if (stt === 'SHIPPING' || stt === 'SHIPPED') return 3;
         if (stt === 'COMPLETED' || stt === 'DELIVERED') return 4;
         return 0;
     };
@@ -48,7 +48,7 @@ export const useOrderDetailLogic = (orderId) => {
 
     const isPending = orderDetail?.order_status === 'PENDING';
     const isCompleted = orderDetail?.order_status === 'COMPLETED' || orderDetail?.order_status === 'DELIVERED';
-    const isShipping = orderDetail?.order_status === 'SHIPPING';
+    const isShipping = orderDetail?.order_status === 'SHIPPING' || orderDetail?.order_status === 'SHIPPED';
     const isCancelled = orderDetail?.order_status === 'CANCELLED';
 
     const handleCancelOrder = () => {
@@ -82,24 +82,28 @@ export const useOrderDetailLogic = (orderId) => {
     };
 
     const addToCartMutation = useAddToCart();
-    
+
     const handleReorder = () => {
         if (!orderDetail || !orderDetail.items) return;
-        
+
         let successCount = 0;
-        
-        // Push all items to cart
-        Promise.all(orderDetail.items.map(item => 
+        let lastError = null;
+
+        Promise.all(orderDetail.items.map(item =>
             addToCartMutation.mutateAsync({
-                part_id: item.part_id,
-                quantity: item.quantity
-            }).then(() => { successCount++ }).catch(e => console.error(e))
+                part_id: item.part_id?._id || item.part_id,
+                quantity: item.quantity,
+                selected_options: item.selected_options || {}
+            }).then(() => { successCount++ }).catch(e => {
+                console.error(e);
+                lastError = e.response?.data?.message;
+            })
         )).finally(() => {
             if (successCount > 0) {
                 message.success(t('reorder_success', `Đã thêm ${successCount} sản phẩm vào giỏ hàng`));
                 navigate('/cart');
             } else {
-                message.error(t('reorder_failed', 'Không thể thêm sản phẩm vào giỏ hàng'));
+                message.error(lastError || t('reorder_failed', 'Không thể thêm sản phẩm vào giỏ hàng'));
             }
         });
     };

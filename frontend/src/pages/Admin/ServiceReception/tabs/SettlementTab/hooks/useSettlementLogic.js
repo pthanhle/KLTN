@@ -117,8 +117,7 @@ export const useSettlementLogic = () => {
 
         const isPaid = invoiceLedger.payment_status === 'PAID';
 
-        const qcStep = (p.timeline || []).find(t => t.step === 'QC_TESTING');
-        const kcsTasks = (qcStep?.qc_checklist || []).map((task, i) => ({
+        const kcsTasks = (p.qc_checklist || []).map((task, i) => ({
             id: `qc_${i}`,
             name: task.task,
             isCompleted: task.status === 'passed',

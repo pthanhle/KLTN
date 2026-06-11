@@ -68,38 +68,40 @@ class PostDriveBottomSheet extends ConsumerWidget {
               right: 24,
               bottom: bottomPadding > 0 ? bottomPadding + 24 : 32 + MediaQuery.of(context).padding.bottom,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Drag handle
-                Center(
-                  child: Container(
-                    width: 48,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sáng rõ
-                      borderRadius: BorderRadius.circular(3),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Drag handle
+                  Center(
+                    child: Container(
+                      width: 48,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6), // Sáng rõ
+                        borderRadius: BorderRadius.circular(3),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-
-                const PostDriveHeader(),
-                const SizedBox(height: 32),
-
-                const InterestLevelSelector(),
-                const SizedBox(height: 24),
-
-                const FeedbackInput(),
-                const SizedBox(height: 32),
-
-                PostDriveSubmitButton(
-                  isEnabled: controller.isValid,
-                  isLoading: state.isSubmitting,
-                  onPressed: () => controller.submitPostDriveData(task.id),
-                ),
-              ],
+                  const SizedBox(height: 24),
+  
+                  const PostDriveHeader(),
+                  const SizedBox(height: 32),
+  
+                  const InterestLevelSelector(),
+                  const SizedBox(height: 24),
+  
+                  const FeedbackInput(),
+                  const SizedBox(height: 32),
+  
+                  PostDriveSubmitButton(
+                    isEnabled: controller.isValid,
+                    isLoading: state.isSubmitting,
+                    onPressed: () => controller.submitPostDriveData(task.id),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

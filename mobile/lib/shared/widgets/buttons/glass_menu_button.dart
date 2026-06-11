@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 class GlassMenuButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -20,6 +21,7 @@ class GlassMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final radius = SmoothBorderRadius(cornerRadius: size * 0.35, cornerSmoothing: 1.0);
 
     return GestureDetector(
       onTap: () {
@@ -27,30 +29,35 @@ class GlassMenuButton extends StatelessWidget {
         onPressed?.call();
       },
       behavior: HitTestBehavior.opaque,
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: ShapeDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.12)
+              : Colors.black.withValues(alpha: 0.06),
+          shape: SmoothRectangleBorder(
+            borderRadius: radius,
+            side: BorderSide(
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.12)
-                  : Colors.black.withValues(alpha: 0.06),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.20)
-                    : Colors.white.withValues(alpha: 0.60),
-                width: 0.5,
-              ),
+                  ? Colors.white.withValues(alpha: 0.20)
+                  : Colors.white.withValues(alpha: 0.60),
+              width: 0.5,
             ),
-            child: Icon(
-              icon,
-              size: iconSize,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.90)
-                  : Colors.black.withValues(alpha: 0.65),
+          ),
+        ),
+        child: ClipSmoothRect(
+          radius: radius,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Center(
+              child: Icon(
+                icon,
+                size: iconSize,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.90)
+                    : Colors.black.withValues(alpha: 0.65),
+              ),
             ),
           ),
         ),

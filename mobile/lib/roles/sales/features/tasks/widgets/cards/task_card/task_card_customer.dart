@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import '../../../../../../../core/utils/theme_extension.dart';
@@ -81,13 +82,13 @@ class TaskCardCustomer extends ConsumerWidget {
             if (task.chatLogs != null && task.chatLogs!.isNotEmpty)
               _buildActionButton(
                 context, 
-                icon: Icons.chat_bubble_rounded, 
+                icon: CupertinoIcons.chat_bubble_fill, 
                 onTap: () => ref.read(taskCardControllerProvider.notifier).openChat(task.id),
               ),
             const SizedBox(width: 8),
             _buildActionButton(
               context, 
-              icon: Icons.phone_rounded, 
+              icon: CupertinoIcons.phone_fill, 
               onTap: () {
                 if (task.customerPhone != null) {
                   ref.read(taskCardControllerProvider.notifier).callCustomer(task.customerPhone!);

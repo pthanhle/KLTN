@@ -4,6 +4,7 @@ import { Wallet, TrendingDown } from 'lucide-react';
 import { getPricingRules } from '../../../../schemas/carPricingSchema';
 import { usePricingState } from '../hooks/usePricingState';
 import { numberToText } from '../../../../../../../utils/numberToText';
+import { parseNumericInput, preventNonNumericInput } from '../../../../utils/carFormUtils';
 
 const PricingCard = ({ form, isLoading }) => {
     const { t, i18n } = useTranslation('adminCarForm');
@@ -52,13 +53,9 @@ const PricingCard = ({ form, isLoading }) => {
                                         placeholder="0"
                                         min={0}
                                         formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                        parser={value => value?.replace(/\D/g, '') || ''}
+                                        parser={parseNumericInput}
                                         controls={false}
-                                        onKeyPress={(e) => {
-                                            if (!/[0-9]/.test(e.key)) {
-                                                e.preventDefault();
-                                            }
-                                        }}
+                                        onKeyPress={preventNonNumericInput}
                                     />
                                 </Form.Item>
                                 <span className="absolute top-[31px] right-8 text-xl font-bold text-slate-400 tracking-tighter pointer-events-none z-10">{t('currencyVND', 'VNĐ')}</span>
@@ -88,13 +85,9 @@ const PricingCard = ({ form, isLoading }) => {
                                         placeholder="0"
                                         min={0}
                                         formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                        parser={value => value?.replace(/\D/g, '') || ''}
+                                        parser={parseNumericInput}
                                         controls={false}
-                                        onKeyPress={(e) => {
-                                            if (!/[0-9]/.test(e.key)) {
-                                                e.preventDefault();
-                                            }
-                                        }}
+                                        onKeyPress={preventNonNumericInput}
                                     />
                                 </Form.Item>
                                 <span className="absolute top-[31px] right-8 text-xl font-bold text-yellow-600/60 dark:text-yellow-500/60 tracking-tighter pointer-events-none z-10">{t('currencyVND', 'VNĐ')}</span>

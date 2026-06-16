@@ -42,27 +42,6 @@ class SalesTasksState {
 
   List<TaskModel> _sortAndFilter(List<TaskModel> list) {
     var result = List<TaskModel>.from(list);
-
-    // Date filter
-    if (filterDate != null) {
-      result = result.where((t) {
-        final dt = DateTime.tryParse(t.appointmentTime ?? '');
-        if (dt == null) return false;
-        return dt.year == filterDate!.year &&
-            dt.month == filterDate!.month &&
-            dt.day == filterDate!.day;
-      }).toList();
-    }
-
-    if (searchQuery.isNotEmpty) {
-      final q = searchQuery.toLowerCase();
-      result = result.where((t) {
-        return (t.licensePlate?.toLowerCase().contains(q) ?? false) ||
-            (t.customerName?.toLowerCase().contains(q) ?? false) ||
-            t.title.toLowerCase().contains(q);
-      }).toList();
-    }
-    // Sort newest first by appointmentTime (ISO string)
     result.sort((a, b) {
       final aTime = DateTime.tryParse(a.appointmentTime ?? '') ?? DateTime(0);
       final bTime = DateTime.tryParse(b.appointmentTime ?? '') ?? DateTime(0);
@@ -106,7 +85,16 @@ class SalesTasksController extends Notifier<SalesTasksState> {
       state = state.copyWith(error: null);
     }
     try {
-      final tasks = await testDriveApiService.fetchMyTasks();
+      String? dateStr;
+      if (state.filterDate != null) {
+        final fDate = state.filterDate!;
+        dateStr = '${fDate.day.toString().padLeft(2, '0')}/${fDate.month.toString().padLeft(2, '0')}/${fDate.year}';
+      }
+      
+      final tasks = await testDriveApiService.fetchMyTasks(
+        search: state.searchQuery,
+        date: dateStr,
+      );
       state = state.copyWith(allTasks: tasks, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -148,6 +136,7 @@ class SalesTasksController extends Notifier<SalesTasksState> {
 
   void updateSearch(String query) {
     state = state.copyWith(searchQuery: query);
+    _loadTasks(isRefresh: true);
   }
 
   void setFilterDate(DateTime? date) {
@@ -156,6 +145,7 @@ class SalesTasksController extends Notifier<SalesTasksState> {
     } else {
       state = state.copyWith(filterDate: date);
     }
+    _loadTasks(isRefresh: true);
   }
 
   Future<void> refresh() async {

@@ -7,10 +7,10 @@ import { SHOWROOM_BRANCHES } from '../../../../../Customer/TestDriveBooking/data
 export const filterTestDrivesByStatus = (drives, filterType) => {
     if (!drives || drives.length === 0) return [];
     
-    // 'upcoming': Pending, Confirmed, InProgress
+    // 'upcoming': Pending, Confirmed, Received, InProgress
     // 'history': Completed, Cancelled
     if (filterType === 'upcoming') {
-        return drives.filter(d => ['Pending', 'Confirmed', 'InProgress'].includes(d.status));
+        return drives.filter(d => ['Pending', 'Confirmed', 'Received', 'InProgress'].includes(d.status));
     }
     
     return drives.filter(d => ['Completed', 'Cancelled'].includes(d.status));

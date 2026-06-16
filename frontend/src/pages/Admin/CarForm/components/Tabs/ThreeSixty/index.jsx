@@ -5,6 +5,8 @@ import ThreeSixtyUploader from './components/UploaderSection';
 import ThreeSixtyPreview from './components/PreviewSection';
 import { useThreeSixtyForm } from './hooks/useThreeSixtyForm';
 
+const HiddenStore = () => null;
+
 const ThreeSixtyTab = ({ form }) => {
     const { t } = useTranslation('adminCarForm');
     const manager = useThreeSixtyForm(form);
@@ -32,7 +34,7 @@ const ThreeSixtyTab = ({ form }) => {
             </header>
 
             {/* Hidden field bound to form */}
-            <Form.Item name="threeSixty" hidden />
+            <Form.Item name="threeSixty" hidden><HiddenStore /></Form.Item>
 
             <div className="grid grid-cols-12 gap-8 relative z-10">
                 <div className="col-span-12 lg:col-span-4">

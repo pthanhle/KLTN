@@ -6,6 +6,7 @@ import 'package:ttauto_staff/roles/auth/models/task_model.dart';
 import 'package:ttauto_staff/roles/sales/features/tasks/controllers/sales_tasks_controller.dart';
 import 'package:ttauto_staff/roles/sales/features/tasks/widgets/cards/task_card.dart';
 import '../cards/task_card_skeleton.dart';
+import 'package:ttauto_staff/roles/sales/features/tasks/widgets/lists/sales_tasks_empty_state.dart';
 
 class TasksListView extends ConsumerWidget {
   final double topPadding;
@@ -32,6 +33,8 @@ class TasksListView extends ConsumerWidget {
     List<TaskModel> tasks = state.activeTasks;
 
     if (tasks.isEmpty) {
+      final isSearchActive = state.searchQuery.isNotEmpty || state.filterDate != null;
+      
       return RefreshIndicator(
         onRefresh: () => ref.read(salesTasksControllerProvider.notifier).refresh(),
         child: ListView(
@@ -40,20 +43,10 @@ class TasksListView extends ConsumerWidget {
           children: [
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.5,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.inbox, size: 64, color: context.colors.outlineVariant),
-                    const SizedBox(height: 16),
-                    Text(
-                      tr('Không có công việc nào trong danh sách này.', context: context),
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+              child: SalesTasksEmptyState(
+                currentTab: state.currentTab,
+                hasAnyTasks: state.allTasks.isNotEmpty,
+                isSearchActive: isSearchActive,
               ),
             ),
           ],

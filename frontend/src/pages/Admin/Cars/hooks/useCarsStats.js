@@ -12,7 +12,7 @@ export const useCarsStats = () => {
                 await new Promise(resolve => setTimeout(resolve, 800));
                 setStats(MOCK_CARS_STATS);
             } catch (error) {
-                console.error("Error fetching car stats:", error);
+                setStats(null);
             } finally {
                 setIsLoading(false);
             }

@@ -58,7 +58,7 @@ class SalesTasksPage extends StatelessWidget {
             children: [
               Positioned.fill(
                 child: TasksListView(
-                  topPadding: MediaQuery.of(context).padding.top + 130,
+                  topPadding: MediaQuery.of(context).padding.top + 180,
                 ),
               ),
               

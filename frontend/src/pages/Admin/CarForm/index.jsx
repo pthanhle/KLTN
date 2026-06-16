@@ -10,10 +10,13 @@ import FeaturesTab from './components/Tabs/Features/index';
 import SEOTab from './components/Tabs/SEO/index';
 import MediaLibraryTab from './components/Tabs/MediaLibrary/index';
 import ThreeSixtyTab from './components/Tabs/ThreeSixty/index';
+import VehicleUnitsTab from './components/Tabs/VehicleUnitsTab/index';
 import { useTranslation } from 'react-i18next';
 import { Form, Skeleton, Space } from 'antd';
 import { useParams } from 'react-router-dom';
 import { useCarFormInit } from './hooks/useCarFormInit';
+
+const HiddenStore = () => null;
 
 const CarForm = () => {
     const { activeTab, setActiveTab } = useCarFormUI();
@@ -27,6 +30,7 @@ const CarForm = () => {
         const tabs = [
             { key: 'overview', component: <OverviewTab form={form} /> },
             { key: 'pricing', component: <PricingInventoryTab form={form} /> },
+            { key: 'vehicle_units', component: <VehicleUnitsTab carId={id !== 'new' ? id : null} form={form} /> },
             { key: 'specs', component: <SpecsTab form={form} /> },
             { key: 'colors', component: <ColorsTab form={form} /> },
             { key: 'features', component: <FeaturesTab form={form} /> },
@@ -63,16 +67,16 @@ const CarForm = () => {
                             <div className="w-full max-w-4xl mx-auto mt-4 p-8 bg-white dark:bg-[#141416] rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm">
                                 <Skeleton active paragraph={{ rows: 2 }} className="mb-8" />
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <Space direction="vertical" size="large" className="w-full">
+                                    <div className="flex flex-col gap-6 w-full">
                                         <Skeleton.Input active block size="large" />
                                         <Skeleton.Input active block size="large" />
                                         <Skeleton.Input active block size="large" />
-                                    </Space>
-                                    <Space direction="vertical" size="large" className="w-full">
+                                    </div>
+                                    <div className="flex flex-col gap-6 w-full">
                                         <Skeleton.Input active block size="large" />
                                         <Skeleton.Input active block size="large" />
                                         <Skeleton.Image active className="!w-full !h-[120px]" />
-                                    </Space>
+                                    </div>
                                 </div>
                             </div>
                         ) : (
@@ -81,10 +85,10 @@ const CarForm = () => {
                                 layout="vertical"
                                 className="w-full"
                             >
-                                <Form.Item name="image" hidden />
-                                <Form.Item name="new_photos" hidden />
-                                <Form.Item name={['gallery', 'photos']} hidden />
-                                <Form.Item name={['gallery', 'videos']} hidden />
+                                <Form.Item name="image" hidden><HiddenStore /></Form.Item>
+                                <Form.Item name="new_photos" hidden><HiddenStore /></Form.Item>
+                                <Form.Item name={['gallery', 'photos']} hidden><HiddenStore /></Form.Item>
+                                <Form.Item name={['gallery', 'videos']} hidden><HiddenStore /></Form.Item>
 
                                 {renderTabContent()}
                             </Form>

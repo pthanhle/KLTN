@@ -57,7 +57,7 @@ export const useSiderMenu = (collapsed) => {
             label: t('admin.sider.orders'),
         },
         {
-            key: '/admin/contracts',
+            key: '/admin/vehicle-contracts',
             icon: <FileText size={iconSize} />,
             label: t('admin.sider.contracts', 'Hợp Đồng'),
         },

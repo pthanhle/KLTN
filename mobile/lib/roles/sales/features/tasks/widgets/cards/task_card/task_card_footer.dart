@@ -55,7 +55,9 @@ class TaskCardFooter extends StatelessWidget {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            task.address ?? tr('Tại Showroom', context: context),
+                            (task.address?.trim().isNotEmpty == true) 
+                                ? task.address! 
+                                : tr('Tại Showroom', context: context),
                             style: context.textTheme.labelMedium?.copyWith(
                               color: context.colors.onSurfaceVariant.withValues(alpha: 0.9),
                               letterSpacing: 0,

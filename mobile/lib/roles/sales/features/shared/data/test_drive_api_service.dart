@@ -39,11 +39,16 @@ class TestDriveApiService {
   }
 
   // GET /staff/sale/appointments — bookings đã được phân công cho tôi
-  Future<List<TaskModel>> fetchMyTasks() async {
+  Future<List<TaskModel>> fetchMyTasks({String? search, String? date}) async {
     final token = await _getToken();
     final dio = _buildDio(token);
     final url = '${ApiConfig.baseUrl}/staff/sale/appointments';
-    final response = await dio.get(url);
+    
+    final queryParams = <String, dynamic>{};
+    if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    if (date != null && date.isNotEmpty) queryParams['date'] = date;
+    
+    final response = await dio.get(url, queryParameters: queryParams);
     final Map<String, dynamic> body =
         response.data as Map<String, dynamic>;
     final List<dynamic> tasksJson =
@@ -54,11 +59,16 @@ class TestDriveApiService {
   }
 
   // GET /staff/sale/appointments — cũng trả về bookings cho dashboard "hôm nay"
-  Future<List<TestDriveBooking>> fetchMyBookings() async {
+  Future<List<TestDriveBooking>> fetchMyBookings({String? search, String? date}) async {
     final token = await _getToken();
     final dio = _buildDio(token);
     final url = '${ApiConfig.baseUrl}/staff/sale/appointments';
-    final response = await dio.get(url);
+    
+    final queryParams = <String, dynamic>{};
+    if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    if (date != null && date.isNotEmpty) queryParams['date'] = date;
+    
+    final response = await dio.get(url, queryParameters: queryParams);
     final Map<String, dynamic> body =
         response.data as Map<String, dynamic>;
     final List<dynamic> bookingsJson =

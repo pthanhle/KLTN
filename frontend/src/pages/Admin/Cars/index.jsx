@@ -56,7 +56,7 @@ const CarsCatalog = () => {
                             className="group flex items-center justify-center gap-2 px-6 py-3.5 bg-white dark:bg-[#141416] hover:bg-slate-50 dark:hover:bg-[#1e1e20] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-full font-black text-[11px] tracking-widest uppercase active:scale-95 transition-all outline-none cursor-pointer"
                         >
                             <Settings size={16} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-300" />
-                            DỰ TOÁN CHI PHÍ
+                            {t('costEstimateSettings', 'DỰ TOÁN CHI PHÍ')}
                         </button>
                         <button
                             type="button"

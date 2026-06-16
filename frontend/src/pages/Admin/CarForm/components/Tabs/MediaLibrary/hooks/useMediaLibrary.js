@@ -42,8 +42,21 @@ export const useMediaLibrary = () => {
                     URL.revokeObjectURL(url);
                 }
             };
-        } else if (typeof rawHeroImage === 'string' && (rawHeroImage.startsWith('http') || rawHeroImage.startsWith('/') || rawHeroImage.startsWith('blob:'))) {
-            setHeroImageUri(rawHeroImage);
+        } else if (typeof rawHeroImage === 'string') {
+            setHeroImageUri(rawHeroImage.startsWith('http') || rawHeroImage.startsWith('/') || rawHeroImage.startsWith('blob:') ? rawHeroImage : `/${rawHeroImage}`);
+        } else if (Array.isArray(rawHeroImage) && rawHeroImage.length > 0) {
+            const firstItem = rawHeroImage[0];
+            if (firstItem.url || firstItem.thumbUrl) {
+                setHeroImageUri(firstItem.url || firstItem.thumbUrl);
+            } else if (firstItem.originFileObj) {
+                const url = URL.createObjectURL(firstItem.originFileObj);
+                setHeroImageUri(url);
+                return () => URL.revokeObjectURL(url);
+            } else {
+                setHeroImageUri(null);
+            }
+        } else if (typeof rawHeroImage === 'object' && (rawHeroImage.url || rawHeroImage.thumbUrl)) {
+            setHeroImageUri(rawHeroImage.url || rawHeroImage.thumbUrl);
         } else {
             setHeroImageUri(null);
         }

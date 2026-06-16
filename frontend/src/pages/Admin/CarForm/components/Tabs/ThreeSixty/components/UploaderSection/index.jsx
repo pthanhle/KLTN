@@ -5,13 +5,14 @@ import StatisticsHUD from './StatisticsHUD';
 import ActionButtons from './ActionButtons';
 import SequenceTips from './SequenceTips';
 
-const ThreeSixtyUploader = ({ 
-    sequenceCount, 
-    onUploadBatch, 
-    onClearSequence, 
-    onProcessAI 
-}) => {
+const ThreeSixtyUploader = ({ manager }) => {
     const { t } = useTranslation('adminCarForm');
+    const {
+        sequenceCount,
+        handleUploadBatch,
+        handleClearSequence,
+        handleProcessAI
+    } = manager;
 
     return (
         <section className="flex flex-col gap-8 h-full">
@@ -21,14 +22,14 @@ const ThreeSixtyUploader = ({
                         {t('uploaderBlockTitle', 'Trình Tải Lên Chuỗi Hình Ảnh')}
                     </h3>
                     
-                    <DragDropZone onUpload={onUploadBatch} />
+                    <DragDropZone onUpload={handleUploadBatch} />
                     
                     <StatisticsHUD sequenceCount={sequenceCount} />
 
                     <ActionButtons 
                         sequenceCount={sequenceCount} 
-                        onClear={onClearSequence} 
-                        onProcessAI={onProcessAI} 
+                        onClear={handleClearSequence} 
+                        onProcessAI={handleProcessAI} 
                     />
                 </div>
 

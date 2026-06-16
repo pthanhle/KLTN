@@ -30,21 +30,9 @@ export const useAdminProductDetailQuery = (id) => {
 export const useUpdateAdminProductMutation = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }) => {
-            console.log('useUpdateAdminProductMutation mutationFn triggered', { id });
-            return updateAdminProduct(id, data);
-        },
-        onSuccess: (data) => {
-            console.log('useUpdateAdminProductMutation onSuccess triggered', data);
-            try {
-                queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
-                console.log('useUpdateAdminProductMutation query invalidation done');
-            } catch (err) {
-                console.error('useUpdateAdminProductMutation query invalidation failed', err);
-            }
-        },
-        onError: (error) => {
-            console.error('useUpdateAdminProductMutation onError triggered', error);
+        mutationFn: ({ id, data }) => updateAdminProduct(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
         }
     });
 };
@@ -52,21 +40,9 @@ export const useUpdateAdminProductMutation = () => {
 export const useCreateAdminProductMutation = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data) => {
-            console.log('useCreateAdminProductMutation mutationFn triggered');
-            return createAdminProduct(data);
-        },
-        onSuccess: (data) => {
-            console.log('useCreateAdminProductMutation onSuccess triggered', data);
-            try {
-                queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
-                console.log('useCreateAdminProductMutation query invalidation done');
-            } catch (err) {
-                console.error('useCreateAdminProductMutation query invalidation failed', err);
-            }
-        },
-        onError: (error) => {
-            console.error('useCreateAdminProductMutation onError triggered', error);
+        mutationFn: (data) => createAdminProduct(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
         }
     });
 };

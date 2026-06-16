@@ -5,7 +5,7 @@ const CarSummary = ({ car }) => {
     const { t } = useTranslation(['booking']);
 
     return (
-        <div className="w-full md:w-[460px] lg:w-[500px] bg-slate-900 border-r border-slate-800 flex flex-col justify-between p-10 lg:p-14 relative overflow-hidden shrink-0">
+        <div className="w-full md:w-[460px] lg:w-[500px] bg-slate-900 dark:bg-[#0a0a0b] border-r border-slate-800 dark:border-white/5 flex flex-col justify-between p-10 lg:p-14 relative overflow-hidden shrink-0">
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent pointer-events-none"></div>
             
             <div className="relative z-10 space-y-2 mb-8 mt-4">
@@ -36,9 +36,20 @@ const CarSummary = ({ car }) => {
 
                 <div className="pt-6 border-t border-white/10">
                     <span className="text-xs text-slate-500 block mb-1">{t('summary_price', 'Price starting from')}</span>
-                    <div className="text-2xl font-black text-yellow-500 tracking-tight">
-                        {new Intl.NumberFormat('vi-VN').format(car.price)} VNĐ
-                    </div>
+                    {car.salePrice && car.salePrice < car.price ? (
+                        <div className="flex flex-col">
+                            <div className="text-2xl font-black text-yellow-500 tracking-tight">
+                                {new Intl.NumberFormat('vi-VN').format(car.salePrice)} VNĐ
+                            </div>
+                            <div className="text-sm font-medium text-slate-500 line-through mt-0.5">
+                                {new Intl.NumberFormat('vi-VN').format(car.price)} VNĐ
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-2xl font-black text-yellow-500 tracking-tight">
+                            {new Intl.NumberFormat('vi-VN').format(car.price)} VNĐ
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

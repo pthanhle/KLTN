@@ -13,9 +13,11 @@ import './config/chartConfig'
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <GoogleOAuthProvider clientId="939950020568-7su5pq39r781kgglsbm8lr7gm55l52gm.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={googleClientId}>
             <Provider store={store}>
                 <QueryClientProvider client={queryClient}>
                     <HelmetProvider>

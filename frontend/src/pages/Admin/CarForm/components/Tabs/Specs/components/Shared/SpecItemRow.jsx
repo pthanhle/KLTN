@@ -3,8 +3,10 @@ import { Form, Input } from 'antd';
 import { GripVertical, Trash2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useTranslation } from 'react-i18next';
 
 const SpecItemRow = ({ itemKey, itemName, restItemField, removeItem, index }) => {
+    const { t } = useTranslation('adminCarForm');
     const {
         attributes,
         listeners,
@@ -42,13 +44,13 @@ const SpecItemRow = ({ itemKey, itemName, restItemField, removeItem, index }) =>
                 <Form.Item
                     {...restItemField}
                     name={[itemName, 'label']}
-                    rules={[{ required: true, message: 'Bắt buộc' }]}
+                    rules={[{ required: true, message: t('specItemRequired', 'Bắt buộc') }]}
                     className="mb-0"
                     required={false}
                 >
                     <Input
                         className="w-full !h-10 !bg-white dark:!bg-[#1a1a1c] !border-slate-200 dark:!border-white/10 !rounded-lg px-3 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:!ring-2 focus:!ring-yellow-500/20"
-                        placeholder="VD: Chiều dài (mm)"
+                        placeholder={t('specItemLabelPlaceholder', 'VD: Chiều dài (mm)')}
                     />
                 </Form.Item>
             </div>
@@ -56,13 +58,13 @@ const SpecItemRow = ({ itemKey, itemName, restItemField, removeItem, index }) =>
                 <Form.Item
                     {...restItemField}
                     name={[itemName, 'value']}
-                    rules={[{ required: true, message: 'Bắt buộc' }]}
+                    rules={[{ required: true, message: t('specItemRequired', 'Bắt buộc') }]}
                     className="mb-0"
                     required={false}
                 >
                     <Input
                         className="w-full !h-10 !bg-white dark:!bg-[#1a1a1c] !border-slate-200 dark:!border-white/10 !rounded-lg px-3 text-sm font-semibold text-slate-900 dark:text-white focus:!ring-2 focus:!ring-yellow-500/20"
-                        placeholder="VD: 4850"
+                        placeholder={t('specItemValuePlaceholder', 'VD: 4850')}
                     />
                 </Form.Item>
             </div>

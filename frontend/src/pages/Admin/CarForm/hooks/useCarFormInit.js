@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAdminProductDetailQuery } from '../../../../services/queries/adminProduct.queries';
 
 export const useCarFormInit = (id, form) => {
     const { data: carDetail, isLoading: isInitializing } = useAdminProductDetailQuery(id);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
         if (!id) {
@@ -10,7 +11,7 @@ export const useCarFormInit = (id, form) => {
             return;
         }
 
-        if (carDetail) {
+        if (carDetail && !isInitialized) {
             const sanitizedData = {
                 ...carDetail,
                 brandId: carDetail.brandId?._id || carDetail.brandId,
@@ -31,8 +32,12 @@ export const useCarFormInit = (id, form) => {
                 threeSixty: carDetail.threeSixty || { images: [], lighting: 'Studio', environment: 'Minimalist Studio' }
             };
             form.setFieldsValue(sanitizedData);
+            setIsInitialized(true);
+        } else if (carDetail && isInitialized) {
+            form.setFieldValue('stock', carDetail.stock);
+            form.setFieldValue('availableShowrooms', carDetail.availableShowrooms);
         }
     }, [id, carDetail, form]);
 
-    return { isInitializing };
+    return { isInitializing: isInitializing && !isInitialized };
 };

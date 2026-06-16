@@ -74,6 +74,8 @@ import enLoyalty from '../locales/en/loyalty.json';
 import viLoyalty from '../locales/vi/loyalty.json';
 import enAdminDashboard from '../locales/en/adminDashboard.json';
 import viAdminDashboard from '../locales/vi/adminDashboard.json';
+import enAdminVehicleContracts from '../locales/en/adminVehicleContracts.json';
+import viAdminVehicleContracts from '../locales/vi/adminVehicleContracts.json';
 
 i18n
     .use(initReactI18next)
@@ -117,6 +119,7 @@ i18n
                 adminOrderDetail: enAdminOrderDetail,
                 loyalty: enLoyalty,
                 adminDashboard: enAdminDashboard,
+                adminVehicleContracts: enAdminVehicleContracts,
             },
             vi: {
                 translation: viTranslation,
@@ -156,6 +159,7 @@ i18n
                 adminOrderDetail: viAdminOrderDetail,
                 loyalty: viLoyalty,
                 adminDashboard: viAdminDashboard,
+                adminVehicleContracts: viAdminVehicleContracts,
             },
         },
         lng: 'vi',

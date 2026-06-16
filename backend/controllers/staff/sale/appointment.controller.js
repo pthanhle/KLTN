@@ -51,7 +51,6 @@ const normalizeBooking = (b) => {
   }
 }
 
-// TaskModel mapping for mobile
 const toTaskModel = (b) => {
   const obj = b.toObject ? b.toObject() : b
   const car = obj.product_id
@@ -63,9 +62,34 @@ const toTaskModel = (b) => {
     CANCELLED: 'done',
   }
   const addr = obj.delivery_address
-  const addressStr = addr
-    ? [addr.street, addr.ward, addr.district, addr.city].filter(Boolean).join(', ')
-    : ''
+  let addressStr = ''
+  let city = ''
+  let district = ''
+  let ward = ''
+  let street = ''
+
+  if (obj.test_drive_type === 'home' && addr) {
+    if (typeof addr === 'string') {
+      addressStr = addr
+    } else {
+      city = addr.city || ''
+      district = addr.district || ''
+      ward = addr.ward || ''
+      street = addr.street || ''
+      addressStr = [street, ward, district, city].filter(Boolean).join(', ')
+    }
+  } else {
+    if (obj.showroom_branch) {
+      addressStr = obj.showroom_branch
+    }
+    if (obj.user_id && obj.user_id.addresses && obj.user_id.addresses.length > 0) {
+      const defaultAddr = obj.user_id.addresses.find((a) => a.is_default) || obj.user_id.addresses[0]
+      city = defaultAddr.city || ''
+      district = defaultAddr.district || ''
+      ward = defaultAddr.ward || ''
+      street = defaultAddr.street || ''
+    }
+  }
 
   return {
     id: String(obj._id),
@@ -73,8 +97,17 @@ const toTaskModel = (b) => {
     priority: obj.priority || 'MEDIUM',
     status: statusToTask[obj.booking_status] || 'confirmed',
     sla: null,
+    customerId: obj.user_id?._id ? String(obj.user_id._id) : null,
     customerName: obj.customer_info?.full_name || obj.user_id?.full_name || '',
     customerPhone: obj.customer_info?.contact_phone || obj.user_id?.phone || '',
+    customerEmail: obj.customer_info?.email || obj.user_id?.email || '',
+    customerTaxCode: obj.user_id?.tax_info?.tax_code || '',
+    customerCompanyName: obj.user_id?.tax_info?.company_name || '',
+    customerCity: city,
+    customerDistrict: district,
+    customerWard: ward,
+    customerStreet: street,
+    productId: car?._id ? String(car._id) : null,
     vehicleModel: car?.name || car?.sku || '',
     licensePlate: '',
     appointmentDate: obj.booking_date ? dayjs(obj.booking_date).format('DD/MM/YYYY') : '',
@@ -92,6 +125,7 @@ export const getAppointments = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1
   const limit = parseInt(req.query.limit) || 50
   const dateStr = req.query.date || ''
+  const search = req.query.search || req.query.q || ''
 
   const query = {
     booking_type: 'test_drive',
@@ -104,9 +138,24 @@ export const getAppointments = asyncHandler(async (req, res) => {
     query.booking_date = { $gte: start, $lte: end }
   }
 
+  if (search) {
+    const users = await User.find({
+      $or: [
+        { full_name: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
+      ],
+    }).select('_id')
+    const userIds = users.map((u) => u._id)
+    query.$or = [
+      { user_id: { $in: userIds } },
+      { 'customer_info.full_name': { $regex: search, $options: 'i' } },
+      { 'customer_info.contact_phone': { $regex: search, $options: 'i' } }
+    ]
+  }
+
   const total = await Booking.countDocuments(query)
   const bookingsRaw = await Booking.find(query)
-    .populate('user_id', 'full_name phone email avatar')
+    .populate('user_id', 'full_name phone email avatar addresses tax_info')
     .populate('product_id', 'name sku images')
     .populate('advisor_id', 'full_name avatar')
     .populate('requested_staff.user_id', 'full_name avatar')
@@ -133,7 +182,7 @@ export const getPool = asyncHandler(async (req, res) => {
   }
 
   const bookingsRaw = await Booking.find(query)
-    .populate('user_id', 'full_name phone email avatar')
+    .populate('user_id', 'full_name phone email avatar addresses tax_info')
     .populate('product_id', 'name sku images')
     .populate('requested_staff.user_id', 'full_name avatar')
     .sort({ booking_date: 1, createdAt: 1 })
@@ -145,7 +194,7 @@ export const getPool = asyncHandler(async (req, res) => {
 // GET /staff/sale/appointments/:id
 export const getAppointmentById = asyncHandler(async (req, res) => {
   const appointment = await Booking.findById(req.params.id)
-    .populate('user_id', 'full_name email phone avatar')
+    .populate('user_id', 'full_name email phone avatar addresses tax_info')
     .populate('product_id', 'name sku images')
     .populate('advisor_id', 'full_name avatar')
     .populate('requested_staff.user_id', 'full_name avatar')
@@ -189,10 +238,10 @@ export const requestJob = asyncHandler(async (req, res) => {
       staffName: req.user.full_name,
       staffAvatar: req.user.avatar,
     })
-  } catch (_) {}
+  } catch (_) { }
 
   const updated = await Booking.findById(booking._id)
-    .populate('user_id', 'full_name phone email avatar')
+    .populate('user_id', 'full_name phone email avatar addresses tax_info')
     .populate('product_id', 'name sku images')
     .populate('requested_staff.user_id', 'full_name avatar')
 
@@ -241,7 +290,7 @@ export const submitCheckin = asyncHandler(async (req, res) => {
   await appointment.save()
 
   const final = await Booking.findById(appointment._id)
-    .populate('user_id', 'full_name phone email avatar')
+    .populate('user_id', 'full_name phone email avatar addresses tax_info')
     .populate('product_id', 'name sku images')
     .populate('advisor_id', 'full_name avatar')
 
@@ -283,11 +332,11 @@ export const submitPostDrive = asyncHandler(async (req, res) => {
         reference_link: '/profile/services',
         is_read: false,
       })
-    } catch (_) {}
+    } catch (_) { }
   }
 
   const final = await Booking.findById(appointment._id)
-    .populate('user_id', 'full_name phone email avatar')
+    .populate('user_id', 'full_name phone email avatar addresses tax_info')
     .populate('product_id', 'name sku images')
     .populate('advisor_id', 'full_name avatar')
 
@@ -333,7 +382,7 @@ export const updateAppointment = asyncHandler(async (req, res) => {
         reference_link: '/profile/services',
         is_read: false,
       })
-    } catch (_) {}
+    } catch (_) { }
   } else if (upperStatus === 'COMPLETED') {
     const message = `Cảm ơn bạn đã lái thử xe ngày ${dayjs(appointment.booking_date).format('DD/MM/YYYY')}. Hy vọng bạn có trải nghiệm tốt!`
     try {
@@ -346,11 +395,11 @@ export const updateAppointment = asyncHandler(async (req, res) => {
         reference_link: '/profile/services',
         is_read: false,
       })
-    } catch (_) {}
+    } catch (_) { }
   }
 
   const final = await Booking.findById(appointment._id)
-    .populate('user_id', 'full_name phone email avatar')
+    .populate('user_id', 'full_name phone email avatar addresses tax_info')
     .populate('product_id', 'name sku images')
     .populate('advisor_id', 'full_name avatar')
     .populate('requested_staff.user_id', 'full_name avatar')

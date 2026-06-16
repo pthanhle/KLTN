@@ -3,6 +3,7 @@ import { LayoutDashboard, Tag, Settings2, Palette, ListChecks, Globe, Images, Bo
 export const BUILDER_TABS = [
     { id: 'overview', labelKey: 'tabOverview', icon: LayoutDashboard },
     { id: 'pricing', labelKey: 'tabPricing', icon: Tag },
+    { id: 'vehicle_units', labelKey: 'vehicleUnitsTab', icon: Box },
     { id: 'specs', labelKey: 'tabSpecs', icon: Settings2 },
     { id: 'colors', labelKey: 'tabColors', icon: Palette },
     { id: 'features', labelKey: 'tabFeatures', icon: ListChecks },

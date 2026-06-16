@@ -20,7 +20,7 @@ const VideoGridItem = ({ video, index, onRemove }) => {
             >
                 {video.thumbnail ? (
                     <Image 
-                        wrapperClassName="w-full h-full block"
+                        rootClassName="w-full h-full block"
                         className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform duration-700" 
                         src={video.thumbnail} 
                         alt={`Video thumbnail ${index}`} 

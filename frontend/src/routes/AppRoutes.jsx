@@ -31,7 +31,7 @@ const AdminServiceReceptionPage = lazy(() => import('../pages/Admin/ServiceRecep
 const AdminServiceReceptionDetailPage = lazy(() => import('../pages/Admin/ServiceReceptionDetail'));
 const AdminOrdersPage = lazy(() => import('../pages/Admin/Orders'));
 const AdminOrderDetailPage = lazy(() => import('../pages/Admin/OrderDetail'));
-const AdminContractsPage = lazy(() => import('../pages/Admin/Contracts'));
+const AdminVehicleContractsPage = lazy(() => import('../pages/Admin/VehicleContracts'));
 const AdminPromotionsPage = lazy(() => import('../pages/Admin/Promotions'));
 const AdminPromotionFormPage = lazy(() => import('../pages/Admin/PromotionForm'));
 
@@ -137,7 +137,7 @@ const AppRoutes = () => {
                         <Route path="/admin/services/reception/:id" element={<AdminServiceReceptionDetailPage />} />
                         <Route path="/admin/orders" element={<AdminOrdersPage />} />
                         <Route path="/admin/orders/:id" element={<AdminOrderDetailPage />} />
-                        <Route path="/admin/contracts" element={<AdminContractsPage />} />
+                        <Route path="/admin/vehicle-contracts" element={<AdminVehicleContractsPage />} />
                         <Route path="/admin/promotions" element={<AdminPromotionsPage />} />
                         <Route path="/admin/promotions/create" element={<AdminPromotionFormPage />} />
                         <Route path="/admin/promotions/edit/:id" element={<AdminPromotionFormPage />} />

@@ -25,9 +25,9 @@ const CoverPreviewCard = () => {
                     <div className="relative group overflow-hidden rounded-2xl bg-slate-50 dark:bg-white/5 h-64 w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-white/10 hover:border-yellow-500 dark:hover:border-yellow-500/50 transition-all hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer">
                         {heroImage ? (
                             <>
-                                <img 
-                                    src={heroImage} 
-                                    alt="Cover Preview" 
+                                <img
+                                    src={heroImage}
+                                    alt="Cover Preview"
                                     className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

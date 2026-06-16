@@ -6,6 +6,9 @@ import { addImageUploadJob } from '../../queues/imageQueue.js'
 import { getIO } from '../../config/socket.js'
 import path from 'path'
 
+const VALID_CAR_STATUSES = ['Draft', 'Published', 'Archived'];
+const VALID_OUT_OF_STOCK_BEHAVIORS = ['pre_order', 'hide', 'contact'];
+
 const safeParse = (data, defaultValue = null) => {
   if (typeof data === 'string') {
     if (data === 'undefined' || data === 'null' || data === '') return defaultValue;
@@ -17,6 +20,51 @@ const safeParse = (data, defaultValue = null) => {
     }
   }
   return data || defaultValue;
+};
+
+const toNumber = (value, defaultValue = undefined) => {
+  if (value === undefined || value === null || value === '') return defaultValue;
+  const numVal = Number(value);
+  return Number.isNaN(numVal) ? defaultValue : numVal;
+};
+
+const toBoolean = (value, defaultValue = false) => {
+  if (value === undefined || value === null || value === '') return defaultValue;
+  return value === true || value === 'true';
+};
+
+const toStringArray = (value, defaultValue = []) => {
+  const parsed = safeParse(value, defaultValue);
+  if (!Array.isArray(parsed)) return defaultValue;
+  return parsed.filter(item => typeof item === 'string' && item.trim() !== '');
+};
+
+const buildSlug = (value) => {
+  return (value || '')
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+};
+
+const buildUniqueSlug = async (baseValue, excludeId = null) => {
+  let baseSlug = buildSlug(baseValue);
+  if (!baseSlug) baseSlug = `car-${Date.now()}`;
+
+  const escapedSlug = baseSlug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const query = { slug: new RegExp(`^${escapedSlug}($|-\\d+$)`, 'i') };
+  if (excludeId) query._id = { $ne: excludeId };
+
+  const count = await Car.countDocuments(query);
+  return count > 0 ? `${baseSlug}-${count + 1}` : baseSlug;
+};
+
+const ensureSkuUnique = async (sku, excludeId = null) => {
+  if (!sku) return true;
+  const query = { sku };
+  if (excludeId) query._id = { $ne: excludeId };
+  const existed = await Car.exists(query);
+  return !existed;
 };
 
 export const getAllProducts = asyncHandler(async (req, res) => {
@@ -134,14 +182,17 @@ export const getProductById = asyncHandler(async (req, res) => {
 
 export const createProduct = asyncHandler(async (req, res) => {
   const {
-    name, product_name, sku, tagline, description,
-    price, stock, isNew, brandId, brandName, year, odo, engine, power, fuel,
-    seats, bodyStyle, isDemoAvailable, isFeatured, status
+    name, product_name, sku, slug: requestedSlug, tagline, description,
+    price, salePrice, stock, isNew, brandId, brandName, year, odo, engine, power, fuel,
+    seats, bodyStyle, isDemoAvailable, isFeatured, status,
+    metaTitle, metaDescription, ogImage, outOfStockBehavior
   } = req.body
 
   const versions = safeParse(req.body.versions, []);
   let colors = safeParse(req.body.colors, []);
   let features = safeParse(req.body.features, []);
+  const availableShowrooms = toStringArray(req.body.availableShowrooms, []);
+  const metaKeywords = toStringArray(req.body.metaKeywords, []);
 
   const files = req.files || [];
 
@@ -170,10 +221,37 @@ export const createProduct = asyncHandler(async (req, res) => {
   const threeSixty = safeParse(req.body.threeSixty, { images: [], lighting: 'Studio', environment: 'Minimalist Studio' });
 
   const finalName = name || product_name;
+  const parsedPrice = toNumber(price, 0);
+  const parsedSalePrice = toNumber(salePrice);
+  const parsedStock = toNumber(stock, 0);
+  const parsedYear = toNumber(year);
+  const parsedOdo = toNumber(odo, 0);
+  const parsedSeats = toNumber(seats);
 
-  if (!finalName || !price) {
+  if (!finalName || price === undefined || price === null || price === '') {
     res.status(400)
     throw new Error('Thiếu thông tin bắt buộc của xe (Tên, Giá)')
+  }
+
+  if (parsedSalePrice !== undefined && parsedSalePrice >= parsedPrice) {
+    res.status(400)
+    throw new Error('Giá khuyến mãi phải nhỏ hơn giá niêm yết')
+  }
+
+  if (status && !VALID_CAR_STATUSES.includes(status)) {
+    res.status(400)
+    throw new Error('Trạng thái xe không hợp lệ')
+  }
+
+  if (outOfStockBehavior && !VALID_OUT_OF_STOCK_BEHAVIORS.includes(outOfStockBehavior)) {
+    res.status(400)
+    throw new Error('Nghiệp vụ cạn kho không hợp lệ')
+  }
+
+  const isSkuAvailable = await ensureSkuUnique(sku);
+  if (!isSkuAvailable) {
+    res.status(400)
+    throw new Error('SKU đã tồn tại')
   }
 
   let heroImage = null;
@@ -188,13 +266,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     galleryPhotos = [...galleryPhotos, ...newPhotos];
   }
 
-  let slug = finalName.toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '');
-
-  const count = await Car.countDocuments({ slug: new RegExp(`^${slug}`, 'i') });
-  if (count > 0) slug = `${slug}-${count + 1}`;
+  const slug = await buildUniqueSlug(requestedSlug || finalName);
 
   const car = new Car({
     name: finalName,
@@ -203,20 +275,23 @@ export const createProduct = asyncHandler(async (req, res) => {
     status: status || 'Published',
     tagline,
     description,
-    price,
-    stock: stock || 0,
-    isNew: isNew || false,
+    price: parsedPrice,
+    salePrice: parsedSalePrice,
+    stock: parsedStock,
+    availableShowrooms,
+    outOfStockBehavior: outOfStockBehavior || 'pre_order',
+    isNew: toBoolean(isNew, false),
     brandId: brandId || slug.split('-')[0],
     brandName,
-    year,
-    odo: odo || 0,
+    year: parsedYear,
+    odo: parsedOdo,
     engine,
     power,
     fuel,
-    seats,
+    seats: parsedSeats,
     bodyStyle,
-    isDemoAvailable: isDemoAvailable !== undefined ? isDemoAvailable : true,
-    isFeatured: isFeatured === 'true' || isFeatured === true,
+    isDemoAvailable: toBoolean(isDemoAvailable, true),
+    isFeatured: toBoolean(isFeatured, false),
     versions,
     colors,
     gallery: { photos: galleryPhotos, videos: gallery.videos || [] },
@@ -224,6 +299,10 @@ export const createProduct = asyncHandler(async (req, res) => {
     specs,
     threeSixty,
     image: heroImage || galleryPhotos[0] || null,
+    metaTitle,
+    metaDescription,
+    metaKeywords,
+    ogImage,
   })
 
   const createdProduct = await car.save()
@@ -255,17 +334,65 @@ export const updateProduct = asyncHandler(async (req, res) => {
   const files = req.files || [];
 
   const allowedFields = [
-    'name', 'product_name', 'sku', 'status', 'tagline', 'description',
+    'name', 'product_name', 'slug', 'sku', 'status', 'tagline', 'description',
     'price', 'salePrice', 'stock', 'isNew', 'brandId', 'brandName',
-    'year', 'odo', 'engine', 'power', 'fuel', 'seats', 'bodyStyle',
+    'availableShowrooms', 'outOfStockBehavior', 'year', 'odo', 'engine', 'power', 'fuel', 'seats', 'bodyStyle',
     'isDemoAvailable', 'isFeatured', 'versions', 'colors', 'gallery', 'features', 'specs',
-    'threeSixty', 'image'
+    'threeSixty', 'image', 'metaTitle', 'metaDescription', 'metaKeywords', 'ogImage'
   ]
+
+  if (req.body.sku !== undefined && req.body.sku !== car.sku) {
+    const isSkuAvailable = await ensureSkuUnique(req.body.sku, id);
+    if (!isSkuAvailable) {
+      res.status(400)
+      throw new Error('SKU đã tồn tại')
+    }
+  }
+
+  if (req.body.slug !== undefined) {
+    const normalizedSlug = buildSlug(req.body.slug);
+    if (!normalizedSlug) {
+      res.status(400)
+      throw new Error('Slug không hợp lệ')
+    }
+    const slugExists = await Car.exists({ slug: normalizedSlug, _id: { $ne: id } });
+    if (slugExists) {
+      res.status(400)
+      throw new Error('Slug đã tồn tại')
+    }
+    req.body.slug = normalizedSlug;
+  }
+
+  if (req.body.price === '') {
+    res.status(400)
+    throw new Error('Giá niêm yết không được để trống')
+  }
+
+  const nextPrice = req.body.price !== undefined ? toNumber(req.body.price, car.price) : car.price;
+  const nextSalePrice = req.body.salePrice !== undefined ? toNumber(req.body.salePrice) : car.salePrice;
+  if (nextSalePrice !== undefined && nextSalePrice !== null && nextSalePrice >= nextPrice) {
+    res.status(400)
+    throw new Error('Giá khuyến mãi phải nhỏ hơn giá niêm yết')
+  }
+
+  if (req.body.status !== undefined && !VALID_CAR_STATUSES.includes(req.body.status)) {
+    res.status(400)
+    throw new Error('Trạng thái xe không hợp lệ')
+  }
+
+  if (req.body.outOfStockBehavior !== undefined) {
+    if (req.body.outOfStockBehavior === '') {
+      req.body.outOfStockBehavior = 'pre_order';
+    } else if (!VALID_OUT_OF_STOCK_BEHAVIORS.includes(req.body.outOfStockBehavior)) {
+      res.status(400)
+      throw new Error('Nghiệp vụ cạn kho không hợp lệ')
+    }
+  }
 
   allowedFields.forEach(field => {
     if (req.body[field] !== undefined) {
       if (field === 'product_name') car.name = req.body[field];
-      else if (['versions', 'colors', 'features', 'specs'].includes(field)) {
+      else if (['versions', 'colors', 'features', 'specs', 'availableShowrooms', 'metaKeywords'].includes(field)) {
         let parsed = safeParse(req.body[field], []);
 
         if (field === 'colors') {
@@ -278,7 +405,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
                 return { ...color, image: `/uploads/temp/${colorFile.filename}` };
               }
               const oldItem = car.colors && car.colors[index];
-              if (oldItem && oldItem.image) return { ...color, image: oldItem.image };
+              return { ...color, image: (oldItem && oldItem.image) ? oldItem.image : null };
             }
             return color;
           });
@@ -294,7 +421,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
                 return { ...feature, image: `/uploads/temp/${featureFile.filename}` };
               }
               const oldItem = car.features && car.features[index];
-              if (oldItem && oldItem.image) return { ...feature, image: oldItem.image };
+              return { ...feature, image: (oldItem && oldItem.image) ? oldItem.image : null };
             }
             return feature;
           });
@@ -309,15 +436,27 @@ export const updateProduct = asyncHandler(async (req, res) => {
         car.markModified(field);
       }
       else if (field === 'isDemoAvailable' || field === 'isNew' || field === 'isFeatured') {
-        car[field] = req.body[field] === 'true' || req.body[field] === true;
+        car[field] = toBoolean(req.body[field], false);
       }
       else if (['price', 'salePrice', 'stock', 'year', 'odo', 'seats'].includes(field)) {
+        if (req.body[field] === '') {
+          if (field === 'stock') {
+            car.stock = 0;
+            return;
+          }
+          if (field !== 'price') {
+            car.set(field, undefined);
+          }
+          return;
+        }
         const numVal = Number(req.body[field]);
         if (!isNaN(numVal)) car[field] = numVal;
       }
       else if (field === 'image') {
         const val = req.body[field];
-        if (typeof val === 'string' && (val.startsWith('http') || val.startsWith('/') || val.startsWith('blob:'))) {
+        if (val === '') {
+          car.set('image', undefined);
+        } else if (typeof val === 'string' && (val.startsWith('http') || val.startsWith('/') || val.startsWith('blob:'))) {
           car.image = val;
         }
       }

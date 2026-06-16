@@ -40,12 +40,28 @@ export const useCarFormSubmit = (form) => {
         return null;
     };
 
+    const clearableFields = new Set([
+        'salePrice',
+        'metaTitle',
+        'metaDescription',
+        'metaKeywords',
+        'ogImage',
+        'availableShowrooms',
+        'outOfStockBehavior'
+    ]);
+
     const convertToFormData = (values) => {
         const formData = new FormData();
         const timestamp = Date.now();
 
         for (const [key, value] of Object.entries(values)) {
-            if (value === undefined || value === null) continue;
+            if (key === 'stock' && id && id !== 'new') continue;
+            
+            if (value === undefined) continue;
+            if (value === null) {
+                if (clearableFields.has(key)) formData.append(key, '');
+                continue;
+            }
 
             if (key === 'image') {
                 const file = getRealFile(value);
@@ -97,37 +113,26 @@ export const useCarFormSubmit = (form) => {
 
     const handlePublish = async () => {
         try {
-            console.log('handlePublish triggered');
             setIsSubmitting(true);
             const values = await form.validateFields();
-            console.log('form validation success', values);
             const formData = convertToFormData({ ...values, status: 'Published' });
 
             if (id) {
-                console.log('Calling updateAdminProduct api directly for publish');
                 await updateAdminProduct(id, formData);
-                console.log('updateAdminProduct call successful');
 
-                queryClient.invalidateQueries({ queryKey: ['admin-products'] })
-                    .then(() => console.log('Query invalidation for admin-products successful'))
-                    .catch(err => console.error('Query invalidation failed', err));
+                queryClient.invalidateQueries({ queryKey: ['admin-products'] });
 
                 sessionStorage.setItem('admin_car_success', 'Cập nhật xe thành công!');
                 navigate('/admin/cars');
             } else {
-                console.log('Calling createAdminProduct api directly for publish');
                 await createAdminProduct(formData);
-                console.log('createAdminProduct call successful');
 
-                queryClient.invalidateQueries({ queryKey: ['admin-products'] })
-                    .then(() => console.log('Query invalidation for admin-products successful'))
-                    .catch(err => console.error('Query invalidation failed', err));
+                queryClient.invalidateQueries({ queryKey: ['admin-products'] });
 
                 sessionStorage.setItem('admin_car_success', 'Thêm xe mới thành công!');
                 navigate('/admin/cars');
             }
         } catch (error) {
-            console.error('handlePublish error', error);
             message.error('Biểu mẫu còn thiếu thông tin hoặc có lỗi xảy ra!');
             setIsSubmitting(false);
         }
@@ -135,39 +140,26 @@ export const useCarFormSubmit = (form) => {
 
     const handleSaveDraft = async () => {
         try {
-            console.log('handleSaveDraft triggered');
             setIsSubmitting(true);
             const values = form.getFieldsValue();
-            console.log('form fields value for draft', values);
             const formData = convertToFormData({ ...values, status: 'Draft' });
 
             if (id) {
-                console.log('Calling updateAdminProduct api directly for draft');
                 await updateAdminProduct(id, formData);
-                console.log('updateAdminProduct (draft) call successful');
 
-                queryClient.invalidateQueries({ queryKey: ['admin-products'] })
-                    .then(() => console.log('Query invalidation for admin-products successful'))
-                    .catch(err => console.error('Query invalidation failed', err));
+                queryClient.invalidateQueries({ queryKey: ['admin-products'] });
 
                 sessionStorage.setItem('admin_car_success', 'Đã lưu nháp cập nhật!');
-                console.log('Redirecting to /admin/cars via navigate');
                 navigate('/admin/cars');
             } else {
-                console.log('Calling createAdminProduct api directly for draft');
                 await createAdminProduct(formData);
-                console.log('createAdminProduct (draft) call successful');
 
-                queryClient.invalidateQueries({ queryKey: ['admin-products'] })
-                    .then(() => console.log('Query invalidation for admin-products successful'))
-                    .catch(err => console.error('Query invalidation failed', err));
+                queryClient.invalidateQueries({ queryKey: ['admin-products'] });
 
                 sessionStorage.setItem('admin_car_success', 'Đã lưu bản nháp mới!');
-                console.log('Redirecting to /admin/cars via navigate');
                 navigate('/admin/cars');
             }
         } catch (error) {
-            console.error('handleSaveDraft error', error);
             message.error('Không thể lưu bản nháp!');
             setIsSubmitting(false);
         }

@@ -13,6 +13,12 @@ class TaskCardBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String? displayBadge = (task.licensePlate != null && task.licensePlate!.trim().isNotEmpty) 
+        ? task.licensePlate 
+        : (task.vehicleModel != null && task.vehicleModel!.trim().isNotEmpty) 
+            ? task.vehicleModel 
+            : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,7 +37,7 @@ class TaskCardBody extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (task.licensePlate != null || task.vehicleModel != null) ...[
+            if (displayBadge != null) ...[
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -46,7 +52,7 @@ class TaskCardBody extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  task.licensePlate ?? task.vehicleModel!,
+                  displayBadge,
                   style: context.textTheme.labelSmall?.copyWith(
                     color: context.colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,

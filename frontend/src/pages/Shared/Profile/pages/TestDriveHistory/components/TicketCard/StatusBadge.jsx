@@ -16,6 +16,13 @@ const StatusBadge = ({ status, t }) => {
                     {t('booking_status_confirmed', 'Đã xác nhận')}
                 </div>
             );
+        case 'Received':
+            return (
+                <div className="w-fit shrink-0 whitespace-nowrap px-3 py-1 bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30 rounded-full text-cyan-600 dark:text-cyan-400 text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 h-fit shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                    {t('booking_status_received', 'Đã Check-in')}
+                </div>
+            );
         case 'InProgress':
             return (
                 <div className="w-fit shrink-0 whitespace-nowrap px-3 py-1 bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/30 rounded-full text-violet-600 dark:text-violet-400 text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 h-fit shadow-sm">

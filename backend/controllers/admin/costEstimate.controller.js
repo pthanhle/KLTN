@@ -6,7 +6,7 @@ export const getCostEstimateConfig = asyncHandler(async (req, res) => {
     if (!config) {
         config = await CostEstimateConfig.create({})
     }
-    res.json(config)
+    res.json({ success: true, data: config })
 })
 
 export const updateCostEstimateConfig = asyncHandler(async (req, res) => {

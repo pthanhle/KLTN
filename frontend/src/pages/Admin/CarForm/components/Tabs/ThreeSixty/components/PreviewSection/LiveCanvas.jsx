@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Skeleton } from 'antd';
 import { Video } from 'lucide-react';
@@ -13,7 +13,6 @@ const LiveCanvas = ({
     onPointerUp 
 }) => {
     const { t } = useTranslation('adminCarForm');
-    const [isLoading, setIsLoading] = useState(true);
 
     return (
         <div 
@@ -23,9 +22,7 @@ const LiveCanvas = ({
             onPointerUp={onPointerUp}
             onPointerLeave={onPointerUp}
         >
-            {/* The 360 Object */}
             <div className={`w-full h-full object-cover transition-opacity duration-300 pointer-events-none ${!hasItems ? 'opacity-30 dark:mix-blend-luminosity grayscale' : 'opacity-100'}`}>
-                {/* Antd Image with fallback/skeleton */}
                 <Image 
                     preview={false}
                     src={hasItems ? currentSrc : THREE_SIXTY_CONFIG.MOCK_DEFAULT_IMAGE}
@@ -34,18 +31,16 @@ const LiveCanvas = ({
                     placeholder={
                         <Skeleton.Image active className="w-full h-full flex items-center justify-center scale-[2.0]" />
                     }
-                    wrapperClassName="w-full h-full"
+                    rootClassName="w-full h-full"
                 />
             </div>
-
-            {/* Empty State Overlay */}
             {!hasItems && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20">
                     <div className="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mb-4">
                         <Video className="w-8 h-8 text-yellow-500" />
                     </div>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-bold tracking-widest uppercase text-center max-w-sm px-8">
-                        {t('previewEmptyWarning', 'Please upload 360 sequence to activate the live preview studio.')}
+                        {t('previewEmptyWarning', 'Vui lòng tải lên chuỗi 360 để kích hoạt phòng studio')}
                     </p>
                 </div>
             )}

@@ -103,7 +103,14 @@ const CarCard = ({ car, t }) => {
                 <div className="flex items-end justify-between mt-auto pt-4 border-t border-slate-100 dark:border-white/5">
                     <div>
                         <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t('card_priceLabel', 'GIÁ NIÊM YẾT')}</p>
-                        <p className="text-xl font-black text-yellow-500">{formatVND(car.price)}</p>
+                        {car.salePrice && car.salePrice < car.price ? (
+                            <div className="flex flex-col">
+                                <p className="text-xl font-black text-yellow-600 dark:text-yellow-500">{formatVND(car.salePrice)}</p>
+                                <p className="text-[11px] font-medium text-slate-400 line-through mt-0.5">{formatVND(car.price)}</p>
+                            </div>
+                        ) : (
+                            <p className="text-xl font-black text-yellow-500">{formatVND(car.price)}</p>
+                        )}
                     </div>
                     <Link
                         to={`/cars/${car.id}`}

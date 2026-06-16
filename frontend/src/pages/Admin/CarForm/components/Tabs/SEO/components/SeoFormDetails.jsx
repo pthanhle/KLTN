@@ -89,7 +89,8 @@ const SeoFormDetails = () => {
                                 placeholder={t('metaKeywordsPlaceholder', 'Thêm từ khoá (Enter để xác nhận)')}
                                 className="w-full min-h-[50px] !bg-white dark:!bg-[#222225] !border-none !rounded-xl !px-1 text-sm font-semibold text-slate-900 dark:text-white focus-within:!ring-2 focus-within:!ring-yellow-500/50 transition-all custom-select-tags"
                                 tokenSeparators={[',']}
-                                dropdownStyle={{ display: 'none' }}
+                                popupMatchSelectWidth={false}
+                                classNames={{ popup: "hidden" }}
                             />
                         </Form.Item>
                     </div>

@@ -24,3 +24,13 @@ export const validateImageUpload = (file) => {
 
     return { isValidType, isValidSize };
 };
+
+export const parseNumericInput = (value) => {
+    return value?.replace(/\D/g, '') || '';
+};
+
+export const preventNonNumericInput = (e) => {
+    if (!/[0-9]/.test(e.key)) {
+        e.preventDefault();
+    }
+};

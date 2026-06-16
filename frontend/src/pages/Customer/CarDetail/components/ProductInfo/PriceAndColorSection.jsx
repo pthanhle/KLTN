@@ -93,11 +93,30 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
                             <div className="space-y-5">
                                 <div>
                                     <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2">{t('retailPrice', 'GIÁ BÁN LẺ ĐỀ XUẤT')}</p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
-                                            {(car.price).toLocaleString()}
-                                        </span>
-                                        <span className="text-[12px] font-black text-yellow-600 dark:text-yellow-500">VNĐ</span>
+                                    <div className="flex flex-col gap-1">
+                                        {car.salePrice && car.salePrice < car.price ? (
+                                            <>
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-3xl lg:text-4xl font-black text-yellow-600 dark:text-yellow-500 tracking-tighter">
+                                                        {(car.salePrice).toLocaleString()}
+                                                    </span>
+                                                    <span className="text-[12px] font-black text-yellow-600 dark:text-yellow-500">VNĐ</span>
+                                                </div>
+                                                <div className="flex items-baseline gap-2 opacity-50">
+                                                    <span className="text-xl font-black text-slate-500 line-through tracking-tighter">
+                                                        {(car.price).toLocaleString()}
+                                                    </span>
+                                                    <span className="text-[10px] font-black text-slate-500 line-through">VNĐ</span>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
+                                                    {(car.price).toLocaleString()}
+                                                </span>
+                                                <span className="text-[12px] font-black text-yellow-600 dark:text-yellow-500">VNĐ</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="h-px bg-slate-200 dark:bg-white/10 w-full"></div>
@@ -185,7 +204,7 @@ const PriceAndColorSection = ({ car, colors, selectedColor, setSelectedColor, t 
         <CostEstimateModal
             open={estimateOpen}
             onClose={() => setEstimateOpen(false)}
-            carPrice={car.price ?? 0}
+            carPrice={(car.salePrice && car.salePrice < car.price) ? car.salePrice : (car.price ?? 0)}
         />
         </>
     );

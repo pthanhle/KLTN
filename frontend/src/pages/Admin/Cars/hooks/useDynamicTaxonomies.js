@@ -27,7 +27,8 @@ export const useDynamicTaxonomies = () => {
                 setBrands(formattedBrands);
                 setBodyStyles(formattedStyles);
             } catch (error) {
-                console.error('Lỗi khi tải dữ liệu Thương hiệu/Kiểu dáng:', error);
+                setBrands([]);
+                setBodyStyles([]);
             } finally {
                 setIsLoadingTaxonomies(false);
             }

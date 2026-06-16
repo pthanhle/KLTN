@@ -69,6 +69,7 @@ $RECYCLE.BIN/
 # ======== Project Specific ========
 /backend/uploads
 /.agents/
+/docs/
 
 # ======== Python ========
 __pycache__/

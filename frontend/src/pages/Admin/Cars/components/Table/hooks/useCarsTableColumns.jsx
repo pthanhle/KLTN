@@ -18,7 +18,13 @@ export const useCarsTableColumns = (handleToggleDemo, handleToggleFeatured) => {
             render: (_, record) => (
                 <div className="flex items-center space-x-4 cursor-pointer group" onClick={() => navigate(`/admin/cars/edit/${record.id}`)}>
                     <div className="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0 shadow-sm group-hover:shadow-md transition-all">
-                        <img src={record.image} alt={record.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <Image
+                            preview={false}
+                            src={record.image}
+                            alt={record.name}
+                            wrapperClassName="w-full h-full"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
                     </div>
                     <div>
                         <p className="font-bold text-slate-900 dark:text-white line-clamp-1 text-left group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">{record.name}</p>
@@ -61,8 +67,15 @@ export const useCarsTableColumns = (handleToggleDemo, handleToggleFeatured) => {
             align: 'right',
             width: 200,
             render: (_, record) => (
-                <div className="text-right">
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-[#ffd165]">{record.price.toLocaleString('vi-VN')} đ</p>
+                <div className="text-right flex flex-col items-end">
+                    {record.salePrice && record.salePrice < record.price ? (
+                        <>
+                            <p className="text-sm font-extrabold text-yellow-600 dark:text-yellow-500">{record.salePrice.toLocaleString('vi-VN')} đ</p>
+                            <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 line-through mt-0.5">{record.price.toLocaleString('vi-VN')} đ</p>
+                        </>
+                    ) : (
+                        <p className="text-sm font-extrabold text-slate-900 dark:text-[#ffd165]">{record.price.toLocaleString('vi-VN')} đ</p>
+                    )}
                     <p className={`text-[10px] font-bold uppercase mt-1 ${record.stock <= 2 ? 'text-red-500 animate-pulse' : 'text-slate-500'}`}>
                         {t('stock', 'Tồn kho')}: {record.stock} {record.stock <= 2 && t('lowStock', '(Sắp hết)')}
                     </p>

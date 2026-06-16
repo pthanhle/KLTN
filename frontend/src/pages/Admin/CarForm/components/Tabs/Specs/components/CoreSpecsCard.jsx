@@ -104,7 +104,7 @@ const CoreSpecsCard = () => {
                         <Select
                             suffixIcon={<Fuel size={18} className="text-yellow-500 pointer-events-none" />}
                             className={`w-full !h-[50px] [&_.ant-select-selector]:!bg-slate-50 dark:[&_.ant-select-selector]:!bg-[#1a1a1c] [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selection-item]:!leading-[50px] [&_.ant-select-selection-item]:text-sm [&_.ant-select-selection-item]:font-semibold [&_.ant-select-selection-item]:text-slate-900 dark:[&_.ant-select-selection-item]:text-white focus-within:[&_.ant-select-selector]:!ring-2 focus-within:[&_.ant-select-selector]:!ring-yellow-500/50 transition-all`}
-                            popupClassName="!rounded-2xl !p-2 dark:bg-[#1c1c1f]"
+                            classNames={{ popup: '!rounded-2xl !p-2 dark:bg-[#1c1c1f]' }}
                             placeholder={t('fuel', 'Chọn nhiên liệu')}
                         >
                             {fuelTypes.map(fuel => (

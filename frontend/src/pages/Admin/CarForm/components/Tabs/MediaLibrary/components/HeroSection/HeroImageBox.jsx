@@ -22,11 +22,11 @@ const HeroImageBox = () => {
                 {heroImage && (
                     <div className="relative group aspect-[4/3] rounded-[32px] overflow-hidden bg-white dark:bg-[#141416] border border-slate-200/60 dark:border-white/5 shadow-2xl shadow-slate-200/50 dark:shadow-none">
                         <Image
-                            wrapperClassName="w-full h-full"
+                            rootClassName="w-full h-full"
                             alt="Hero Car"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             src={heroImage}
-                            preview={{ maskClassName: 'hidden' }}
+                            preview={false}
                             placeholder={<Skeleton.Image active className="w-full h-full flex items-center justify-center scale-[3.0]" />}
                         />
 

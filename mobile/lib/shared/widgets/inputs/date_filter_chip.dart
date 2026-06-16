@@ -22,24 +22,137 @@ class DateFilterChip extends StatelessWidget {
 
   Future<void> _pickDate(BuildContext context) async {
     final now = DateTime.now();
-    final initial = selectedDate ?? now;
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: initial,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 1),
-      locale: const Locale('vi', 'VN'),
-      builder: (ctx, child) {
-        return Theme(
-          data: Theme.of(ctx).copyWith(
-            colorScheme: Theme.of(ctx).colorScheme.copyWith(
-              primary: Theme.of(ctx).colorScheme.primary,
+    DateTime tempDate = selectedDate ?? now;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    Widget glassBlock({required Widget child}) {
+      return Container(
+        width: double.infinity,
+        decoration: ShapeDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.white.withValues(alpha: 0.72),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.80),
+              width: 0.5,
             ),
           ),
-          child: child!,
+          shadows: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: ClipSmoothRect(
+          radius: SmoothBorderRadius(cornerRadius: 24, cornerSmoothing: 1.0),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: child,
+          ),
+        ),
+      );
+    }
+
+    final picked = await showCupertinoModalPopup<DateTime>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.40),
+      builder: (ctx) {
+        return Material(
+          type: MaterialType.transparency,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  glassBlock(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+                          child: Text(
+                            'Chọn ngày',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.5,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 200,
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.date,
+                            initialDateTime: tempDate,
+                            minimumDate: DateTime(now.year - 1),
+                            maximumDate: DateTime(now.year + 1),
+                            onDateTimeChanged: (DateTime newDate) {
+                              tempDate = newDate;
+                            },
+                          ),
+                        ),
+                        Container(height: 0.5, color: theme.dividerColor.withValues(alpha: 0.15)),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(ctx, tempDate);
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 17),
+                            color: Colors.transparent,
+                            child: Text(
+                              'Xác nhận',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  glassBlock(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(ctx),
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 17),
+                        color: Colors.transparent,
+                        child: Text(
+                          'Hủy',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFF007AFF),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
+
     if (picked != null) onDateChanged(picked);
   }
 

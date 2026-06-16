@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { App } from 'antd';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useCarsFilter } from './useCarsFilter';
 import { useCarsSelection } from './useCarsSelection';
 import { useDynamicTaxonomies } from './useDynamicTaxonomies';
@@ -9,6 +10,7 @@ import { useCarSocket } from './useCarSocket';
 
 export const useCarsCatalogLogic = () => {
     const { message } = App.useApp();
+    const { t } = useTranslation('adminCars');
     const filterState = useCarsFilter();
     const taxonomyState = useDynamicTaxonomies();
     
@@ -56,8 +58,7 @@ export const useCarsCatalogLogic = () => {
         try {
             await updateProduct({ id, data: { isDemoAvailable: newStatus } });
         } catch (error) {
-            message.error("Failed to update demo status");
-            console.error(error);
+            message.error(t('updateDemoFailed', 'Không thể cập nhật trạng thái lái thử'));
         }
     };
 
@@ -70,8 +71,7 @@ export const useCarsCatalogLogic = () => {
         try {
             await updateProduct({ id, data: { isFeatured: newStatus } });
         } catch (error) {
-            message.error("Failed to update featured status");
-            console.error(error);
+            message.error(t('updateFeaturedFailed', 'Không thể cập nhật trạng thái nổi bật'));
         }
     };
 

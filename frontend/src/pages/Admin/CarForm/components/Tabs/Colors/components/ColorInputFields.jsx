@@ -55,9 +55,16 @@ const ColorInputFields = ({ name, restField }) => {
                     name={[name, 'image']}
                     className="mb-0"
                     required={false}
+                    getValueProps={(value) => ({
+                        fileList: value ? [
+                            typeof value === 'string'
+                                ? { uid: '-1', name: value.split('/').pop(), status: 'done', url: value }
+                                : value
+                        ] : []
+                    })}
                     getValueFromEvent={(e) => {
                         if (Array.isArray(e)) return e;
-                        return e?.file;
+                        return e?.fileList?.[0]?.originFileObj || e?.file;
                     }}
                 >
                     <Upload {...uploadProps}>

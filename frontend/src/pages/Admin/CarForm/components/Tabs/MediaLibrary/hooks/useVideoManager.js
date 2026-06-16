@@ -28,7 +28,7 @@ export const useVideoManager = () => {
             });
             resetFormFields(); // clear input
         } catch (error) {
-            console.error("Failed to fetch video config", error);
+            resetFormFields();
         } finally {
             setIsLoading(false);
         }

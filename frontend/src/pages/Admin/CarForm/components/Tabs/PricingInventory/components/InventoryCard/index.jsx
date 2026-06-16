@@ -1,14 +1,14 @@
-import { Image, Skeleton } from 'antd';
+import { Skeleton } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { Archive } from 'lucide-react';
-import { CAR_FORM_IMAGES } from '../../../../../constants/carFormConstants';
-
 import StockDisplay from './StockDisplay';
 import ShowroomSelector from './ShowroomSelector';
 import OutOfStockConfig from './OutOfStockConfig';
+import { useInventoryOptions } from '../../hooks/useInventoryOptions';
 
 const InventoryCard = ({ isLoading }) => {
     const { t } = useTranslation('adminCarForm');
+    const { showroomOptions } = useInventoryOptions();
 
     return (
         <section className="animate-fade-in">
@@ -31,7 +31,7 @@ const InventoryCard = ({ isLoading }) => {
                         <StockDisplay />
                         <OutOfStockConfig />
                         <div className="md:col-span-2 border-t border-slate-200 dark:border-white/10 pt-6">
-                            <ShowroomSelector />
+                            <ShowroomSelector options={showroomOptions} />
                         </div>
                     </div>
                 )}

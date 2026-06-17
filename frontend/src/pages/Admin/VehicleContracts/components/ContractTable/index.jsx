@@ -1,105 +1,36 @@
 import React from 'react';
-import { Table, Button, Space, Tag, Typography, Skeleton } from 'antd';
-import { EyeOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { Table, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { EnterpriseStatusBadge } from '../../../Shared/components/Badges/EnterpriseStatusBadge';
-import dayjs from 'dayjs';
+import { getContractColumns } from '../../constants/contract.constants.jsx';
 
 const { Text } = Typography;
 
-const ContractTable = ({ data, isLoading, onViewDetails, onApprove }) => {
+const ContractTable = ({ data, isLoading, total, currentPage, pageSize, onPageChange, onViewDetails, onApprove }) => {
     const { t } = useTranslation('adminVehicleContracts');
 
-    const columns = [
-        {
-            title: t('Số Hợp đồng'),
-            dataIndex: 'contract_no',
-            key: 'contract_no',
-            render: (text) => <Text strong className="font-mono">{text}</Text>,
-        },
-        {
-            title: t('Khách hàng'),
-            dataIndex: 'customer_name',
-            key: 'customer_name',
-            render: (text, record) => (
-                <div className="flex flex-col">
-                    <Text strong>{text}</Text>
-                    <Text type="secondary" className="text-xs">{record.customer_phone}</Text>
-                </div>
-            ),
-        },
-        {
-            title: t('Số VIN'),
-            dataIndex: 'vin',
-            key: 'vin',
-            render: (text) => <Tag color="blue" className="font-mono">{text}</Tag>,
-        },
-        {
-            title: t('Giá bán'),
-            dataIndex: 'final_price',
-            key: 'final_price',
-            render: (val) => (
-                <Text className="text-blue-600 font-semibold">
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0)}
-                </Text>
-            ),
-        },
-        {
-            title: t('Trạng thái'),
-            dataIndex: 'status',
-            key: 'status',
-            render: (status) => <EnterpriseStatusBadge status={status} />,
-        },
-        {
-            title: t('Ngày tạo'),
-            dataIndex: 'created_at',
-            key: 'created_at',
-            render: (date) => <Text type="secondary">{dayjs(date).format('DD/MM/YYYY HH:mm')}</Text>,
-        },
-        {
-            title: '',
-            key: 'actions',
-            align: 'right',
-            render: (_, record) => (
-                <Space>
-                    <Button 
-                        type="default" 
-                        icon={<EyeOutlined />} 
-                        onClick={() => onViewDetails(record)}
-                        className="flex items-center"
-                    >
-                        {t('Xem chi tiết')}
-                    </Button>
-                    {record.status === 'pending_approval' && (
-                        <Button 
-                            type="primary" 
-                            icon={<CheckCircleOutlined />} 
-                            onClick={() => onApprove(record)}
-                            className="bg-green-600 hover:bg-green-700 flex items-center"
-                        >
-                            {t('Duyệt hợp đồng')}
-                        </Button>
-                    )}
-                </Space>
-            ),
-        },
-    ];
-
-    if (isLoading) {
-        return (
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-                <Skeleton active paragraph={{ rows: 6 }} />
-            </div>
-        );
-    }
+    const columns = getContractColumns(t, onViewDetails, onApprove);
 
     return (
         <div className="bg-white dark:bg-[#141416] rounded-2xl shadow-sm border border-slate-200 dark:border-white/5 overflow-hidden">
         <Table
             columns={columns}
             dataSource={data}
+            loading={isLoading}
             rowKey="id"
-            pagination={{ pageSize: 10, className: 'px-6 py-4 !mb-0 border-t border-slate-100 dark:border-white/5' }}
+            scroll={{ x: 'max-content' }}
+            onRow={(record) => ({
+                onClick: () => onViewDetails(record),
+            })}
+            pagination={{
+                current: currentPage,
+                pageSize: pageSize,
+                total: total || 0,
+                onChange: onPageChange,
+                showSizeChanger: true,
+                pageSizeOptions: ['10', '20', '50', '100'],
+                showTotal: (total, range) => `${t('show')} ${range[0]} - ${range[1]} ${t('of')} ${total} ${t('contracts')}`,
+                className: '!mt-2 !mb-0 !pt-4 !pb-4 !px-6 !text-xs !font-bold !uppercase !tracking-widest !text-slate-500 custom-pagination border-t border-slate-100 dark:border-white/5'
+            }}
             className="w-full"
             rowClassName={() => 'hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer'}
             locale={{ emptyText: t('Không có hợp đồng nào.') }}

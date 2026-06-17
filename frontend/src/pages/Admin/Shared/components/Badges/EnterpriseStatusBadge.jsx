@@ -10,11 +10,13 @@ export const EnterpriseStatusBadge = ({ status }) => {
         reserved: { color: 'orange', text: t('Đang Giữ Chỗ', 'Đang Giữ Chỗ') },
         contract_pending: { color: 'gold', text: t('Chờ duyệt', 'Chờ Duyệt HĐ') },
         sold: { color: 'green', text: t('Đã Bán', 'Đã Bán') },
-        delivered: { color: 'cyan', text: t('Đã giao xe', 'Đã Bàn Giao') },
-        draft: { color: 'default', text: t('Nháp', 'Nháp') },
+        draft: { color: 'default', text: t('Nháp (Chờ duyệt)', 'Nháp (Chờ duyệt)') },
+        issued: { color: 'cyan', text: t('Đã duyệt', 'Đã Duyệt') },
+        signed: { color: 'blue', text: t('Đã ký', 'Đã Ký') },
         pending_approval: { color: 'gold', text: t('Chờ duyệt', 'Chờ Duyệt') },
-        approved: { color: 'blue', text: t('Đã duyệt', 'Đã Duyệt') },
+        approved: { color: 'cyan', text: t('Đã duyệt', 'Đã Duyệt') },
         paid: { color: 'green', text: t('Đã thanh toán', 'Đã Thanh Toán') },
+        delivered: { color: 'geekblue', text: t('Đã giao xe', 'Đã Giao Xe') },
         cancelled: { color: 'red', text: t('Đã hủy', 'Đã Hủy') },
     };
 

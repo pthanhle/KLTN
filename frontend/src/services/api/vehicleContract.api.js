@@ -13,7 +13,7 @@ const getRequestConfig = (data) => {
 
 export const getVehicleContracts = async (params) => {
     const response = await axiosClient.get('/admin/vehicle-contracts', { params });
-    return response.data;
+    return response;
 };
 
 export const getVehicleContractById = async (id) => {

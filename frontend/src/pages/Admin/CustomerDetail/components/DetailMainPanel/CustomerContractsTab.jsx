@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../../../../utils/axiosClient';
-import ContractTable from '../../../Contracts/components/Table/ContractTable';
-import ContractCreateModal from '../../../Contracts/components/ContractCreateModal';
+import ContractTable from '../../../VehicleContracts/components/ContractTable';
+import { ContractApprovalDrawer } from '../../../VehicleContracts/components/ContractApprovalDrawer';
 
 export const CustomerContractsTab = ({ customerId }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -56,24 +56,20 @@ export const CustomerContractsTab = ({ customerId }) => {
         <div className="bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-white/10 p-6">
             <ContractTable
                 data={data}
-                loading={loading}
+                isLoading={loading}
                 pagination={pagination}
                 onChange={handleTableChange}
-                onEdit={(record) => {
+                onViewDetails={(record) => {
                     setEditData(record);
                     setIsModalVisible(true);
                 }}
-                onRefresh={() => fetchContracts(pagination.current, sortData)}
             />
-            <ContractCreateModal
-                visible={isModalVisible}
-                editData={editData}
-                onCancel={() => {
+            <ContractApprovalDrawer
+                open={isModalVisible}
+                contract={editData}
+                onClose={() => {
                     setIsModalVisible(false);
                     setEditData(null);
-                }}
-                onSuccess={() => {
-                    setIsModalVisible(false);
                     fetchContracts(pagination.current, sortData);
                 }}
             />

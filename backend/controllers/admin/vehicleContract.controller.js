@@ -14,8 +14,8 @@ import {
 
 const CONTRACT_STATUSES = ['draft', 'issued', 'signed', 'paid', 'cancelled', 'delivered']
 
-const buildContractQuery = (req) => {
-  const { status, customerId, salesId, carId, vehicleUnitId, search } = req.query
+const buildContractQuery = async (req) => {
+  const { status, customerId, salesId, carId, vehicleUnitId, search, startDate, endDate } = req.query
   const query = {}
 
   if (status) query.status = status
@@ -23,13 +23,47 @@ const buildContractQuery = (req) => {
   if (salesId) query.sales_id = salesId
   if (carId) query.car_id = carId
   if (vehicleUnitId) query.vehicle_unit_id = vehicleUnitId
-  if (search) query.contract_number = { $regex: search, $options: 'i' }
+  if (search && search.trim()) {
+    const cleanSearch = search.trim()
+    const unitIds = []
+    try {
+      const units = await VehicleUnit.find({ vin: { $regex: cleanSearch, $options: 'i' } }).select('_id')
+      units.forEach(u => unitIds.push(u._id))
+    } catch (e) {
+      // ignore
+    }
+
+    const searchOr = [
+      { contract_number: { $regex: cleanSearch, $options: 'i' } },
+      { 'customer_snapshot.full_name': { $regex: cleanSearch, $options: 'i' } },
+      { 'customer_snapshot.phone': { $regex: cleanSearch, $options: 'i' } },
+      { 'vehicle_snapshot.vin': { $regex: cleanSearch, $options: 'i' } }
+    ]
+
+    if (unitIds.length > 0) {
+      searchOr.push({ vehicle_unit_id: { $in: unitIds } })
+    }
+
+    query.$or = searchOr
+  }
+
+  if (startDate || endDate) {
+    query.createdAt = {}
+    if (startDate) query.createdAt.$gte = new Date(startDate)
+    if (endDate) query.createdAt.$lte = new Date(endDate)
+  }
 
   if (req.user && !req.user.isAdmin && req.user.role_id?.role_name !== 'admin') {
-    query.$or = [
+    const permissionOr = [
       { sales_id: req.user._id },
       { created_by: req.user._id }
     ]
+    if (query.$or) {
+      query.$and = [{ $or: query.$or }, { $or: permissionOr }]
+      delete query.$or
+    } else {
+      query.$or = permissionOr
+    }
   }
 
   return query
@@ -161,7 +195,7 @@ const applyContractStatusToVehicle = async ({ contract, nextStatus, performedBy,
 export const getVehicleContracts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1
   const limit = parseInt(req.query.limit) || 20
-  const query = buildContractQuery(req)
+  const query = await buildContractQuery(req)
 
   const [contracts, total] = await Promise.all([
     VehicleContract.find(query)
@@ -187,6 +221,23 @@ export const getVehicleContracts = asyncHandler(async (req, res) => {
   })
 })
 
+export const getVehicleContractsStats = asyncHandler(async (req, res) => {
+  const query = await buildContractQuery(req)
+
+  const stats = await VehicleContract.aggregate([
+    { $match: query },
+    {
+      $group: {
+        _id: '$status',
+        count: { $sum: 1 },
+        totalAmount: { $sum: '$pricing_snapshot.grand_total' }
+      }
+    }
+  ])
+
+  res.json({ success: true, data: stats })
+})
+
 export const getVehicleContractById = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400)
@@ -196,9 +247,10 @@ export const getVehicleContractById = asyncHandler(async (req, res) => {
   const contract = await VehicleContract.findById(req.params.id)
     .populate('customer_id', 'full_name email phone address tax_info')
     .populate('car_id', 'name sku slug brandName image price salePrice')
-    .populate('vehicle_unit_id')
+    .populate('vehicle_unit_id', 'vin unit_code status location color')
     .populate('sales_id', 'full_name email phone avatar')
     .populate('test_drive_booking_id', 'booking_code booking_date time_slot booking_status')
+    .lean()
 
   if (!contract) {
     res.status(404)
@@ -327,6 +379,19 @@ export const updateVehicleContractStatus = asyncHandler(async (req, res) => {
     throw new Error('Không thể cập nhật hợp đồng đã hủy hoặc đã bàn giao')
   }
 
+  if (['issued', 'signed', 'paid', 'delivered'].includes(status)) {
+    const existingActiveContract = await VehicleContract.findOne({
+      _id: { $ne: contract._id },
+      vehicle_unit_id: contract.vehicle_unit_id,
+      status: { $in: ['issued', 'signed', 'paid', 'delivered'] }
+    })
+
+    if (existingActiveContract) {
+      res.status(400)
+      throw new Error(`Xe này đã được duyệt bán trong hợp đồng ${existingActiveContract.contract_number || existingActiveContract.contract_no}`)
+    }
+  }
+
   contract.status = status
   if (status === 'issued') contract.issued_at = contract.issued_at || new Date()
   if (['signed', 'paid', 'delivered'].includes(status)) contract.signed_at = contract.signed_at || new Date()
@@ -360,7 +425,7 @@ export const updateVehicleContract = asyncHandler(async (req, res) => {
     throw new Error('Chỉ được sửa nội dung hợp đồng khi còn bản nháp')
   }
 
-  const allowedFields = ['pricing_snapshot', 'commission_snapshot', 'attachments', 'note', 'sales_id']
+  const allowedFields = ['customer_snapshot', 'vehicle_snapshot', 'pricing_snapshot', 'commission_snapshot', 'attachments', 'note', 'sales_id']
   allowedFields.forEach(field => {
     if (req.body[field] !== undefined) contract.set(field, req.body[field])
   })

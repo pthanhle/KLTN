@@ -41,6 +41,16 @@
   "Đang Chờ Duyệt": "Pending Approval",
   "Đã Bán & Giao": "Sold & Delivered",
   "Tổng Doanh Thu": "Total Revenue",
-  "Tìm kiếm Hợp đồng, Số VIN, Khách hàng...": "Search Contract, VIN, Customer...",
-  "Trang chủ": "Home"
+  "Tìm kiếm Hợp đồng, Số VIN, Khách hàng...": "Search Contracts, VIN, Customer...",
+  "Trang chủ": "Home",
+  "Nhân viên KD": "Sales Staff",
+  "Thao tác": "Actions",
+  "Lọc theo ngày": "Filter by Date",
+  "Tất cả nhân viên": "All Staff",
+  "show": "Show",
+  "of": "of",
+  "contracts": "contracts",
+  "Từ ngày": "From Date",
+  "Đến ngày": "To Date",
+  "Không có": "None"
 }

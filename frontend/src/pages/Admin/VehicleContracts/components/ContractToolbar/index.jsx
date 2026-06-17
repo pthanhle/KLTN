@@ -1,11 +1,19 @@
 import React from 'react';
-import { Input, Select } from 'antd';
-import { Search, Filter } from 'lucide-react';
+import { Input, Select, DatePicker } from 'antd';
+import { Search, Filter, Calendar, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { CONTRACT_STATUS_OPTIONS } from '../../constants/contract.constants.jsx';
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
-const ContractToolbar = ({ searchTerm, onSearch, statusFilter, onStatusFilter }) => {
+const ContractToolbar = ({ 
+    searchTerm, onSearch, 
+    statusFilter, onStatusFilter,
+    dateRange, onDateRange,
+    salesId, onSalesId,
+    staffList, isLoadingStaff 
+}) => {
     const { t } = useTranslation('adminVehicleContracts');
 
     return (
@@ -20,19 +28,42 @@ const ContractToolbar = ({ searchTerm, onSearch, statusFilter, onStatusFilter })
                 />
             </div>
 
-            <div className="flex w-full lg:w-auto gap-4">
+            <div className="flex flex-wrap w-full lg:w-auto gap-4">
+                <RangePicker 
+                    value={dateRange}
+                    onChange={onDateRange}
+                    className="w-full lg:w-64 h-12 custom-datepicker"
+                    format="DD/MM/YYYY"
+                    placeholder={[t('Từ ngày'), t('Đến ngày')]}
+                    suffixIcon={<Calendar size={16} />}
+                />
+
+                <Select
+                    value={salesId}
+                    onChange={onSalesId}
+                    className="w-full lg:w-48 h-12 custom-select"
+                    suffixIcon={<Users size={16} />}
+                    loading={isLoadingStaff}
+                    showSearch
+                    optionFilterProp="children"
+                >
+                    <Option value="all">{t('Tất cả nhân viên')}</Option>
+                    {staffList?.map(staff => (
+                        <Option key={staff._id} value={staff._id}>{staff.fullName || staff.full_name || staff.email}</Option>
+                    ))}
+                </Select>
+
                 <Select
                     value={statusFilter}
                     onChange={onStatusFilter}
-                    className="w-full lg:w-48 h-12 custom-select"
+                    className="w-full lg:w-40 h-12 custom-select"
                     suffixIcon={<Filter size={16} />}
                 >
-                    <Option value="all">{t('Tất cả')}</Option>
-                    <Option value="pending_approval">{t('Chờ duyệt')}</Option>
-                    <Option value="approved">{t('Đã duyệt')}</Option>
-                    <Option value="paid">{t('Đã thanh toán')}</Option>
-                    <Option value="delivered">{t('Đã giao xe')}</Option>
-                    <Option value="cancelled">{t('Đã hủy')}</Option>
+                    {CONTRACT_STATUS_OPTIONS.map(option => (
+                        <Option key={option.value} value={option.value}>
+                            {t(option.labelKey)}
+                        </Option>
+                    ))}
                 </Select>
             </div>
         </div>

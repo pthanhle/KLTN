@@ -7,6 +7,11 @@
   "Đã thanh toán": "Đã thanh toán",
   "Đã giao xe": "Đã giao xe",
   "Đã hủy": "Đã hủy",
+  "Nháp (Chờ Duyệt)": "Nháp (Chờ Duyệt)",
+  "Đã ký": "Đã ký",
+  "Trong Kho": "Trong Kho",
+  "Đang Giữ Chỗ": "Đang Giữ Chỗ",
+  "Đã Bán": "Đã Bán",
   "Số Hợp đồng": "Số Hợp đồng",
   "Khách hàng": "Khách hàng",
   "Mẫu xe": "Mẫu xe",
@@ -42,5 +47,15 @@
   "Đã Bán & Giao": "Đã Bán & Giao",
   "Tổng Doanh Thu": "Tổng Doanh Thu",
   "Tìm kiếm Hợp đồng, Số VIN, Khách hàng...": "Tìm kiếm Hợp đồng, Số VIN, Khách hàng...",
-  "Trang chủ": "Trang chủ"
+  "Trang chủ": "Trang chủ",
+  "Nhân viên KD": "Nhân viên KD",
+  "Thao tác": "Thao tác",
+  "Lọc theo ngày": "Lọc theo ngày",
+  "Tất cả nhân viên": "Tất cả nhân viên",
+  "show": "Hiển thị",
+  "of": "của",
+  "contracts": "hợp đồng",
+  "Từ ngày": "Từ ngày",
+  "Đến ngày": "Đến ngày",
+  "Không có": "Không có"
 }

@@ -43,7 +43,7 @@ export const customerOtpCreationEmail = (fullName, otp, tempPassword) => ({
             <h2 style="color: #1e293b; text-align: center;">Chào mừng khách hàng mới!</h2>
             <p>Xin chào <strong>${fullName}</strong>,</p>
             <p>Một tài khoản khách hàng đã được tạo cho bạn trên hệ thống của chúng tôi.</p>
-            
+
             <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; margin: 15px 0;">
                 <p style="margin: 0; color: #475569; font-size: 14px;">Thông tin đăng nhập tạm thời:</p>
                 <p style="margin: 5px 0 0 0; font-family: monospace; font-size: 16px; font-weight: bold; color: #0f172a;">
@@ -55,9 +55,9 @@ export const customerOtpCreationEmail = (fullName, otp, tempPassword) => ({
             <div style="${OTP_BOX_STYLE}">
                 <span style="${OTP_SPAN_STYLE}">${otp}</span>
             </div>
-            
+
             <p style="font-size: 14px; color: #64748b;">
-                Mã OTP có hiệu lực trong <strong>10 phút</strong>. 
+                Mã OTP có hiệu lực trong <strong>10 phút</strong>.
                 Sau khi đăng nhập lần đầu, bạn nên đổi mật khẩu để đảm bảo an toàn.
             </p>
             <hr style="${HR_STYLE}">
@@ -291,7 +291,7 @@ export const serviceTrackingEmail = (fullName, trackingCode, trackingUrl, licens
             <h2 style="color: #1e293b; text-align: center;">Theo dõi tiến độ dịch vụ</h2>
             <p>Xin chào <strong>${fullName}</strong>,</p>
             <p>Yêu cầu dịch vụ của bạn đã được điều phối và đang được xử lý.</p>
-            
+
             <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center;">
                 <p style="margin: 0; color: #475569; font-size: 14px;">Mã dịch vụ của bạn (Tracking Code):</p>
                 <p style="margin: 5px 0 0 0; font-family: monospace; font-size: 24px; font-weight: bold; color: #0f172a; letter-spacing: 2px;">
@@ -322,7 +322,7 @@ export const serviceTrackingEmail = (fullName, trackingCode, trackingUrl, licens
                     Theo dõi tiến độ
                 </a>
             </div>
-            
+
             <hr style="${HR_STYLE}">
             <p style="color: #999; font-size: 12px;">
                 Hoặc truy cập trực tiếp link này:<br>

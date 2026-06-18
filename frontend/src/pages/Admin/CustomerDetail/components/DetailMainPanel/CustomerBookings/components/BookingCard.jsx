@@ -42,18 +42,18 @@ export const BookingCard = ({ booking, t }) => {
                     <div className={`absolute h-full transition-all duration-1000 ${statusConfig.color} ${progressRatio}`}></div>
                 </div>
                 <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                    <span className={isStep1 ? 'text-slate-800 dark:text-white' : ''}>{t('adminCustomers:stepReceived', 'Tiếp nhận')}</span>
-                    <span className={isStep2 ? 'text-slate-800 dark:text-white' : ''}>{t('adminCustomers:stepInProgress', 'Thực hiện')}</span>
-                    <span className={isStep3 ? 'text-slate-800 text-right dark:text-white' : 'text-right'}>{t('adminCustomers:stepHandover', 'Bàn giao')}</span>
+                    <span className={isStep1 ? 'text-slate-800 dark:text-white' : ''}>{t('Tiếp nhận')}</span>
+                    <span className={isStep2 ? 'text-slate-800 dark:text-white' : ''}>{t('Thực hiện')}</span>
+                    <span className={isStep3 ? 'text-slate-800 text-right dark:text-white' : 'text-right'}>{t('Bàn giao')}</span>
                 </div>
             </div>
             
             <div className="mt-5 pt-4 border-t border-slate-100 dark:border-white/5 pl-2 flex justify-between items-center">
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                    {t('adminCustomers:lblBookingStatusId', 'Mã Trạng Thái')}: <span className="text-slate-800 dark:text-white font-black">{bookingCode}</span>
+                    {t('Mã Đặt Chỗ')}: <span className="text-slate-800 dark:text-white font-black">{bookingCode}</span>
                 </p>
                 {booking.payment_status === 'UNPAID' && (
-                    <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" title={t('adminCustomers:tooltipUnpaid', 'Chưa thanh toán')}></span>
+                    <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" title={t('Chưa thanh toán')}></span>
                 )}
             </div>
         </div>

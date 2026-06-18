@@ -28,7 +28,7 @@ export const ShippingModal = ({ isOpen, onCancel, onSubmit, order }) => {
             closeIcon={null}
             closable={false}
             width={512}
-            destroyOnClose
+            destroyOnHidden
             classNames={{ content: 'bg-white dark:bg-[#141416] border border-slate-200 dark:border-white/10 rounded-2xl p-0 overflow-hidden shadow-2xl' }}
             wrapClassName="backdrop-blur-sm"
         >

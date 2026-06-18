@@ -7,6 +7,7 @@ const LanguageSwitcher = () => {
     const { i18n } = useTranslation('layout');
 
     const changeLanguage = (lng) => {
+        localStorage.setItem('language', lng);
         i18n.changeLanguage(lng);
     };
 

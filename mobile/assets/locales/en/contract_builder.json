@@ -33,5 +33,7 @@
   "Họ tên": "Full Name",
   "Điện thoại": "Phone",
   "CCCD": "ID Card",
-  "Địa chỉ": "Address"
+  "Địa chỉ": "Address",
+  "Đã gửi hợp đồng lên hệ thống thành công. Đang chờ Admin duyệt.": "Contract submitted successfully. Waiting for Admin approval.",
+  "Thành công": "Success"
 }

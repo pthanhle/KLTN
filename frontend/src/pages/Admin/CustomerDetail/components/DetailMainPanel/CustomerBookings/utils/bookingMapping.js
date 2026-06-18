@@ -3,16 +3,18 @@ import { getBookingStatusConfig } from '../constants/bookingStatus';
 export const mapBookingData = (booking, t) => {
     const statusConfig = getBookingStatusConfig(booking.booking_status || booking.status);
     
-    const serviceName = booking.services?.[0]?.service_name 
-        || booking.service 
-        || t('adminCustomers:defaultService', 'Dịch vụ Tiêu Chuẩn');
+    const isTestDrive = booking.booking_type === 'test_drive';
+
+    const serviceName = isTestDrive
+        ? t('Lái thử xe')
+        : (booking.services?.[0]?.service_name || booking.service || t('Dịch vụ Tiêu Chuẩn'));
         
-    const carName = booking.vehicle_info 
-        ? `${booking.vehicle_info.brand} ${booking.vehicle_info.model}` 
-        : booking.car_name || t('adminCustomers:defaultCar', 'Xe Nội Bộ');
+    const carName = isTestDrive
+        ? (booking.product_id?.name || booking.product_id?.product_name || booking.product_id?.car_name || t('Xe Nội Bộ'))
+        : (booking.vehicle_info ? `${booking.vehicle_info.brand} ${booking.vehicle_info.model}` : booking.car_name || t('Xe Nội Bộ'));
         
     const date = booking.booking_date || booking.date;
-    const timeSlot = booking.time_slot || t('adminCustomers:timeTba', 'Thời gian chưa xác định');
+    const timeSlot = booking.time_slot || t('Thời gian chưa xác định');
     const bookingCode = booking.booking_code || booking.id;
     
     // Calculate progress ratio based on status

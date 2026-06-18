@@ -67,7 +67,7 @@ const ServiceBookingDetailDrawer = ({ booking, advisors = [], open, onClose }) =
                 body: 'bg-white dark:bg-[#141416]',
             }}
             closeIcon={<span className="text-slate-400 hover:text-red-500 transition-colors">✕</span>}
-            destroyOnClose
+            destroyOnHidden
         >
             <div className="px-1">
                 {/* Booking code + date created */}

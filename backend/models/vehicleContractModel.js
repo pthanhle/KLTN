@@ -90,6 +90,8 @@ vehicleContractSchema.virtual('id').get(function () {
   return this._id.toHexString()
 })
 
+vehicleContractSchema.index({ createdAt: -1 })
+
 const VehicleContract = mongoose.model('VehicleContract', vehicleContractSchema)
 
 export default VehicleContract

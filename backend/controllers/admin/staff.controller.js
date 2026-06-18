@@ -2,6 +2,8 @@ import User from '../../models/userModel.js'
 import Employee from '../../models/employeeModel.js'
 import Staff from '../../models/staffModel.js'
 import RepairProgress from '../../models/repairprogressModel.js'
+import VehicleContract from '../../models/vehicleContractModel.js'
+import Booking from '../../models/bookingModel.js'
 import asyncHandler from 'express-async-handler'
 import Role from '../../models/roleModel.js'
 import crypto from 'crypto'
@@ -145,43 +147,94 @@ export const getStaffById = asyncHandler(async (req, res) => {
     const emp = await Employee.findOne({ user_id: user._id })
     const staffDoc = await Staff.findOne({ user_id: user._id })
 
-    // Build performance from real RepairProgress records
-    const repairOrders = await RepairProgress.find({
-        $or: [{ advisor_id: user._id }, { mechanic_id: user._id }]
-    })
-        .populate('booking_id', 'customer_info vehicle_info booking_code')
-        .sort({ createdAt: -1 })
-        .limit(100)
+    const roleName = user.role_id?.role_name;
+    let todo = [];
+    let inProgress = [];
+    let done = [];
+    let totalRepairs = 0;
+    let completedRepairs = 0;
+    let completionRate = 0;
 
-    const mapToTask = (order) => {
-        const booking = order.booking_id
-        return {
-            id: booking?.booking_code || order._id.toString().slice(-6),
-            title: `${booking?.vehicle_info?.brand || ''} ${booking?.vehicle_info?.model || ''}`.trim() || 'Sửa chữa',
-            priority: 'MEDIUM',
-            customerName: booking?.customer_info?.full_name || 'N/A',
-            licensePlate: booking?.vehicle_info?.license_plate || 'N/A',
-            customerPhone: booking?.customer_info?.contact_phone || 'N/A',
-            vehicleModel: `${booking?.vehicle_info?.brand || ''} ${booking?.vehicle_info?.model || ''}`.trim() || 'N/A',
-            appointmentTime: order.expected_start_datetime
-                ? new Date(order.expected_start_datetime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-                : 'N/A',
-            description: order.notes || '',
-            status: order.status,
+    if (roleName === 'sale') {
+        const bookings = await Booking.find({
+            booking_type: 'test_drive',
+            advisor_id: user._id,
+        }).populate('product_id', 'name sku images')
+
+        const contracts = await VehicleContract.find({
+            sales_id: user._id
+        }).populate('car_id', 'name sku images')
+
+        const mapBookingToTask = (b) => ({
+            id: b.booking_code,
+            title: `Lái thử: ${b.customer_info?.full_name || 'Khách hàng'}`,
+            priority: b.priority || 'MEDIUM',
+            customerName: b.customer_info?.full_name || 'N/A',
+            customerPhone: b.customer_info?.contact_phone || 'N/A',
+            vehicleModel: b.product_id?.name || b.product_id?.sku || 'N/A',
+            appointmentTime: b.booking_date ? new Date(b.booking_date).toLocaleDateString('vi-VN') : 'N/A',
+            status: b.booking_status,
+            taskType: 'TEST_DRIVE'
+        })
+
+        const mapContractToTask = (c) => ({
+            id: c.contract_number,
+            title: `Hợp đồng: ${c.customer_snapshot?.full_name || 'Khách hàng'}`,
+            priority: 'HIGH',
+            customerName: c.customer_snapshot?.full_name || 'N/A',
+            customerPhone: c.customer_snapshot?.phone || 'N/A',
+            vehicleModel: c.vehicle_snapshot?.name || c.vehicle_snapshot?.sku || 'N/A',
+            appointmentTime: c.createdAt ? new Date(c.createdAt).toLocaleDateString('vi-VN') : 'N/A',
+            status: c.status,
+            taskType: 'CONTRACT'
+        })
+
+        todo = bookings.filter(b => ['PENDING', 'CONFIRMED'].includes(b.booking_status)).map(mapBookingToTask)
+        inProgress = contracts.filter(c => ['draft', 'issued'].includes(c.status)).map(mapContractToTask)
+        done = contracts.filter(c => ['signed', 'paid', 'delivered'].includes(c.status)).map(mapContractToTask)
+
+        totalRepairs = todo.length + inProgress.length + done.length;
+        completedRepairs = done.length;
+        completionRate = totalRepairs > 0 ? Math.round((completedRepairs / totalRepairs) * 100) : 0;
+    } else {
+        // Build performance from real RepairProgress records for other roles
+        const repairOrders = await RepairProgress.find({
+            $or: [{ advisor_id: user._id }, { mechanic_id: user._id }]
+        })
+            .populate('booking_id', 'customer_info vehicle_info booking_code')
+            .sort({ createdAt: -1 })
+            .limit(100)
+
+        const mapToTask = (order) => {
+            const booking = order.booking_id
+            return {
+                id: booking?.booking_code || order._id.toString().slice(-6),
+                title: `${booking?.vehicle_info?.brand || ''} ${booking?.vehicle_info?.model || ''}`.trim() || 'Sửa chữa',
+                priority: 'MEDIUM',
+                customerName: booking?.customer_info?.full_name || 'N/A',
+                licensePlate: booking?.vehicle_info?.license_plate || 'N/A',
+                customerPhone: booking?.customer_info?.contact_phone || 'N/A',
+                vehicleModel: `${booking?.vehicle_info?.brand || ''} ${booking?.vehicle_info?.model || ''}`.trim() || 'N/A',
+                appointmentTime: order.expected_start_datetime
+                    ? new Date(order.expected_start_datetime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+                    : 'N/A',
+                description: order.notes || '',
+                status: order.status,
+            }
         }
+
+        const todoStatuses = ['RECEIVED', 'DIAGNOSING', 'QUOTING']
+        const inProgressStatuses = ['IN_PROGRESS', 'QC_TESTING']
+        const doneStatuses = ['COMPLETED']
+
+        todo = repairOrders.filter(o => todoStatuses.includes(o.status)).map(mapToTask)
+        inProgress = repairOrders.filter(o => inProgressStatuses.includes(o.status)).map(mapToTask)
+        done = repairOrders.filter(o => doneStatuses.includes(o.status)).map(mapToTask)
+
+        totalRepairs = repairOrders.length
+        completedRepairs = done.length
+        completionRate = totalRepairs > 0 ? Math.round((completedRepairs / totalRepairs) * 100) : 0
     }
-
-    const todoStatuses = ['RECEIVED', 'DIAGNOSING', 'QUOTING']
-    const inProgressStatuses = ['IN_PROGRESS', 'QC_TESTING']
-    const doneStatuses = ['COMPLETED']
-
-    const todo = repairOrders.filter(o => todoStatuses.includes(o.status)).map(mapToTask)
-    const inProgress = repairOrders.filter(o => inProgressStatuses.includes(o.status)).map(mapToTask)
-    const done = repairOrders.filter(o => doneStatuses.includes(o.status)).map(mapToTask)
-
-    const totalRepairs = repairOrders.length
-    const completedRepairs = done.length
-    const completionRate = totalRepairs > 0 ? Math.round((completedRepairs / totalRepairs) * 100) : 0
 
     res.json({
         _id: user._id,

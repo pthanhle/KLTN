@@ -14,7 +14,7 @@ export const ContractApprovalDrawer = ({ open, contract, onClose }) => {
     const handleApprove = () => {
         if (!contract?.id) return;
         approveContract(
-            { id: contract.id, statusData: { status: 'approved' } },
+            { id: contract.id, statusData: { status: 'issued' } },
             {
                 onSuccess: () => {
                     onClose();
@@ -37,7 +37,7 @@ export const ContractApprovalDrawer = ({ open, contract, onClose }) => {
             footer={
                 <Space className="w-full justify-end">
                     <Button onClick={onClose} disabled={isPending}>{t('Đóng')}</Button>
-                    {contract?.status === 'pending_approval' && (
+                    {contract?.status === 'draft' && (
                         <Popconfirm
                             title={t('Bạn có chắc chắn muốn duyệt hợp đồng này? Chiếc xe sẽ bị khóa hoàn toàn.')}
                             onConfirm={handleApprove}

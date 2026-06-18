@@ -30,7 +30,7 @@ export const ReassignModal = ({ isOpen, onCancel, onSubmit, currentStaffId }) =>
             footer={null}
             closable={false}
             width={520}
-            destroyOnClose
+            destroyOnHidden
             styles={{
                 content: { padding: 0, overflow: 'hidden', borderRadius: '1rem' },
                 body: { padding: 0 }

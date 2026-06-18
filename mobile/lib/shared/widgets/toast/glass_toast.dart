@@ -212,7 +212,7 @@ class _ToastOverlayWrapperState extends State<_ToastOverlayWrapper> with SingleT
     final topPadding = MediaQuery.of(context).padding.top;
     
     return Positioned(
-      top: topPadding + 16,
+      top: 16,
       left: 0,
       right: 0,
       child: SafeArea(

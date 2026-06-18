@@ -341,7 +341,7 @@ const AdminCreateBookingDrawer = ({ open, onClose }) => {
                     </button>
                 </div>
             }
-            destroyOnClose
+            destroyOnHidden
         >
             <div className="px-6 py-5 overflow-y-auto h-full">
                 <FormProvider {...logic.methods}>

@@ -6,7 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ttauto_staff/shared/widgets/buttons/liquid_button.dart';
-
+import 'package:ttauto_staff/shared/widgets/toast/glass_toast.dart';
 import '../../controllers/contract_builder_controller.dart';
 import 'components/review_row.dart';
 import 'components/review_section.dart';
@@ -201,8 +201,14 @@ class ContractReviewSheet extends ConsumerWidget {
                       onPressed: () async {
                         final success = await controller.submitContract();
                         if (success && context.mounted) {
-                          Navigator.of(context).pop(); 
-                          // Success logic sẽ xử lý quay về trang Task hoặc hiển thị thành công.
+                          GlassToast.show(
+                            context,
+                            title: 'Thành công'.tr(),
+                            subtitle: 'Đã gửi hợp đồng lên hệ thống thành công. Đang chờ Admin duyệt.'.tr(),
+                            icon: CupertinoIcons.checkmark_seal_fill,
+                            color: CupertinoColors.activeGreen,
+                          );
+                          Navigator.of(context).popUntil((route) => route.isFirst);
                         }
                       },
                       child: Row(

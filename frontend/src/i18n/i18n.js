@@ -16,6 +16,8 @@ import enAdminPromotionForm from '../locales/en/adminPromotionForm.json';
 import viAdminPromotionForm from '../locales/vi/adminPromotionForm.json';
 import enAdminCustomers from '../locales/en/adminCustomers.json';
 import viAdminCustomers from '../locales/vi/adminCustomers.json';
+import enAdminCustomerDetail from '../locales/en/adminCustomerDetail.json';
+import viAdminCustomerDetail from '../locales/vi/adminCustomerDetail.json';
 import enAdminBrands from '../locales/en/adminBrands.json';
 import viAdminBrands from '../locales/vi/adminBrands.json';
 import enAdminCategories from '../locales/en/adminCategories.json';
@@ -90,6 +92,7 @@ i18n
                 adminPromotions: enAdminPromotions,
                 adminPromotionForm: enAdminPromotionForm,
                 adminCustomers: enAdminCustomers,
+                adminCustomerDetail: enAdminCustomerDetail,
                 adminBrands: enAdminBrands,
                 adminCategories: enAdminCategories,
                 adminCars: enAdminCars,
@@ -130,6 +133,7 @@ i18n
                 adminPromotions: viAdminPromotions,
                 adminPromotionForm: viAdminPromotionForm,
                 adminCustomers: viAdminCustomers,
+                adminCustomerDetail: viAdminCustomerDetail,
                 adminBrands: viAdminBrands,
                 adminCategories: viAdminCategories,
                 adminCars: viAdminCars,
@@ -162,7 +166,7 @@ i18n
                 adminVehicleContracts: viAdminVehicleContracts,
             },
         },
-        lng: 'vi',
+        lng: localStorage.getItem('i18nextLng') || localStorage.getItem('language') || 'vi',
         fallbackLng: 'en',
         interpolation: {
             escapeValue: false,

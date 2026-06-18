@@ -25,7 +25,7 @@ export const PrintModal = ({ isOpen, onCancel, order }) => {
             closeIcon={null}
             closable={false}
             width={800}
-            destroyOnClose
+            destroyOnHidden
             classNames={{ content: '!bg-transparent !shadow-none !p-0' }}
             wrapClassName="backdrop-blur-sm"
         >

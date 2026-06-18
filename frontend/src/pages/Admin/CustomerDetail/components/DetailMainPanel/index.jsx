@@ -1,11 +1,10 @@
 import { Tabs, Skeleton } from 'antd';
 import { CustomerGarageCards } from './CustomerGarageCards';
-import { CustomerBentoHighlights } from './CustomerBentoHighlights';
 import { CustomerTimeline } from './CustomerTimeline';
 import { CustomerServiceHistory } from './CustomerServiceHistory';
 import { CustomerBookings } from './CustomerBookings';
 import { CustomerLoyalty } from './CustomerLoyalty';
-import { CustomerContractsTab } from './CustomerContractsTab';
+import { CustomerContractsTab } from './CustomerContractsTab/index.jsx';
 import { getDetailTabs } from '../../constants/detailTabs';
 
 export const DetailMainPanel = ({
@@ -39,10 +38,10 @@ export const DetailMainPanel = ({
             case 'HISTORY':
                 content = (
                     <CustomerServiceHistory
-                        serviceHistory={orders}
-                        isLoading={ordersLoading}
-                        pagination={ordersPagination}
-                        onPageChange={onOrdersPageChange}
+                        historyBookings={bookings?.filter(b => ['COMPLETED', 'CANCELLED'].includes(b.booking_status || b.status))}
+                        isLoading={bookingsLoading}
+                        pagination={bookingsPagination}
+                        onPageChange={onBookingsPageChange}
                         t={t}
                     />
                 );
@@ -80,9 +79,9 @@ export const DetailMainPanel = ({
                 tabBarStyle={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
             />
 
-            <CustomerBentoHighlights customer={customer} t={t} />
-
-            <CustomerTimeline engagements={customer.upcoming_engagements} t={t} />
+            {activeTab === 'GARAGE' && (
+                <CustomerTimeline engagements={customer.upcoming_engagements} t={t} />
+            )}
         </section>
     );
 };

@@ -4,12 +4,13 @@ import { DetailHeader } from './components/DetailHeader';
 import { DetailSidebar } from './components/DetailSidebar/index.jsx';
 import { DetailMainPanel } from './components/DetailMainPanel';
 import { CustomerEditorDrawer } from './components/CustomerEditorDrawer';
-import { CustomerActionModals } from './components/CustomerActionModals';
+import { TierUpgradeModal } from './components/Modals/TierUpgradeModal';
+import { PointsGiftModal } from './components/Modals/PointsGiftModal';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 const CustomerDetailPage = () => {
-    const { t } = useTranslation(['adminCustomers', 'admin']);
+    const { t } = useTranslation(['adminCustomerDetail', 'adminCustomers', 'admin']);
     const { 
         customer, 
         isLoading, 
@@ -94,14 +95,19 @@ const CustomerDetailPage = () => {
                 onSave={handleCustomerUpdate}
             />
 
-            <CustomerActionModals
+            <TierUpgradeModal
                 customer={customer}
-                isTierModalOpen={isTierModalOpen}
-                setIsTierModalOpen={setIsTierModalOpen}
-                isPointsModalOpen={isPointsModalOpen}
-                setIsPointsModalOpen={setIsPointsModalOpen}
+                isOpen={isTierModalOpen}
+                onClose={() => setIsTierModalOpen(false)}
                 tiersList={tiersList}
                 onUpgradeTier={handleUpgradeTier}
+                isLoading={isActionLoading}
+                t={t}
+            />
+
+            <PointsGiftModal
+                isOpen={isPointsModalOpen}
+                onClose={() => setIsPointsModalOpen(false)}
                 onAddPoints={handleAddPoints}
                 isLoading={isActionLoading}
                 t={t}

@@ -19,7 +19,7 @@ export const DocumentHeader = ({ contract, isEditMode, onChange }) => {
             </div>
             
             <p className="text-sm italic text-right mt-6">
-                Hà Nội, {formatA4Date(contract.createdAt || contract.created_at)}
+                TP.HCM, {formatA4Date(contract.createdAt || contract.created_at)}
             </p>
             
             <div className="text-justify mt-4 text-sm leading-relaxed">

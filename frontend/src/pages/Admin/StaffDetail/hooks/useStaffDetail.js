@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { message, Modal } from 'antd';
+import { App } from 'antd';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AdminStaffAPI } from '@/services/api/adminStaff.api';
 
@@ -8,6 +8,7 @@ export const useStaffDetail = (id) => {
     const [isDeactivating, setIsDeactivating] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const queryClient = useQueryClient();
+    const { message, modal } = App.useApp();
 
     const { data: staff, isLoading } = useQuery({
         queryKey: ['admin-staff-detail', id],
@@ -34,12 +35,14 @@ export const useStaffDetail = (id) => {
     const handleEditProfile = () => setIsEditModalOpen(true);
 
     const handleDeactivateAccount = () => {
-        Modal.confirm({
+        modal.confirm({
             title: 'Xác nhận vô hiệu hoá',
             content: `Bạn có chắc muốn vô hiệu hoá tài khoản của ${staff?.fullName}?`,
             okText: 'Vô hiệu hoá',
             okType: 'danger',
             cancelText: 'Huỷ',
+            className: 'custom-admin-modal',
+            wrapClassName: 'custom-admin-modal-wrap',
             onOk: async () => {
                 setIsDeactivating(true);
                 try {

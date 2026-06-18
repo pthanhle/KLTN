@@ -1,10 +1,11 @@
 export const COMPANY_PROFILE = {
     name: 'CÔNG TY TNHH TT AUTO',
-    address: '123 Đường Láng, Đống Đa, Hà Nội',
-    phone: '0987 654 321',
+    address: 'Số 1 Võ Văn Ngân, Phường Linh Chiểu, Thành phố Thủ Đức, TP.HCM',
+    phone: '1900.8888',
+    email: 'service@ttauto.vn',
     tax_code: '0101234567',
-    representative: 'Nguyễn Văn Giám Đốc',
+    representative: 'Nguyễn Văn TT',
     position: 'Giám đốc',
     bank_account: '1903654321011',
-    bank_name: 'Techcombank - CN Đống Đa',
+    bank_name: 'Techcombank - CN Thủ Đức',
 };

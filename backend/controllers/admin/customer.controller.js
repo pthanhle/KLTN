@@ -268,8 +268,9 @@ export const getBookingsByCustomer = asyncHandler(async (req, res) => {
 
     const total = await Booking.countDocuments(query)
     const bookings = await Booking.find(query)
-        .populate('service_id', 'service_name price duration description')
-        .populate('product_id', 'product_name price type description')
+        .populate('product_id', 'name price type description')
+        .populate('advisor_id', 'full_name avatar phone')
+        .populate('mechanic_id', 'full_name avatar')
         .sort({ booking_date: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
@@ -278,8 +279,9 @@ export const getBookingsByCustomer = asyncHandler(async (req, res) => {
         const bookingObj = b.toObject()
         const snapshotPrice = bookingObj.price
         if (snapshotPrice !== undefined && snapshotPrice !== null) {
-            if (bookingObj.service_id) bookingObj.service_id.price = snapshotPrice
-            if (bookingObj.product_id) bookingObj.product_id.price = snapshotPrice
+            if (bookingObj.product_id && typeof bookingObj.product_id === 'object') {
+                bookingObj.product_id.price = snapshotPrice
+            }
         }
         return bookingObj
     })

@@ -34,7 +34,6 @@ export const useCustomerDetail = () => {
         const fetchCustomer = async () => {
             setIsLoading(true);
             try {
-                console.log('Fetching customer detail for ID:', id);
                 const data = await adminCustomerApi.getCustomerById(id);
                 setCustomer(data);
             } catch (err) {
@@ -79,7 +78,10 @@ export const useCustomerDetail = () => {
     }, [id]);
 
     useEffect(() => {
-        if (activeTab === 'HISTORY') fetchOrders();
+        if (activeTab === 'HISTORY') {
+            fetchOrders();
+            fetchBookings();
+        }
         if (activeTab === 'BOOKINGS') fetchBookings();
     }, [activeTab, fetchOrders, fetchBookings]);
 

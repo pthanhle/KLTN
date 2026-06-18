@@ -79,10 +79,10 @@ const UserActions = () => {
                                 {user?.full_name?.charAt(0) || 'U'}
                             </div>
                         </div>
-                        <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                            <div className="bg-white dark:bg-[#161a23] border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl py-2 w-48 overflow-hidden">
+                        <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
+                            <div className="bg-white dark:bg-[#0e121a] border border-slate-100 dark:border-white/5 rounded-[20px] shadow-2xl dark:shadow-[0_15px_50px_rgba(0,0,0,0.8)] py-2 w-48 overflow-hidden">
                                 <div className="px-2 mb-1">
-                                    <Link to="/profile" className="flex items-center gap-2 px-3 py-2 text-sm font-bold !text-slate-700 dark:!text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 hover:!text-yellow-500 rounded-lg transition-colors group">
+                                    <Link to="/profile" className="flex items-center gap-2 px-3 py-2.5 text-sm font-bold !text-slate-700 dark:!text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 hover:!text-yellow-500 rounded-xl transition-colors group">
                                         <User size={16} className="transition-colors" />
                                         {t('customer.header.profile')}
                                     </Link>
@@ -90,7 +90,7 @@ const UserActions = () => {
                                 <div className="px-2 mt-1">
                                     <button
                                         onClick={handleLogout}
-                                        className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm font-bold text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors"
+                                        className="w-full text-left flex items-center gap-2 px-3 py-2.5 text-sm font-bold text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-xl transition-colors"
                                     >
                                         <LogOut size={16} />
                                         {t('customer.header.logout')}

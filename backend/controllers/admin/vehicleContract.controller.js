@@ -12,7 +12,7 @@ import {
   syncCarInventorySummary,
 } from '../../utils/vehicleInventory.js'
 
-const CONTRACT_STATUSES = ['draft', 'issued', 'signed', 'paid', 'cancelled', 'delivered']
+const CONTRACT_STATUSES = ['draft', 'issued', 'signed', 'cancelled']
 
 const buildContractQuery = async (req) => {
   const { status, customerId, salesId, carId, vehicleUnitId, search, startDate, endDate } = req.query
@@ -150,16 +150,10 @@ const applyContractStatusToVehicle = async ({ contract, nextStatus, performedBy,
     transactionType = 'contract_lock'
   }
 
-  if (['signed', 'paid'].includes(nextStatus) && ['contract_pending', 'reserved'].includes(unit.status)) {
+  if (nextStatus === 'signed' && ['contract_pending', 'reserved'].includes(unit.status)) {
     unit.status = 'sold'
     unit.lifecycle.sold_at = unit.lifecycle.sold_at || new Date()
     transactionType = 'sell'
-  }
-
-  if (nextStatus === 'delivered' && unit.status === 'sold') {
-    unit.status = 'delivered'
-    unit.lifecycle.delivered_at = new Date()
-    transactionType = 'deliver'
   }
 
   if (nextStatus === 'cancelled' && ['reserved', 'contract_pending'].includes(unit.status)) {
@@ -374,16 +368,16 @@ export const updateVehicleContractStatus = asyncHandler(async (req, res) => {
     throw new Error('Không tìm thấy hợp đồng mua xe')
   }
 
-  if (contract.status === 'cancelled' || contract.status === 'delivered') {
+  if (['cancelled', 'signed'].includes(contract.status)) {
     res.status(400)
-    throw new Error('Không thể cập nhật hợp đồng đã hủy hoặc đã bàn giao')
+    throw new Error('Hợp đồng đã hoàn tất hoặc đã hủy, không thể thay đổi trạng thái')
   }
 
-  if (['issued', 'signed', 'paid', 'delivered'].includes(status)) {
+  if (['issued', 'signed'].includes(status)) {
     const existingActiveContract = await VehicleContract.findOne({
       _id: { $ne: contract._id },
       vehicle_unit_id: contract.vehicle_unit_id,
-      status: { $in: ['issued', 'signed', 'paid', 'delivered'] }
+      status: { $in: ['issued', 'signed'] }
     })
 
     if (existingActiveContract) {
@@ -394,8 +388,13 @@ export const updateVehicleContractStatus = asyncHandler(async (req, res) => {
 
   contract.status = status
   if (status === 'issued') contract.issued_at = contract.issued_at || new Date()
-  if (['signed', 'paid', 'delivered'].includes(status)) contract.signed_at = contract.signed_at || new Date()
-  if (status === 'cancelled') contract.cancelled_at = new Date()
+  if (status === 'signed') contract.signed_at = contract.signed_at || new Date()
+  if (status === 'cancelled') {
+    contract.cancelled_at = new Date()
+    if (reason) {
+      contract.note = reason
+    }
+  }
 
   await contract.save()
 
@@ -406,7 +405,7 @@ export const updateVehicleContractStatus = asyncHandler(async (req, res) => {
     reason,
   })
 
-  if (['signed', 'paid'].includes(status)) {
+  if (status === 'signed') {
     await createCommissionIfNeeded(contract)
   }
 
@@ -420,14 +419,32 @@ export const updateVehicleContract = asyncHandler(async (req, res) => {
     throw new Error('Không tìm thấy hợp đồng mua xe')
   }
 
-  if (contract.status !== 'draft') {
+  if (['cancelled', 'signed'].includes(contract.status)) {
     res.status(400)
-    throw new Error('Chỉ được sửa nội dung hợp đồng khi còn bản nháp')
+    throw new Error('Hợp đồng đã hoàn tất hoặc bị hủy, không thể chỉnh sửa')
   }
 
-  const allowedFields = ['customer_snapshot', 'vehicle_snapshot', 'pricing_snapshot', 'commission_snapshot', 'attachments', 'note', 'sales_id']
+  const protectedFields = ['customer_snapshot', 'vehicle_snapshot', 'pricing_snapshot', 'commission_snapshot', 'sales_id']
+
+  if (!['draft', 'issued'].includes(contract.status)) {
+    const isTryingToUpdateProtected = protectedFields.some(field => req.body[field] !== undefined)
+    if (isTryingToUpdateProtected) {
+      res.status(400)
+      throw new Error('Chỉ được sửa nội dung lõi (giá, xe, khách hàng) khi hợp đồng chưa được ký')
+    }
+
+    if (req.body.attachments && req.body.attachments.length < contract.attachments.length) {
+      res.status(400)
+      throw new Error('Không thể xóa chứng từ pháp lý sau khi hợp đồng đã được khách ký')
+    }
+  }
+
+  const allowedFields = [...protectedFields, 'attachments', 'note']
   allowedFields.forEach(field => {
-    if (req.body[field] !== undefined) contract.set(field, req.body[field])
+    if (req.body[field] !== undefined) {
+      if (!['draft', 'issued'].includes(contract.status) && protectedFields.includes(field)) return;
+      contract.set(field, req.body[field])
+    }
   })
 
   await contract.save()

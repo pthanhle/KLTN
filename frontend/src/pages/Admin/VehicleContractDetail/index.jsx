@@ -3,11 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from 'antd';
 import { useVehicleContractDetail } from './hooks/useVehicleContractDetail';
+import { useContractActions } from './hooks/useContractActions';
 import { ContractDetailHeader } from './components/Header';
 import { CustomerSection } from './components/CustomerSection';
 import { VehicleSection } from './components/VehicleSection';
 import { FinancialSection } from './components/FinancialSection';
+import { AttachmentsSection } from './components/AttachmentsSection';
 import { A4ContractModal } from './components/A4ContractModal';
+import { CancelContractModal } from './components/CancelContractModal';
 const VehicleContractDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -15,7 +18,9 @@ const VehicleContractDetail = () => {
     
     const { state, actions } = useVehicleContractDetail(id);
     const { contract, isLoading, isApproving } = state;
+    const { handleSign, handleDeliver } = useContractActions(id);
     const [isA4ModalVisible, setIsA4ModalVisible] = useState(false);
+    const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
 
     if (isLoading) {
         return (
@@ -46,12 +51,16 @@ const VehicleContractDetail = () => {
                 onApprove={actions.handleApprove} 
                 isApproving={isApproving} 
                 onPrint={() => setIsA4ModalVisible(true)}
+                onSign={handleSign}
+                onDeliver={handleDeliver}
+                onCancel={() => setIsCancelModalVisible(true)}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-6">
                     <CustomerSection snapshot={contract.customer_snapshot} />
                     <VehicleSection snapshot={contract.vehicle_snapshot} />
+                    <AttachmentsSection contract={contract} />
                 </div>
                 <div className="space-y-6">
                     <FinancialSection snapshot={contract.pricing_snapshot} />
@@ -63,6 +72,15 @@ const VehicleContractDetail = () => {
                     contract={contract}
                     isOpen={isA4ModalVisible}
                     onClose={() => setIsA4ModalVisible(false)}
+                />
+            )}
+
+            {contract && (
+                <CancelContractModal
+                    visible={isCancelModalVisible}
+                    onClose={() => setIsCancelModalVisible(false)}
+                    contractId={contract._id}
+                    currentNote={contract.note}
                 />
             )}
         </div>

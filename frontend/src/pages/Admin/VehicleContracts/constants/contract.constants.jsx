@@ -10,9 +10,7 @@ export const CONTRACT_STATUS_OPTIONS = [
     { value: 'all', labelKey: 'Tất cả' },
     { value: 'draft', labelKey: 'Chờ duyệt' },
     { value: 'issued', labelKey: 'Đã duyệt' },
-    { value: 'signed', labelKey: 'Đã ký' },
-    { value: 'paid', labelKey: 'Đã thanh toán' },
-    { value: 'delivered', labelKey: 'Đã giao xe' },
+    { value: 'signed', labelKey: 'Đã ký / Hoàn tất' },
     { value: 'cancelled', labelKey: 'Đã hủy' }
 ];
 

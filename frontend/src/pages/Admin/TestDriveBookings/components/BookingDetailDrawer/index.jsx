@@ -79,7 +79,7 @@ const BookingDetailDrawer = ({ bookingId, open, onClose }) => {
                 body: 'bg-white dark:bg-[#141416]',
             }}
             closeIcon={<span className="text-slate-400 hover:text-red-500 transition-colors">✕</span>}
-            destroyOnClose
+            destroyOnHidden
         >
             {isLoading ? (
                 <Skeleton active paragraph={{ rows: 12 }} />

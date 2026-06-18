@@ -9,12 +9,12 @@ export const useContractBuilder = (id, initialContractData) => {
     const { t } = useTranslation('adminVehicleContractBuilder');
     const queryClient = useQueryClient();
 
-    const [isEditMode, setIsEditMode] = useState(initialContractData?.status === 'draft');
+    const [isEditMode, setIsEditMode] = useState(['draft', 'issued'].includes(initialContractData?.status));
     const [draftData, setDraftData] = useState(null);
     const printRef = useRef(null);
 
     useEffect(() => {
-        setIsEditMode(initialContractData?.status === 'draft');
+        setIsEditMode(['draft', 'issued'].includes(initialContractData?.status));
     }, [initialContractData?.status]);
 
     useEffect(() => {
@@ -30,7 +30,7 @@ export const useContractBuilder = (id, initialContractData) => {
         documentTitle: `Hop_dong_${initialContractData?.contract_number || id}`,
         onBeforeGetContent: () => {
             return new Promise((resolve, reject) => {
-                if (initialContractData?.status !== 'draft') {
+                if (!['draft', 'issued'].includes(initialContractData?.status)) {
                     return resolve();
                 }
 

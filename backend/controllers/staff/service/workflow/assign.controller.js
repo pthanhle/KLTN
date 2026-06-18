@@ -46,12 +46,16 @@ export const assignMechanic = asyncHandler(async (req, res) => {
 
     await progress.save()
 
+    if (progress.booking_id) {
+        progress.booking_id.mechanic_id = mechanic_id;
+        await progress.booking_id.save();
+    }
+
     const populated = await RepairProgress.findById(progress._id)
         .populate('booking_id')
         .populate('mechanic_id', 'full_name')
         .populate('advisor_id', 'full_name')
 
-    // Notify the assigned mechanic via socket
     try {
         const io = getIO()
         io.to(`user_${mechanic_id}`).emit('new_task_assigned', {
@@ -62,7 +66,7 @@ export const assignMechanic = asyncHandler(async (req, res) => {
             end_time,
             message: 'Bạn vừa được phân công một lệnh sửa chữa mới',
         })
-    } catch (_) {}
+    } catch (_) { }
 
     res.json({
         message: 'Phân công KTV thành công',

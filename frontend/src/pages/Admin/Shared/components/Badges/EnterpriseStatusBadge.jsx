@@ -10,14 +10,12 @@ export const EnterpriseStatusBadge = ({ status }) => {
         reserved: { color: 'orange', text: t('Đang Giữ Chỗ', 'Đang Giữ Chỗ') },
         contract_pending: { color: 'gold', text: t('Chờ duyệt', 'Chờ Duyệt HĐ') },
         sold: { color: 'green', text: t('Đã Bán', 'Đã Bán') },
-        draft: { color: 'default', text: t('Nháp (Chờ duyệt)', 'Nháp (Chờ duyệt)') },
-        issued: { color: 'cyan', text: t('Đã duyệt', 'Đã Duyệt') },
-        signed: { color: 'blue', text: t('Đã ký', 'Đã Ký') },
+        draft: { color: 'default', text: t('Chờ duyệt', 'Chờ Duyệt') },
+        issued: { color: 'processing', text: t('Đã duyệt', 'Đã Duyệt') },
+        signed: { color: 'success', text: t('Đã ký / Hoàn tất', 'Đã Ký / Hoàn Tất') },
         pending_approval: { color: 'gold', text: t('Chờ duyệt', 'Chờ Duyệt') },
         approved: { color: 'cyan', text: t('Đã duyệt', 'Đã Duyệt') },
-        paid: { color: 'green', text: t('Đã thanh toán', 'Đã Thanh Toán') },
-        delivered: { color: 'geekblue', text: t('Đã giao xe', 'Đã Giao Xe') },
-        cancelled: { color: 'red', text: t('Đã hủy', 'Đã Hủy') },
+        cancelled: { color: 'error', text: t('Đã hủy', 'Đã Hủy') },
     };
 
     const config = STATUS_MAP[status] || { color: 'default', text: status };

@@ -4,7 +4,7 @@ export const CONTRACT_TERMS = [
         title: 'ĐIỀU 3: GIAO NHẬN XE VÀ BẢO HÀNH',
         paragraphs: [
             '3.1. Thời gian giao xe: Dự kiến trong vòng 15 ngày làm việc kể từ ngày Bên B thanh toán đầy đủ 100% giá trị hợp đồng cho Bên A.',
-            '3.2. Địa điểm giao nhận: Showroom TT AUTO - 123 Đường Láng, Đống Đa, Hà Nội.',
+            '3.2. Địa điểm giao nhận: Showroom TT AUTO - Số 1 Võ Văn Ngân, Phường Linh Chiểu, Thành phố Thủ Đức, TP.HCM.',
             '3.3. Bảo hành: Xe được bảo hành theo tiêu chuẩn của nhà sản xuất (03 năm hoặc 100.000 km tuỳ điều kiện nào đến trước).'
         ]
     },

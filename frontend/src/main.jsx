@@ -15,16 +15,24 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
+const AppWithProviders = () => (
+    <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+            <HelmetProvider>
+                <App />
+            </HelmetProvider>
+        </QueryClientProvider>
+    </Provider>
+);
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <GoogleOAuthProvider clientId={googleClientId}>
-            <Provider store={store}>
-                <QueryClientProvider client={queryClient}>
-                    <HelmetProvider>
-                        <App />
-                    </HelmetProvider>
-                </QueryClientProvider>
-            </Provider>
-        </GoogleOAuthProvider>
+        {googleClientId ? (
+            <GoogleOAuthProvider clientId={googleClientId}>
+                <AppWithProviders />
+            </GoogleOAuthProvider>
+        ) : (
+            <AppWithProviders />
+        )}
     </React.StrictMode>
 )

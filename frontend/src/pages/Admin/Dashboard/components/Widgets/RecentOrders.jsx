@@ -4,7 +4,7 @@ import { ShoppingBag, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatVND } from '../../../Customers/utils/format';
-import { ORDER_STATUS_MAP } from '../../constants/dashboardConstants';
+import { ORDER_STATUS_MAP } from '../../constants/dashboard.constants';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 

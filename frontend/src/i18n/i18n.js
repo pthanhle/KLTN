@@ -78,6 +78,8 @@ import enAdminDashboard from '../locales/en/adminDashboard.json';
 import viAdminDashboard from '../locales/vi/adminDashboard.json';
 import enAdminVehicleContracts from '../locales/en/adminVehicleContracts.json';
 import viAdminVehicleContracts from '../locales/vi/adminVehicleContracts.json';
+import enAdminRevenueReport from '../locales/en/adminRevenueReport.json';
+import viAdminRevenueReport from '../locales/vi/adminRevenueReport.json';
 
 i18n
     .use(initReactI18next)
@@ -123,6 +125,7 @@ i18n
                 loyalty: enLoyalty,
                 adminDashboard: enAdminDashboard,
                 adminVehicleContracts: enAdminVehicleContracts,
+                adminRevenueReport: enAdminRevenueReport,
             },
             vi: {
                 translation: viTranslation,
@@ -164,6 +167,7 @@ i18n
                 loyalty: viLoyalty,
                 adminDashboard: viAdminDashboard,
                 adminVehicleContracts: viAdminVehicleContracts,
+                adminRevenueReport: viAdminRevenueReport,
             },
         },
         lng: localStorage.getItem('i18nextLng') || localStorage.getItem('language') || 'vi',

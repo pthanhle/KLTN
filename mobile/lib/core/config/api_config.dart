@@ -14,7 +14,8 @@ class ApiConfig {
     }
 
     if (Platform.isIOS || Platform.isMacOS) {
-      return 'http://localhost:$_port/api';
+
+      return 'http://172.20.10.3:$_port/api';
     }
 
     return 'http://localhost:$_port/api';

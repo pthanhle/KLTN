@@ -263,14 +263,10 @@ export const getRevenueAnalytics = asyncHandler(async (req, res) => {
             { $match: matchAll },
             { $group: { _id: '$order_status', count: { $sum: 1 } } }
         ]),
-        OrderItem.aggregate([
-            { $lookup: { from: 'orders', localField: 'order_id', foreignField: '_id', as: 'order' } },
-            { $unwind: '$order' },
-            { $match: { 'order.order_status': { $in: ['DELIVERED', 'COMPLETED'] }, 'order.createdAt': { $gte: start.toDate(), $lte: end.toDate() } } },
-            { $group: { _id: '$product_id', totalSold: { $sum: '$quantity' }, totalRevenue: { $sum: { $multiply: ['$quantity', '$price'] } } } },
-            { $lookup: { from: 'parts', localField: '_id', foreignField: '_id', as: 'product' } },
-            { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } },
-            { $project: { name: { $ifNull: ['$product.name', 'Sản phẩm đã xóa'] }, totalSold: 1, totalRevenue: 1 } },
+        Order.aggregate([
+            { $match: matchCompleted },
+            { $unwind: '$items' },
+            { $group: { _id: '$items.part_id', name: { $first: '$items.name' }, totalSold: { $sum: '$items.quantity' }, totalRevenue: { $sum: '$items.total_price' } } },
             { $sort: { totalRevenue: -1 } },
             { $limit: 5 }
         ]),

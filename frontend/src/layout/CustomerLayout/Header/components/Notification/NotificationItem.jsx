@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Popover } from 'antd';
-import { Link } from 'react-router-dom';
-import { Settings, Wrench, Tag, ShoppingBag, Calendar, ArrowRight, X } from 'lucide-react';
+import { Settings, Wrench, Tag, ShoppingBag, Calendar, X } from 'lucide-react';
 import { NOTIFICATION_TYPES } from '../../constants/notification.constants';
 import { getRelativeTime } from '../../utils/date.utils';
 
@@ -59,15 +58,6 @@ const DetailContent = ({ notification, onClose, t }) => {
                 {getRelativeTime(notification.createdAt, t)}
             </p>
 
-            {notification.reference_link && (
-                <Link
-                    to={notification.reference_link}
-                    onClick={onClose}
-                    className="flex items-center justify-center gap-1.5 w-full py-2 bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold rounded-xl transition-colors text-xs"
-                >
-                    Xem chi tiết <ArrowRight size={13} />
-                </Link>
-            )}
         </div>
     );
 };

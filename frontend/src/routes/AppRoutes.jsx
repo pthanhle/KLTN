@@ -14,6 +14,7 @@ const ResetPassword = lazy(() => import('../pages/Auth/ResetPassword'));
 const VerifyOTP = lazy(() => import('../pages/Auth/VerifyOTP'));
 
 const AdminDashboard = lazy(() => import('../pages/Admin/Dashboard'));
+const AdminRevenueReport = lazy(() => import('../pages/Admin/RevenueReport'));
 
 const CustomersPage = lazy(() => import('../pages/Admin/Customers'));
 const CustomerDetailPage = lazy(() => import('../pages/Admin/CustomerDetail'));
@@ -119,6 +120,7 @@ const AppRoutes = () => {
                 <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                     <Route element={<AdminLayout />}>
                         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                        <Route path="/admin/revenue-report" element={<AdminRevenueReport />} />
                         <Route path="/admin/profile" element={<ProfilePage />} />
                         <Route path="/admin/customers" element={<CustomersPage />} />
                         <Route path="/admin/customers/:id" element={<CustomerDetailPage />} />

@@ -22,7 +22,8 @@ const NotificationDropdown = () => {
 
     useEffect(() => {
         function handleClickOutside(event) {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+            const isInsidePopover = event.target.closest('.ant-popover');
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target) && !isInsidePopover) {
                 setIsOpen(false);
             }
         }

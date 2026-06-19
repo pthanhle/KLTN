@@ -9,3 +9,11 @@ export const useAdminPendingCounts = () => {
         staleTime: 20000,
     });
 };
+
+export const useRevenueAnalytics = (params = {}) => {
+    return useQuery({
+        queryKey: ['revenue-analytics', params],
+        queryFn: () => adminDashboardApi.getRevenueAnalytics(params),
+        staleTime: 5 * 60 * 1000,
+    });
+};

@@ -4,6 +4,7 @@ import {
     getPendingCounts,
     getRevenueReport,
     getTopProducts,
+    getRevenueAnalytics,
 } from '../../controllers/admin/dashboard.controller.js'
 import { protect, admin } from '../../middleware/authMiddleware.js'
 
@@ -15,5 +16,6 @@ router.get('/', getDashboardStats)
 router.get('/pending-counts', getPendingCounts)
 router.get('/revenue-report', getRevenueReport)
 router.get('/top-products', getTopProducts)
+router.get('/revenue-analytics', getRevenueAnalytics)
 
 export default router

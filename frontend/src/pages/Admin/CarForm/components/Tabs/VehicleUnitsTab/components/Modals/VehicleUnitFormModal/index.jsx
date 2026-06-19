@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Modal, Form, Input, Select, Row, Col, Space, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
-import { Wand2, CarFront, Palette, MapPin } from 'lucide-react';
+import { CarFront, Palette } from 'lucide-react';
 import { useVehicleUnitForm } from '../../../hooks/useVehicleUnitForm';
 import { getConditionOptions, getLocationOptions } from '../../../data/vehicleUnit.data';
 
@@ -23,25 +23,6 @@ const VehicleUnitFormModal = ({ open, onClose, unit, carId, carColors = [] }) =>
             resetForm();
         }
     }, [open, resetForm]);
-
-    const handleAutoGenerateVIN = () => {
-        const chars = 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789';
-        let vin = '';
-        for (let i = 0; i < 17; i++) {
-            vin += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        setValue('vin', vin, { shouldValidate: true });
-    };
-
-    const handleAutoGenerateEngineNumber = () => {
-        const chars = 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789';
-        const prefix = "B48-";
-        let randomStr = '';
-        for (let i = 0; i < 6; i++) {
-            randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        setValue('engine_number', `${prefix}${randomStr}`, { shouldValidate: true });
-    };
 
     const colorOptions = carColors.map(c => ({
         label: (
@@ -112,16 +93,6 @@ const VehicleUnitFormModal = ({ open, onClose, unit, carId, carColors = [] }) =>
                                         {...field}
                                         placeholder={t('VD: WBA...')}
                                         className="!h-12 !bg-slate-50 dark:!bg-[#1a1a1c] !border-slate-200 dark:!border-white/10 !rounded-xl px-4 text-slate-900 dark:text-white font-mono font-bold uppercase focus:!ring-2 focus:!ring-yellow-500/50 transition-all"
-                                        suffix={
-                                            <button
-                                                type="button"
-                                                onClick={handleAutoGenerateVIN}
-                                                className="text-yellow-600 dark:text-yellow-500 hover:opacity-70 transition-opacity bg-transparent border-none cursor-pointer flex items-center justify-center p-1"
-                                                title={t('Tự động sinh VIN')}
-                                            >
-                                                <Wand2 size={16} />
-                                            </button>
-                                        }
                                     />
                                 </Form.Item>
                             )}
@@ -137,20 +108,10 @@ const VehicleUnitFormModal = ({ open, onClose, unit, carId, carColors = [] }) =>
                                     validateStatus={errors.engine_number ? 'error' : ''}
                                     help={errors.engine_number?.message}
                                 >
-                                    <Input 
-                                        {...field} 
-                                        placeholder={t('VD: B48...')} 
-                                        className="!h-12 !bg-slate-50 dark:!bg-[#1a1a1c] !border-slate-200 dark:!border-white/10 !rounded-xl px-4 text-slate-900 dark:text-white font-mono font-bold uppercase focus:!ring-2 focus:!ring-yellow-500/50 transition-all" 
-                                        suffix={
-                                            <button
-                                                type="button"
-                                                onClick={handleAutoGenerateEngineNumber}
-                                                className="text-yellow-600 dark:text-yellow-500 hover:opacity-70 transition-opacity bg-transparent border-none cursor-pointer flex items-center justify-center p-1"
-                                                title={t('Tự động sinh Số máy')}
-                                            >
-                                                <Wand2 size={16} />
-                                            </button>
-                                        }
+                                    <Input
+                                        {...field}
+                                        placeholder={t('VD: B48...')}
+                                        className="!h-12 !bg-slate-50 dark:!bg-[#1a1a1c] !border-slate-200 dark:!border-white/10 !rounded-xl px-4 text-slate-900 dark:text-white font-mono font-bold uppercase focus:!ring-2 focus:!ring-yellow-500/50 transition-all"
                                     />
                                 </Form.Item>
                             )}

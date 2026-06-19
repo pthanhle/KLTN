@@ -13,7 +13,8 @@ import {
     Settings,
     Car,
     CalendarCheck,
-    FileText
+    FileText,
+    BarChart3,
 } from 'lucide-react';
 import { useAdminPendingCounts } from '../../../../services/queries/adminDashboard.queries';
 
@@ -45,6 +46,11 @@ export const useSiderMenu = (collapsed) => {
             key: '/admin/dashboard',
             icon: <LayoutDashboard size={iconSize} />,
             label: t('admin.sider.dashboard'),
+        },
+        {
+            key: '/admin/revenue-report',
+            icon: <BarChart3 size={iconSize} />,
+            label: t('admin.sider.revenue-report', 'Báo Cáo'),
         },
         {
             key: '/admin/customers',

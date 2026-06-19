@@ -94,31 +94,39 @@ export const getVehicleUnitColumns = ({ t, onEdit, onViewTimeline }) => [
         key: 'action',
         align: 'right',
         width: 120,
-        render: (_, record) => (
-            <div className="flex items-center justify-end gap-1 pr-2">
-                <Tooltip title={t('Lịch sử Giao dịch')}>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onViewTimeline(record);
-                        }}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-500/10 transition-colors opacity-70 hover:opacity-100 cursor-pointer outline-none"
-                    >
-                        <History size={16} strokeWidth={1.75} />
-                    </button>
-                </Tooltip>
-                <Tooltip title={t('Cập nhật Xe')}>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onEdit(record);
-                        }}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:text-[#ffd165] dark:hover:bg-yellow-500/10 transition-colors opacity-70 hover:opacity-100 cursor-pointer outline-none"
-                    >
-                        <Edit2 size={16} strokeWidth={1.75} />
-                    </button>
-                </Tooltip>
-            </div>
-        )
+        render: (_, record) => {
+            const isClosed = record.status === 'sold' || record.status === 'delivered';
+            return (
+                <div className="flex items-center justify-end gap-1 pr-2">
+                    <Tooltip title={t('Lịch sử Giao dịch')}>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onViewTimeline(record);
+                            }}
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-500/10 transition-colors opacity-70 hover:opacity-100 cursor-pointer outline-none"
+                        >
+                            <History size={16} strokeWidth={1.75} />
+                        </button>
+                    </Tooltip>
+                    <Tooltip title={isClosed ? t('Không thể cập nhật xe đã bán / bàn giao') : t('Cập nhật Xe')}>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (!isClosed) onEdit(record);
+                            }}
+                            disabled={isClosed}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors outline-none
+                                ${isClosed
+                                    ? 'text-slate-300 dark:text-slate-600 opacity-40 cursor-not-allowed'
+                                    : 'text-slate-400 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:text-[#ffd165] dark:hover:bg-yellow-500/10 opacity-70 hover:opacity-100 cursor-pointer'
+                                }`}
+                        >
+                            <Edit2 size={16} strokeWidth={1.75} />
+                        </button>
+                    </Tooltip>
+                </div>
+            );
+        }
     }
 ];

@@ -11,7 +11,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.pageSize || req.query.limit) || 12
   const search = req.query.search || keyword || ''
   const sortParam = req.query.sort || 'newest';
-  
+
   let sortField = 'createdAt';
   let sortOrder = -1;
   if(sortParam === 'price_asc') { sortField = 'price'; sortOrder = 1; }
@@ -76,9 +76,9 @@ export const getProducts = asyncHandler(async (req, res) => {
     success: true,
     data: {
       products,
-      pagination: { 
-        current: page, 
-        pageSize: limit, 
+      pagination: {
+        current: page,
+        pageSize: limit,
         total,
         totalPages: Math.ceil(total / limit)
       }

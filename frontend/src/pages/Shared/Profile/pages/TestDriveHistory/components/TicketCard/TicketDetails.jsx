@@ -5,11 +5,14 @@ const TicketDetails = ({ drive, t }) => {
     return (
         <div className="flex-1 min-w-0 p-6 md:p-8 flex flex-col justify-between">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-8 gap-4">
-                <div>
+                <div className="min-w-0 overflow-hidden">
                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1.5">
                         {t('booking_id', 'Mã Đặt Lịch')}
                     </div>
-                    <div className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter transition-colors duration-300">
+                    <div
+                        className="text-base md:text-lg font-black text-slate-900 dark:text-white tracking-tighter transition-colors duration-300 truncate font-mono"
+                        title={`#${drive._id}`}
+                    >
                         #{drive._id}
                     </div>
                 </div>

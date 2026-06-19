@@ -1,9 +1,10 @@
+import { Pagination } from 'antd';
 import OrderCard from './components/OrderCard/index.jsx';
 import { useOrderHistoryLogic } from './hooks/useOrderHistoryLogic';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const OrderHistory = () => {
-    const { t, TABS, activeTab, setActiveTab, filteredOrders, isLoading, handleCancelOrder, handleConfirmReceipt } = useOrderHistoryLogic();
+    const { t, TABS, activeTab, setActiveTab, paginatedOrders, totalOrders, currentPage, setCurrentPage, pageSize, isLoading, handleCancelOrder, handleConfirmReceipt } = useOrderHistoryLogic();
 
     return (
         <section className="w-full">
@@ -55,12 +56,12 @@ const OrderHistory = () => {
                         </div>
                     ))
                 ) : (
-                    filteredOrders.length > 0 ? (
-                        filteredOrders.map(order => (
-                            <OrderCard 
-                                key={order.order_code} 
-                                order={order} 
-                                t={t} 
+                    paginatedOrders.length > 0 ? (
+                        paginatedOrders.map(order => (
+                            <OrderCard
+                                key={order.order_code}
+                                order={order}
+                                t={t}
                                 handleCancelOrder={() => handleCancelOrder(order._id)}
                                 handleConfirmReceipt={() => handleConfirmReceipt(order._id)}
                             />
@@ -74,6 +75,19 @@ const OrderHistory = () => {
                     )
                 )}
             </div>
+
+            {totalOrders > pageSize && (
+                <div className="mt-8 flex justify-center">
+                    <Pagination
+                        current={currentPage}
+                        total={totalOrders}
+                        pageSize={pageSize}
+                        onChange={setCurrentPage}
+                        showSizeChanger={false}
+                        showTotal={(total, range) => `${range[0]}–${range[1]} / ${total} đơn hàng`}
+                    />
+                </div>
+            )}
         </section>
     );
 };

@@ -1,10 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useGetServiceBookingsQuery } from '../../../../../../services/queries/bookingQueries';
 import { useTranslation } from 'react-i18next';
+
+const PAGE_SIZE = 4;
 
 export const useServiceHistoryLogic = () => {
     const { t } = useTranslation('profile');
     const { data: bookings = [], isLoading } = useGetServiceBookingsQuery();
+    const [currentPage, setCurrentPage] = useState(1);
 
     const servicesData = useMemo(() => {
         return bookings.map(b => ({
@@ -74,9 +77,18 @@ export const useServiceHistoryLogic = () => {
         return recommendations;
     }, [servicesData]);
 
+    const paginatedServices = useMemo(() => {
+        const start = (currentPage - 1) * PAGE_SIZE;
+        return servicesData.slice(start, start + PAGE_SIZE);
+    }, [servicesData, currentPage]);
+
     return {
         t,
-        servicesData,
+        servicesData: paginatedServices,
+        totalServices: servicesData.length,
+        currentPage,
+        setCurrentPage,
+        pageSize: PAGE_SIZE,
         nextRecommendedDates,
         isLoading
     };

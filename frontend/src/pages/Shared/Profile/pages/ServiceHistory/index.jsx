@@ -1,3 +1,4 @@
+import { Pagination } from 'antd';
 import MaintenanceCard from './components/MaintenanceCard/index.jsx';
 import MaintenanceAlert from './components/MaintenanceAlert/index.jsx';
 import { useServiceHistoryLogic } from './hooks/useServiceHistoryLogic';
@@ -5,7 +6,7 @@ import { FileDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const ServiceHistory = () => {
-    const { t, servicesData, nextRecommendedDates, isLoading } = useServiceHistoryLogic();
+    const { t, servicesData, totalServices, currentPage, setCurrentPage, pageSize, nextRecommendedDates, isLoading } = useServiceHistoryLogic();
 
     return (
         <section className="w-full">
@@ -51,15 +52,28 @@ const ServiceHistory = () => {
                     ))
                 ) : (
                     servicesData.map((service, index) => (
-                        <MaintenanceCard 
-                            key={service.booking_code} 
-                            service={service} 
-                            index={index} 
+                        <MaintenanceCard
+                            key={service.booking_code}
+                            service={service}
+                            index={index}
                             t={t}
                         />
                     ))
                 )}
             </div>
+
+            {totalServices > pageSize && (
+                <div className="mt-8 flex justify-center">
+                    <Pagination
+                        current={currentPage}
+                        total={totalServices}
+                        pageSize={pageSize}
+                        onChange={setCurrentPage}
+                        showSizeChanger={false}
+                        showTotal={(total, range) => `${range[0]}–${range[1]} / ${total} lịch bảo dưỡng`}
+                    />
+                </div>
+            )}
         </section>
     );
 };

@@ -60,6 +60,7 @@ const normalizeBooking = (b) => {
     signatureUrl: obj.signature_url || null,
     interestLevel: obj.interest_level ?? null,
     evaluationFeedback: obj.evaluation_feedback || null,
+    rescheduleReason: obj.reschedule_reason || null,
     createdAt: obj.createdAt,
   }
 }

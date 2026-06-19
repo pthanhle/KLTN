@@ -4,6 +4,8 @@ import { useGetMyOrders, useCancelOrder, useConfirmReceipt } from '@/services/qu
 import { message } from 'antd';
 import { useQueryClient } from '@tanstack/react-query';
 
+const PAGE_SIZE = 5;
+
 export const useOrderHistoryLogic = () => {
     const { t } = useTranslation('profile');
     const queryClient = useQueryClient();
@@ -21,6 +23,12 @@ export const useOrderHistoryLogic = () => {
     ], [t]);
 
     const [activeTab, setActiveTab] = useState(TABS[0]);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        setCurrentPage(1);
+    };
 
     const { data, isLoading } = useGetMyOrders({ limit: 100 });
     const allOrders = data?.orders || [];
@@ -34,6 +42,11 @@ export const useOrderHistoryLogic = () => {
         if (activeTab === TABS[5]) return allOrders.filter(o => o.order_status === 'CANCELLED');
         return allOrders;
     }, [allOrders, activeTab, TABS]);
+
+    const paginatedOrders = useMemo(() => {
+        const start = (currentPage - 1) * PAGE_SIZE;
+        return filteredOrders.slice(start, start + PAGE_SIZE);
+    }, [filteredOrders, currentPage]);
 
     const handleCancelOrder = (orderId) => {
         if (window.confirm(t('order_cancel_confirm', 'Bạn có chắc chắn muốn hủy đơn hàng này không?'))) {
@@ -67,8 +80,13 @@ export const useOrderHistoryLogic = () => {
         t,
         TABS,
         activeTab,
-        setActiveTab,
+        setActiveTab: handleTabChange,
         filteredOrders,
+        paginatedOrders,
+        currentPage,
+        setCurrentPage,
+        totalOrders: filteredOrders.length,
+        pageSize: PAGE_SIZE,
         isLoading,
         handleCancelOrder,
         handleConfirmReceipt

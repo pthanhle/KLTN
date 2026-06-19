@@ -1,18 +1,21 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Pagination } from 'antd';
 import { useNotificationPageLogic } from './hooks/useNotificationPageLogic';
 import NotificationHeader from './components/Header/NotificationHeader';
 import NotificationTabsFilter from './components/Tabs/NotificationTabsFilter';
 import NotificationGroup from './components/Group/NotificationGroup';
 import EmptyNotification from './components/Feedback/EmptyNotification';
 import NotificationSkeleton from './components/Feedback/NotificationSkeleton';
-import { ChevronDown } from 'lucide-react';
-import { Button } from 'antd';
 
 const ProfileNotifications = () => {
     const { t } = useTranslation('profile');
     const {
         notifications,
+        totalNotifications,
+        currentPage,
+        setCurrentPage,
+        pageSize,
         isLoading,
         activeTab,
         setActiveTab,
@@ -68,7 +71,7 @@ const ProfileNotifications = () => {
                     onChangeTab={setActiveTab} 
                 />
 
-                {notifications.length === 0 ? (
+                {totalNotifications === 0 ? (
                     <EmptyNotification />
                 ) : (
                     <div className="space-y-12 mb-16">
@@ -96,17 +99,19 @@ const ProfileNotifications = () => {
                     </div>
                 )}
 
-                {/* Load More Footer */}
-                {notifications.length > 0 && (
-                    <footer className="mt-16 flex justify-center pb-20">
-                        <Button 
-                            className="group flex flex-row-reverse items-center justify-center gap-2 px-8 md:px-10 !h-12 bg-white dark:bg-[#141416] rounded-full border border-slate-200 dark:border-white/10 hover:!border-yellow-500/50 dark:hover:!border-yellow-500/50 transition-all duration-500 shadow-sm"
-                            icon={<ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-yellow-500 group-hover:translate-y-1 transition-transform" />}
-                        >
-                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-300 group-hover:text-yellow-600 dark:group-hover:text-yellow-500 transition-colors">
-                                {t('notif_btn_load_more', 'Xem thêm thông báo')}
-                            </span>
-                        </Button>
+                {totalNotifications > pageSize && (
+                    <footer className="mt-10 flex justify-center pb-20">
+                        <Pagination
+                            current={currentPage}
+                            total={totalNotifications}
+                            pageSize={pageSize}
+                            onChange={(page) => {
+                                setCurrentPage(page);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            showSizeChanger={false}
+                            showTotal={(total, range) => `${range[0]}–${range[1]} / ${total} thông báo`}
+                        />
                     </footer>
                 )}
             </div>

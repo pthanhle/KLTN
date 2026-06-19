@@ -5,6 +5,19 @@ import { Settings, Wrench, Tag, ShoppingBag, Calendar, MoreVertical, Eye, EyeOff
 import { NOTIFICATION_TYPES } from '../../../../../../../layout/CustomerLayout/Header/constants/notification.constants';
 import { getRelativeTime } from '../../../../../../../layout/CustomerLayout/Header/utils/date.utils';
 
+const buildDetailUrl = (notification) => {
+    const { type, reference_id, reference_link } = notification;
+    if (reference_id) {
+        if (type === NOTIFICATION_TYPES.BOOKING || type === NOTIFICATION_TYPES.MAINTENANCE) {
+            return `/profile/services/${reference_id}`;
+        }
+        if (type === NOTIFICATION_TYPES.ORDER) {
+            return `/profile/orders/${reference_id}`;
+        }
+    }
+    return reference_link || null;
+};
+
 const TYPE_CONFIG = {
     [NOTIFICATION_TYPES.BOOKING]: { icon: Calendar, iconClass: 'text-blue-500', bgClass: 'bg-blue-100 dark:bg-blue-900/30' },
     [NOTIFICATION_TYPES.ORDER]: { icon: ShoppingBag, iconClass: 'text-emerald-500', bgClass: 'bg-emerald-100 dark:bg-emerald-900/30' },
@@ -67,9 +80,9 @@ const NotificationCard = ({ notification, onMarkRead, onMarkUnread, onDelete }) 
                 </p>
 
                 <div className="pt-3 flex gap-4">
-                    {notification.reference_link && (
+                    {buildDetailUrl(notification) && (
                         <Link
-                            to={notification.reference_link}
+                            to={buildDetailUrl(notification)}
                             className="text-[10px] md:text-[11px] font-black text-yellow-600 dark:text-yellow-500 uppercase tracking-[0.15em] hover:underline underline-offset-4"
                         >
                             {t('notif_action_detail', 'Chi tiết')}

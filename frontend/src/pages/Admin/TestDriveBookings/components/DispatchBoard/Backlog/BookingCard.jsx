@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { CalendarOutlined, ScheduleOutlined } from '@ant-design/icons';
+import { CalendarOutlined, ScheduleOutlined, SwapOutlined } from '@ant-design/icons';
 import { useBookingCardLogic } from './hooks/useBookingCardLogic';
 import { ClaimRequestGroup } from './components/ClaimRequestGroup';
 
@@ -27,19 +27,27 @@ export const BookingCardUI = ({ booking, t, isDragging, style, setNodeRef, liste
             <div className="absolute inset-0 bg-yellow-500/0 group-hover:bg-yellow-500/5 transition-colors pointer-events-none rounded-r-2xl" />
 
             <div className="flex justify-between items-start mb-3 relative z-10">
-                <div>
+                <div className="min-w-0">
                     <p className="font-bold text-slate-800 dark:text-white text-base truncate">{booking.fullName}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{booking.phoneNumber}</p>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                    {booking.sequence_number != null && (
-                        <span className="font-mono text-[10px] font-bold text-yellow-600 dark:text-yellow-500">
-                            #{booking.sequence_number}
+                <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+                    <div className="flex items-center gap-1.5">
+                        {booking.sequence_number != null && (
+                            <span className="font-mono text-[10px] font-bold text-yellow-600 dark:text-yellow-500">
+                                #{booking.sequence_number}
+                            </span>
+                        )}
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${typeTheme.badge}`}>
+                            {typeBadgeLabel}
+                        </span>
+                    </div>
+                    {booking.rescheduleReason && (
+                        <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400 uppercase tracking-wide">
+                            <SwapOutlined className="text-[10px]" />
+                            Dời lịch
                         </span>
                     )}
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${typeTheme.badge}`}>
-                        {typeBadgeLabel}
-                    </span>
                 </div>
             </div>
 
@@ -54,7 +62,7 @@ export const BookingCardUI = ({ booking, t, isDragging, style, setNodeRef, liste
                 </div>
             </div>
 
-            <div className="bg-slate-50 dark:bg-white/5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center relative group overflow-hidden">
+            <div className={`px-3 py-2 rounded-lg border flex flex-col gap-1.5 relative group overflow-hidden ${booking.rescheduleReason ? 'bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/20' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5'}`}>
                 <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 relative z-10">
                     <div className="flex items-center gap-1">
                         <CalendarOutlined className="text-[14px]" />
@@ -65,6 +73,12 @@ export const BookingCardUI = ({ booking, t, isDragging, style, setNodeRef, liste
                         {booking.selectedTimeSlot}
                     </div>
                 </div>
+                {booking.rescheduleReason && (
+                    <div className="flex items-start gap-1.5 text-[11px] text-orange-600 dark:text-orange-400 relative z-10">
+                        <SwapOutlined className="text-[11px] mt-0.5 shrink-0" />
+                        <span className="leading-snug line-clamp-2">{booking.rescheduleReason}</span>
+                    </div>
+                )}
             </div>
 
             <ClaimRequestGroup

@@ -10,9 +10,15 @@ export const useTestDriveHistory = (t) => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const [filterType, setFilterType] = useState('upcoming'); // 'upcoming' | 'history'
+    const [filterType, setFilterType] = useState('upcoming');
+    const [currentPage, setCurrentPage] = useState(1);
 
     const { data: rawDrives = [], isLoading, isError } = useGetTestDriveList();
+
+    const handleFilterChange = (type) => {
+        setFilterType(type);
+        setCurrentPage(1);
+    };
 
     if (isError) {
         message.error(t('fetch_error', 'Lỗi tải dữ liệu.'));
@@ -23,6 +29,12 @@ export const useTestDriveHistory = (t) => {
     const filteredDrives = useMemo(() => {
         return filterTestDrivesByStatus(rawDrives, filterType);
     }, [rawDrives, filterType]);
+
+    const PAGE_SIZE = 4;
+    const paginatedDrives = useMemo(() => {
+        const start = (currentPage - 1) * PAGE_SIZE;
+        return filteredDrives.slice(start, start + PAGE_SIZE);
+    }, [filteredDrives, currentPage]);
 
     const handleReschedule = (id) => {
         const drive = rawDrives.find(d => d._id === id);
@@ -58,10 +70,14 @@ export const useTestDriveHistory = (t) => {
     };
 
     return {
-        drives: filteredDrives,
+        drives: paginatedDrives,
+        totalDrives: filteredDrives.length,
+        currentPage,
+        setCurrentPage,
+        pageSize: PAGE_SIZE,
         isLoading,
         filterType,
-        setFilterType,
+        setFilterType: handleFilterChange,
         handleReschedule,
         handleCancel
     };

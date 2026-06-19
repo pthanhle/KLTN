@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Pagination } from 'antd';
 import { CarFront } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTestDriveHistory } from './hooks/useTestDriveHistory';
@@ -9,13 +9,17 @@ import TestDriveReminder from './components/TestDriveReminder';
 
 const TestDriveHistory = () => {
     const { t } = useTranslation(['profile']);
-    const { 
-        drives, 
-        isLoading, 
-        filterType, 
-        setFilterType, 
-        handleReschedule, 
-        handleCancel 
+    const {
+        drives,
+        totalDrives,
+        currentPage,
+        setCurrentPage,
+        pageSize,
+        isLoading,
+        filterType,
+        setFilterType,
+        handleReschedule,
+        handleCancel
     } = useTestDriveHistory(t);
 
     return (
@@ -64,14 +68,26 @@ const TestDriveHistory = () => {
                 ) : drives.length > 0 ? (
                     <>
                         {drives.map(drive => (
-                            <TicketCard 
-                                key={drive.booking_code} 
-                                drive={drive} 
+                            <TicketCard
+                                key={drive.booking_code}
+                                drive={drive}
                                 handleReschedule={handleReschedule}
                                 handleCancel={handleCancel}
                                 t={t}
                             />
                         ))}
+                        {totalDrives > pageSize && (
+                            <div className="flex justify-center pt-4">
+                                <Pagination
+                                    current={currentPage}
+                                    total={totalDrives}
+                                    pageSize={pageSize}
+                                    onChange={setCurrentPage}
+                                    showSizeChanger={false}
+                                    showTotal={(total, range) => `${range[0]}–${range[1]} / ${total} lịch hẹn`}
+                                />
+                            </div>
+                        )}
                         <TestDriveReminder t={t} />
                     </>
                 ) : (

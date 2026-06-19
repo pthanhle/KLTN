@@ -4,6 +4,7 @@ import '../../../../core/routes/router_keys.dart';
 import '../../../../core/views/pages/main_scaffold.dart';
 import '../../../../core/views/pages/dynamic_dashboard.dart';
 import '../../../../core/views/pages/dynamic_tasks.dart';
+import '../features/contracts/views/contracts_page.dart';
 import '../../auth/views/pages/profile_page.dart';
 
 final StatefulShellRoute salesRoutes = StatefulShellRoute.indexedStack(
@@ -32,14 +33,12 @@ final StatefulShellRoute salesRoutes = StatefulShellRoute.indexedStack(
       ],
     ),
     StatefulShellBranch(
-      navigatorKey: RouterKeys.shellSalesCalendarKey,
+      navigatorKey: RouterKeys.shellSalesCalendarKey, // Keep the key for now to avoid modifying core router_keys.dart unless needed
       routes: [
         GoRoute(
-          path: '/calendar',
-          name: 'sales_calendar',
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Trang Lịch Trình (Đang phát triển)')),
-          ),
+          path: '/contracts',
+          name: 'sales_contracts',
+          builder: (context, state) => const ContractsPage(),
         ),
       ],
     ),

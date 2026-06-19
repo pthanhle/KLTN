@@ -86,6 +86,6 @@ app.use(notFound)
 app.use(errorHandler)
 
 const PORT = process.env.PORT || 5000
-server.listen(PORT, () =>
-  console.log(`Server & WebSocket chạy trên cổng ${PORT}`.yellow.bold)
+server.listen(PORT, '0.0.0.0', () =>
+  console.log(`Server & WebSocket chạy trên cổng ${PORT} (host 0.0.0.0)`.yellow.bold)
 )

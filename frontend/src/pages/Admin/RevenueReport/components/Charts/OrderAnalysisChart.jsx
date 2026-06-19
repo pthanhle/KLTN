@@ -3,16 +3,18 @@ import {
     ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, Legend,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { formatVND } from '@/pages/Admin/Customers/utils/format';
+import { ChartTooltipWrapper } from './Shared/ChartTooltipWrapper';
 
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({ active, payload, t }) => {
     if (!active || !payload?.length) return null;
     const item = payload[0]?.payload;
     const label = item?.weekEnd
-        ? `Tuần ${item.label} – ${item.weekEnd}`
+        ? `${t('Tuần')} ${item.label} – ${item.weekEnd}`
         : item?.label;
     return (
-        <div className="bg-white dark:bg-[#1a1a2e] p-4 rounded-xl shadow-xl border border-slate-100 dark:border-white/10 min-w-[170px]">
+        <ChartTooltipWrapper active={active} payload={payload} minWidth="170px">
             <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2">{label}</p>
             {payload.map((entry, i) => (
                 <div key={i} className="flex items-center justify-between gap-4 text-sm font-semibold" style={{ color: entry.color }}>
@@ -20,7 +22,7 @@ const CustomTooltip = ({ active, payload }) => {
                     <span>{entry.dataKey === 'revenue' ? formatVND(entry.value) : entry.value}</span>
                 </div>
             ))}
-        </div>
+        </ChartTooltipWrapper>
     );
 };
 
@@ -42,6 +44,7 @@ const renderLegend = (props) => {
 };
 
 export const OrderAnalysisChart = ({ timeSeries, period }) => {
+    const { t } = useTranslation('adminRevenueReport');
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => { setMounted(true); }, []);
 
@@ -50,8 +53,8 @@ export const OrderAnalysisChart = ({ timeSeries, period }) => {
     return (
         <section className="bg-white dark:bg-[#141416] p-6 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm flex flex-col h-full min-h-[380px]">
             <header className="mb-6">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Phân tích đơn hàng</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Số đơn và doanh thu theo kỳ</p>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">{t('Phân tích đơn hàng')}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('Số đơn và doanh thu theo kỳ')}</p>
             </header>
             <div className="flex-1 w-full min-h-[280px]">
                 {mounted && data.length > 0 ? (
@@ -81,12 +84,12 @@ export const OrderAnalysisChart = ({ timeSeries, period }) => {
                                 tick={{ fontSize: 11, fill: '#64748b' }}
                                 tickFormatter={(v) => v >= 1000000 ? `${(v / 1000000).toFixed(0)}M` : v}
                             />
-                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(148,163,184,0.08)', radius: 8 }} />
+                            <Tooltip content={<CustomTooltip t={t} />} cursor={{ fill: 'rgba(148,163,184,0.08)', radius: 8 }} />
                             <Legend content={renderLegend} />
                             <Bar
                                 yAxisId="left"
                                 dataKey="orderCount"
-                                name="Số đơn"
+                                name={t('Số đơn')}
                                 fill="#818cf8"
                                 radius={[5, 5, 0, 0]}
                                 barSize={period === 'day' ? 8 : 22}
@@ -95,7 +98,7 @@ export const OrderAnalysisChart = ({ timeSeries, period }) => {
                                 yAxisId="right"
                                 type="monotone"
                                 dataKey="revenue"
-                                name="Doanh thu"
+                                name={t('Doanh thu')}
                                 stroke="#f59e0b"
                                 strokeWidth={2.5}
                                 dot={false}
@@ -105,7 +108,7 @@ export const OrderAnalysisChart = ({ timeSeries, period }) => {
                     </ResponsiveContainer>
                 ) : mounted ? (
                     <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
-                        Không có dữ liệu trong kỳ này
+                        {t('Không có dữ liệu trong kỳ này')}
                     </div>
                 ) : null}
             </div>

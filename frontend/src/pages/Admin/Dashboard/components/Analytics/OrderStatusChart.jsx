@@ -1,7 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import { ORDER_STATUS_MAP } from '../../constants/dashboardConstants';
+import { transformOrderStatusData } from '../../utils/dashboard.utils';
 
 const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -25,13 +25,7 @@ export const OrderStatusChart = ({ data }) => {
         setIsMounted(true);
     }, []);
 
-    const chartData = Object.entries(data || {})
-        .filter(([, v]) => v > 0)
-        .map(([key, value]) => ({
-            name: ORDER_STATUS_MAP[key] ? t(ORDER_STATUS_MAP[key].labelKey) : key,
-            value,
-            fill: ORDER_STATUS_MAP[key]?.color || '#94a3b8',
-        }));
+    const chartData = transformOrderStatusData(data, t);
 
     const total = chartData.reduce((s, d) => s + d.value, 0);
 

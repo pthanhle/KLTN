@@ -2,24 +2,27 @@ import React from 'react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { formatVND } from '@/pages/Admin/Customers/utils/format';
+import { ChartTooltipWrapper } from './Shared/ChartTooltipWrapper';
 
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({ active, payload, t }) => {
     if (!active || !payload?.length) return null;
     const item = payload[0]?.payload;
     const label = item?.weekEnd
-        ? `Tuần ${item.label} – ${item.weekEnd}`
+        ? `${t('Tuần')} ${item.label} – ${item.weekEnd}`
         : item?.label;
     return (
-        <div className="bg-white dark:bg-[#1a1a2e] p-4 rounded-xl shadow-xl border border-slate-100 dark:border-white/10 min-w-[170px]">
+        <ChartTooltipWrapper active={active} payload={payload}>
             <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2">{label}</p>
             <p className="text-base font-extrabold text-indigo-600 dark:text-indigo-400">{formatVND(payload[0]?.value)}</p>
-            <p className="text-xs text-slate-400 mt-1">{item?.orderCount} đơn hoàn thành</p>
-        </div>
+            <p className="text-xs text-slate-400 mt-1">{item?.orderCount} {t('đơn hoàn thành')}</p>
+        </ChartTooltipWrapper>
     );
 };
 
 export const RevenueTrendChart = ({ timeSeries, period }) => {
+    const { t } = useTranslation('adminRevenueReport');
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => { setMounted(true); }, []);
 
@@ -29,8 +32,8 @@ export const RevenueTrendChart = ({ timeSeries, period }) => {
         <section className="bg-white dark:bg-[#141416] p-6 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm flex flex-col h-full min-h-[380px]">
             <header className="mb-6 flex justify-between items-start">
                 <div>
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">Xu hướng doanh thu</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Doanh thu từ đơn đã hoàn thành</p>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">{t('Xu hướng doanh thu')}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('Doanh thu từ đơn đã hoàn thành')}</p>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full flex-shrink-0">
                     <span className="w-2 h-2 rounded-full bg-indigo-500" />
@@ -63,7 +66,7 @@ export const RevenueTrendChart = ({ timeSeries, period }) => {
                                 tickFormatter={(v) => v >= 1000000 ? `${(v / 1000000).toFixed(0)}M` : v}
                                 dx={-15}
                             />
-                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(148,163,184,0.4)', strokeWidth: 1, strokeDasharray: '5 5' }} />
+                            <Tooltip content={<CustomTooltip t={t} />} cursor={{ stroke: 'rgba(148,163,184,0.4)', strokeWidth: 1, strokeDasharray: '5 5' }} />
                             <Area
                                 type="monotone"
                                 dataKey="revenue"
@@ -77,7 +80,7 @@ export const RevenueTrendChart = ({ timeSeries, period }) => {
                     </ResponsiveContainer>
                 ) : mounted ? (
                     <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
-                        Không có dữ liệu trong kỳ này
+                        {t('Không có dữ liệu trong kỳ này')}
                     </div>
                 ) : null}
             </div>

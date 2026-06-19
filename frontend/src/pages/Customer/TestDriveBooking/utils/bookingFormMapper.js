@@ -101,5 +101,6 @@ export const mapFormToReschedulePayload = (data) => {
         test_drive_type: data.bookingType,
         showroom_branch: data.bookingType === 'showroom' ? data.showroomBranch : null,
         delivery_address: deliveryAddressObj,
+        has_driver_license: data.hasDriverLicense ?? false,
     };
 };

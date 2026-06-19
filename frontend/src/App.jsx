@@ -4,18 +4,21 @@ import { AppProvider } from './contexts/AppContext';
 import { App as AntdApp } from 'antd';
 import { ThemeProvider } from './contexts/ThemeContext';
 import AuthInitializer from './components/AuthInitializer';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
     return (
         <BrowserRouter>
-            <ThemeProvider>
-                <AppProvider>
-                    <AntdApp>
-                        <AuthInitializer />
-                        <AppRoutes />
-                    </AntdApp>
-                </AppProvider>
-            </ThemeProvider>
+            <ErrorBoundary>
+                <ThemeProvider>
+                    <AppProvider>
+                        <AntdApp>
+                            <AuthInitializer />
+                            <AppRoutes />
+                        </AntdApp>
+                    </AppProvider>
+                </ThemeProvider>
+            </ErrorBoundary>
         </BrowserRouter>
     )
 }

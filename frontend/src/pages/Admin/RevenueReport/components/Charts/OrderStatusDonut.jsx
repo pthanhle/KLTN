@@ -1,35 +1,29 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
+import { STATUS_MAP } from '../../constants/revenue.constants';
+import { ChartTooltipWrapper } from './Shared/ChartTooltipWrapper';
 
-const STATUS_MAP = {
-    PENDING:    { label: 'Chờ duyệt',   color: '#f59e0b' },
-    CONFIRMED:  { label: 'Đã xác nhận', color: '#3b82f6' },
-    PROCESSING: { label: 'Đang xử lý',  color: '#8b5cf6' },
-    SHIPPED:    { label: 'Đang giao',    color: '#06b6d4' },
-    DELIVERED:  { label: 'Đã giao',     color: '#10b981' },
-    COMPLETED:  { label: 'Hoàn thành',  color: '#22c55e' },
-    CANCELLED:  { label: 'Đã hủy',      color: '#ef4444' },
-};
-
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({ active, payload, t }) => {
     if (!active || !payload?.length) return null;
     const entry = payload[0];
     return (
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl shadow-xl border border-slate-100 dark:border-white/10">
+        <ChartTooltipWrapper active={active} payload={payload}>
             <p className="text-sm font-bold" style={{ color: entry.payload.fill }}>{entry.name}</p>
-            <p className="text-lg font-black text-slate-800 dark:text-white">{entry.value} đơn</p>
-        </div>
+            <p className="text-lg font-black text-slate-800 dark:text-white">{entry.value} {t('đơn')}</p>
+        </ChartTooltipWrapper>
     );
 };
 
 export const OrderStatusDonut = ({ distribution }) => {
+    const { t } = useTranslation('adminRevenueReport');
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => { setMounted(true); }, []);
 
     const chartData = Object.entries(distribution || {})
         .filter(([, v]) => v > 0)
         .map(([key, value]) => ({
-            name: STATUS_MAP[key]?.label ?? key,
+            name: t(STATUS_MAP[key]?.label ?? key),
             value,
             fill: STATUS_MAP[key]?.color ?? '#94a3b8',
         }));
@@ -39,8 +33,8 @@ export const OrderStatusDonut = ({ distribution }) => {
     return (
         <section className="bg-white dark:bg-[#141416] p-6 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm h-full flex flex-col">
             <header className="mb-4">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Phân loại đơn hàng</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Tổng cộng {total} đơn trong kỳ</p>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">{t('Phân loại đơn hàng')}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('Tổng cộng {{count}} đơn trong kỳ', { count: total })}</p>
             </header>
 
             {chartData.length > 0 ? (
@@ -63,7 +57,7 @@ export const OrderStatusDonut = ({ distribution }) => {
                                             <Cell key={`cell-${index}`} fill={entry.fill} />
                                         ))}
                                     </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
+                                    <Tooltip content={<CustomTooltip t={t} />} />
                                 </PieChart>
                             </ResponsiveContainer>
                         )}
@@ -90,7 +84,7 @@ export const OrderStatusDonut = ({ distribution }) => {
                 </>
             ) : (
                 <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
-                    Không có dữ liệu
+                    {t('Không có dữ liệu')}
                 </div>
             )}
         </section>

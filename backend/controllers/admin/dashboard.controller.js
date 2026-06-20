@@ -75,11 +75,15 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         order_status: 'PENDING'
     })
 
-    const pendingAppointmentsCount = await ServiceAppointment.countDocuments({
-        status: 'PENDING'
+    const pendingAppointmentsCount = await Booking.countDocuments({
+        booking_type: { $in: ['service', 'maintenance'] },
+        booking_status: 'PENDING'
     })
 
-    const pendingTestDrivesCount = 0 // testDriveBookingModel not yet complete
+    const pendingTestDrivesCount = await Booking.countDocuments({
+        booking_type: 'test_drive',
+        booking_status: 'PENDING'
+    })
 
     const orderStatusStats = await Order.aggregate([
         {
@@ -104,9 +108,10 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         "inventory.available_stock": { $lt: 5 },
     }).select('name sku inventory images').sort({ 'inventory.available_stock': 1 }).limit(5);
 
-    const recentAppointments = await ServiceAppointment.find()
+    const recentAppointments = await Booking.find({ booking_type: { $in: ['service', 'maintenance'] } })
         .sort({ createdAt: -1 })
         .limit(5)
+        .populate('product_id', 'name sku images')
         .lean();
 
     const recentTestDrives = await Booking.find({ booking_type: 'test_drive' })
@@ -115,7 +120,6 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .populate('product_id', 'name sku images')
         .lean();
 
-    // Monthly revenue for the current year (bar chart)
     const monthlyRevenue = await Order.aggregate([
         {
             $match: {

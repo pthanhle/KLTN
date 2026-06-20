@@ -1,3 +1,4 @@
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -18,12 +19,16 @@ import {
 } from 'lucide-react';
 import { useAdminPendingCounts } from '../../../../services/queries/adminDashboard.queries';
 
-const BadgeIcon = ({ icon, count }) => {
-    if (!count) return icon;
+const BadgeIcon = ({ icon, count, className }) => {
+    if (!count) {
+        return React.cloneElement(icon, {
+            className: [icon.props.className, className].filter(Boolean).join(' ')
+        });
+    }
     return (
-        <span className="relative inline-flex">
+        <span className={`relative inline-flex ${className || ''}`}>
             {icon}
-            <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none shadow-sm">
+            <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none shadow-sm z-10">
                 {count > 99 ? '99+' : count}
             </span>
         </span>

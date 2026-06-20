@@ -42,9 +42,9 @@ class MainScaffold extends StatelessWidget {
             onTap: () => _goBranch(1),
           ),
           GlassNavItem(
-            icon: CupertinoIcons.calendar,
-            activeIcon: CupertinoIcons.calendar,
-            label: 'Lịch hẹn'.tr(),
+            icon: CupertinoIcons.doc_text,
+            activeIcon: CupertinoIcons.doc_text,
+            label: 'Hợp đồng'.tr(),
             isSelected: navigationShell.currentIndex == 2,
             onTap: () => _goBranch(2),
           ),

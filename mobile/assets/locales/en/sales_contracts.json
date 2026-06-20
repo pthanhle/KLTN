@@ -1,0 +1,11 @@
+{
+  "sales_contracts_title": "Contracts",
+  "status_all": "All",
+  "status_draft": "Draft",
+  "status_issued": "Pending Sign",
+  "status_signed": "Signed",
+  "status_cancelled": "Cancelled",
+  "status_paid": "Paid",
+  "status_delivered": "Delivered",
+  "status_unknown": "Unknown"
+}

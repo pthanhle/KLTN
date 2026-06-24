@@ -54,7 +54,7 @@ const CarDetailPage = () => {
                 <HeroSection car={car} t={t} />
             </div>
 
-            <StickyNav t={t} />
+            <StickyNav t={t} car={car} />
 
             <PriceAndColorSection
                 car={car}
@@ -83,6 +83,26 @@ const CarDetailPage = () => {
                             features={[{ title: '', desc: car.features[1].desc, image: car.features[1].image }]}
                             align="left"
                             subtitle={t('technology')}
+                        />
+                    )}
+
+                    {car.features[2] && (
+                        <FeatureSection
+                            id="performance"
+                            title={car.features[2].title}
+                            features={[{ title: '', desc: car.features[2].desc, image: car.features[2].image }]}
+                            align="right"
+                            subtitle={t('performance')}
+                        />
+                    )}
+
+                    {car.features[3] && (
+                        <FeatureSection
+                            id="features"
+                            title={car.features[3].title}
+                            features={[{ title: '', desc: car.features[3].desc, image: car.features[3].image }]}
+                            align="left"
+                            subtitle={t('features')}
                         />
                     )}
                 </>

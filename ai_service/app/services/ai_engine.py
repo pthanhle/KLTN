@@ -36,7 +36,7 @@ BOOKING_KEYWORDS = {
     "đặt lịch", "đặt hẹn", "book lịch", "hẹn dịch vụ", "lịch dịch vụ",
     "lịch bảo dưỡng", "bảo dưỡng xe", "đặt bảo dưỡng", "muốn đặt",
     "đặt lịch sửa", "đặt lịch rửa", "đặt lịch kiểm tra",
-    "lịch sửa xe", "lịch rửa xe", "đặt dịch vụ",
+    "lịch sửa xe", "lịch rửa xe", "đặt dịch vụ", "đặt lịch lái thử", "lái thử", "book test drive", "test drive",
 }
 
 PARTS_KEYWORDS = {
@@ -220,9 +220,9 @@ async def _extract_booking_details(message: str) -> dict | None:
         f'Tin nhắn: "{message}"\n\n'
         "Khung giờ hợp lệ (chọn đúng một): 08:00-10:00, 10:00-12:00, 13:00-15:00, 15:00-17:00\n"
         "Quy tắc khung giờ: sáng/8h/9h → 08:00-10:00 | 10h/11h → 10:00-12:00 | chiều/13h/14h → 13:00-15:00 | chiều muộn/15h/16h → 15:00-17:00\n"
-        "Loại dịch vụ: MAINTENANCE (bảo dưỡng định kỳ), REPAIR (sửa chữa), CAR_SPA (rửa/chăm sóc xe), INSPECTION (kiểm tra), OTHER\n\n"
+        "Loại dịch vụ: MAINTENANCE (bảo dưỡng định kỳ), REPAIR (sửa chữa), CAR_SPA (rửa/chăm sóc xe), INSPECTION (kiểm tra), TEST_DRIVE (lái thử), OTHER\n\n"
         "Chỉ trả về JSON hợp lệ, không có text nào khác:\n"
-        '{"service_type":"MAINTENANCE","booking_date":"YYYY-MM-DD hoặc null","time_slot":"khung giờ hoặc null",'
+        '{"service_type":"MAINTENANCE hoặc TEST_DRIVE...","booking_date":"YYYY-MM-DD hoặc null","time_slot":"khung giờ hoặc null",'
         '"vehicle_brand":"null nếu không đề cập","vehicle_model":"null nếu không đề cập",'
         '"vehicle_license_plate":"null nếu không đề cập","notes":"ghi chú nếu có","is_complete":true,"missing_info":[]}'
     )
@@ -240,7 +240,11 @@ async def _extract_booking_details(message: str) -> dict | None:
                 data["time_slot"] = None
                 missing.append("khung giờ mong muốn (sáng hoặc chiều)")
             if not data.get("service_type"):
-                missing.append("loại dịch vụ (bảo dưỡng, sửa chữa, rửa xe...)")
+                missing.append("loại dịch vụ (bảo dưỡng, sửa chữa, rửa xe, lái thử...)")
+            
+            if data.get("service_type") == "TEST_DRIVE" and not data.get("vehicle_model") and not data.get("vehicle_brand"):
+                missing.append("dòng xe muốn lái thử")
+
             for field in ["vehicle_brand", "vehicle_model", "vehicle_license_plate"]:
                 if data.get(field) == "null":
                     data[field] = None

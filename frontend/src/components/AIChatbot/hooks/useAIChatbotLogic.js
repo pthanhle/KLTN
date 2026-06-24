@@ -140,6 +140,22 @@ export const useAIChatbotLogic = (isOpen) => {
         if (!user) {
             throw new Error('Bạn cần đăng nhập để đặt lịch dịch vụ.');
         }
+
+        if (formData.service_type === 'TEST_DRIVE') {
+            const testDrivePayload = {
+                product_id: formData.product_id,
+                booking_type: 'test_drive',
+                test_drive_type: 'showroom',
+                showroom_branch: '1',
+                contact_phone: formData.contact_phone || '',
+                booking_date: formData.booking_date,
+                time_slot: formData.time_slot,
+                customer_note: formData.notes || '',
+                has_driver_license: true
+            };
+            return await BookingAPI.submitTestDrive(testDrivePayload);
+        }
+
         const payload = {
             booking_type: 'service',
             booking_date: formData.booking_date,

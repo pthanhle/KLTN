@@ -2,8 +2,8 @@ import { MOCK_PROFILE_CUSTOMER } from '@/pages/Shared/Profile/data/profile.mock'
 
 export const mockQuickActions = [
     { id: 1, labelKey: 'quick_action_pricing' },
-    { id: 2, labelKey: 'quick_action_booking' },
-    { id: 3, labelKey: 'quick_action_consult' },
+    { id: 2, labelKey: 'quick_action_consult' },
+    { id: 3, labelKey: 'quick_action_booking' },
     { id: 4, labelKey: 'quick_action_sales' }
 ];
 

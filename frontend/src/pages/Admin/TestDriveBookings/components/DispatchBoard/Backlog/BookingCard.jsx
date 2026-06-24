@@ -30,6 +30,11 @@ export const BookingCardUI = ({ booking, t, isDragging, style, setNodeRef, liste
                 <div className="min-w-0">
                     <p className="font-bold text-slate-800 dark:text-white text-base truncate">{booking.fullName}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{booking.phoneNumber}</p>
+                    {(booking.bookingCode || booking.booking_code) && (
+                        <p className="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 mt-0.5">
+                            {booking.bookingCode || booking.booking_code}
+                        </p>
+                    )}
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
                     <div className="flex items-center gap-1.5">

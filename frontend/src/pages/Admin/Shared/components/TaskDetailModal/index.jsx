@@ -185,10 +185,6 @@ export const TaskDetailModal = ({ task, onClose }) => {
                     >
                         {t('adminStaffDetail:btn_close', 'Đóng')}
                     </button>
-                    <button className="px-4 py-2 rounded-lg text-sm font-medium bg-yellow-500 hover:bg-yellow-600 text-slate-900 shadow-sm transition-colors flex items-center gap-2">
-                        <AlertCircle size={16} />
-                        {t('adminStaffDetail:btn_remind_staff', 'Nhắc nhở nhân viên')}
-                    </button>
                 </div>
 
             </div>

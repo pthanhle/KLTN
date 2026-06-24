@@ -6,6 +6,7 @@ import asyncHandler from 'express-async-handler'
 import mongoose from 'mongoose'
 import emailQueue from '../../queues/emailQueue.js'
 import { testDriveConfirmationEmail } from '../../utils/emailTemplates.js'
+import { createAndEmitNotification } from '../../utils/notificationHelper.js'
 
 const generateBookingCode = (prefix = 'BK') => {
     const rand = Math.random().toString(36).substring(2, 8).toUpperCase()
@@ -140,14 +141,12 @@ export const createBooking = asyncHandler(async (req, res) => {
     })
 
     try {
-        await Notification.create({
-            user_id: req.user._id,
+        await createAndEmitNotification(req.user._id, {
             title: 'Đặt lịch thành công',
             message: `Bạn đã đặt lịch thành công. Mã: ${booking_code}. Chờ xác nhận từ đội ngũ TT AUTO.`,
             type: 'BOOKING',
             reference_id: booking_code,
             reference_link: '/profile/services',
-            is_read: false,
         })
     } catch (e) {
         console.error('Notification error:', e)
